@@ -10,6 +10,7 @@ header = """\n
 \\newcommand{\schemename}{{\sf %s}}
 \\newcommand{\schemeref}{%s_proof}
 \\newcommand{\schemecite}{\cite{REF}}
+\\newcommand{\secretkey}{ %s }
 \\newcommand{\listofbfs}{ %s }
 \\newcommand{\listofmskvalues}{ %s }
 \\newcommand{\listofrandomvalues}{ %s }
@@ -62,7 +63,7 @@ class LatexCodeGenerator:
             # matches word + numbers => 'x1' => 'x_1'
             res = re.findall(r"[a-zA-Z]+|\d+", name)
             if len(res) == 2:
-                return res[0] + "_" + res[1]
+                return name.replace(res[0] + res[1], res[0] + "_" + res[1])
             else:
                 for i,j in self.latexVars.items():
                     if i in name: return name.replace(i, j)
@@ -170,9 +171,10 @@ class GenerateProof:
         self.stepPrefix = prefixStr
         return
         
-    def initLCG(self, bfList, mskList, randList, keyDefsList, originalKeyNodes, transformKeyNodes, pseudoKey):
+    def initLCG(self, skList, bfList, mskList, randList, keyDefsList, originalKeyNodes, transformKeyNodes, pseudoKey):
         if self.lcg == None:
             self.lcg = LatexCodeGenerator()
+            self.skList = skList
             self.bfList = bfList
             self.mskList = mskList
             self.randList = randList
@@ -220,9 +222,13 @@ class GenerateProof:
 #        return
     
     # starting point
-    def proofHeader(self, title, list_bfs, list_msk, list_rand, key_defs, original_key, transform_key, pseudo_key):
-        list_bfs_str = ""; list_msk_str = ""; list_rand_str = ""; key_defs_str = ""; 
+    def proofHeader(self, title, list_sks, list_bfs, list_msk, list_rand, key_defs, original_key, transform_key, pseudo_key):
+        list_sks_str = ""; list_bfs_str = ""; list_msk_str = ""; list_rand_str = ""; key_defs_str = ""; 
         original_key_str = ""; transform_key_str = ""; pseudo_key_str = ""
+        # list of msk values
+        for i in list_sks:
+            list_sks_str += i + ","
+        list_sks_str = list_sks_str[:len(list_sks_str)-1]
         # list of msk values
         for i in list_bfs:
             list_bfs_str += i + ","
@@ -252,7 +258,7 @@ class GenerateProof:
             pseudo_key_str += i + ","
         pseudo_key_str = pseudo_key_str[:len(pseudo_key_str)-1]
         
-        result = header % (title, title, list_bfs_str, list_msk_str, list_rand_str, key_defs_str, original_key_str, transform_key_str, pseudo_key_str)
+        result = header % (title, title, list_sks_str, list_bfs_str, list_msk_str, list_rand_str, key_defs_str, original_key_str, transform_key_str, pseudo_key_str)
         return result
 
     def proofBody(self, step, data):
@@ -268,7 +274,7 @@ class GenerateProof:
 
     def writeConfig(self, latex_file):
         title = string.capwords(latex_file)
-        outputStr = self.proofHeader(title, self.bfList, self.mskList, self.randList, self.keyDefsList, self.originalKeyList, self.transformKeyList, self.pseudoKey)        
+        outputStr = self.proofHeader(title, self.skList, self.bfList, self.mskList, self.randList, self.keyDefsList, self.originalKeyList, self.transformKeyList, self.pseudoKey)        
 #        outputStr = self.proofHeader(title, self.constants, self.sig_vars, self.lcg_data['indiv'], self.lcg_data['batch'])
 #        for i in range(self.__lcg_steps):
 #            outputStr += self.proofBody(i+1, self.lcg_data[i])

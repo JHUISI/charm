@@ -14,7 +14,8 @@
 
 \begin{document}
 % input for automatically generated outsource proof
-\input{proof_genwaters09}
+%\input{proof_genwaters09}
+\input{proof_gendsewaters09_test}
 
 \newtheorem{definition}{Definition}
 \newtheorem{theorem}{Theorem}
@@ -58,12 +59,14 @@
 \newcommand{\Sig}{\mathsf{Sig}}
 \newcommand{\G}{\mathsf{Gen}}
 \newcommand{\SK}{\mathsf{SK}}
+\newcommand{\CT}{\mathsf{CT}}
 \newcommand{\Screen}{\mathsf{Screen}}
 \newcommand{\Setup}{\mathsf{Setup}}
 \newcommand{\Keygen}{\mathsf{Keygen}}
 \newcommand{\KeygenOut}{\mathsf{KeygenOut}}
 \newcommand{\Transform}{\mathsf{Transform}}
 \newcommand{\Decrypt}{\mathsf{Decrypt}}
+\newcommand{\Decout}{\mathsf{DecOut}}
 \newcommand{\compareequals}{\stackrel{?}{=}}
 \newcommand{\numsigs}{\eta}
 
@@ -74,22 +77,34 @@
 
 \section{$\KeygenOut$ Proof}
 
-Let $\listofmskvalues$ be the MSK variable(s) and $\listofrandomvalues$ be randomness selected in the $\Keygen$ algorithm. The $\Keygen$ algorithm runs to obtain the secret key, $\SK$ and is computed as follows:
+Let $\listofmskvalues$ be the MSK variable(s) and $\listofrandomvalues$ be randomness selected in the $\Keygen$ algorithm. The $\Keygen$ algorithm runs to obtain the secret key, \\ $\SK = \{\secretkey\}$ and is computed as follows:
 
 \begin{description}
-\item {\sf SK}: \begin{equation}  \originalkey \end{equation}
+\item {\sf SK}: \begin{multline*}  \originalkey \end{multline*}
 \end{description}
 
 \noindent
 The $\KeygenOut$ algorithm selects blinding factors, $\listofbfs \in \Zp^*$. Let $\keydefinitions$ be the new MSK variables and random values selected in $\KeygenOut$ and let the new $\SK'$ be computed as follows:
 
 \begin{description}
-\item {\sf SK'}: \begin{equation}  \transformkey \end{equation}
+\item {\sf SK'}: \begin{multline*}  \transformkey \end{multline*}
 \end{description}
 
 \noindent
 The new $\SK'$ has the same uniform distribution as a randomly generated pseudo-key ($\pseudokey$) without knowledge of the original $\Keygen$. Therefore, the $\SK'$ provides no benefit to an adversary.
 
 \section{$\Transform$ Proof}
+
+In the ${\schemename}$ scheme, we show the relevant portions to our transformation in the $\Decrypt$ algorithm. The ciphertext, $\CT = \{\ciphertext\}$ and the $\SK = \{\secretkey\}$. 
+
+%\begin{description}
+%\item {Step 1: Compute tag} \begin{equation*} tag =  \end{equation*}
+%\end{description}
+\gutsofdecrypt
+
+% Rework this text...
+Then, we show how the computation of the original $\Decrypt$ algorithm is distributed between the $\Transform$ algorithm and the $\Decout$ algorithm.
+
+\gutsoftransform
 
 \end{document}

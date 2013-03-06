@@ -1287,37 +1287,53 @@ def instantiateBFSolver(config, assignInfo):
     #os.system("rm -f " + name + " " + name + "c")
     # PRELIMINARY PROOF GEN CODE FOR TRANSFORM KEY
     skList = keygenElemToSMTExp[ str(config.keygenSecVar) ]
+    skList.sort()
     keyDefs = []
     bfList = []
+    SKList = []
     originalKeyNodes = []
     transformKeyNodes = []
     pseudoKey = []
     for i in skList:
         skElem = bfMap[ i ]
-        thePseudoKey =  i + "''"
-        for j, k in skElem.items():
-            J = getLatexVar(j)
-            bfStr = "{\sf " + getLatexVar(k) + "}"
-            theDef = J + "' = {" + J + " \cdot " + bfStr + "}"
-            if theDef not in keyDefs: keyDefs.append( theDef )
-            if bfStr not in bfList: bfList.append( bfStr )
+        skLatex = getLatexVar(i)
+        SKList.append(skLatex)
+        thePseudoKey =  skLatex + "''"
         if thePseudoKey not in pseudoKey: pseudoKey.append( thePseudoKey )
         (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, i)
-        resNode = varInfoObj.getAssignBaseElemsOnly()
-        resNode2 = BinaryNode.copy(resNode)
-        for j, k in skElem.items():
-            InPlaceReplaceAttr(resNode2, j, j + "'")
-        originalKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i), resNode) ) # I + " = " + str(resNode) )
-        transformKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i + "'"), resNode2) ) # I + " = " + str(resNode2) )
-        print("node: ", resNode, type(resNode)) # need the symbolic executed version! 
-        
+        if type(skElem) == dict:
+            for j, k in skElem.items():
+                J = getLatexVar(j)
+                bfStr = "{\sf " + getLatexVar(k) + "}"
+                theDef = J + "' = {" + J + " \cdot " + bfStr + "}"
+                if theDef not in keyDefs: keyDefs.append( theDef )
+                if bfStr not in bfList: bfList.append( bfStr )
+            resNode = varInfoObj.getAssignBaseElemsOnly()
+            resNode2 = BinaryNode.copy(resNode)
+            for j, k in skElem.items():
+                InPlaceReplaceAttr(resNode2, j, j + "'")
+            originalKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i), resNode) ) # I + " = " + str(resNode) )
+            transformKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i + "'"), resNode2) ) # I + " = " + str(resNode2) )
+            print("node: ", resNode, type(resNode)) # need the symbolic executed version! 
+        else:
+            print("UNIQUE BF: ", skElem)
+            bfStr = "{\sf " + getLatexVar(skElem) + "}"
+            if bfStr not in bfList: bfList.append( bfStr )
+            resNode = varInfoObj.getAssignBaseElemsOnly()            
+            theDef = getLatexVar(i) + "' = (" + getLatexVar(i) + " ) ^ { " + bfStr + "}"
+            if theDef not in keyDefs: keyDefs.append( theDef )
+            originalKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i), resNode) ) # I + " = " + str(resNode) )
+            exp = BinaryNode(ops.EXP, resNode, BinaryNode(bfStr))
+            transformKeyNodes.append( BinaryNode(ops.EQ, BinaryNode(i + "'"), exp) ) # I + " = " + str(resNode2) )
+
+    print("\secretkey = ", SKList)
     print("\\blindingfactors = ", bfList)
     print("\keydefinitions =", keyDefs)
     print("\originalkey = ", originalKeyNodes)
     print("\\transformkey = ", transformKeyNodes)
     print("\pseudokey = ", pseudoKey, "\n")
     proof = GenerateProof()
-    proof.initLCG(bfList, mskVars, rndVars, keyDefs, originalKeyNodes, transformKeyNodes, pseudoKey)
+    proof.initLCG(SKList, bfList, mskVars, rndVars, keyDefs, originalKeyNodes, transformKeyNodes, pseudoKey)
     proof.writeProof(sdlName)
     #print(results.resultDictionary)
     os.system("rm -f " + name + "*")

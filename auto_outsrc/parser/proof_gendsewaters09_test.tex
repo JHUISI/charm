@@ -1,0 +1,106 @@
+
+
+\catcode`\^ = 13 \def^#1{\sp{#1}{}}
+\newcommand{\newln}{\\&\quad\quad{}}
+\newcommand{\schemename}{{\sf Dsewaters09}}
+\newcommand{\schemeref}{Dsewaters09_proof}
+\newcommand{\schemecite}{\cite{REF}}
+\newcommand{\secretkey}{ D_1,D_2,D_3,D_4,D_5,D_6,D_7,K,tag_k }
+\newcommand{\listofbfs}{ {\sf uf_0},{\sf bf_0},{\sf uf_1} }
+\newcommand{\listofmskvalues}{ \alpha,a_1 }
+\newcommand{\listofrandomvalues}{ r_1,r_2,z_2,z_1,id,tag_k }
+\newcommand{\keydefinitions}{ D_1' = (D_1 ) ^ { {\sf uf_0}},\alpha' = {\alpha \cdot {\sf bf_0}},z_1' = {z_1 \cdot {\sf bf_0}},r_2' = {r_2 \cdot {\sf bf_0}},r_1' = {r_1 \cdot {\sf bf_0}},z_2' = {z_2 \cdot {\sf bf_0}},K' = (K ) ^ { {\sf uf_1}},tag_k' = {tag_k \cdot {\sf bf_0}} }
+\newcommand{\originalkey}{ D_1 = g^{\alpha \cdot a_1} \cdot v^{(r_1 + r_2)},D_2 = g^{-\alpha} \cdot v_1^{(r_1 + r_2)} \cdot g^{z_1},D_3 = g^{b \cdot -z_1},D_4 = v_2^{(r_1 + r_2)} \cdot g^{z_2},D_5 = g^{b \cdot -z_2},\\D_6 = g^{b \cdot r_2},D_7 = g^{r_1},K = (u^{id} \cdot w^{tag_k} \cdot h)^{r_1},tag_k = tag_k }
+\newcommand{\transformkey}{ D_1' = (g^{\alpha \cdot a_1} \cdot v^{(r_1 + r_2)})^{{{\sf uf_0}}},D_2' = g^{-\alpha'} \cdot v_1^{(r_1' + r_2')} \cdot g^{z_1'},D_3' = g^{b \cdot -z_1'},D_4' = v_2^{(r_1' + r_2')} \cdot g^{z_2'},D_5' = g^{b \cdot -z_2'},\\D_6' = g^{b \cdot r_2'},D_7' = g^{r_1'},K' = u^{id} \cdot w^{tag_k} \cdot h^{r_1 \cdot {{\sf uf_1}}},tag_k' = tag_k' }
+\newcommand{\pseudokey}{ D_1'',D_2'',D_3'',D_4'',\\D_5'',D_6'',D_7'',K'',tag_k'' }
+
+% transform commands
+\newcommand{\ciphertext}{ C_1,C_2,C_3,C_4,C_5,C_6,C_7,E_1,E_2,tag_c }
+
+% showing the decrypt routine
+\newcommand{\gutsofdecrypt}{
+\medskip \noindent
+{\bf  Step 1:} Compute tag:
+\begin{equation}
+tag = (tag_c - tag_k)^{-1}
+\end{equation}
+\medskip \noindent
+{\bf  Step 2:} Compute $A_1$:
+\begin{equation}
+A_1 = e(C_1, D_1) \cdot e(C_2, D_2) \cdot e(C_3, D_3) \cdot e(C_4, D_4) \cdot e(C_5, D_5)
+\end{equation}
+\medskip \noindent
+{\bf  Step 3:} Compute $A_2$:
+\begin{equation}
+A_2 = e(C_6, D_6) \cdot e(C_7, D_7)
+\end{equation}
+\medskip \noindent
+{\bf  Step 4:} Compute $A_3$:
+\begin{equation}
+A_3 = A_1 / A_2
+\end{equation}
+\medskip \noindent
+{\bf  Step 5:} Compute $A_4$:
+\begin{equation}
+A_4 = e(E_1, D_7) / e(E_2, K)
+\end{equation}
+\medskip \noindent
+{\bf  Step 6:} Compute $R_0$:
+\begin{equation}
+R_0 = A_4 ^{tag}
+\end{equation}
+\medskip \noindent
+{\bf  Step 7:} Compute $R_1$:
+\begin{equation}
+R_1 = A_3 / R_0
+\end{equation}
+\medskip \noindent
+{\bf  Step 8:} Compute M:
+\begin{equation}
+M = C_0 / R_1
+\end{equation}
+}
+
+\newcommand{\gutsoftransform}{
+\medskip \noindent
+{\bf  Step 1:} Compute tag:
+\begin{equation}
+tag = (tag_c - tag_k)^{-1}
+\end{equation}
+\medskip \noindent
+{\bf  Step 2:} Compute $A_1$:
+\begin{equation}
+BT_1 = e(C_1, D_1'), BT_2 = e(C_2, D_2'), BT_3 = e(C_3, D_3') \cdot e(C_5, D_5'), BT_4 = e(C_4, D_4')
+\end{equation}
+\medskip \noindent
+{\bf  Step 3:} Compute $A_2$:
+\begin{equation}
+A_2 = e(C_6, D_6') \cdot e(C_7, D_7')
+\end{equation}
+\medskip \noindent
+{\bf  Step 4:} Compute $A_3$:
+\begin{equation}
+A_3 = A_1 / A_2
+\end{equation}
+\medskip \noindent
+{\bf  Step 5:} Compute $A_4$:
+\begin{equation}
+A_4 = e(E_1, D_7') / e(E_2, K')
+\end{equation}
+\medskip \noindent
+{\bf  Step 6:} Compute $R_0$:
+\begin{equation}
+R_0 = A_4 ^{tag}
+\end{equation}
+%\medskip \noindent
+%{\bf  Step 7:} Compute $R_1$:
+%\begin{equation}
+%R_1 = A_3 / R_0
+%\end{equation}
+%\medskip \noindent
+%{\bf  Step 8:} Compute M:
+%\begin{equation}
+%M = C_0 / R_1
+%\end{equation}
+}
+
