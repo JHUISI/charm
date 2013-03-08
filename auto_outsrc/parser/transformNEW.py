@@ -1,6 +1,7 @@
 import sdlpath
 from sdlparser.SDLParser import *
 from outsrctechniques import *
+from outsrcproof import *
 #from keygen import processListOrExpandNodes
 
 from SDLPreProcessor import hasPairingsSomewhere
@@ -36,6 +37,9 @@ nilType = 'nil'
 singleBF = False
 
 canCollapseThisForLoop = False
+
+latexOutputString = ""
+latexStepCounter = 0
 
 def getRightSideOfStringAssignStatement(inputString):
     inputStringSeparated = inputString.split(" := ")
@@ -924,8 +928,15 @@ def determineIfWeCanCollapseThisForLoop(astNodes, lineNo, varsThatAreBlindedDict
 
     canCollapseThisForLoop = True
 
+def prepareLatexOutputString():
+    global latexOutputString
+
+    latexOutputString += "\\newcommand{\\gutsoftransform}{\n"
+    latexOutputString += "\\medskip \\noindent\n"
+
 def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     global currentNumberOfForLoops, withinForLoop, iterationNo, atLeastOneForLoop, writeToDecout
+    global latexOutputString, latexStepCounter
 
     #print(varsThatAreBlindedDict)
 
@@ -1028,10 +1039,14 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     print(ctVarsThatNeedBuckets)
     '''
 
-
+    prepareLatexOutputString()
+    latexCodeGenObj = LatexCodeGenerator()
 
     #main loop
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
+        latexStepCounter += 1
+        latexOutputString += "{\\bf  Step " + str(latexStepCounter) + ":}"
+        print(latexCodeGenObj.print_statement(astNodes[lineNo - 1]))
         currentNode = astNodes[lineNo - 1]
         makeSecretKeyBlindedNameReplacements(currentNode, secretKeyElements)
         if (currentNode.type == ops.NONE):
@@ -1201,3 +1216,5 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     removeRangeFromLinesOfCode(getStartLineNoOfFunc(config.decryptFuncName), getEndLineNoOfFunc(config.decryptFuncName))
 
     parseLinesOfCode(getLinesOfCode(), False)
+
+    print(latexOutputString)

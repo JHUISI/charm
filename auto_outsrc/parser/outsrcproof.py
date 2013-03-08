@@ -287,3 +287,7 @@ class GenerateProof:
         f.write(output)
         f.close()
         return True
+
+    #def appendDecryptToProof(self, latex_file):
+        #f = open('proof_gen' + latex_file + '.tex', 'a')
+        #output = 
