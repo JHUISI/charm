@@ -10,10 +10,10 @@
 
 # 4. Label ciphertext elements and identify all the variables that can be moved to G1 vs. G2: 
 #     - must verify that we don't compromise on the security
-import sdlpath, sys, os, random, string, re
+import src.sdlpath, sys, os, random, string, re, importlib
 import sdlparser.SDLParser as sdl
 from sdlparser.SDLang import *
-from outsrctechniques import SubstituteVar, SubstitutePairings
+from src.outsrctechniques import SubstituteVar, SubstitutePairings
 
 assignInfo = None
 SHORT_KEYS = "keys" # for
@@ -31,6 +31,7 @@ G2Prefix = "G2"
 length = 5 # length of temporary file
 oldListTypeRefs = {}
 newListTypeRefs = {}
+loc = "src"
 
 class GetPairingVariables:
     def __init__(self, list1, list2):
@@ -262,8 +263,10 @@ def instantiateSolver(variables, clauses, constraints, mofnConstraints, bothCons
     name = ""
     for i in range(length):
         name += random.choice(string.ascii_lowercase + string.digits)
+    newName = loc + "." + name
     name += ".py"
-    f = open(name, 'w')
+    fileTarget = loc + "/" + name
+    f = open(fileTarget, 'w')
     f.write(outputVariables)
     f.write(outputClauses)
     if outputForBoth != "": f.write(outputForBoth)
@@ -271,16 +274,15 @@ def instantiateSolver(variables, clauses, constraints, mofnConstraints, bothCons
     f.write(outputConstraints)
     f.close()
     
-    os.system("python2.7 z3solver.py %s" % name)
-    newName = name.split('.')[0]
-    results = __import__(newName)
+    os.system("python2.7 %s/z3solver.py %s/%s" % (loc, loc, name))
+    results = importlib.import_module(newName) #__import__(newName)
     if(not results.satisfiable):
-        #os.system("rm -f " + name + "*")
+        os.system("rm -f " + fileTarget + "*")
         print("SAT solver could not find a suitable solution. Change configuration and try again!")
         return results.satisfiable, None
     
     print(results.resultDictionary)
-    #os.system("rm -f " + name + "*")    
+    os.system("rm -f " + fileTarget + "*")
     return results.satisfiable, results.resultDictionary
 
 def getAssignmentForName(var, varTypes):
@@ -407,7 +409,7 @@ def searchForSolution(short, constraintList, txor, varTypes, conf):
     return fileSuffix, resultDict
 
 
-def main(sdlFile, config, sdlVerbose=False):
+def runAutoGroup(sdlFile, config, sdlVerbose=False):
     sdl.parseFile2(sdlFile, sdlVerbose, ignoreCloudSourcing=True)
     global assignInfo
     assignInfo = sdl.getAssignInfo()
@@ -1070,4 +1072,4 @@ if __name__ == "__main__":
         sdl.masterPubVars = configModule.masterPubVars
         sdl.masterSecVars = configModule.masterSecVars
             
-    main(sdl_file, configModule, sdlVerbose)
+    runAutoGroup(sdl_file, configModule, sdlVerbose)

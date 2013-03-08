@@ -1,6 +1,7 @@
 from __future__ import print_function
 from z3 import *
 from itertools import combinations
+import importlib
 
 """
 format of config file:
@@ -33,9 +34,14 @@ satisfiableKeyword = "satisfiable"
 
 def readConfig(filename):
     print("Importing file: ", filename)
-    file = filename.split('.')[0]
+    file = filename.split('.')[0].split('/')
 
-    fileVars = __import__(file)
+    if len(file) == 2:
+        print(file)
+        fileVars = importlib.import_module(file[1])
+    else:
+        fileVars = importlib.import_module(file[0])
+        
     fileKeys = dir(fileVars)
     return _readConfig(fileVars, fileKeys)
 

@@ -1,4 +1,4 @@
-import sdlpath
+import src.sdlpath
 from SDLParser import *
 from SDLang import *
 
