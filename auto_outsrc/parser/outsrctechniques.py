@@ -1585,16 +1585,18 @@ def CombinePairings(nodeList, _verbose=False):
     # combine then split pairings
     mulNode = AbstractTechnique.createMulFromAList(nodeList)
     equation = BinaryNode(ops.EQ_TST, mulNode, BinaryNode("1"))
+    combinedPairings = False
     
     tech6 = PairInstanceFinderImproved()
     ASTVisitor(tech6).preorder(equation)
     if tech6.testForApplication(): 
         tech6.makeSubstitution(equation)
+        combinedPairings = True
   
     if _verbose: print("Result:\t", equation.left)
     getPair = GetPairings()
     ASTVisitor(getPair).preorder(equation)
-    return getPair.getList()
+    return getPair.getList(), combinedPairings
 
 def PEMDAS(node):
     if (type(node) is str):

@@ -85,8 +85,10 @@ def getCTVarNames():
                 ctVarNames.append(listNode)
     else:
         sys.exit("getCTVarNames in transformNEW.py:  output of encrypt is neither an attribute nor a list.")
-
-    return ctVarNames
+    print("getCTVarNames: ", ctVarNames)
+    (funcName, varInfoObj) = getVarNameEntryFromAssignInfo(assignInfo, ctVarNames[0])
+    ctList = varInfoObj.getAssignNode().getRight().listNodes
+    return ctVarNames, ctList
 
 #TODO:  right now, this function is verbatim the same as the one in keygen.py.
 #Consolidate so there's only one copy of the code.
@@ -473,7 +475,7 @@ def getIndexVarNameFromBinaryNode(node, varName):
 
     return firstPossibleName
 
-def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, currentLineNo, astNodes, config):
+def writeOutPairingCalcs(techApplied, groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, currentLineNo, astNodes, config):
     global transformListCounter, decoutListCounter, iterationNo
 
     decoutListCounter = transformListCounter
@@ -502,7 +504,7 @@ def writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNo
             lineForTransformLines += "{ " + str(currentNode.right.left) + " on ( "
 
         listOfPairings = groupedPairing[1]
-        listOfPairings = CombinePairings(listOfPairings)
+        listOfPairings, techApplied['CombinePairings'] = CombinePairings(listOfPairings)
         #print("Combined pairings for blinding factor ", groupedPairing[0], ":  ", listOfPairings)
         for pairing in listOfPairings:
             lineForTransformLines += str(pairing) + " * " 
@@ -928,13 +930,13 @@ def determineIfWeCanCollapseThisForLoop(astNodes, lineNo, varsThatAreBlindedDict
 
     canCollapseThisForLoop = True
 
-def prepareLatexOutputString():
-    global latexOutputString
+#def prepareLatexOutputString():
+#    global latexOutputString
+#
+#    latexOutputString += "\\newcommand{\\gutsoftransform}{\n"
+#    latexOutputString += "\\medskip \\noindent\n"
 
-    latexOutputString += "\\newcommand{\\gutsoftransform}{\n"
-    latexOutputString += "\\medskip \\noindent\n"
-
-def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
+def transformNEW(proof, varsThatAreBlindedDict, secretKeyElements, config):
     global currentNumberOfForLoops, withinForLoop, iterationNo, atLeastOneForLoop, writeToDecout
     global latexOutputString, latexStepCounter
 
@@ -944,9 +946,10 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
 
     seeIfSingleBF(varsThatAreBlindedDict)
 
-    ctVarNames = getCTVarNames()
-    #print(ctVarNames)
-    #sys.exit("test")
+    ctVarNames, ctList = getCTVarNames()
+    proof.setCTVars(ctList)
+    #print(ctVarNames, " := ", ctList)
+    #sys.exit(0)
 
     #addTransformFuncIntro()
     (stmtsDec, typesDec, depListDec, depListNoExponentsDec, infListDec, infListNoExponentsDec) = getFuncStmts(config.decryptFuncName)
@@ -985,6 +988,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     # get knownVars
     for lineNo in range((firstLineOfDecryptFunc + 1), (lastLineOfTransform + 1)):
         currentFullNode = astNodes[lineNo - 1]
+        originalNode = BinaryNode.copy(currentFullNode)
         makeSecretKeyBlindedNameReplacements(currentFullNode, secretKeyElements)
         if (str(currentFullNode.left) == inputKeyword):
             appendToKnownVars(currentFullNode.right, knownVars)
@@ -993,6 +997,7 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
             decoutRunningInputLine = createDecoutInputLine(currentFullNode.right, ctVarNames, allPossibleBlindingFactors)
             continue
         currentNode = currentFullNode.right
+        proof.setDecryptStep(originalNode)
         if (currentNode == None):
             continue
         if (currentNode.type == ops.EXPAND):
@@ -1039,14 +1044,14 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
     print(ctVarsThatNeedBuckets)
     '''
 
-    prepareLatexOutputString()
-    latexCodeGenObj = LatexCodeGenerator()
+#    prepareLatexOutputString()
+#    latexCodeGenObj = LatexCodeGenerator()
 
     #main loop
     for lineNo in range(startLineNoOfSearch, (lastLineOfTransform + 1)):
-        latexStepCounter += 1
-        latexOutputString += "{\\bf  Step " + str(latexStepCounter) + ":}"
-        print(latexCodeGenObj.print_statement(astNodes[lineNo - 1]))
+#        latexStepCounter += 1
+#        latexOutputString += "{\\bf  Step " + str(latexStepCounter) + ":}"
+#        print(latexCodeGenObj.print_statement(astNodes[lineNo - 1]))
         currentNode = astNodes[lineNo - 1]
         makeSecretKeyBlindedNameReplacements(currentNode, secretKeyElements)
         if (currentNode.type == ops.NONE):
@@ -1054,15 +1059,16 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
         path_applied = []
         #if (hasPairingsSomewhere(currentNode) == True):
             #print("Unsimplified node:  ", currentNode)
-
+        techs_applied = {'SimplifySDLNode':None, 'applyTechnique11':None, 'GroupPairings':None}
         currentNode = SimplifySDLNode(currentNode, path_applied)
+        if(len(path_applied) > 0): techs_applied['SimplifySDLNode'] = True
         #if (hasPairingsSomewhere(currentNode) == True):
             #print("Simplified node:  ", currentNode)
 
         currentNodeTechnique11RightSide = applyTechnique11(currentNode)
         if (currentNodeTechnique11RightSide != None):
             currentNode.right = currentNodeTechnique11RightSide
-
+            techs_applied['applyTechnique11'] = True
         #if (hasPairingsSomewhere(currentNode) == True):
             #print("After Technique 11:  ", currentNode)
 
@@ -1095,11 +1101,13 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
 
             if ( (currentNode.type == ops.FOR) or (currentNode.type == ops.IF) ):
                 transformLines.append(str(currentNode) + "\nNOP\n")
+                proof.setTransformStep(currentNode, techs_applied)
                 if (writeToDecout == True):
                     decoutLines.append(str(currentNode) + "\nNOP\n")
                     addVarsUsedInDecoutToGlobalList(currentNode)
                     searchForCTVarsThatNeedBuckets(currentNode, ctExpandListNodes, ctVarsThatNeedBuckets)
             else:
+                proof.setTransformStep(currentNode, techs_applied)
                 transformLines.append(str(currentNode) + "\n")
                 if (writeToDecout == True):
                     decoutLines.append(str(currentNode) + "\n")
@@ -1124,7 +1132,8 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
         elif ( (len(currentNodePairings) > 0) and (areAllVarsOnLineKnownByTransform == True) ):
             groupedPairings = groupPairings(currentNodePairings, varsThatAreBlindedDict, config)
             #print("Grouped pairings:  ", groupedPairings)
-            writeOutPairingCalcs(groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, lineNo, astNodes, config)
+            writeOutPairingCalcs(techs_applied, groupedPairings, transformLines, decoutLines, currentNode, blindingVarsThatAreLists, lineNo, astNodes, config)
+            proof.setTransformStep(currentNode, techs_applied)
             if (groupedPairings[0][0] == []):
                 knownVars.append(str(currentNode.left))
         elif (areAllVarsOnLineKnownByTransform == True):
@@ -1217,4 +1226,5 @@ def transformNEW(varsThatAreBlindedDict, secretKeyElements, config):
 
     parseLinesOfCode(getLinesOfCode(), False)
 
-    print(latexOutputString)
+    #print(latexOutputString)
+    proof.writeProof()

@@ -1334,10 +1334,11 @@ def instantiateBFSolver(config, assignInfo):
     print("\pseudokey = ", pseudoKey, "\n")
     proof = GenerateProof()
     proof.initLCG(SKList, bfList, mskVars, rndVars, keyDefs, originalKeyNodes, transformKeyNodes, pseudoKey)
-    proof.writeProof(sdlName)
+    proof.setSDLName(sdlName)
+#    proof.writeProof(sdlName)
     #print(results.resultDictionary)
     os.system("rm -f " + name + "*")
-    return (bfMap, skBfMap)
+    return (bfMap, skBfMap, proof)
 
 def prepareDictForTransform(resultDictionary, config):
     retDict = {}
@@ -1407,26 +1408,12 @@ def keygen(file, config):
     stringEntriesInKeygenElemToSMTExp = removeStringEntriesFromKeygenElemToSMTExp(config)
     removeStringEntriesFromSKinKeygenElemToSMTExp(stringEntriesInKeygenElemToSMTExp, config)
 
-    bfMap, skBfMap = instantiateBFSolver(config, assignInfo)
-
-    #print("First BFSolver Result:  ", skBfMap)
-
-
+    bfMap, skBfMap, proof = instantiateBFSolver(config, assignInfo)
 
     for stringEntry in stringEntriesInKeygenElemToSMTExp:
         skBfMap[stringEntry] = nilType
-    
-    #print("BFSolver Results: ", skBfMap)
-    # produce proof
-    # generateTKProof(bfMap, config)
-
-    #print("skBfMap before group is ", skBfMap)
-
 
     skBfMap = applyGroupSharingOptimization(skBfMap, config)
-
-
-    #print("skBfMap after group is ", skBfMap)
 
     applyBlindingFactorsToScheme(skBfMap, config)
     secretKeyName = config.keygenSecVar
@@ -1462,7 +1449,7 @@ def keygen(file, config):
 
 
     startTime = time.clock()
-    transformNEW(resultDictionaryForTransform, secretKeyElements, config)
+    transformNEW(proof, resultDictionaryForTransform, secretKeyElements, config)
     endTime = time.clock()
     runningTime = (endTime - startTime) * 1000
     #print("Running time for TransformNew in ms is ", runningTime) 

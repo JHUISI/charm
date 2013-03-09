@@ -19,26 +19,20 @@ header = """\n
 \\newcommand{\\transformkey}{ %s }
 \\newcommand{\pseudokey}{ %s }
 """
-# schemename - title
-# schemeref - title
-# list of msk 
-# list of random values
-# key definitions
-# original key
-# transform key
 
-proof_header = """\n
-\\newcommand{\gutsoftheproof}{
-""" 
+headerCT = "\n\\newcommand{\ciphertext}{ %s }\n"
+
+header_transform = """\n
+\\newcommand{\gutsoftransform}{
+"""
+
+header_decrypt = """\n
+\\newcommand{\gutsofdecrypt}{
+"""
 proof_footer = "\n}\n"
-# pk variables : pk, g  (just print constants)
-# sig variables : h,sig  (easy as well in signature variable)
-# indiv eq => 'e(h,pk) = e(sig,g)' = easy
-# batch eq => e(\prod_{j=1}^{\numsigs} h_j^{\delta_j},pk) = e(\prod_{j= 1}^\numsigs sig_j^{\delta_j},g) 
-# needs => delta = {\delta_j}, \prod{j=1}^\numsigs == prod{j:=1, N}, 
 
 basic_step = """\medskip \\noindent
-{\\bf %s Step %d:} %s:
+{\\bf Step %d:} %s:
 \\begin{equation}
 %s
 \end{equation}
@@ -161,8 +155,10 @@ class LatexCodeGenerator:
 
 class GenerateProof:
     def __init__(self):
-        self.lcg_data = {} 
-        self.__lcg_steps = 0
+        self.__lcg_decrypt_data = {} 
+        self.__lcg_decrypt_count = 0
+        self.__lcg_transform_data = {} 
+        self.__lcg_transform_count = 0
         self.lcg = None
         self.stepPrefix = ''
     
@@ -186,6 +182,42 @@ class GenerateProof:
         else:
             # init'ed already
             return False
+    
+    def setSDLName(self, name):
+        self.latex_file = name
+        return
+    
+    def setCTVars(self, ctList):
+        self.ctList = ctList
+        return
+    
+    def setDecryptStep(self, node):
+        assert self.lcg != None, "LatexCodeGen not initialized."
+        msg = ""
+        if node.type == ops.EQ:
+            # check rhs
+            if node.right.type == ops.FUNC: return
+            msg = "Compute $" + self.lcg.print_statement(node.left) + "$"
+        self.__lcg_decrypt_data[ self.__lcg_decrypt_count ] = {'msg': msg, 'eq': self.lcg.print_statement( node ) }
+        self.__lcg_decrypt_count += 1
+        return
+    
+    def setTransformStep(self, node, techs):
+        assert self.lcg != None, "LatexCodeGen not initialized."
+        msg = ""
+        if node.type == ops.EQ:
+            # check rhs
+            if node.right.type == ops.FUNC: return
+            msg = "" # + self.lcg.print_statement(node.left) 
+            for i,j in techs.items():
+                if i == 'applyTechnique11':
+                    msg += "Unrolled the dot product, "
+                if i == 'SimplifySDLNode' and j != None:
+                    msg += "Simplified the equation, "
+            msg += "then computed $" + self.lcg.print_statement(node.left) + "$"
+        self.__lcg_transform_data[ self.__lcg_transform_count ] = {'msg': msg, 'eq': self.lcg.print_statement( node ) }
+        self.__lcg_transform_count += 1
+        return
     
 #    def setBreakPoint(self):
 #        self.lcg_data[ self.__lcg_steps ] = {} # how should this work?
@@ -226,62 +258,76 @@ class GenerateProof:
         list_sks_str = ""; list_bfs_str = ""; list_msk_str = ""; list_rand_str = ""; key_defs_str = ""; 
         original_key_str = ""; transform_key_str = ""; pseudo_key_str = ""
         # list of msk values
-        for i in list_sks:
-            list_sks_str += i + ","
-        list_sks_str = list_sks_str[:len(list_sks_str)-1]
+        list_sks_str = self.__toList(list_sks)
         # list of msk values
-        for i in list_bfs:
-            list_bfs_str += i + ","
-        list_bfs_str = list_bfs_str[:len(list_bfs_str)-1]
-        # list of msk values
-        for i in list_msk:
-            list_msk_str += self.lcg.getLatexVersion(i) + ","
-        list_msk_str = list_msk_str[:len(list_msk_str)-1]
-        # list of random values
-        for i in list_rand:
-            list_rand_str += self.lcg.getLatexVersion(i) + ","
-        list_rand_str = list_rand_str[:len(list_rand_str)-1]
+        list_bfs_str = self.__toList(list_bfs)
         # list of key definitions
-        for i in key_defs:
-            key_defs_str += i + ","
-        key_defs_str = key_defs_str[:len(key_defs_str)-1]
-        # original key definitions
-        for i in original_key:
-            original_key_str += self.lcg.print_statement(i)  + ","
-        original_key_str = original_key_str[:len(original_key_str)-1]
-        # transform key definition
-        for i in transform_key:
-            transform_key_str += self.lcg.print_statement(i) + ","
-        transform_key_str = transform_key_str[:len(transform_key_str)-1]
+        key_defs_str = self.__toList(key_defs)
         # pseudo key definition
-        for i in pseudo_key:
-            pseudo_key_str += i + ","
-        pseudo_key_str = pseudo_key_str[:len(pseudo_key_str)-1]
-        
+        pseudo_key_str = self.__toList(pseudo_key)
+        # list of msk values
+        list_msk_str = self.__toLaTeX(list_msk)
+        # list of random values
+        list_rand_str = self.__toLaTeX(list_rand)
+        # original key definitions
+        original_key_str = self.__toPrintStatement(original_key)
+        # transform key definition
+        transform_key_str = self.__toPrintStatement(transform_key)
+
         result = header % (title, title, list_sks_str, list_bfs_str, list_msk_str, list_rand_str, key_defs_str, original_key_str, transform_key_str, pseudo_key_str)
         return result
 
+    def __toLaTeX(self, _list):
+        _list_str = ""
+        for i in _list:
+            _list_str += self.lcg.getLatexVersion(i) + ","
+        _list_str = _list_str[:len(_list_str)-1]
+        return _list_str
+    
+    def __toList(self, _list):
+        _list_str = ""
+        for i in _list:
+            _list_str += i + ","
+        _list_str = _list_str[:len(_list_str)-1]
+        return _list_str
+    
+    def __toPrintStatement(self, _list):
+        _list_str = ""
+        for i in _list:
+            _list_str += self.lcg.print_statement(i) + ","
+        _list_str = _list_str[:len(_list_str)-1]
+        return _list_str
+    
     def proofBody(self, step, data):
-        pre_eq = data.get('preq')
-        cur_eq = data['eq']
-        step_prefix = data.get('stepPrefix')
-        if pre_eq != None:
-            result_eq = pre_eq + cur_eq
-        else: result_eq = cur_eq
-        result = basic_step % (step_prefix, step, data['msg'], result_eq)
+#        pre_eq = data.get('preq')
+#        step_prefix = data.get('stepPrefix')
+        result_eq = data['eq']
+        result = basic_step % (step, data['msg'], result_eq)
         #print('[STEP', step, ']: ', result)
         return result
 
     def writeConfig(self, latex_file):
         title = string.capwords(latex_file)
-        outputStr = self.proofHeader(title, self.skList, self.bfList, self.mskList, self.randList, self.keyDefsList, self.originalKeyList, self.transformKeyList, self.pseudoKey)        
-#        outputStr = self.proofHeader(title, self.constants, self.sig_vars, self.lcg_data['indiv'], self.lcg_data['batch'])
-#        for i in range(self.__lcg_steps):
-#            outputStr += self.proofBody(i+1, self.lcg_data[i])
-#        outputStr += footer
+        outputStr = self.proofHeader(title, self.skList, self.bfList, self.mskList, self.randList, self.keyDefsList, self.originalKeyList, self.transformKeyList, self.pseudoKey)
+        # add list of ciphertext names
+        outputStr += headerCT % self.__toLaTeX(self.ctList)
+        # build the decrypt portion of proof
+        outputStr += header_decrypt
+        for i in range(self.__lcg_decrypt_count):
+            outputStr += self.proofBody(i+1, self.__lcg_decrypt_data[i])
+        outputStr += proof_footer
+       # build the transform portion of proof 
+        outputStr += header_transform
+        for i in range(self.__lcg_transform_count):
+            outputStr += self.proofBody(i+1, self.__lcg_transform_data[i])
+        outputStr += proof_footer
         return outputStr
     
-    def writeProof(self, latex_file):
+    def writeProof(self, file=None):
+        if file == None:
+            latex_file = self.latex_file
+        else:
+            latex_file = file
         f = open('proof_gen' + latex_file + '.tex', 'w')
         output = self.writeConfig(latex_file)
         f.write(output)

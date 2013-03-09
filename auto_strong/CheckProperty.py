@@ -47,3 +47,4 @@ print("Evaluate: e(a, Y) == e(g, b) : ", M.evaluate(e(a, y) == e(g, b)))
 print("Evaluate: e(X, a) * e(X, b)^M == e(g, c) : ", M.evaluate(((e(x, a) * (e(x, b) * m)) == e(g, c))))
 
 #result1 = solve(verify1, verify2, m > 1, g > 1, a > 1, y > 1) #, x > 1)
+print("Simpify test: ", simplify(verify2))
