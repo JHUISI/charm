@@ -31,7 +31,7 @@ tt, xx, yy, mm = Ints('tt xx yy mm')
 #my_solver.add( And(m == 3, ))
 b = t * y
 #c = t * (x + (m * x * y))
-c = t * (xx + (m * xx * y))
+c = tt * (xx + (mm * xx * yy))
 
 
 #b = a ** y
