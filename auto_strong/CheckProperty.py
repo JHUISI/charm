@@ -87,7 +87,7 @@ s  = Then(t1, t2)
 
 g1 = Goal()
 g2 = Goal()
-#g.add(And(t*x + m*x*t*y == t*(xx + yy*m*xx), t > 1, y > 1, m > 1, x > 1, xx > 1, yy > 1, x != xx, y == yy) )
+##g.add(And(t*x + m*x*t*y == t*(xx + yy*m*xx), t > 1, y > 1, m > 1, x > 1, xx > 1, yy > 1, x != xx, y == yy) )
 g1.add(And( M.evaluate(verify1), t > 1, y > 1, yy > 1, y != yy) )
 g2.add(And( M.evaluate(verify2), t > 1, m > 1, x > 1, xx > 1, yy > 1, x != xx) )
 
