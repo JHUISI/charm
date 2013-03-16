@@ -29,9 +29,9 @@ tt, xx, yy, mm = Ints('tt xx yy mm')
 #my_solver.add( And(g == t, t != 0, t != 1) ) # , a > 1, a < p-1) )
 #my_solver.add( And(x == 3, y == 4, m == 5) )
 #my_solver.add( And(m == 3, ))
-b = t * y
+b = t * yy
 #c = t * (x + (m * x * y))
-c = tt * (xx + (mm * xx * yy))
+c = t * (xx + (m * xx * yy))
 
 
 #b = a ** y
@@ -47,8 +47,8 @@ print(M, "\n")
 #Verify2 = M.evaluate(((e(X, a) + (e(X, b**m)) == e(g, c))))
 #Verify2 = M.evaluate(e(X, a*(b ** m)) == e(g, c))
 
-verify1 = e(t, y) - e(1, b) == 0
-verify2 = (((e(x, t) + (e(x, b) * m))) - e(1, c) == 0)
+verify1 = e(t, y) == e(1, b)
+verify2 = (((e(x, t) + (e(x, b) * m))) == e(1, c))
 
 #print("Evaluate: e(a+b, c) == e(a, c+b) : ", m.evaluate(e(a+b, c) == e(a, c+b)))
 ##print(m.evaluate(e(a, c+1)))
@@ -78,5 +78,21 @@ Verify2 = simplify(M.evaluate(verify2), eq2ineq=False, ite_extra_rules=True, mul
 #else:
 #    print("FAILED: ", g.check())
 #max = 20
-solve_using(my_solver, verify1, verify2, t > 1, x > 1, y > 1, m > 1) #, And(t > 1, t < max), And(x > 1, x < max), And(y > 1, y < max), And(m > 1, m < max), x != xx)
+#solve_using(my_solver, verify1, verify2, t != 0, x != 0, y != 0, x != xx) #, And(t > 1, t < max), And(x > 1, x < max), And(y > 1, y < max), And(m > 1, m < max), x != xx)
 
+t1 = Tactic("qfnra-nlsat")
+t2 = Tactic("ctx-simplify")
+
+s  = Then(t1, t2)
+
+g1 = Goal()
+g2 = Goal()
+#g.add(And(t*x + m*x*t*y == t*(xx + yy*m*xx), t > 1, y > 1, m > 1, x > 1, xx > 1, yy > 1, x != xx, y == yy) )
+g1.add(And( M.evaluate(verify1), t > 1, y > 1, yy > 1, y != yy) )
+g2.add(And( M.evaluate(verify2), t > 1, m > 1, x > 1, xx > 1, yy > 1, x != xx) )
+
+print("Goal 1: ", g1)
+print("Result for G1: ",  s(g1) ) 
+print()
+print("Goal 2: ", g2)
+print("Result for G2: ",  s(g2) ) 
