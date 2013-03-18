@@ -2137,8 +2137,8 @@ void initpairing(void) 		{
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     if(st->dBench == NULL)
         CLEAN_EXIT;
+    Py_INCREF(st->dBench);
     dBench = st->dBench;
-//    Py_INCREF(dBench);
 
     dBench->bench_initialized = FALSE;
     Operations *cntr = (Operations *) malloc(sizeof(Operations));

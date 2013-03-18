@@ -1812,6 +1812,9 @@ void initelliptic_curve(void) 		{
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
+    if(st->dBench == NULL)
+        CLEAN_EXIT;
+    Py_INCREF(st->dBench);
     dBench = st->dBench;
     dBench->bench_initialized = FALSE;
     dBench->op_add = 0;	dBench->op_sub = 0;
