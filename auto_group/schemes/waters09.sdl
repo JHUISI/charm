@@ -1,5 +1,6 @@
 name := waters09
 setting := symmetric
+short := keys
 
 BEGIN :: types
 policy_str := str
