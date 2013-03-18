@@ -70,6 +70,9 @@ typedef enum Group GroupType;
 static Benchmark *dBench;
 #endif
 
+#define PrintPyRef(msg, o) printf("%s:" #msg " ref cnt = '%i'\n", __FUNCTION__, (int) Py_REFCNT(o));
+
+
 PyTypeObject ElementType;
 PyTypeObject PairingType;
 static PyObject *ElementError;

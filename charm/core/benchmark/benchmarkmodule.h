@@ -72,24 +72,6 @@ typedef enum Measure MeasureType;
 #define _PAIR_OPT		"Pair"
 #define _GRAN_OPT		"Granular"
 
-// for recording native time
-#ifdef BENCHMARK_ENABLED
-#define START_CLOCK(object) \
-if(object->native_option) { \
-	PyStartTBenchmark(NATIVE_TIME, object); \
-}
-
-#define STOP_CLOCK(object) \
-if(object->native_option) { \
-	PyStopTBenchmark(NATIVE_TIME, object); \
-}
-#else
-
-#define START_CLOCK(object) /* ... */
-#define STOP_CLOCK(object) /* ... */
-
-#endif
-
 typedef struct {
 	PyObject_HEAD
 
@@ -129,24 +111,12 @@ PyObject *Retrieve_result(Benchmark *self, char *option);
 #define PyBenchmark_API_pointers 6
 
 #ifdef BENCHMARK_ENABLED
-#define START_NATIVE(bench)  \
-    if(bench->bench_initialized && bench->native_option) { \
-	PyStartTBenchmark(NATIVE_TIME, bench); }
-
-#define STOP_NATIVE(bench)  \
-	if(bench->bench_initialized && bench->native_option) {  \
-	PyStopTBenchmark(NATIVE_TIME, bench); }
-
 #define UPDATE_BENCHMARK(option, bench)   \
 	if(bench->bench_initialized) {	   \
 	PyUpdateBenchmark(option, bench); }
 
 #else
-
-#define START_NATIVE(bench)  /* ... */
-#define STOP_NATIVE(bench) /* ... */
 #define UPDATE_BENCHMARK(option, bench) /* ... */
-
 #endif
 
 #ifdef BENCHMARK_MODULE
@@ -245,14 +215,6 @@ PyObject *func_name(PyObject *self, PyObject *args) { \
 	debug("Invalid benchmark idenifier.\n"); }	\
 	Py_RETURN_FALSE;	}
 
-
-#define InitClear(bench)  \
-	bench->bench_initialized = bench->granular_option = FALSE; \
-	bench->op_add = bench->op_sub = bench->op_mult = 0;	\
-	bench->op_div = bench->op_exp = bench->op_pair = 0; \
-	bench->native_time_ms = bench->cpu_time_ms = bench->real_time_ms = 0.0; \
-	bench->identifier = -1;
-
 #define ADD_BENCHMARK_OPTIONS(m)		\
 	PyModule_AddStringConstant(m, "CpuTime", "CpuTime");		\
 	PyModule_AddStringConstant(m, "RealTime", "RealTime");		\
@@ -261,7 +223,6 @@ PyObject *func_name(PyObject *self, PyObject *args) { \
 	PyModule_AddStringConstant(m, "Mul", "Mul");		\
 	PyModule_AddStringConstant(m, "Div", "Div");			\
 	PyModule_AddStringConstant(m, "Exp", "Exp");
-
 
 /* end - api helper functions */
 

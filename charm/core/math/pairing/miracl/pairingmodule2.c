@@ -1557,19 +1557,13 @@ void Operations_clear()
 
 PyObject *PyCreateList(MeasureType type)
 {
-//	int groupTypes = 4;
-	int count = -1;
-	PyObject *objList = PyList_New(0);
-	// Insert backwards from GT -> G2 -> G1 -> ZR
-	GetField(count, type, pyGT_t, dBench);
-	PyList_Insert(objList, 0, Py_BuildValue("i", count));
-	GetField(count, type, pyG2_t, dBench);
-	PyList_Insert(objList, 0, Py_BuildValue("i", count));
-	GetField(count, type, pyG1_t, dBench);
-	PyList_Insert(objList, 0, Py_BuildValue("i", count));
-	GetField(count, type, pyZR_t, dBench);
-	PyList_Insert(objList, 0, Py_BuildValue("i", count));
+	int countZR = -1, countG1 = -1, countG2 = -1, countGT = -1;
+	GetField(countZR, type, pyZR_t, dBench);
+	GetField(countG1, type, pyG1_t, dBench);
+	GetField(countG2, type, pyG2_t, dBench);
+	GetField(countGT, type, pyGT_t, dBench);
 
+	PyObject *objList = Py_BuildValue("[iiii]", countZR, countG1, countG2, countGT);
 	return objList;
 }
 
@@ -1590,17 +1584,17 @@ static PyObject *Granular_benchmark(PyObject *self, PyObject *args)
 		PyObject *SubList = PyCreateList(SUBTRACTION);
 		PyObject *ExpList = PyCreateList(EXPONENTIATION);
 		dict = PyDict_New();
+		if(dict == NULL) return NULL;
 		PyDict_SetItemString(dict, "Mul", MulList);
-		Py_XDECREF(MulList);
 		PyDict_SetItemString(dict, "Div", DivList);
-		Py_XDECREF(DivList);
 		PyDict_SetItemString(dict, "Add", AddList);
-		Py_XDECREF(AddList);
 		PyDict_SetItemString(dict, "Sub", SubList);
-		Py_XDECREF(SubList);
 		PyDict_SetItemString(dict, "Exp", ExpList);
-		Py_XDECREF(ExpList);
-
+		Py_DECREF(MulList);
+		Py_DECREF(DivList);
+		Py_DECREF(AddList);
+		Py_DECREF(SubList);
+		Py_DECREF(ExpList);
 	}
 
 	return dict;
@@ -1984,9 +1978,9 @@ PyMethodDef pairing_methods[] = {
 
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1_t and G2 and returns an element mapped to GT"},
 	{"hashPair", (PyCFunction)sha1_hash2, METH_VARARGS, "Compute a sha1 hash of an element type"},
-	{"SymEnc", (PyCFunction) AES_Encrypt, METH_VARARGS, "AES encryption args: key (bytes or str), message (str)"},
-	{"SymDec", (PyCFunction) AES_Decrypt, METH_VARARGS, "AES decryption args: key (bytes or str), ciphertext (str)"},
-#ifdef BENCHMARK_ENABLED
+//	{"SymEnc", (PyCFunction) AES_Encrypt, METH_VARARGS, "AES encryption args: key (bytes or str), message (str)"},
+//	{"SymDec", (PyCFunction) AES_Decrypt, METH_VARARGS, "AES decryption args: key (bytes or str), ciphertext (str)"},
+#if BENCHMARK_ENABLED
 	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
@@ -2071,14 +2065,19 @@ void initpairing(void) 		{
     if(st->dBench == NULL)
         CLEAN_EXIT;
     dBench = st->dBench;
-    Py_INCREF(dBench);
+//    Py_INCREF(dBench);
     dBench->bench_initialized = FALSE;
 
     Operations *cntr = (Operations *) malloc(sizeof(Operations));
     dBench->data_ptr = (void *) cntr; // store data structure
     dBench->gran_init = &Operations_clear; // pointer to clearing the structure memory
     CLEAR_ALLDBENCH(dBench);
-    InitClear(dBench);
+    dBench->granular_option = FALSE;
+    dBench->op_add = 0;	dBench->op_sub = 0;
+    dBench->op_mult = 0; dBench->op_div = 0;
+    dBench->op_exp = 0; dBench->op_pair = 0;
+    dBench->cpu_time_ms = 0.0; dBench->real_time_ms = 0.0;
+    dBench->identifier = -1;
 #endif
 
     Py_INCREF(&PairingType);
@@ -2104,6 +2103,7 @@ void initpairing(void) 		{
 
 LEAVE:
     if (PyErr_Occurred()) {
+		PyErr_Clear();
         Py_XDECREF(m);
     	INITERROR;
     }

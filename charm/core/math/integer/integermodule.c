@@ -2343,7 +2343,7 @@ LEAVE:
 	if (PyErr_Occurred()) {
 		printf("ERROR: module load failed!\n");
 		PyErr_Clear();
-		//Py_XDECREF(m);
+		Py_XDECREF(m);
 		INITERROR;
    }
 
