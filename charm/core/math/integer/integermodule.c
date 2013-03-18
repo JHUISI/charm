@@ -2257,7 +2257,7 @@ static int int_clear(PyObject *m) {
     Py_XDECREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
 	Py_CLEAR(GETSTATE(m)->dBench);
-//	Py_XDECREF(dBench);
+	Py_XDECREF(dBench);
 #endif
 	return 0;
 }
@@ -2302,7 +2302,7 @@ void initinteger(void) {
 	if (st->error == NULL)
         CLEAN_EXIT;
 	IntegerError = st->error;
-    Py_INCREF(IntegerError);
+//    Py_INCREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
     if(import_benchmark() < 0)
     	CLEAN_EXIT;
@@ -2311,10 +2311,14 @@ void initinteger(void) {
     	INITERROR;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     dBench = st->dBench;
-//    Py_INCREF(dBench);
-    InitClear(dBench);
-//    Py_INCREF(&BenchmarkType);
-//    PyModule_AddObject(m, "benchmark", (PyObject *)&BenchmarkType);
+    dBench->bench_initialized = FALSE;
+    dBench->op_add = 0;	dBench->op_sub = 0;
+    dBench->op_mult = 0; dBench->op_div = 0;
+    dBench->op_exp = 0;
+    dBench->cpu_time_ms = 0.0; dBench->real_time_ms = 0.0;
+    dBench->identifier = -1;
+
+    //printf("DEBUG: Refcnt dBench = '%i'\n", (int) Py_REFCNT(dBench));
 #endif
 
 	Py_INCREF(&IntegerType);
@@ -2338,6 +2342,7 @@ void initinteger(void) {
 LEAVE:
 	if (PyErr_Occurred()) {
 		printf("ERROR: module load failed!\n");
+		PyErr_Clear();
 		//Py_XDECREF(m);
 		INITERROR;
    }
