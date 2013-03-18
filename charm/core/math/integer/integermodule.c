@@ -2350,6 +2350,7 @@ LEAVE:
 		INITERROR;
    }
 
+   debug("importing integer module.\n");
 #if PY_MAJOR_VERSION >= 3
 	return m;
 #endif
