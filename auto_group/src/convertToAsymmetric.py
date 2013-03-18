@@ -24,10 +24,13 @@ variableKeyword = "variables"
 clauseKeyword = "clauses"
 constraintKeyword = "constraints"
 mofnKeyword = "mofn"
-PUB_SCHEME = "PUB"
-SIG_SCHEME = "SIG"
+PKENC = "PKENC" # encryption
+PKSIG = "PKSIG" # signatures
+functionOrder = "functionOrder"
+
 G1Prefix = "G1"
 G2Prefix = "G2"
+Gtypes = [G1Prefix, G2Prefix]
 length = 5 # length of temporary file
 oldListTypeRefs = {}
 newListTypeRefs = {}
@@ -414,9 +417,9 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     global assignInfo
     assignInfo = sdl.getAssignInfo()
     setting = sdl.assignInfo[sdl.NONE_FUNC_NAME][ALGEBRAIC_SETTING].getAssignNode().getRight().getAttribute()
-    bv_name = sdl.assignInfo[sdl.NONE_FUNC_NAME][BV_NAME].getAssignNode().getRight().getAttribute()
+    sdl_name = sdl.assignInfo[sdl.NONE_FUNC_NAME][BV_NAME].getAssignNode().getRight().getAttribute()
     typesBlock = sdl.getFuncStmts( TYPES_HEADER )
-    print("name is", bv_name)
+    print("name is", sdl_name)
     print("setting is", setting)
     
     lines = list(typesBlock[0].keys())
@@ -425,7 +428,7 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     begin = ["BEGIN :: " + TYPES_HEADER]
     end = ["END :: " + TYPES_HEADER]
 
-    newLines0 = [ BV_NAME + " := " + bv_name, SETTING + " := " + sdl.ASYMMETRIC_SETTING ] 
+    newLines0 = [ BV_NAME + " := " + sdl_name, SETTING + " := " + sdl.ASYMMETRIC_SETTING ] 
     newLines1 = begin + typesBlockLines + end
     
     assert setting == sdl.SYMMETRIC_SETTING, "No need to convert to asymmetric setting."    
@@ -443,7 +446,7 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     if not hasattr(config, 'schemeType'):
         sys.exit("'schemeType' option missing in specified config file.")
         
-    if config.schemeType == PUB_SCHEME:
+    if config.schemeType == PKENC:
         (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getVarInfoFuncStmts( config.setupFuncName )
         (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getVarInfoFuncStmts( config.keygenFuncName )
         (stmtE, typesE, depListE, depListNoExpE, infListE, infListNoExpE) = sdl.getVarInfoFuncStmts( config.encryptFuncName )    
@@ -454,7 +457,7 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
         varTypes.update(typesD)
         # TODO: expand search to encrypt and portentially setup
         pairingSearch = [stmtD] # aka start with decrypt.
-    elif config.schemeType == SIG_SCHEME:
+    elif config.schemeType == PKSIG:
         if hasattr(config, 'setupFuncName'): (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getVarInfoFuncStmts( config.setupFuncName )
         (stmtK, typesK, depListK, depListNoExpK, infListK, infListNoExpK) = sdl.getVarInfoFuncStmts( config.keygenFuncName )
         (stmtSi, typesSi, depListSi, depListNoExpSi, infListSi, infListNoExpSi) = sdl.getVarInfoFuncStmts( config.signFuncName )    
@@ -510,7 +513,7 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
             constraintList.append(i)
     print("pair vars LHS:", pair_vars_G1_lhs)
     print("pair vars RHS:", pair_vars_G1_rhs) 
-    if config.schemeType == SIG_SCHEME: sys.exit(0) # TODO: need to resolve when to incorporate the split pairings technique 
+    if config.schemeType == PKSIG: sys.exit(0) # TODO: need to resolve when to incorporate the split pairings technique 
     print("list of gens :", generators)
     info = {}
     info[ 'G1_lhs' ] = (pair_vars_G1_lhs, assignTraceback(generators, varTypes, pair_vars_G1_lhs, constraintList))
@@ -586,7 +589,7 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     newLinesK = transformFunction(entireSDL, config.keygenFuncName, stmtK, groupInfo, noChangeList)
     print("<===== transforming %s =====>" % config.keygenFuncName)
 
-    if config.schemeType == PUB_SCHEME:
+    if config.schemeType == PKENC:
         print("<===== transforming %s =====>" % config.encryptFuncName)
         newLines2 = transformFunction(entireSDL, config.encryptFuncName, stmtE, groupInfo, noChangeList)
         print("<===== transforming %s =====>" % config.encryptFuncName)
@@ -594,7 +597,7 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
         print("<===== transforming %s =====>" % config.decryptFuncName)
         newLines3 = transformFunction(entireSDL, config.decryptFuncName, stmtD, groupInfo, noChangeList)
         print("<===== transforming %s =====>" % config.decryptFuncName)
-    elif config.schemeType == SIG_SCHEME:
+    elif config.schemeType == PKSIG:
         print("<===== transforming %s =====>" % config.signFuncName)
         newLines2 = transformFunction(entireSDL, config.signFuncName, stmtSi, groupInfo, noChangeList)
         print("<===== transforming %s =====>" % config.signFuncName)
@@ -606,8 +609,8 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     # debug 
     print_sdl(False, newLinesS, newLinesK, newLines2, newLines3)
     
-    outputFile = bv_name + "_asym_" + fileSuffix
-    writeConfig(outputFile + ".bv", newLines0, newLines1, newLinesSe, newLinesS, newLinesK, newLines2, newLines3)
+    outputFile = sdl_name + "_asym_" + fileSuffix
+    writeConfig(outputFile + ".sdl", newLines0, newLines1, newLinesSe, newLinesS, newLinesK, newLines2, newLines3)
     return outputFile
 
 # temporary placement
@@ -930,7 +933,19 @@ def handleListTypeRefs(varTypes, ref, info, isForBoth, groupType):
     if changeBack != None: refName = changeBack #TODO: handle this better in the future
     newRefName = refName + "#" + str(newRef)
     return newRefName
-    
+
+def prune(_list):
+    # remove redundancies in list
+    _list2 = list(set(_list))
+    _list3 = []
+    for i in _list2:
+        if i.find(sdl.LIST_INDEX_SYMBOL) != -1:
+            # chop off the '#' in the case of list references
+            _list3.append(i.split(sdl.LIST_INDEX_SYMBOL)[0])
+        else:
+            _list3.append(i)
+    # return the pruned list
+    return _list3
 
 def updateAllForBoth(node, assignVar, varInfo, info, changeLeftVar=True, noChangeList=[]):
     newLine1 = updateAllForG1(node, assignVar, varInfo, info, changeLeftVar, noChangeList)
@@ -952,7 +967,8 @@ def updateAllForG1(node, assignVar, varInfo, info, changeLeftVar, noChangeList=[
         sdl.ASTVisitor( SubstituteVar('', str(types.G1), initChange=True) ).preorder( new_node2 )
         return str(new_node2)
     
-    newVarDeps = set(varDeps).difference(noChangeList)
+    prunedList = prune(noChangeList)
+    newVarDeps = set(varDeps).difference(prunedList, Gtypes)
     for i in newVarDeps:
         new_i = i + G1Prefix
         updatedRefAlready = False
@@ -989,7 +1005,8 @@ def updateAllForG2(node, assignVar, varInfo, info, changeLeftVar, noChangeList=[
         sdl.ASTVisitor( SubstituteVar('', str(types.G2), initChange=True) ).preorder( new_node2 )
         return str(new_node2)
     
-    newVarDeps = set(varDeps).difference(noChangeList)
+    prunedList = prune(noChangeList)
+    newVarDeps = set(varDeps).difference(prunedList, Gtypes)
     for i in newVarDeps:
         new_i = i + G2Prefix
         updatedRefAlready = False

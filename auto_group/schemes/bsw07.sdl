@@ -3,14 +3,13 @@ setting := symmetric
 short := keys
 
 BEGIN :: types
-policyUSstr := str
+policystr := str
 attrs := list{str}
 sh := symmap
 coeff := list
 S := list{str}
 M := GT
 END :: types
-
 
 BEGIN :: func:setup
 input := None
@@ -74,29 +73,29 @@ Cr#y1 := (g^sh#y1)
 Cpr#y1 := (H(y1,G1)^sh#y1)
 END :: for
 
-ct := list{policyUSstr, Ctl, C, Cr, Cpr}
+ct := list{policystr, Ctl, C, Cr, Cpr}
 output := ct
 END :: func:encrypt
 
 
 BEGIN :: func:decrypt
 input := list{pk, sk, S, ct}
-ct := expand{policyUSstr, Ctl, C, Cr, Cpr}
+ct := expand{policystr, Ctl, C, Cr, Cpr}
 sk := expand{D, Dj, Djp}
 
-policy := createPolicy(policyUSstr)
+policy := createPolicy(policystr)
 attrs := prune(policy, S)
 coeff := getCoefficients(policy)
 
 Y := len(attrs)
-reservedVarName0 := init(GT)
+resVarName0 := init(GT)
 BEGIN :: for
 for{y := 0, Y}
-yGetStringSuffix := GetString(attrs#y)
-reservedVarName1 := ((e(Cr#yGetStringSuffix,Dj#yGetStringSuffix) / e(Djp#yGetStringSuffix,Cpr#yGetStringSuffix))^coeff#yGetStringSuffix)
-reservedVarName0 := reservedVarName0 * reservedVarName1
+y2 := GetString(attrs#y)
+resVarName1 := ((e(Cr#y2,Dj#y2) / e(Djp#y2,Cpr#y2))^coeff#y2)
+resVarName0 := resVarName0 * resVarName1
 END :: for
-A := reservedVarName0
+A := resVarName0
 
 result0 := e(C,D)
 result1 := (result0 / A)
