@@ -977,10 +977,8 @@ static PyObject *Element_negate(Element *self)
 	}
 #endif
 
-	//START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_neg(newObject->e, self->e);
-	//STOP_CLOCK(dBench);
 
 	return (PyObject *) newObject;
 }
@@ -1034,7 +1032,6 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		else {
 			EXIT_IF(TRUE, "undefined exponentiation operation.");
 		}
-		//STOP_CLOCK(dBench);
 	}
 	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
@@ -1044,14 +1041,12 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		IS_SAME_GROUP(lhs_o1, rhs_o2);
 		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation");
 		if(rhs_o2->element_type == ZR) {
-			// element_pow_zn(newObject->e, lhs_o1->e, rhs_o1->e);
-			//START_CLOCK(dBench);
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
-			mpz_init(n);
-			element_to_mpz(n, rhs_o2->e);
-			element_pow_mpz(newObject->e, lhs_o1->e, n);
-			mpz_clear(n);
-			//STOP_CLOCK(dBench);
+			element_pow_zn(newObject->e, lhs_o1->e, rhs_o2->e);
+//			mpz_init(n);
+//			element_to_mpz(n, rhs_o2->e);
+//			element_pow_mpz(newObject->e, lhs_o1->e, n);
+//			mpz_clear(n);
 		}
 		else {
 			// we have a problem

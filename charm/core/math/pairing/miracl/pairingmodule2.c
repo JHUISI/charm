@@ -528,7 +528,6 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	if(!PyArg_ParseTuple(args, "Oi|i", &group, &arg1, &seed))
 		return NULL;
 
-	START_CLOCK(dBench);
 	retObject = PyObject_New(Element, &ElementType);
 	debug("init random element in '%d'\n", arg1);
 	if(arg1 == pyZR_t) {
@@ -673,24 +672,16 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		}
 
 		if(self->element_type != pyZR_t && other->element_type == pyZR_t) {
-			//
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul_zn(newObject, self, other);
-			//
 		}
 		else if(other->element_type != pyZR_t && self->element_type == pyZR_t) {
-			// START_CLOCK
-			//
 			newObject = createNewElement(other->element_type, self->pairing);
 			element_mul_zn(newObject, other, self);
-			//
 		}
 		else { // all other cases
-			// START_CLOCK
-			//
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul(newObject, self, other);
-			//
 		}
 	}
 	else {
@@ -1233,7 +1224,6 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 					object = (Element *) tmpObject;
 
 					element_add_to_hash(object);
-					STOP_CLOCK(dBench);
 				}
 				else if(PyBytes_CharmCheck(tmpObject)) {
 					str = NULL;
