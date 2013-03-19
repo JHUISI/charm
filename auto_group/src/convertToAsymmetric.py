@@ -277,7 +277,7 @@ def instantiateSolver(variables, clauses, constraints, mofnConstraints, bothCons
     f.write(outputConstraints)
     f.close()
     
-    os.system("python2.7 %s/z3solver.py %s/%s" % (loc, loc, name))
+    os.system("/opt/local/bin/python2.7 %s/z3solver.py %s/%s" % (loc, loc, name))
     results = importlib.import_module(newName) #__import__(newName)
     if(not results.satisfiable):
         os.system("rm -f " + fileTarget + "*")
@@ -455,7 +455,7 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
         varTypes.update(typesK)
         varTypes.update(typesE)
         varTypes.update(typesD)
-        # TODO: expand search to encrypt and portentially setup
+        # TODO: expand search to encrypt and potentially setup
         pairingSearch = [stmtD] # aka start with decrypt.
     elif config.schemeType == PKSIG:
         if hasattr(config, 'setupFuncName'): (stmtS, typesS, depListS, depListNoExpS, infListS, infListNoExpS) = sdl.getVarInfoFuncStmts( config.setupFuncName )
@@ -466,22 +466,26 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
         varTypes.update(typesSi)
         varTypes.update(typesV)
         pairingSearch = [stmtV] # aka start with verify
-#        sys.exit("Still working on this...")
+        sys.exit("Still working on this...")
     else:
-        sys.exit("'schemeType' options are 'PUB' or 'SIG'")
+        sys.exit("'schemeType' options are 'PKENC' or 'PKSIG'")
         
-    generators = []
+    info = {}
+    gen = Generators(info)
     print("List of generators for scheme")
     if hasattr(config, "extraSetupFuncName"):
         (stmtSe, typesSe, depListSe, depListNoExpSe, infListSe, infListNoExpSe) = sdl.getVarInfoFuncStmts( config.extraSetupFuncName )
-        extractGeneratorList(stmtSe, typesSe, generators)
+        gen.extractGens(stmtSe, typesSe)
+        #extractGeneratorList(stmtSe, typesSe, generators)
         varTypes.update(typesSe)
     
     if hasattr(config, 'setupFuncName'):
-        extractGeneratorList(stmtS, typesS, generators) # extract generators from setup if defined
+        #genLists = extractGeneratorList(stmtS, typesS, generators) # extract generators from setup if defined
+        gen.extractGens(stmtS, typesS)
     else:
         sys.exit("Assumption failed: setup not defined for this function. Where to extract generators?")
     
+    generators = gen.getGens()
     # need a Visitor class to build these variables  
     # TODO: expand to other parts of algorithm including setup, keygen, encrypt 
     hashVarList = []
@@ -515,7 +519,6 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     print("pair vars RHS:", pair_vars_G1_rhs) 
     if config.schemeType == PKSIG: sys.exit(0) # TODO: need to resolve when to incorporate the split pairings technique 
     print("list of gens :", generators)
-    info = {}
     info[ 'G1_lhs' ] = (pair_vars_G1_lhs, assignTraceback(generators, varTypes, pair_vars_G1_lhs, constraintList))
     info[ 'G1_rhs' ] = (pair_vars_G1_rhs, assignTraceback(generators, varTypes, pair_vars_G1_rhs, constraintList))
 
@@ -523,7 +526,8 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     print("info => G1 rhs : ", info['G1_rhs'])
     
     print("<===== Determine Asymmetric Generators =====>")
-    (generatorLines, generatorMapG1, generatorMapG2) = Step1_DeriveSetupGenerators(generators, info)
+    #(generatorLines, generatorMapG1, generatorMapG2) = Step1_DeriveSetupGenerators(generators, info)
+    (generatorLines, generatorMapG1, generatorMapG2) = gen.setupNewGens()
     print("Generators in G1: ", generatorMapG1)
     print("Generators in G2: ", generatorMapG2)
     print("<===== Determine Asymmetric Generators =====>\n")
@@ -790,62 +794,92 @@ def buildMap(generators, varTypes, varList, var, constraintList):
             
     return    
 
-def extractGeneratorList(stmtS, typesS, generators):
-    lines = list(stmtS.keys())
-    lines.sort()
-    for i in lines:
-        if type(stmtS[i]) == sdl.VarInfo and stmtS[i].getHasRandomness() and Type(stmtS[i].getAssignNode()) == ops.EQ:
-            t = stmtS[i].getAssignVar()
-            if typesS.get(t) == None: 
-                typ = stmtS[i].getAssignNode().right.left.attr
-#                print("Retrieved type directly: ", typ)
-            else:
-                typ = typesS[t].getType()
-            if typ == types.G1:
-                print(i, ": ", typ, " :=> ", stmtS[i].getAssignNode())
-                generators.append(str(stmtS[i].getAssignVar()))
-
-    return
-
-
-def Step1_DeriveSetupGenerators(generators, info):
-    """derive generators used by the scheme using the following rules:
-    1. first generator is selected as the base generator, "g". We split into two. 1 in G1 and other in G2.
-    2. second generator and thereafter are defined in terms of base generator, g in both groups as follows (DH):
-         h = random(ZR)
-         h_G1 = g_G1 ^ h
-         h_G2 = g_G2 ^ h
-    """
-    generatorLines = []
-    generatorMapG1 = {}
-    generatorMapG2 = {}
-
-    if len(generators) == 0:
-        sys.exit("The scheme selects no generators in setup? Please try again.\n")    
-    base_generator = generators[0]
-    # split the first generator
-    base_generatorG1 = base_generator + G1Prefix
-    base_generatorG2 = base_generator + G2Prefix
-    generatorLines.append(base_generatorG1 + " := random(G1)")
-    generatorLines.append(base_generatorG2 + " := random(G2)")
-    generatorMapG1[ base_generator ] = base_generatorG1
-    generatorMapG2[ base_generator ] = base_generatorG2
-    info['baseGeneratorG1'] = base_generatorG1
-    info['baseGeneratorG2'] = base_generatorG2
+class Generators:
+    def __init__(self, info):
+        self.generators = []
+        self.genDict = {}
+        self.info = info
+        
+    def extractGens(self, stmt, _types):
+        lines = list(stmt.keys())
+        lines.sort()
+        for i in lines:
+            if type(stmt[i]) == sdl.VarInfo and stmt[i].getHasRandomness() and Type(stmt[i].getAssignNode()) == ops.EQ:
+                t = stmt[i].getAssignVar()
+                if _types.get(t) == None: 
+                    typ = stmt[i].getAssignNode().right.left.attr
+    #                print("Retrieved type directly: ", typ)
+                else:
+                    typ = _types[t].getType()
+                if typ == types.G1:
+                    if (stmt[i].getOutsideForLoopObj() != None): inForLoop = True
+                    else: inForLoop = False
+                    print(i, ": ", typ, " :=> ", stmt[i].getAssignNode(), ", loop :=> ", inForLoop)
+                    if not inForLoop: 
+                        self.generators.append(str(stmt[i].getAssignVar()))
+                    else:
+                        listRef = stmt[i].getAssignVar().split(LIST_INDEX_SYMBOL)[0]
+                        self.generators.append(listRef)
+                        self.genDict[ listRef ] = (str(stmt[i].getAssignVar()), stmt[i].getOutsideForLoopObj())
+                        print("ForLoop start: ", stmt[i].getStartLineNo(), stmt[i].getEndLineNo())
     
-    for j in range(1, len(generators)):
-        i = generators[j]
-        generatorLines.append(i + " := random(ZR)")
-        generatorLines.append(i + G1Prefix + " := " + base_generatorG1 + " ^ " + i)
-        generatorLines.append(i + G2Prefix + " := " + base_generatorG2 + " ^ " + i)
-        generatorMapG1[ i ] = i + G1Prefix
-        generatorMapG2[ i ] = i + G2Prefix
+        return
+
+    def setupNewGens(self):
+        """derive generators used by the scheme using the following rules:
+        1. first generator is selected as the base generator, "g". We split into two. 1 in G1 and other in G2.
+        2. second generator and thereafter are defined in terms of base generator, g in both groups as follows (DH):
+             h = random(ZR)
+             hG1 = gG1 ^ h
+             hG2 = gG2 ^ h
+        3. TODO: need a way to prune which setup generators are used (a kind of optimization)
+        """
+        generatorLines = []
+        generatorMapG1 = {}
+        generatorMapG2 = {}
     
-    print("....New Generators...")
-    for line in generatorLines:
-        print(line)
-    print("....New Generators...")
-    return (generatorLines, generatorMapG1, generatorMapG2)
+        if len(self.generators) == 0:
+            sys.exit("The scheme selects no generators in setup? Please try again.\n")    
+        base_generator = self.generators[0]
+        # split the first generator
+        base_generatorG1 = base_generator + G1Prefix
+        base_generatorG2 = base_generator + G2Prefix
+        generatorLines.append(base_generatorG1 + " := random(G1)")
+        generatorLines.append(base_generatorG2 + " := random(G2)")
+        generatorMapG1[ base_generator ] = base_generatorG1
+        generatorMapG2[ base_generator ] = base_generatorG2
+        self.info['baseGeneratorG1'] = base_generatorG1
+        self.info['baseGeneratorG2'] = base_generatorG2
+        
+        genLists = self.genDict.keys()
+        for j in range(1, len(self.generators)):
+            i = self.generators[j]
+            if i not in genLists: 
+                # generator itself is not a list
+                generatorLines.append(i + " := random(ZR)")
+                generatorLines.append(i + G1Prefix + " := " + base_generatorG1 + " ^ " + i)
+                generatorLines.append(i + G2Prefix + " := " + base_generatorG2 + " ^ " + i)
+                generatorMapG1[ i ] = i + G1Prefix
+                generatorMapG2[ i ] = i + G2Prefix
+            elif i in genLists:
+                print("setupNewGens: handle list => ", i)
+                # BEGIN :: for
+                # for{ start, end }
+                #   i := random(ZR)
+                #   oldIG1#x? := g ^ i
+                #   oldIG2#x? := g ^ i
+                # END :: for
+            else: #elif i in genCond:
+                print("setupNewGens: handle conditionals => ", i)
+                
+        print("....New Generators...")
+        for line in generatorLines:
+            print(line)
+        print("....New Generators...")
+        return (generatorLines, generatorMapG1, generatorMapG2)
+
+    def getGens(self):
+        return self.generators
 
 def assignVarOccursInBoth(varName, info):
     """determines if varName occurs in the 'both' set. For varName's that have a '#' indicator, we first split it
