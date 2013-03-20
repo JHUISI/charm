@@ -130,7 +130,7 @@ class transformXOR:
         if leftAssignVar in 'G1': create 1 statement in G1
         if leftAssignVar in 'G2': create 1 statement in G2
 """
-def transformFunction(entireSDL, funcName, blockStmts, info, noChangeList, startLines=[]):
+def transformFunction(entireSDL, funcName, blockStmts, info, noChangeList, startLines={}):
     begin = "BEGIN :: func:" + funcName
     end = "END :: func:" + funcName
     newLines = [begin] # + list(startLines)
@@ -181,19 +181,24 @@ def updateForIfConditional(node, assignVar, varInfo, info, theType, noChangeList
     sdl.ASTVisitor( SubstituteVar('', str(theType), initChange=True) ).preorder( new_node2 )
     return new_node2
 
-def handleVarInfo(newLines, assign, blockStmt, info, noChangeList, startLines=[]):
+def handleVarInfo(newLines, assign, blockStmt, info, noChangeList, startLines={}):
     if Type(assign) == ops.EQ:
         assignVar = blockStmt.getAssignVar()
         # store for later
         newLine = None
-        if assignVar == sdl.inputVarName:
-            newLines.append(str(assign))
-            newLines.extend(startLines)
-            return
-        elif blockStmt.getHasRandomness():
-            if not assignVarIsGenerator(assignVar, info):
-                print(" :-> not a generator, so add to newLines.", end="") # do not include in new setup 
+        varTypeObj = info['varTypes'].get(assignVar)
+        # case A: randomness and occurs in startLines
+        if blockStmt.getHasRandomness() and startLines.get(assignVar) != None:
+            newLines.extend( startLines[assignVar] )
+            return True
+            #if not assignVarIsGenerator(assignVar, info):
+        # case B: randomness and varTypeObj != None
+        if blockStmt.getHasRandomness() and varTypeObj != None:
+            if varTypeObj.getType() in [types.ZR, types.GT]:
+                print(" :-> not a generator, so add to newLines.", end="")
                 newLine = str(assign) # unmodified
+            else:
+                print(" :-> what type ?= ", info['varTypes'].get(assignVar).getType(), end="")
         elif assignVarOccursInBoth(assignVar, info):
             print(" :-> split computation in G1 & G2:", blockStmt.getVarDepsNoExponents(), end="")
             newLine = updateAllForBoth(assign, assignVar, blockStmt, info, True, noChangeList)
@@ -527,7 +532,8 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     
     print("<===== Determine Asymmetric Generators =====>")
     #(generatorLines, generatorMapG1, generatorMapG2) = Step1_DeriveSetupGenerators(generators, info)
-    (generatorLines, generatorMapG1, generatorMapG2) = gen.setupNewGens()
+    (generatorMapG1, generatorMapG2) = gen.setupNewGens()
+    generatorLines = gen.getGenLines()
     print("Generators in G1: ", generatorMapG1)
     print("Generators in G2: ", generatorMapG2)
     print("<===== Determine Asymmetric Generators =====>\n")
@@ -566,6 +572,8 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
         groupInfo = DeriveGeneralSolution(res, resMap, xorVarMap, info)
     else:
         groupInfo = DeriveSpecificSolution(resultDict, xorVarMap, info)
+    
+    #generatorLines = gen.pruneGens(groupInfo)
     groupInfo['generators'] = generators 
     groupInfo['generatorMapG1'] = generatorMapG1
     groupInfo['generatorMapG2'] = generatorMapG2
@@ -580,35 +588,38 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     newLinesS = []
     entireSDL = sdl.getLinesOfCode()
     if hasattr(config, "extraSetupFuncName"):
-        print("<===== transforming %s =====>" % config.extraSetupFuncName)
+        print("<===== processing %s =====>" % config.extraSetupFuncName)
         newLinesSe = transformFunction(entireSDL, config.extraSetupFuncName, stmtSe, groupInfo, noChangeList, generatorLines)
-        print("<===== transforming %s =====>" % config.extraSetupFuncName)
+        print("<===== processing  %s =====>" % config.extraSetupFuncName)
 
     if hasattr(config, 'setupFuncName'):    
-        print("<===== transforming %s =====>" % config.setupFuncName)
+        print("<===== processing %s =====>" % config.setupFuncName)
         newLinesS = transformFunction(entireSDL, config.setupFuncName, stmtS, groupInfo, noChangeList, generatorLines)
-        print("<===== transforming %s =====>" % config.setupFuncName)
-
-    print("<===== transforming %s =====>" % config.keygenFuncName) 
+        print("<===== processing %s =====>" % config.setupFuncName)
+    
+#    print_sdl(True, newLinesSe, newLinesS)
+#    sys.exit(0)
+    
+    print("<===== processing %s =====>" % config.keygenFuncName) 
     newLinesK = transformFunction(entireSDL, config.keygenFuncName, stmtK, groupInfo, noChangeList)
-    print("<===== transforming %s =====>" % config.keygenFuncName)
+    print("<===== processing %s =====>" % config.keygenFuncName)
 
     if config.schemeType == PKENC:
-        print("<===== transforming %s =====>" % config.encryptFuncName)
+        print("<===== processing %s =====>" % config.encryptFuncName)
         newLines2 = transformFunction(entireSDL, config.encryptFuncName, stmtE, groupInfo, noChangeList)
-        print("<===== transforming %s =====>" % config.encryptFuncName)
+        print("<===== processing %s =====>" % config.encryptFuncName)
     
-        print("<===== transforming %s =====>" % config.decryptFuncName)
+        print("<===== processing %s =====>" % config.decryptFuncName)
         newLines3 = transformFunction(entireSDL, config.decryptFuncName, stmtD, groupInfo, noChangeList)
-        print("<===== transforming %s =====>" % config.decryptFuncName)
+        print("<===== processing %s =====>" % config.decryptFuncName)
     elif config.schemeType == PKSIG:
-        print("<===== transforming %s =====>" % config.signFuncName)
+        print("<===== processing %s =====>" % config.signFuncName)
         newLines2 = transformFunction(entireSDL, config.signFuncName, stmtSi, groupInfo, noChangeList)
-        print("<===== transforming %s =====>" % config.signFuncName)
+        print("<===== processing %s =====>" % config.signFuncName)
     
-        print("<===== transforming %s =====>" % config.verifyFuncName)
+        print("<===== processing %s =====>" % config.verifyFuncName)
         newLines3 = transformFunction(entireSDL, config.verifyFuncName, stmtV, groupInfo, noChangeList)
-        print("<===== transforming %s =====>" % config.verifyFuncName)
+        print("<===== processing %s =====>" % config.verifyFuncName)
         
     # debug 
     print_sdl(False, newLinesS, newLinesK, newLines2, newLines3)
@@ -797,6 +808,7 @@ def buildMap(generators, varTypes, varList, var, constraintList):
 class Generators:
     def __init__(self, info):
         self.generators = []
+        self.genLines = {}
         self.genDict = {}
         self.info = info
         
@@ -806,7 +818,7 @@ class Generators:
         for i in lines:
             if type(stmt[i]) == sdl.VarInfo and stmt[i].getHasRandomness() and Type(stmt[i].getAssignNode()) == ops.EQ:
                 t = stmt[i].getAssignVar()
-                if _types.get(t) == None: 
+                if _types.get(t) == None:
                     typ = stmt[i].getAssignNode().right.left.attr
     #                print("Retrieved type directly: ", typ)
                 else:
@@ -820,9 +832,13 @@ class Generators:
                     else:
                         listRef = stmt[i].getAssignVar().split(LIST_INDEX_SYMBOL)[0]
                         self.generators.append(listRef)
-                        self.genDict[ listRef ] = (str(stmt[i].getAssignVar()), stmt[i].getOutsideForLoopObj())
-                        print("ForLoop start: ", stmt[i].getStartLineNo(), stmt[i].getEndLineNo())
-    
+                        self.genDict[ listRef ] = str(stmt[i].getAssignVar()) #, str(stmt[i].getAssignNode()))   # str(stmt[i].getOutsideForLoopObj())
+                        print("genDict : ", self.genDict)
+#                        startLine = stmt[i].getOutsideForLoopObj().getStartLineNo()
+#                        endLine = stmt[i].getOutsideForLoopObj().getEndLineNo()+1
+#                        newLines = sdl.getLinesOfCodeFromLineNos(list(range(startLine, endLine)))
+#                        print("ForLoop content:\n", newLines)
+#                        print("Stmt Interest: ", stmt[i].getAssignNode())
         return
 
     def setupNewGens(self):
@@ -834,53 +850,111 @@ class Generators:
              hG2 = gG2 ^ h
         3. TODO: need a way to prune which setup generators are used (a kind of optimization)
         """
-        generatorLines = []
-        generatorMapG1 = {}
-        generatorMapG2 = {}
+        #genLines = []
+        genMapG1 = {}
+        genMapG2 = {}
     
         if len(self.generators) == 0:
             sys.exit("The scheme selects no generators in setup? Please try again.\n")    
-        base_generator = self.generators[0]
+        base_gen = self.generators[0]
+        self.base_gen = base_gen
         # split the first generator
-        base_generatorG1 = base_generator + G1Prefix
-        base_generatorG2 = base_generator + G2Prefix
-        generatorLines.append(base_generatorG1 + " := random(G1)")
-        generatorLines.append(base_generatorG2 + " := random(G2)")
-        generatorMapG1[ base_generator ] = base_generatorG1
-        generatorMapG2[ base_generator ] = base_generatorG2
-        self.info['baseGeneratorG1'] = base_generatorG1
-        self.info['baseGeneratorG2'] = base_generatorG2
+        base_genG1 = base_gen + G1Prefix
+        base_genG2 = base_gen + G2Prefix
         
-        genLists = self.genDict.keys()
+        self.genLines[ base_gen ] = []
+        self.genLines[ base_gen ].append(base_genG1 + " := random(G1)")
+        self.genLines[ base_gen ].append(base_genG2 + " := random(G2)")
+        
+        genMapG1[ base_gen ] = base_genG1
+        genMapG2[ base_gen ] = base_genG2
+        self.info['baseGeneratorG1'] = base_genG1
+        self.info['baseGeneratorG2'] = base_genG2
+        
+        genOfList = self.genDict.keys()
         for j in range(1, len(self.generators)):
             i = self.generators[j]
-            if i not in genLists: 
+            if i not in genOfList: 
                 # generator itself is not a list
-                generatorLines.append(i + " := random(ZR)")
-                generatorLines.append(i + G1Prefix + " := " + base_generatorG1 + " ^ " + i)
-                generatorLines.append(i + G2Prefix + " := " + base_generatorG2 + " ^ " + i)
-                generatorMapG1[ i ] = i + G1Prefix
-                generatorMapG2[ i ] = i + G2Prefix
-            elif i in genLists:
+                self.genLines[ i ] = []
+                self.genLines[ i ].append(i + " := random(ZR)")
+                self.genLines[ i ].append(i + G1Prefix + " := " + base_genG1 + " ^ " + i)
+                self.genLines[ i ].append(i + G2Prefix + " := " + base_genG2 + " ^ " + i)
+                
+                #generatorLines.append(i + " := random(ZR)")
+                #generatorLines.append(i + G1Prefix + " := " + base_generatorG1 + " ^ " + i)
+                #generatorLines.append(i + G2Prefix + " := " + base_generatorG2 + " ^ " + i)
+                genMapG1[ i ] = i + G1Prefix
+                genMapG2[ i ] = i + G2Prefix
+            elif i in genOfList:
                 print("setupNewGens: handle list => ", i)
-                # BEGIN :: for
-                # for{ start, end }
-                #   i := random(ZR)
-                #   oldIG1#x? := g ^ i
-                #   oldIG2#x? := g ^ i
-                # END :: for
+                oldI = self.genDict[ i ] # 0 : old i
+                self.genLines[ oldI ] = []
+                self.genLines[ oldI ].append(i + " := random(ZR)")
+                self.genLines[ oldI ].append(oldI.replace(i, i + G1Prefix) + " := " + base_genG1 + " ^ " + i)
+                self.genLines[ oldI ].append(oldI.replace(i, i + G2Prefix) + " := " + base_genG2 + " ^ " + i)
+                genMapG1[ i ] = i + G1Prefix
+                genMapG2[ i ] = i + G2Prefix                
             else: #elif i in genCond:
                 print("setupNewGens: handle conditionals => ", i)
                 
-        print("....New Generators...")
-        for line in generatorLines:
-            print(line)
-        print("....New Generators...")
-        return (generatorLines, generatorMapG1, generatorMapG2)
+#        print("....Start New Generators...")
+#        for line in self.genLines:
+#            print(line)
+#        print("....End New Generators...")
+        return (genMapG1, genMapG2)
 
     def getGens(self):
-        return self.generators
+        return self.generators    
+    
+    def getGenLines(self):
+        return self.genLines
+    
+    # TODO: future optimization
+    def pruneGens(self, groupInfo):
+        pruneGenLines = {}
+        base_genG1 = self.base_gen + G1Prefix
+        base_genG2 = self.base_gen + G2Prefix
 
+        genOfList = self.genDict.keys()
+        for j in range(1, len(self.generators)):
+            i = self.generators[j]
+            if i not in genOfList: 
+                # generator itself is not a list
+                pruneGenLines[ i ] = []
+                pruneGenLines[ i ].append(i + " := random(ZR)")
+                stmtG1 = i + G1Prefix + " := " + base_genG1 + " ^ " + i
+                stmtG2 = i + G2Prefix + " := " + base_genG2 + " ^ " + i
+                if i in groupInfo["both"]: 
+                    pruneGenLines[ i ].extend([stmtG1, stmtG2])
+                elif i in groupInfo[G1Prefix]:
+                    pruneGenLines[ i ].append(stmtG1)
+                elif i in groupInfo[G2Prefix]:
+                    pruneGenLines[ i ].append(stmtG2)
+                else:
+                    assert False, "pruneGens: could not find generator in groupInfo list."                    
+            elif i in genOfList:
+                oldI = self.genDict[ i ] # 0 : old i
+                pruneGenLines[ oldI ] = []
+                pruneGenLines[ oldI ].append(i + " := random(ZR)")
+                stmtG1 = oldI.replace(i, i + G1Prefix) + " := " + base_genG1 + " ^ " + i
+                stmtG2 = oldI.replace(i, i + G2Prefix) + " := " + base_genG2 + " ^ " + i
+                if i in groupInfo["both"]: 
+                    pruneGenLines[ oldI ].extend([stmtG1, stmtG2])
+                elif i in groupInfo[G1Prefix]:
+                    pruneGenLines[ oldI ].append(stmtG1)
+                elif i in groupInfo[G2Prefix]:
+                    pruneGenLines[ oldI ].append(stmtG2)
+                else:
+                    assert False, "pruneGens: could not find generator in groupInfo list."
+            else: #elif i in genCond:
+                print("setupNewGens: handle conditionals => ", i)
+        print("....Start Pruned Generators...")
+        for line in pruneGenLines:
+            print(line)
+        print("....End Pruned Generators...")                
+        return pruneGenLines
+    
 def assignVarOccursInBoth(varName, info):
     """determines if varName occurs in the 'both' set. For varName's that have a '#' indicator, we first split it
     then see if arg[0] is in the 'both' set."""
@@ -996,7 +1070,7 @@ def updateAllForG1(node, assignVar, varInfo, info, changeLeftVar, noChangeList=[
     sdl.ASTVisitor( SubstituteVar(assignVar, new_assignVar) ).preorder( new_node2 )
     info['generatorMapG1'][assignVar] = new_assignVar
     # see if it is initCall:
-    if varInfo.getInitCall():
+    if varInfo.getInitCall() or varInfo.getHasRandomness():
         # make change and return here
         sdl.ASTVisitor( SubstituteVar('', str(types.G1), initChange=True) ).preorder( new_node2 )
         return str(new_node2)
@@ -1034,7 +1108,7 @@ def updateAllForG2(node, assignVar, varInfo, info, changeLeftVar, noChangeList=[
     sdl.ASTVisitor( SubstituteVar(assignVar, new_assignVar) ).preorder( new_node2 )
     info['generatorMapG2'][assignVar] = new_assignVar
     # see if it is initCall:
-    if varInfo.getInitCall():
+    if varInfo.getInitCall() or varInfo.getHasRandomness():
         # make change and return here
         sdl.ASTVisitor( SubstituteVar('', str(types.G2), initChange=True) ).preorder( new_node2 )
         return str(new_node2)

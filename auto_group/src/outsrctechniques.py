@@ -947,7 +947,12 @@ class SubstituteVar:
         if found:
             ind = node.listNodes.index(self.target)
             node.listNodes[ind] = self.new_var
-
+    
+    def visit_random(self, node, data):
+        if node.left != None and self.initChange:
+            if self.new_var in types.getList():
+                node.left.attr = types[self.new_var]
+    
 class SubstitutePairings:
     def __init__(self, this, this_new, side='left'):
         self.this_target = this
