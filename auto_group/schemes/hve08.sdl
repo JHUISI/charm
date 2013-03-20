@@ -118,14 +118,14 @@ WVector#i := V#i ^ (s2#i)
 END :: if
 END :: for
 
-CT := list{omega, C0, XVector, WVector}
-output := CT
+ct := list{omega, C0, XVector, WVector}
+output := ct
 END :: func:encrypt
 
 
 BEGIN :: func:decrypt
-input := list{CT, sk}
-CT := expand{omega, C0, XVector, WVector}
+input := list{ct, sk}
+ct := expand{omega, C0, XVector, WVector}
 sk := expand{YVector, LVector}
 
 dotProd := init(GT)

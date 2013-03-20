@@ -595,10 +595,7 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
         print("<===== processing %s =====>" % config.setupFuncName)
         newLinesS = transformFunction(entireSDL, config.setupFuncName, stmtS, groupInfo, noChangeList, generatorLines)
         print("<===== processing %s =====>" % config.setupFuncName)
-    
-#    print_sdl(True, newLinesSe, newLinesS)
-#    sys.exit(0)
-    
+        
     print("<===== processing %s =====>" % config.keygenFuncName) 
     newLinesK = transformFunction(entireSDL, config.keygenFuncName, stmtK, groupInfo, noChangeList)
     print("<===== processing %s =====>" % config.keygenFuncName)

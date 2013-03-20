@@ -1,0 +1,65 @@
+name := bbibe04
+setting := symmetric
+
+BEGIN :: types
+M := GT
+END :: types
+
+BEGIN :: func:setup
+input := None
+g := random(G1)
+u := random(G1)
+h := random(G1)
+
+alpha := random(ZR)
+egg := (e(g,g)^alpha)
+galpha := g ^ alpha
+
+msk := list{galpha}
+pk := list{g, u, h, egg}
+
+output := list{msk, pk}
+END :: func:setup
+
+
+BEGIN :: func:keygen
+input := list{pk, msk, id}
+pk := expand{g, u, h, egg}
+msk := expand{galpha}
+
+ID := H(id, ZR)
+r := random(ZR)
+K1 := (galpha * ((u^ID) * h))^r
+K2 := g^r
+
+sk := list{K1, K2}
+output := sk
+END :: func:keygen
+
+
+BEGIN :: func:encrypt
+input := list{pk, M, id}
+pk := expand{g, u, h, egg}
+
+ID := H(id, ZR)
+s := random(ZR)
+C0 := M * (egg ^ s)
+C1 := g^s
+C2 := ((u^ID) * h)^s
+
+ct := list{C0, C1, C2}
+output := ct
+END :: func:encrypt
+
+
+BEGIN :: func:decrypt
+input := list{pk, sk, ct}
+pk := expand{g, u, h, egg}
+ct := expand{C0, C1, C2}
+sk := expand{K1, K2}
+
+R0 := e(K1, C1) / e(K2, C2)
+M := C0 / R0
+output := M
+END :: func:decrypt
+
