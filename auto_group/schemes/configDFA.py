@@ -1,5 +1,6 @@
 
 schemeType = "PKENC"
+short = "keys"
 
 setupFuncName = "setup"
 keygenFuncName = "keygen"

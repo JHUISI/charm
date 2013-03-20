@@ -20,6 +20,8 @@ SHORT_KEYS = "keys" # for
 SHORT_CIPHERTEXT = "ciphertext" # in case, an encryption scheme
 SHORT_SIGNATURE  = "signature" # in case, a sig algorithm
 SHORT_FORALL = "both"
+SHORT_DEFAULT = "all"
+SHORT_OPTIONS = [SHORT_KEYS, SHORT_CIPHERTEXT, SHORT_SIGNATURE, SHORT_FORALL]
 variableKeyword = "variables"
 clauseKeyword = "clauses"
 constraintKeyword = "constraints"
@@ -438,13 +440,10 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     
     assert setting == sdl.SYMMETRIC_SETTING, "No need to convert to asymmetric setting."    
     # determine user preference in terms of keygen or encrypt
-    contarget = sdl.assignInfo[sdl.NONE_FUNC_NAME]['short']
-    if contarget:
-        target = contarget.getAssignNode().right.getAttribute()
-    if contarget == None:
-        short = SHORT_KEYS
-    else:
-        short = target
+    short = SHORT_DEFAULT # default option
+    if hasattr(config, 'short'):
+        if config.short in SHORT_OPTIONS:
+            short = config.short
     print("reducing size of '%s'" % short) 
 
     varTypes = dict(sdl.getVarTypes().get(TYPES_HEADER))

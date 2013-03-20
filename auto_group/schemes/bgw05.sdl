@@ -1,6 +1,5 @@
 name := bgw05
 setting := symmetric
-short := keys
 
 BEGIN :: types
 n := int

@@ -1,6 +1,5 @@
 name := dfa12
 setting := symmetric
-short := keys
 
 BEGIN :: types
 M := GT

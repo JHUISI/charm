@@ -1,6 +1,5 @@
 name := lw10
 setting := symmetric
-short := keys
 
 BEGIN :: types
 gid := str

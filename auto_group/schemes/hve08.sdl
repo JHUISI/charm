@@ -1,6 +1,5 @@
 name := hve08
 setting := symmetric
-short := keys
 
 n := 5
 

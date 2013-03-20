@@ -1,4 +1,5 @@
 schemeName = "WATERS05"
+short = "keys"
 
 setupFuncName 	= "setup"
 keygenFuncName 	= "keygen"
