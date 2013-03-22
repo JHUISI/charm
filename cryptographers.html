@@ -190,7 +190,7 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
     <span class="n">j</span> <span class="o">=</span> <span class="n">g</span> <span class="o">*</span> <span class="n">h</span>
     <span class="n">k</span> <span class="o">=</span> <span class="n">h</span> <span class="o">**</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">**</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">))</span> <span class="o">/</span> <span class="n">m</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">**</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">))</span> <span class="o">/</span> <span class="n">k</span>
 <span class="n">EndBenchmark</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
 
 <span class="n">msmtDict</span> <span class="o">=</span> <span class="n">GetGeneralBenchmarks</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
