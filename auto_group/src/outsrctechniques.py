@@ -982,14 +982,20 @@ class SubstitutePairings:
         if lhs in self.generators and rhs not in self.generators:
             if rhs in self.pairingInfo[G1Prefix]:
                 node.left.setAttribute( self.mapG2.get(lhs) )
+                self.pairingInfo[G2Prefix][ self.pairingInfo[G2Prefix].index(lhs) ] = self.mapG2.get(lhs)
             elif rhs in self.pairingInfo[G2Prefix]:
-                node.left.setAttribute( self.mapG1.get(lhs) )            
+                node.left.setAttribute( self.mapG1.get(lhs) )
+                self.pairingInfo[G1Prefix][ self.pairingInfo[G1Prefix].index(lhs) ] = self.mapG1.get(lhs)
         # if e(X \in G1, g) => e(X, gG2) and vice versa                
         elif lhs not in self.generators and rhs in self.generators:
             if lhs in self.pairingInfo[G1Prefix]:
                 node.right.setAttribute( self.mapG2.get(rhs) )
+                self.pairingInfo[G2Prefix][ self.pairingInfo[G2Prefix].index(rhs) ] = self.mapG2.get(rhs)
+                
             elif lhs in self.pairingInfo[G2Prefix]:
-                node.right.setAttribute( self.mapG1.get(rhs) )
+                node.right.setAttribute( self.mapG1.get(rhs) )                
+                self.pairingInfo[G1Prefix][ self.pairingInfo[G1Prefix].index(rhs) ] = self.mapG1.get(rhs)
+
         else:
             pass # we leave other cases untouched
                 
@@ -1032,6 +1038,29 @@ def SimplifySDLNode(equation, path, code_block=None, debug=False):
         print("path: ", path)
         print("optimized equation: ", new_eq)
     return new_eq
+
+# figures out which optimizations apply
+def SplitPairings(equation, path, code_block=None, debug=False):
+    tech_list = [2, 3] # 4
+    # 1. apply the start technique to equation
+    new_eq = equation
+    while True:
+        cur_tech = tech_list.pop()
+        if debug: print("Testing technique: ", cur_tech)
+        (tech, new_eq) = testTechnique(cur_tech, new_eq, code_block)
+        
+        if tech.applied:
+            if debug: print("Technique ", cur_tech, " successfully applied.")
+            path.append(cur_tech)
+            tech_list = [2, 3]
+            continue
+        else:
+            if len(tech_list) == 0: break
+    if debug: 
+        print("path: ", path)
+        print("optimized equation: ", new_eq)
+    return new_eq
+
 
 class SubstituteAttrBasic:
     def __init__(self, variable_map):
@@ -1487,6 +1516,8 @@ class PruneTree:
             node.right = BinaryNode("1")      
     
     def visit(self, node, data):
+        if node.right == None: return
+        
         if Type(node.left) != ops.NONE and Type(node.right) == ops.NONE:
             #print("prune this 1: ", node)
             addAsChildNodeToParent(data, node.left)            
@@ -1609,11 +1640,23 @@ class GetPairings:
     def getList(self):
         return self._list
 
+class CheckForPairing:
+    def __init__(self):
+        self.hasPairings = False
+    
+    def visit(self, node, data):
+        pass
+    
+    def visit_pair(self, node, data):
+        self.hasPairings = True
+        
+    def getHasPairings(self):
+        return self.hasPairings
+
 def HasPairings(node):
-    gp = GetPairings()
-    ASTVisitor(gp).inorder(node)
-    if len(gp.getList()) > 0: return True
-    return False
+    cfp = CheckForPairing()
+    ASTVisitor(cfp).inorder(node)
+    return cfp.getHasPairings()
 
 def CombinePairings(nodeList, _verbose=False):
     # combine then split pairings
@@ -1632,16 +1675,21 @@ def CombinePairings(nodeList, _verbose=False):
 
 # assumes that each pairing has one argument on lhs
 class MaintainOrder:
-    def __init__(self, theVarTypes):
-        self.varTypes = theVarTypes
+    def __init__(self, info):
+        self.pairingInfo = info['pairing']
 
     def visit(self, node, data):
         pass
     
     def visit_pair(self, node, data):
-        lhs = str(node.left)
-        rhs = str(node.right)
-#        if self.varTypes.get(lhs) != None and self.varTypes.get(lhs)
+        lhs = node.left.getRefAttribute()
+        rhs = node.right.getRefAttribute()
+        
+        if lhs in self.pairingInfo[G2Prefix] and rhs in self.pairingInfo[G1Prefix]:
+            # need to swap pointers
+            save_left = node.left
+            node.left = node.right
+            node.right = save_left
 
 def PEMDAS(node):
     if (type(node) is str):

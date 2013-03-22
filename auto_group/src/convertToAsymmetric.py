@@ -13,7 +13,7 @@
 import src.sdlpath, sys, os, random, string, re, importlib
 import sdlparser.SDLParser as sdl
 from sdlparser.SDLang import *
-from src.outsrctechniques import SubstituteVar, SubstitutePairings, HasPairings
+from src.outsrctechniques import SubstituteVar, SubstitutePairings, SplitPairings, HasPairings, MaintainOrder, PairInstanceFinderImproved
 
 assignInfo = None
 SHORT_SECKEYS = "secret_keys" # for
@@ -59,19 +59,6 @@ class GetPairingVariables:
             pass
         elif Type(node.left) != ops.ATTR and Type(node.right) == ops.ATTR:
             pass
-
-class CheckForPairing:
-    def __init__(self):
-        self.hasPairings = False
-    
-    def visit(self, node, data):
-        pass
-    
-    def visit_pair(self, node, data):
-        self.hasPairings = True
-        
-    def getHasPairings(self):
-        return self.hasPairings
 
 class transformXOR:
     def __init__(self, fixedValues):
@@ -147,15 +134,15 @@ def transformFunction(entireSDL, funcName, blockStmts, info, noChangeList, start
     for index, i in enumerate(lines):
         assert type(blockStmts[i]) == sdl.VarInfo, "transformFunction: blockStmts must be VarInfo Objects."
         if blockStmts[i].getIsForLoopBegin():
-            newLines.append(START_TOKEN + " " + BLOCK_SEP + ' for')
+            newLines.append("\n" + START_TOKEN + " " + BLOCK_SEP + ' for')
             newLines.append(str(blockStmts[i].getAssignNode()))
         elif blockStmts[i].getIsForLoopEnd():
             newLines.append(str(blockStmts[i].getAssignNode()))
         
         elif blockStmts[i].getIsIfElseBegin():
-            newLines.append(START_TOKEN + " " + BLOCK_SEP + ' if')
-#            newLines.append(str(blockStmts[i].getAssignNode()))
+            newLines.append("\n" + START_TOKEN + " " + BLOCK_SEP + ' if')
             assign = blockStmts[i].getAssignNode()
+            print(i, ":", assign, end="")           
             handleVarInfo(newLines, assign, blockStmts[i], info, noChangeList)
         
         elif blockStmts[i].getIsIfElseEnd():
@@ -517,26 +504,29 @@ def runAutoGroup(sdlFile, config, sdlVerbose=False):
     # TODO: expand to other parts of algorithm including setup, keygen, encrypt 
     hashVarList = []
     pair_vars_G1_lhs = [] 
-    pair_vars_G1_rhs = []
-    print("TODO: pre-processing => split pairings")
+    pair_vars_G1_rhs = []    
     gpv = GetPairingVariables(pair_vars_G1_lhs, pair_vars_G1_rhs) 
     for eachStmt in pairingSearch:
         lines = eachStmt.keys()
         for i in lines:
             if type(eachStmt[i]) == sdl.VarInfo:
+                
                 print("Each: ", eachStmt[i].getAssignNode())
-                cfp = CheckForPairing()
-                if eachStmt[i].getHasPairings():
+                if HasPairings( eachStmt[i].getAssignNode() ):
+                    path_applied = []
+                    eachStmt[i].assignNode = SplitPairings(eachStmt[i].getAssignNode(), path_applied)
+                    if len(path_applied) > 0: print("Split Pairings: ", eachStmt[i].getAssignNode())
                     sdl.ASTVisitor( gpv ).preorder( eachStmt[i].getAssignNode() )
                 elif eachStmt[i].getHashArgsInAssignNode(): 
                     # in case, there's a hashed values...build up list and check later to see if it appears
                     # in pairing variable list
                     hashVarList.append(str(eachStmt[i].getAssignVar()))
                 else:
-                    assignNode = eachStmt[i].getAssignNode()
-                    sdl.ASTVisitor( cfp ).preorder( assignNode )
-                    if cfp.getHasPairings():
-                        sdl.ASTVisitor( gpv ).preorder( assignNode )
+                    continue # not interested
+#                    assignNode = eachStmt[i].getAssignNode()
+#                    sdl.ASTVisitor( cfp ).preorder( assignNode )
+#                    if cfp.getHasPairings():
+#                        sdl.ASTVisitor( gpv ).preorder( assignNode )
                 
     constraintList = []
     # determine if any hashed values in decrypt show up in a pairing
@@ -1195,16 +1185,17 @@ def updateForLists(varInfo, assignVar, info):
 def updateForPairing(varInfo, info):
     node = BinaryNode.copy(varInfo.getAssignNode())
     sdl.ASTVisitor( SubstitutePairings(info) ).preorder( node )
-#    for i in varInfo.getVarDepsNoExponents():
-#        if i in info['generators']: #only if the attr's refer to generators directly...
-#            pass
-            # action: always revert to base generators selected for asymmetric as opposed to maintain
-            # symmetricity in asymmetric setting...if that makes any sense!
-            ##sdl.ASTVisitor( SubstitutePairings(i, info['baseGeneratorG1'], 'left')).preorder( node )
-            ##sdl.ASTVisitor( SubstitutePairings(i, info['baseGeneratorG2'], 'right')).preorder( node )
-            #sdl.ASTVisitor( MaintainOrder(info['newTypes']) ).preorder( node )
-            # post-process node with pairings: maintain order of G1 <= lhs, G2 <= rhs, 
-            # and attempt to combine pairings wherever possible 
+    print("\n\t Pre techs: ", node, end="")
+    sdl.ASTVisitor( MaintainOrder(info) ).preorder( node )    
+    # combining pairing logic a bit.
+    while True:
+        tech6 = PairInstanceFinderImproved()
+        sdl.ASTVisitor(tech6).preorder( node )
+        if tech6.testForApplication(): 
+            tech6.makeSubstitution( node )
+        else:
+            break
+
     print("\n\t Changed: ", node)
     return str(node)
 

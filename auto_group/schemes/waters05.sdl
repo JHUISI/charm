@@ -105,7 +105,7 @@ for{i := 0, l}
 END :: for
 
 BEGIN :: if
-if { ((e(S1, g) * e(S2, u1b) * e(S2, dotProd2) * e(S3, u2b) * e(S3, dotProd3)) == A) }
+if { ((e(S1, g) * e(S2, u1b * dotProd2) * e(S3, u2b * dotProd3)) == A) }
    output := True
 else
    output := False
@@ -122,5 +122,4 @@ u2b := \hat{u_2\prime}
 ub := \hat{u}
 END :: latex
 
-# if { ((e(S1, g) * e(S2, u1b * dotProd2) * e(S3, u2b * dotProd3)) == A) }
-
+# if { ((e(S1, g) * e(S2, u1b) * e(S2, dotProd2) * e(S3, u2b) * e(S3, dotProd3)) == A) }
