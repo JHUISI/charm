@@ -1,5 +1,5 @@
 schemeType = "PKENC"
-short = "keys"
+short = "secret_keys"
 
 extraSetupFuncName = "setup"
 setupFuncName = "authsetup"

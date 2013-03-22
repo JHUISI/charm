@@ -1,8 +1,8 @@
 name := waters05
+setting := symmetric
 l := 5
 zz := 32
 
-setting := asymmetric
 
 BEGIN :: types
 alpha := ZR
@@ -12,70 +12,45 @@ mver := list{ZR}
 kver := list{ZR}
 ID := str
 M := str
-S1 := G1
-S2 := G1
-S3 := G1
-h := G1
 u := list{G1}
-ub := list{G2}
-u1b := list{G2}
-u2b := list{G2}
-g1 := G1
-g2 := G2
+ub := list{G1}
+u1b := list{G1}
+u2b := list{G1}
 A := GT
 zz := int
 END :: types
-
-BEGIN :: precompute
- k := stringToInt(ID, l, zz)
- m := stringToInt(M, l, zz)
-END :: precompute
-
-constant := list{A, g2, ub, u1b, u2b}
-public := list{k, ID}
-signature := list{S1, S2, S3}
-message := list{m, M}
-
-BEGIN :: count
-message_count := N
-public_count := N
-signature_count := N
-END :: count
-
-verify := { (e(S1, g2) * e(S2, u1b * (prod{y:=0, l} on ub_y^k_y)) * e(S3, u2b * (prod{y:=0,l} on ub_y^m_y))) == A }
 
 BEGIN :: func:setup
 input := None
  alpha := random(ZR) 
  h := random(G1)
- g1 := random(G1)
- g2 := random(G2)
- A := (e(h, g2) ^ alpha)
+ g := random(G1)
+ A := (e(h, g) ^ alpha)
 
 BEGIN :: for
 for{i := 0, l}
  y0#i := random(ZR)
- u#i := g1 ^ y0#i
- ub#i := g2 ^ y0#i
+ u#i := g ^ y0#i
+ ub#i := g ^ y0#i
 END :: for
 
  y1t := random(ZR)
  y2t := random(ZR)
 
- u1t := g1 ^ y1t
- u2t := g1 ^ y2t
+ u1t := g ^ y1t
+ u2t := g ^ y2t
 
- u1b := g2 ^ y1t
- u2b := g2 ^ y2t
+ u1b := g ^ y1t
+ u2b := g ^ y2t
 
  msk := h ^ alpha
- mpk := list{g1, g2, A, u1t, u2t, u1b, u2b} 
-output := list{mpk, u, ub, msk}
+ mpk := list{g, A, u, ub, u1t, u2t, u1b, u2b} 
+output := list{mpk, msk}
 END :: func:setup
 
 BEGIN :: func:keygen
-input := list{mpk, u, msk, ID}
- mpk := expand{g1, g2, A, u1t, u2t, u1b, u2b}
+input := list{mpk, msk, ID}
+ mpk := expand{g, A, u, ub, u1t, u2t, u1b, u2b}
  
  k := stringToInt(ID, l, zz)
  dotProd := init(G1) 
@@ -86,7 +61,8 @@ END :: for
 
  r := random(ZR)
  k1 := msk * ((u1t * dotProd) ^ r)
- k2 := g1 ^ -r
+ k2 := g ^ -r
+
  sk := list{k1, k2}
  output := sk
 END :: func:keygen
@@ -94,8 +70,8 @@ END :: func:keygen
 
 
 BEGIN :: func:sign
-input := list{mpk, u, sk, M}
- mpk := expand{g1, g2, A, u1t, u2t, u1b, u2b}
+input := list{mpk, sk, M}
+ mpk := expand{g, A, u, ub, u1t, u2t, u1b, u2b}
  m := stringToInt(M, l, zz)
  sk := expand{k1, k2}
  s  := random(ZR)
@@ -107,17 +83,20 @@ END :: for
 
  S1 := k1 * ((u2t * dotProd1) ^ s)
  S2 := k2
- S3 := g1 ^ -s
-output := list{S1, S2, S3}
+ S3 := g ^ -s
+ sig := list{S1, S2, S3}
+output := sig
 END :: func:sign
 
 BEGIN :: func:verify
- input := list{A, g2, ub, u1b, u2b, ID, M, S1, S2, S3}
+ input := list{mpk, ID, M, sig}
+ mpk := expand{g, A, u, ub, u1t, u2t, u1b, u2b}
+ sig := expand{S1, S2, S3}
 
  kver := stringToInt(ID, l, zz)
  mver := stringToInt(M, l, zz)
- dotProd2 := init(G2)
- dotProd3 := init(G2)
+ dotProd2 := init(G1)
+ dotProd3 := init(G1)
  
 BEGIN :: for
 for{i := 0, l}
@@ -126,7 +105,7 @@ for{i := 0, l}
 END :: for
 
 BEGIN :: if
-if { ((e(S1, g2) * e(S2, u1b * dotProd2) * e(S3, u2b * dotProd3)) == A) }
+if { ((e(S1, g) * e(S2, u1b) * e(S2, dotProd2) * e(S3, u2b) * e(S3, dotProd3)) == A) }
    output := True
 else
    output := False
@@ -142,4 +121,6 @@ u1b := \hat{u_1\prime}
 u2b := \hat{u_2\prime}
 ub := \hat{u}
 END :: latex
+
+# if { ((e(S1, g) * e(S2, u1b * dotProd2) * e(S3, u2b * dotProd3)) == A) }
 

@@ -22,6 +22,9 @@ from SDLang import *
 #    
 #    return prod_result
 
+G1Prefix = "G1"
+G2Prefix = "G2"
+
 class AbstractTechnique:
     def __init__(self, allStmtsInBlock):
         assert type(allStmtsInBlock) == dict, "Invalid dict of code block"
@@ -953,23 +956,43 @@ class SubstituteVar:
             if self.new_var in types.getList():
                 node.left.attr = types[self.new_var]
     
+"""SubstitutePairings assumes pairings have been split already. """
 class SubstitutePairings:
-    def __init__(self, this, this_new, side='left'):
-        self.this_target = this
-        self.this_new    = this_new
-        self.side        = side
+    def __init__(self, info):
+        self.pairingInfo = info.get('pairing')
+        self.mapG1 = info.get('generatorMapG1')
+        self.mapG2 = info.get('generatorMapG2')
+        self.generators = info.get('generators')
+        self.verbose = False
+        
     def visit(self, node, data):
         pass
     
     def visit_pair(self, node, data):
         # TODO: may not be ATTR nodes: look for other cases
-        if self.side == 'left' and str(node.left) == self.this_target and Type(node.left) == ops.ATTR:
-            if self.this_new != None: node.left.setAttribute(self.this_new)
-        elif self.side == 'right' and str(node.right) == self.this_target and Type(node.right) == ops.ATTR:
-            if self.this_new != None: node.right.setAttribute(self.this_new)
+        lhs = node.left.getRefAttribute()
+        rhs = node.right.getRefAttribute()
+        if self.verbose: print("\nDEBUG: lhs=", lhs, ", rhs=", rhs)
+        if lhs in self.generators and rhs in self.generators: # covers lhs == rhs OR lhs != rhs
+            node.left.setAttribute( self.mapG1.get(lhs) )
+            node.right.setAttribute( self.mapG2.get(rhs) )
+            return
+        
+        # if e(g, X \in G2) => e(gG1, X) and vice versa
+        if lhs in self.generators and rhs not in self.generators:
+            if rhs in self.pairingInfo[G1Prefix]:
+                node.left.setAttribute( self.mapG2.get(lhs) )
+            elif rhs in self.pairingInfo[G2Prefix]:
+                node.left.setAttribute( self.mapG1.get(lhs) )            
+        # if e(X \in G1, g) => e(X, gG2) and vice versa                
+        elif lhs not in self.generators and rhs in self.generators:
+            if lhs in self.pairingInfo[G1Prefix]:
+                node.right.setAttribute( self.mapG2.get(rhs) )
+            elif lhs in self.pairingInfo[G2Prefix]:
+                node.right.setAttribute( self.mapG1.get(rhs) )
         else:
-            print("TODO: handle this case - ", Type(node.left), Type(node.right))
-
+            pass # we leave other cases untouched
+                
 techMap = {1:Technique1, 2:Technique2, 3:Technique3, 4:Technique4, 11:Technique11}
 
 def testTechnique(tech_option, equation, code_block=None):
@@ -1582,9 +1605,15 @@ class GetPairings:
     def visit_pair(self, node, data):
         self._list.append(BinaryNode.copy(node))
         return
+    
     def getList(self):
         return self._list
 
+def HasPairings(node):
+    gp = GetPairings()
+    ASTVisitor(gp).inorder(node)
+    if len(gp.getList()) > 0: return True
+    return False
 
 def CombinePairings(nodeList, _verbose=False):
     # combine then split pairings
@@ -1600,6 +1629,19 @@ def CombinePairings(nodeList, _verbose=False):
     getPair = GetPairings()
     ASTVisitor(getPair).preorder(equation)
     return getPair.getList()
+
+# assumes that each pairing has one argument on lhs
+class MaintainOrder:
+    def __init__(self, theVarTypes):
+        self.varTypes = theVarTypes
+
+    def visit(self, node, data):
+        pass
+    
+    def visit_pair(self, node, data):
+        lhs = str(node.left)
+        rhs = str(node.right)
+#        if self.varTypes.get(lhs) != None and self.varTypes.get(lhs)
 
 def PEMDAS(node):
     if (type(node) is str):

@@ -781,7 +781,7 @@ def writeAssignStmt_Python(outputFile, binNode):
 
     if (variableName == outputKeyword):
         if ( strNode == "output := false" ):
-            falseOutputString += writeCurrentNumTabsToString()
+            falseOutputString = writeCurrentNumTabsToString()
             falseOutputString += "return False\n"
             outputFile.write(falseOutputString)
             return

@@ -1,5 +1,5 @@
 schemeType = "PKENC"
-short = "keys"
+short = "both"
 
 setupFuncName = "setup"
 keygenFuncName = "keygen"
@@ -9,6 +9,6 @@ decryptFuncName = "decrypt"
 masterPubVars = ["pk"]
 masterSecVars = ["msk"]
 
-keygenPubVar = ["pk"]
+keygenPubVar = "pk"
 keygenSecVar = "sk"
 ciphertextVar = "ct"
