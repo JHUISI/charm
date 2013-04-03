@@ -12,9 +12,9 @@ Features of Charm include:
 * An integrated compiler for interactive and non-interactive ZK proofs
 * Integrated benchmarking capability
 
-Charm Documentation
-===================
-For complete install docs see http://jhuisi.github.com/charm/install_source.html
+Documentation
+=============
+For complete install docs see http://jhuisi.github.com/charm/install_source.html. 
 
 Schemes
 =======

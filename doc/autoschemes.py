@@ -122,7 +122,7 @@ if __name__ == "__main__":
    mods = list()
    rel_path = '../'
    slash = '/'
-   mod_list = [config.scheme_path, config.abenc_path, config.dabenc_path, config.pkenc_path, config.pksig_path]
+   mod_list = [config.scheme_path, config.abenc_path, config.pkenc_path, config.pksig_path]
    for p in mod_list:
        mods.append( find_modules(rel_path + p) )
    for p in range(len(mod_list)):
