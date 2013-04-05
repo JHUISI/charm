@@ -12,6 +12,7 @@ Demonstration Schemes
    charm/schemes/dabe_aw11
    charm/schemes/encap_bchk05
    charm/schemes/pk_vrf
+   charm/schemes/pre_mg07
    charm/schemes/protocol_cns07
    charm/schemes/protocol_schnorr91
    charm/schemes/sigma1
@@ -19,6 +20,7 @@ Demonstration Schemes
    charm/schemes/sigma3
    charm/schemes/pksig/pksig_bls04
    charm/schemes/pksig/pksig_boyen
+   charm/schemes/pksig/pksig_boyen_mod
    charm/schemes/pksig/pksig_chch
    charm/schemes/pksig/pksig_chp
    charm/schemes/pksig/pksig_cl03
@@ -36,6 +38,8 @@ Demonstration Schemes
    charm/schemes/abenc/abenc_bsw07
    charm/schemes/abenc/abenc_lsw08
    charm/schemes/abenc/abenc_waters09
+   charm/schemes/abenc/dfa_fe12
+   charm/schemes/abenc/pk_hve08
    charm/schemes/pkenc/pkenc_cs98
    charm/schemes/pkenc/pkenc_elgamal85
    charm/schemes/pkenc/pkenc_paillier99

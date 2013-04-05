@@ -1,12 +1,12 @@
 '''
-Script to automatically generate documentation stubs for schemes
+Script to automatically generate documentation stubs for schemes, toolbox and test code
 
 Author: Gary Belvin
 '''
 import os, re
 import config
 
-skipList = config.skip_list # ['ake_ecmqv', 'pksig_rsa_hw09', 'bls04']
+skipList = config.skip_list
 
 def find_modules(path="."):
     if type(path) == str:
@@ -135,7 +135,7 @@ if __name__ == "__main__":
    #Auto add toolbox classes
    print("Adding: ", config.toolbox_path)
    mods = find_modules(config.toolbox_path)
-   auto_add_rst(mods, 'source/toolbox/')
+   auto_add_rst(mods, 'source/toolbox/', True)
    replace_toc('source/toolbox.rst', 'auto_toolbox_list', mods, 'toolbox/')
 
   
