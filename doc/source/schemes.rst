@@ -1,6 +1,6 @@
 .. _schemes:
 
-Demonstration Schemes
+Implemented Schemes
 -----------------------------------------
 
 .. begin_auto_scheme_list

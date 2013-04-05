@@ -29,6 +29,9 @@ sys.path.insert(0, os.path.abspath('../../charm/schemes/hibenc'))
 sys.path.insert(0, os.path.abspath('../../charm/schemes/grpsig'))
 sys.path.insert(0, os.path.abspath('../../charm/schemes/commit'))
 sys.path.insert(0, os.path.abspath('../../charm/toolbox'))
+sys.path.insert(0, os.path.abspath('../../charm/test'))
+sys.path.insert(0, os.path.abspath('../../charm/test/schemes'))
+sys.path.insert(0, os.path.abspath('../../charm/test/toolbox'))
 
 # -- General configuration -----------------------------------------------------
 

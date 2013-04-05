@@ -8,21 +8,19 @@ import config
 
 skipList = config.skip_list
 
-def find_modules(path="."):
+def find_modules(path=".", excludeTests=True):
     if type(path) == str:
        path = [path]
     modules = list()
     for this_path in path: 
         for filename in os.listdir(this_path):
-#            print("file: ", filename)
+            #print("file: ", filename)
             if re.match("^[^_][\w]+\.py$", filename):
                module = filename[:-3]
                modules.append(module)
 
     #Exclude unit tests
-    modules = [mod for mod in modules if not re.match(".*_test$", mod)]
-    #modules = [mod for mod in modules if not re.match("batch.*", mod)]
-    #modules = [mod for mod in modules if not re.match("bench.*", mod)]
+    if excludeTests: modules = [mod for mod in modules if not re.match(".*_test$", mod)]
     try:
         for i in skipList:
             modules.remove(i)    
@@ -138,4 +136,13 @@ if __name__ == "__main__":
    auto_add_rst(mods, 'source/toolbox/', True)
    replace_toc('source/toolbox.rst', 'auto_toolbox_list', mods, 'toolbox/')
 
+   #Auo add test case code 
+   print("Adding: ", config.test_path + "/schemes")
+   mods = find_modules(config.test_path + "/schemes", excludeTests=False)
+   auto_add_rst(mods, 'source/test/', True)
+   replace_toc('source/test_schemes.rst', 'auto_test_schemes_list', mods, 'test/')
   
+   print("Adding: ", config.test_path + "/toolbox")
+   mods = find_modules(config.test_path + "/toolbox", excludeTests=False)
+   auto_add_rst(mods, 'source/test/', True)
+   replace_toc('source/test_toolbox.rst', 'auto_test_toolbox_list', mods, 'test/')

@@ -3,28 +3,42 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Charm-Crypto's documentation!
+Charm-Crypto docs
 ========================================
 .. sectionauthor:: My Name
 
-Contents:
+Users:
+
+.. toctree::
+   :maxdepth: 1
+   
+   quick_start
+   install_source 
+   mobile
+
+Development Guide
 
 .. toctree::
    :maxdepth: 1
 
-   install_source 
    cryptographers
    developers
-   mobile
 
-Developer Resources
+Cryptographic Schemes
 
 .. toctree::
    :maxdepth: 1
 
    schemes
+   test_schemes
+
+Our Toolbox
+
+.. toctree::
+   :maxdepth: 1
+
    toolbox
-   todo
+   test_toolbox
 
 Indices and tables
 ==================
