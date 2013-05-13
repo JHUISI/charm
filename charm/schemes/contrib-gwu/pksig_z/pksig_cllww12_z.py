@@ -58,20 +58,20 @@ class Sign_Chen12_z(PKSig):
         one = group.random(ZR)
         
         [D11, D12, D13, D14] = GaussEliminationinGroups([[d11, d12, d13, d14, one],
-                                        [d21, d22, d23, d24, group.init(ZR, long(0))],
-                                        [d31, d32, d33, d34, group.init(ZR, long(0))],
-                                        [d41, d42, d43, d44, group.init(ZR, long(0))]])
-        [D21, D22, D23, D24] = GaussEliminationinGroups([[d11, d12, d13, d14, group.init(ZR, long(0))],
+                                        [d21, d22, d23, d24, group.init(ZR, 0)],
+                                        [d31, d32, d33, d34, group.init(ZR, 0)],
+                                        [d41, d42, d43, d44, group.init(ZR, 0)]])
+        [D21, D22, D23, D24] = GaussEliminationinGroups([[d11, d12, d13, d14, group.init(ZR, 0)],
                                         [d21, d22, d23, d24, one],
-                                        [d31, d32, d33, d34, group.init(ZR, long(0))],
-                                        [d41, d42, d43, d44, group.init(ZR, long(0))]])
-        [D31, D32, D33, D34] = GaussEliminationinGroups([[d11, d12, d13, d14, group.init(ZR, long(0))],
-                                        [d21, d22, d23, d24, group.init(ZR, long(0))],
+                                        [d31, d32, d33, d34, group.init(ZR, 0)],
+                                        [d41, d42, d43, d44, group.init(ZR, 0)]])
+        [D31, D32, D33, D34] = GaussEliminationinGroups([[d11, d12, d13, d14, group.init(ZR, 0)],
+                                        [d21, d22, d23, d24, group.init(ZR, 0)],
                                         [d31, d32, d33, d34, one],
-                                        [d41, d42, d43, d44, group.init(ZR, long(0))]])
-        [D41, D42, D43, D44] = GaussEliminationinGroups([[d11, d12, d13, d14, group.init(ZR, long(0))],
-                                        [d21, d22, d23, d24, group.init(ZR, long(0))],
-                                        [d31, d32, d33, d34, group.init(ZR, long(0))],
+                                        [d41, d42, d43, d44, group.init(ZR, 0)]])
+        [D41, D42, D43, D44] = GaussEliminationinGroups([[d11, d12, d13, d14, group.init(ZR, 0)],
+                                        [d21, d22, d23, d24, group.init(ZR, 0)],
+                                        [d31, d32, d33, d34, group.init(ZR, 0)],
                                         [d41, d42, d43, d44, one]])
         
 

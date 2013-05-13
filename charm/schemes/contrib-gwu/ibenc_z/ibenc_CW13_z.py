@@ -27,11 +27,12 @@ class IBE_CW13(IBEnc):
     >>> ibe = IBE_CW13(group)
     >>> (master_public_key, master_secret_key) = ibe.setup()
     >>> ID = 'user@email.com'
-    >>> private_key = ibe.extract(master_secret_key, ID)
+    >>> private_key = ibe.extract(master_public_key, master_secret_key, ID)
     >>> msg = group.random(GT)
     >>> cipher_text = ibe.encrypt(master_public_key, ID, msg)
     >>> decryptedMSG = ibe.decrypt(master_public_key, private_key, cipher_text)
     >>> print (decryptedMSG==msg)
+    True
     """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
@@ -47,10 +48,10 @@ class IBE_CW13(IBEnc):
         B = [[group.random(ZR), group.random(ZR)],[group.random(ZR), group.random(ZR)]]
        
         Bt = MatrixTransGroups(B)
-        Bstar= [GaussEliminationinGroups([[Bt[0][0], Bt[0][1], group.init(ZR, long(1))],
-                                                  [Bt[1][0], Bt[1][1], group.init(ZR, long(0))]]),
-                GaussEliminationinGroups([[Bt[0][0], Bt[0][1], group.init(ZR, long(0))],
-                                                  [Bt[1][0], Bt[1][1], group.init(ZR, long(1))]])]
+        Bstar= [GaussEliminationinGroups([[Bt[0][0], Bt[0][1], group.init(ZR, 1)],
+                                                  [Bt[1][0], Bt[1][1], group.init(ZR, 0)]]),
+                GaussEliminationinGroups([[Bt[0][0], Bt[0][1], group.init(ZR, 0)],
+                                                  [Bt[1][0], Bt[1][1], group.init(ZR, 1)]])]
         Bstar = MatrixTransGroups(Bstar)
 
 
@@ -59,8 +60,8 @@ class IBE_CW13(IBEnc):
 #             print("[%s,%s]"%(i[0],i[1]))
             
         #generate R
-        R = [[group.random(ZR), group.init(ZR, long(0))],
-            [group.init(ZR, long(0)), group.init(ZR, long(1))]]
+        R = [[group.random(ZR), group.init(ZR, 0)],
+            [group.init(ZR, 0), group.init(ZR, 1)]]
         
         #generate A1 and A2
         A1 =[[group.random(ZR), group.random(ZR)],

@@ -37,10 +37,10 @@ class Sign_CW13(PKSig):
         B = [[group.random(ZR), group.random(ZR)],[group.random(ZR), group.random(ZR)]]
        
         Bt = MatrixTransGroups(B)
-        Bstar= [GaussEliminationinGroups([[Bt[0][0], Bt[0][1], group.init(ZR, long(1))],
-                                                  [Bt[1][0], Bt[1][1], group.init(ZR, long(0))]]),
-                GaussEliminationinGroups([[Bt[0][0], Bt[0][1], group.init(ZR, long(0))],
-                                                  [Bt[1][0], Bt[1][1], group.init(ZR, long(1))]])]
+        Bstar= [GaussEliminationinGroups([[Bt[0][0], Bt[0][1], group.init(ZR, 1)],
+                                                  [Bt[1][0], Bt[1][1], group.init(ZR, 0)]]),
+                GaussEliminationinGroups([[Bt[0][0], Bt[0][1], group.init(ZR, 0)],
+                                                  [Bt[1][0], Bt[1][1], group.init(ZR, 1)]])]
         Bstar = MatrixTransGroups(Bstar)
 
 
@@ -49,8 +49,8 @@ class Sign_CW13(PKSig):
 #             print("[%s,%s]"%(i[0],i[1]))
             
         #generate R
-        R = [[group.random(ZR), group.init(ZR, long(0))],
-            [group.init(ZR, long(0)), group.init(ZR, long(1))]]
+        R = [[group.random(ZR), group.init(ZR, 0)],
+            [group.init(ZR, 0), group.init(ZR, 1)]]
         
         #generate A1 and A2
         A1 =[[group.random(ZR), group.random(ZR)],

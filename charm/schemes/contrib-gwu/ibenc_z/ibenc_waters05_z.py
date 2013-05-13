@@ -42,9 +42,9 @@ class IBE_N04_z(IBEnc):
     >>> (master_public_key, master_key) = ibe.setup()
     >>> ID = "bob@mail.com"
     >>> kID = waters_hash.hash(ID)
-    >>> secret_key = ibe.extract(master_public_key, master_key, kID)
+    >>> secret_key = ibe.extract(master_key, ID)
     >>> msg = group.random(GT)
-    >>> cipher_text = ibe.encrypt(master_public_key, kID, msg)
+    >>> cipher_text = ibe.encrypt(master_public_key, ID, msg)
     >>> decrypted_msg = ibe.decrypt(master_public_key, secret_key, cipher_text)
     >>> decrypted_msg == msg
     True
@@ -53,7 +53,7 @@ class IBE_N04_z(IBEnc):
     """Implementation of David Naccahe Identity Based Encryption"""
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        IBEnc.setProperty(self, secdef='IND_ID_CPA', assumption='DBDH', secmodel='Standard')
+        #IBEnc.setProperty(self, secdef='IND_ID_CPA', assumption='DBDH', secmodel='Standard')
         #, other={'id':ZR}
         #message_space=[GT, 'KEM']
         global group
