@@ -10,7 +10,7 @@ To use any of our existing schemes in your application, each scheme includes a `
 
 ::
 
-	from charm.schemes.pkenc.pkenc_cs98.py import CS98
+	from charm.schemes.pkenc.pkenc_cs98 import CS98
 	from charm.toolbox.eccurve import prime192v1
 	from charm.toolbox.ecgroup import ECGroup
 	

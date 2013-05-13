@@ -1,5 +1,5 @@
-from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.IBEnc import *
 
 debug = False
 class HashIDAdapter(IBEnc):
@@ -18,44 +18,42 @@ class HashIDAdapter(IBEnc):
     True
     """
     def __init__(self, scheme, group):
+        global ibe
         IBEnc.__init__(self)
         self.group = group
-        self.ibe_good = False
+        ibe = None
         # validate that we have the appropriate object
-        
-        if IBEnc.checkProperty(self, scheme, {'scheme':self.baseSchemeTypes.IBEnc, 
-                                        'secdef':self.baseSecDefs.sIND_ID_CPA, 
-                                        'id':ZR}):
-            self.ibenc = scheme
+        criteria = [('secDef', IND_sID_CPA), ('scheme', 'IBEnc'), ('secModel', SM), ('id',ZR)]
+        if IBEnc.checkProperty(self, scheme, criteria):
             # change our property as well
-            IBEnc.setProperty(self, secdef='IND_ID_CPA', other={'id':str}, secmodel='ROM')
-            # check message space?
-            self.ibe_good = True
-
-        if not self.ibe_good:
-            assert False, "ibe object does not satisfy requirements."
+            IBEnc.updateProperty(self, scheme, secDef=IND_ID_CPA, id=str, secModel=ROM)
+            ibe = scheme
+            #IBEnc.printProperties(self)
+        else:
+            assert False, "Input scheme does not satisfy adapter properties: %s" % criteria
 
     def setup(self):
-        if not self.ibe_good: return IBEnc.setup(self)
-        return self.ibenc.setup()
+        assert ibe != None, "IBEnc alg not set"
+        return ibe.setup()
 
     def extract(self, mk, ID):
-        if not self.ibe_good: return IBEnc.extract(self, mk, ID)
+        assert ibe != None, "IBEnc alg not set"
         if type(ID) == str:
             ID2 = self.group.hash(ID)
-            return self.ibenc.extract(mk, ID2)
+            sk = ibe.extract(mk, ID2); sk['IDstr'] = ID
+            return sk
         else:
             assert False, "invalid type on ID."
     
     def encrypt(self, pk, ID, msg):
-        if not self.ibe_good: return IBEnc.encrypt(self, pk, ID, msg)
+        assert ibe != None, "IBEnc alg not set"        
         if type(ID) == str:
             ID2 = self.group.hash(ID)
-            return self.ibenc.encrypt(pk, ID2, msg)
+            return ibe.encrypt(pk, ID2, msg)
         else:
             assert False, "invalid type on ID."
 
     def decrypt(self, pk, sk, ct):
-        if not self.ibe_good: return IBEnc.decrypt(self, pk, sk, ct)
-        return self.ibenc.decrypt(pk, sk, ct)
+        assert ibe != None, "IBEnc alg not set"        
+        return ibe.decrypt(pk, sk, ct)
 

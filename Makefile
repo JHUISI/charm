@@ -13,7 +13,7 @@ gmp_url=http://ftp.gnu.org/gnu/gmp/${gmp_version}.tar.gz
 gmp_options=CC="${CC}" CPP="${CPP}" LDFLAGS="${LDFLAGS}" CPPFLAGS="${CPPFLAGS}" ${OSFLAGS}
 
 # pbc source
-pbc_version=pbc-0.5.12
+pbc_version=pbc-0.5.13
 pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
 pbc_options=CC="${CC}" CPP="${CPP}" LDFLAGS="${LDFLAGS}" CPPFLAGS="${CPPFLAGS}" ${OSFLAGS}
 DESTDIR=${prefix}

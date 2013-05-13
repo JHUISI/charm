@@ -10,7 +10,7 @@ from charm.toolbox.schemebase import *
 class ABEnc(SchemeBase):
     def __init__(self):
         SchemeBase.__init__(self)
-        SchemeBase.setProperty(self, scheme='ABEnc')  
+        SchemeBase._setProperty(self, scheme='ABEnc')  
         self.baseSecDefs = Enum('IND_AB_CPA', 'IND_AB_CCA', 'sIND_AB_CPA', 'sIND_AB_CCA') 
 
     def setup(self):

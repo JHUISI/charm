@@ -27,8 +27,8 @@
 *
 ************************************************************************/
 
-#include "miracl_interface2.h"
 #include "miracl_config.h"
+#include "miracl_interface2.h"
 #include "miracl.h"
 #include <sstream>
 
@@ -66,7 +66,7 @@ string bigToBytes(Big x)
 {
 	char c[MAX_LEN+1];
 	memset(c, 0, MAX_LEN);
-	int size = to_binary(x, MAX_LEN, c, TRUE);
+	int size = to_binary(x, MAX_LEN, c, FALSE); // working w/ TRUE
 	string bytes(c, size);
 //	cout << "length :=> " << size << endl;
 //	printf("bigToBytes before => ");
@@ -84,15 +84,30 @@ string bigToBytes(Big x)
 Big *bytesToBig(string str, int *counter)
 {
 	int pos = str.find_first_of(':');
-	int len = atoi( str.substr(0, pos).c_str() );
-	const char *elem = str.substr(pos+1, pos + len).c_str();
+	if(pos > BIG_SIZE || pos < 0) {
+		return new Big(0);
+	}
 //	cout << "pos of elem => " << pos << endl;
+	int len = atoi( str.substr(0, pos).c_str() );
+	int add_zeroes = PAD_SIZE;
+	const char *elem = str.substr(pos+1, pos + len).c_str();
+	char elem2[MAX_LEN + 1];
+	memset(elem2, 0, MAX_LEN);
+	// right justify elem2 before call to 'from_binary'
+	if(len < BIG_SIZE) {
+		// need to prepend additional zero's
+		add_zeroes += (BIG_SIZE - len);
+	}
+
+	for(int i = add_zeroes; i < BIG_SIZE + add_zeroes; i++)
+		elem2[i] = elem[i-add_zeroes];
+
 //	printf("bytesToBig before => ");
 //	_printf_buffer_as_hex((uint8_t *) elem, len);
 //	cout << "len => " << len << endl;
-//    big x = mirvar(0);
-//    bytes_to_big(len, (char *) elem, x);
-	Big x = from_binary(len, (char *) elem);
+//	printf("bytesToBig before2 => ");
+//	_printf_buffer_as_hex((uint8_t *) elem2, MAX_LEN);
+	Big x = from_binary(MAX_LEN, (char *) elem2);
 	Big *X  = new Big(x);
 //	cout << "Big => " << *X << endl;
 	*counter  = pos + len + 1;
@@ -104,7 +119,7 @@ pairing_t *pairing_init(int securitylevel) {
 
 	PFC *pfc = new PFC(securitylevel);
 	miracl *mip=get_mip();  // get handle on mip (Miracl Instance Pointer)
-	mip->IOBASE = 16;
+	mip->IOBASE = 10;
 
 	//cout << "Initialized: " << pfc << endl;
     //cout << "Order = " << pfc->order() << endl;
@@ -154,22 +169,22 @@ int element_is_member(Curve_t ctype, Group_t type, const pairing_t *pairing, ele
 {
 	PFC *pfc = (PFC *) pairing;
 	// test whether e is in type
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) e;
 		if(*x > 0 && *x < pfc->order()) return TRUE;
 		return FALSE;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *point = (G1 *) e;
 		if ((*(pfc->cof) * point->g).iszero() == TRUE) { return FALSE; }
 		else { return TRUE; }
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *point = (G2 *) e;
 		if ((*(pfc->cof) * point->g).iszero() == TRUE) { return FALSE; }
 		else { return TRUE; }
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *point = (GT *) e;
 		if ((pow(point->g, pfc->order())).iszero() == TRUE) { return FALSE; }
 		else { return TRUE; }
@@ -181,20 +196,21 @@ int element_is_member(Curve_t ctype, Group_t type, const pairing_t *pairing, ele
 void element_random(Group_t type, const pairing_t *pairing, element_t *e) {
 	PFC *pfc = (PFC *) pairing;
 
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) e;
 		pfc->random(*x);
+		*x = *x % pfc->order();
 		// cout << "1st: generated a random value x = " << *x << endl;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *g = (G1 *) e;
 		pfc->random(*g);
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *g = (G2 *) e;
 		pfc->random(*g);
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		cout << "Error: can't generate random GT elements directly!" << endl;
 	}
 	else {
@@ -204,19 +220,19 @@ void element_random(Group_t type, const pairing_t *pairing, element_t *e) {
 
 void element_printf(Group_t type, const element_t *e)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *y = (Big *) e;
 		cout << *y;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *point = (G1 *) e;
 		cout << point->g;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *point = (G2 *) e;
 		cout << point->g;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *point = (GT *) e;
 		cout << point->g;
 	}
@@ -230,22 +246,22 @@ int _element_length_to_str(Group_t type, const element_t *e)
 {
 	stringstream ss;
 	string s;
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *y = (Big *) e;
 		ss << *y;
 // 		cout << "ZR origin => " << *y << endl;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *point = (G1 *) e;
 		ss << point->g;
 //		cout << "G1 origin => " << point->g << endl;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *point = (G2 *) e;
 		ss << point->g;
 //		cout << "G2 origin => " << point->g << endl;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *point = (GT *) e;
 		ss << point->g;
 //		cout << "GT origin => " << point->g << endl;
@@ -262,20 +278,20 @@ int _element_to_str(unsigned char **data_str, Group_t type, const element_t *e)
 {
 	stringstream ss;
 	string s;
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *y = (Big *) e;
 		ss << *y;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *point = (G1 *) e;
 		ss << point->g;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *point = (G2 *) e;
 		ss << point->g;
 //		cout << "G2 origin => " << point->g << endl;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *point = (GT *) e;
 		ss << point->g;
 //		cout << "GT origin => " << point->g << endl;
@@ -291,7 +307,7 @@ int _element_to_str(unsigned char **data_str, Group_t type, const element_t *e)
 
 void _element_add(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
@@ -299,11 +315,11 @@ void _element_add(Group_t type, element_t *c, const element_t *a, const element_
 		*z = ((*x + *y) % *o1);
 //		cout << "Result => " << *z << endl;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;
 		*z = *x + *y;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *x = (G2 *) a;  G2 *y = (G2 *) b; G2 *z = (G2 *) c;
 		*z = *x + *y;
 	}
@@ -315,18 +331,22 @@ void _element_add(Group_t type, element_t *c, const element_t *a, const element_
 
 void _element_sub(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
 		Big *o1 = (Big *) o;
 		*z = ((*x - *y) % *o1);
+//		if(*z < 0) {
+//			*z = (*z + *o1) % *o1;
+//		}
+
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;
 		*z = *x + (-*y);
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *x = (G2 *) a;  G2 *y = (G2 *) b; G2 *z = (G2 *) c;
 		*z = *x + (-*y);
 	}
@@ -335,20 +355,31 @@ void _element_sub(Group_t type, element_t *c, const element_t *a, const element_
 
 void _element_mul(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
-//		*z = *x * *y;
 		Big *o1 = (Big *) o;
-		*z = modmult(*x, *y, *o1);
+//		if(*y == Big(-1)) {
+//			*z = *x;
+//			z->negate();
+//		}
+//		else if(y->isone()) {
+//			*z = *x;
+//		}
+//		else {
+			*z = modmult(*x, *y, *o1);
+//		}
+		if(*z < 0) {
+			*z = (*z + *o1) % *o1;
+		}
 //		cout << "Result => " << *z << endl;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;
 		 *z = *x + *y;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *x = (G2 *) a;  G2 *y = (G2 *) b; G2 *z = (G2 *) c;
 #if BUILD_BN_CURVE == 1
 		x->g.norm();
@@ -357,7 +388,7 @@ void _element_mul(Group_t type, element_t *c, const element_t *a, const element_
 //		cout << y->g << endl;
 		*z = *x + *y;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *x = (GT *) a;  GT *y = (GT *) b; GT *z = (GT *) c;
 		*z = *x * *y;
 	}
@@ -370,24 +401,32 @@ void _element_mul(Group_t type, element_t *c, const element_t *a, const element_
 void _element_mul_si(Group_t type, const pairing_t *pairing, element_t *c, const element_t *a, const signed long int b, const element_t *o)
 {
 	PFC *pfc = (PFC *) pairing;
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *z  = (Big *) c;
 		Big *x  = (Big *) a;
 		Big *o1 = (Big *) o;
-
-		*z = modmult(*x, Big(b), *o1);
+		if(b == -1) {
+			*z = *x;
+			z->negate();
+		}
+		else if(b == 1) {
+			*z = *x;
+		}
+		else {
+			*z = modmult(*x, Big(b), *o1);
+		}
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *z = (G1 *) c;
 		G1 *x = (G1 *) a;
 		*z = pfc->mult(*x, Big(b));
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *z = (G2 *) c;
 		G2 *x = (G2 *) a;
 		*z = pfc->mult(*x, Big(b));
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *z = (GT *) c;
 		GT *x = (GT *) a;
 		*z = pfc->power(*x, Big(b));
@@ -398,24 +437,32 @@ void _element_mul_zn(Group_t type, const pairing_t *pairing, element_t *c, const
 {
 	PFC *pfc = (PFC *) pairing;
 	Big *b1 = (Big *) b;
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *z = (Big *) c;
 		Big *x = (Big *) a;
 		Big *o1 = (Big *) o;
-
-		*z = modmult(*x, *b1, *o1);
+		if(*b1 == Big(-1)) {
+			*z = *x;
+			z->negate();
+		}
+		else if(b1->isone()) {
+			*z = *x;
+		}
+		else {
+			*z = modmult(*x, *b1, *o1);
+		}
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *z = (G1 *) c;
 		G1 *x = (G1 *) a;
 		*z = pfc->mult(*x, *b1);
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *z = (G2 *) c;
 		G2 *x = (G2 *) a;
 		*z = pfc->mult(*x, *b1);
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *z = (GT *) c;
 		GT *x = (GT *) a;
 		*z = pfc->power(*x, *b1);
@@ -424,29 +471,27 @@ void _element_mul_zn(Group_t type, const pairing_t *pairing, element_t *c, const
 
 void _element_div(Group_t type, element_t *c, const element_t *a, const element_t *b, const element_t *o)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
 		Big *z = (Big *) c;
 		Big *o1 = (Big *) o;
 
 		if(!y->iszero()) *z = moddiv(*x, *y, *o1);
-//		cout << "y => " << *y << endl;
 //		cout << "Result => " << *z << endl;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *x = (G1 *) a;  G1 *y = (G1 *) b; G1 *z = (G1 *) c;
 		*z = *x + (-*y);
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *x = (G2 *) a;  G2 *y = (G2 *) b; G2 *z = (G2 *) c;
 		*z = *x + (-*y);
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *x = (GT *) a;  GT *y = (GT *) b; GT *z = (GT *) c;
 		*z = *x / *y;
 	}
-//	else if(type == )
 
 }
 
@@ -454,7 +499,7 @@ element_t *_element_pow_zr_zr(Group_t type, const pairing_t *pairing, const elem
 {
 	Big *o1 = (Big *) o;
 
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) a;
 		return (element_t *) new Big(pow(*x, b, *o1));
 	}
@@ -467,29 +512,31 @@ element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, element_t *a,
 	Big *y = (Big *) b; // note: must be ZR
 	PFC *pfc = (PFC *) pairing;
 
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) a;
 		Big *z = (Big *) o;
 		Big w = pow(*x, *y, *z);
 		return (element_t *) new Big(w);
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *x  = (G1 *)  a;
 		G1 *z = new G1();
+		if(*x == *z) { return (element_t *) z; }
 		// (x->point)^y
 //		z->g = *y * x->g;
 		// TODO: overflow error occurs if "y" is too big w/in miracl. Need to investigate
 		*z = pfc->mult(*x, *y);
 		return (element_t *) z;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *x  = (G2 *)  a;
 		G2 *z = new G2();
+		if(*x == *z) { return (element_t *) z; }
 		// (x->point)^y
 		*z = pfc->mult(*x, *y);
 		return (element_t *) z;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 //		PFC *pfc = (PFC *) pairing;
 		GT *x  = (GT *)  a;
 		GT *z = new GT();
@@ -504,7 +551,7 @@ element_t *_element_pow_zr(Group_t type, const pairing_t *pairing, element_t *a,
 
 element_t *_element_neg(Group_t type, const element_t *e, const element_t *o)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) e;
 		Big *y = new Big(*x);
 		// Big *o1 = (Big *) o;
@@ -512,19 +559,19 @@ element_t *_element_neg(Group_t type, const element_t *e, const element_t *o)
 		// *y %= *o1;
 		return (element_t *) y;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *x = (G1 *) e;
 		G1 *y = new G1();
 		y->g = -x->g;
 		return (element_t *) y;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *x = (G2 *) e;
 		G2 *y = new G2();
 		y->g = -x->g;
 		return (element_t *) y;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		// TODO: see element_inv comment
 	}
 	return NULL;
@@ -538,8 +585,8 @@ element_t *_element_neg(Group_t type, const element_t *e, const element_t *o)
 void _element_inv(Group_t type, const pairing_t *pairing, const element_t *a, element_t *b, element_t *o)
 {
 	PFC *pfc = (PFC *) pairing;
-	// TODO: not working as expected for ZR_t * ~ZR_t = seg fault?
-	if(type == ZR_t) {
+	// TODO: not working as expected for pyZR_t * ~pyZR_t = seg fault?
+	if(type == pyZR_t) {
 		Big *x = (Big *) a;
 		Big *order = (Big *) o;
 //		Big *y = new Big();
@@ -547,18 +594,18 @@ void _element_inv(Group_t type, const pairing_t *pairing, const element_t *a, el
 		*y = inverse(*x, *order);
 //		cout << "inv res => " << *y << endl;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *g = (G1 *) a;
 		G1 *h = (G1 *) b;
 		// set it to the inverse
 		h->g = -g->g;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *g = (G2 *) a;
 		G2 *h = (G2 *) b;
 		h->g = -g->g;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *g = (GT *) a;
 		GT *h = (GT *) b;
 		h->g     = pfc->power(*g, Big(-1)).g;
@@ -588,24 +635,24 @@ G1 *charToG1(char *c, int len)
 	Big *x0 = charToBig(c, len); // convert to a char
 	while(!point->g.set(*x0, *x0)) *x0 += 1;
 
-	// cout << "Point in G1 => " << point->g << endl;
+    //cout << "Point in G1 => " << point->g << endl;
 	return point;
 }
 
 element_t *hash_then_map(Group_t type, const pairing_t *pairing, char *data, int len)
 {
 	PFC *pfc = (PFC *) pairing;
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big x = pfc->hash_to_group(data);
 		Big *X = new Big(x);
 		return (element_t *) X;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *w = new G1();
 		pfc->hash_and_map(*w, data);
 		return (element_t *) w;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *w = new G2();
 		pfc->hash_and_map(*w, data);
 		return (element_t *) w;
@@ -623,12 +670,17 @@ void _init_hash(const pairing_t *pairing)
 	pfc->start_hash();
 }
 
-void _element_add_str_hash(const pairing_t *pairing, void *data, int len)
+void _element_add_str_hash(const pairing_t *pairing, char *data, int len)
 {
 	PFC *pfc = (PFC *) pairing;
-	string s((char *) data);
-	if(s.size() == (size_t) len) {
+	//string s(data, len);
+	if(strlen(data) == (size_t) len) {
+//		printf("hash string: '%s'\n", data);
+		string s(data, len);
+//		cout << "hash string: " << s << endl;
 		Big b = pfc->hash_to_group((char *) s.c_str());
+		// Big *b = new Big(pfc->hash_to_group(data));
+//		cout << "Result: " << b << endl;
 		pfc->add_to_hash(b);
 	}
 }
@@ -636,19 +688,19 @@ void _element_add_str_hash(const pairing_t *pairing, void *data, int len)
 void _element_add_to_hash(Group_t type, const pairing_t *pairing, const element_t *e)
 {
 	PFC *pfc = (PFC *) pairing;
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *b = (Big *) e;
 		pfc->add_to_hash(*b);
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *g1 = (G1 *) e;
 		pfc->add_to_hash(*g1);
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *g2 = (G2 *) e;
 		pfc->add_to_hash(*g2);
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *gt = (GT *) e;
 		pfc->add_to_hash(*gt);
 	}
@@ -659,18 +711,25 @@ element_t *finish_hash(Group_t type, const pairing_t *pairing)
 	PFC *pfc = (PFC *) pairing;
 	Big *b = new Big(pfc->finish_hash_to_group());
 
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		return (element_t *) b;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *g1 = new G1();
-		pfc->hash_and_map(*g1, (char *) bigToBytes(*b).c_str());
+		string str = bigToRawBytes(*b);
+		char *c_str = (char *) str.c_str();
+		pfc->hash_and_map(*g1, c_str);
+		delete b;
 		return (element_t *) g1;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *g2 = new G2();
-		pfc->hash_and_map(*g2, (char *) bigToBytes(*b).c_str());
+		string str = bigToRawBytes(*b);
+		char *c_str = (char *) str.c_str();
+		pfc->hash_and_map(*g2,  c_str);
+		delete b;
 		return (element_t *) g2;
+//		_printf_buffer_as_hex((uint8_t *) c_str, str.size());
 	}
 	else {
 		cout << "Hashing to an invalid type: " << type << endl;
@@ -681,14 +740,14 @@ element_t *finish_hash(Group_t type, const pairing_t *pairing)
 
 element_t *_element_from_hash(Group_t type, const pairing_t *pairing, void *data, int len)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		return (element_t *) charToBig((char *) data, len);
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		return (element_t *) charToG1((char *) data, len);
 	}
-	/* G2_t not so straigthforward to do by hand - just use hash then map */
-	else if(type == G2_t) {
+	/* pyG2_t not so straigthforward to do by hand - just use hash then map */
+	else if(type == pyG2_t) {
 		return hash_then_map(type, pairing, (char *) data, len);
 	}
 	return NULL;
@@ -696,7 +755,7 @@ element_t *_element_from_hash(Group_t type, const pairing_t *pairing, void *data
 
 
 int element_is_value(Group_t type, element_t *n, int value) {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) n;
 		if(*x == Big(value)) {
 			return TRUE;
@@ -711,23 +770,23 @@ int element_is_value(Group_t type, element_t *n, int value) {
 int _element_cmp(Group_t type, element_t *a, element_t *b) {
 
 	BOOL result = -1;
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *lhs = (Big *) a;
 		Big *rhs = (Big *) b;
 		result = *lhs == *rhs ? TRUE : FALSE;
 		// cout << "Equal ? " << result << endl;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *lhs = (G1 *) a;
 		G1 *rhs = (G1 *) b;
 		result = *lhs == *rhs ? TRUE : FALSE;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *lhs = (G2 *) a;
 		G2 *rhs = (G2 *) b;
 		result = *lhs == *rhs ? TRUE  : FALSE;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *lhs = (GT *) a;
 		GT *rhs = (GT *) b;
 		result = *lhs == *rhs ? TRUE  : FALSE;
@@ -738,7 +797,7 @@ int _element_cmp(Group_t type, element_t *a, element_t *b) {
 
 void _element_set_si(Group_t type, element_t *dst, const signed long int src)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *d = (Big *) dst;
 		*d = Big(src);
 //		cout << "Final value => " << *d << endl;
@@ -747,7 +806,7 @@ void _element_set_si(Group_t type, element_t *dst, const signed long int src)
 
 int _element_setG1(Group_t type, element_t *c, const element_t *a, const element_t *b)
 {
-	if(type == G1_t) {
+	if(type == pyG1_t) {
 		G1 *p = (G1 *) c;
 		Big *x = (Big *) a;
 		Big *y = (Big *) b;
@@ -759,12 +818,12 @@ int _element_setG1(Group_t type, element_t *c, const element_t *a, const element
 
 void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *src)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *e1 = (Big *) dst;
 		Big *a1 = (Big *) src;
 		*e1 = *a1;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *g = (G1 *) dst;
 		G1 *h = (G1 *) src;
 
@@ -772,7 +831,7 @@ void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *
 		h->g.get(x, y);
 		g->g.set(x, y);
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *g = (G2 *) dst;
 		G2 *h = (G2 *) src;
 
@@ -789,9 +848,15 @@ void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *
 			h->g.get(x1, y1);
 			g->g.set(x1, y1);
 		}
+#elif BUILD_SS_CURVE == 1
+		if(ctype == SS) {
+			Big x, y;
+			h->g.get(x, y);
+			g->g.set(x, y);
+		}
 #endif
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *g = (GT *) dst;
 		GT *h = (GT *) src;
 #if BUILD_MNT_CURVE == 1
@@ -805,6 +870,12 @@ void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *
 			ZZn4 x, y, z;
 			h->g.get(x, y, z);
 			g->g.set(x, y, z);
+		}
+#elif BUILD_SS_CURVE == 1
+		if(ctype == SS) {
+			ZZn x, y;
+			h->g.get(x, y);
+			g->g.set(x, y);
 		}
 #endif
 	}
@@ -826,8 +897,8 @@ char *print_mpz(mpz_t x, int base) {
 
 void _element_set_mpz(Group_t type, element_t *dst, mpz_t src)
 {
-	// convert an mpz to a Big (for ZR_t)
-	if(type == ZR_t) {
+	// convert an mpz to a Big (for pyZR_t)
+	if(type == pyZR_t) {
 		char *x_string = print_mpz(src, 10);
 		big y;
 		y = mirvar(0);
@@ -844,7 +915,7 @@ void _element_set_mpz(Group_t type, element_t *dst, mpz_t src)
 
 void _element_to_mpz(Group_t type, element_t *src, mpz_t dst)
 {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *x = (Big *) src;
 
 		// This is a hack: find a better way of convert big to mpz
@@ -864,7 +935,7 @@ void _element_to_mpz(Group_t type, element_t *src, mpz_t dst)
  */
 void _element_hash_key(const pairing_t *pairing, Group_t type, element_t *e, void *data, int len)
 {
-	if(type == GT_t) {
+	if(type == pyGT_t) {
 		PFC *pfc = (PFC *) pairing;
 		GT *gt = (GT *) e;
 		Big tmp = pfc->hash_to_aes_key(*gt);
@@ -874,39 +945,31 @@ void _element_hash_key(const pairing_t *pairing, Group_t type, element_t *e, voi
 		memcpy((char *) data, tmp_str.c_str(), (size_t) strlen(tmp_str.c_str()));
 	}
 }
+
+// #ifdef ASYMMETRIC == 1
 /* Note the following type definition from MIRACL pairing_3.h
  * G1 is a point over the base field, and G2 is a point over an extension field.
  * GT is a finite field point over the k-th extension, where k is the embedding degree.
  */
-element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1, const element_t *in2) {
+element_t *_element_pairing(const pairing_t *pairing, const element_t *in1, const element_t *in2) {
 	// we assume that in1 is G1 and in2 is G2 otherwise bad things happen
 	PFC *pfc = (PFC *) pairing;
 	G1 *g1 = (G1 *) in1;
 	G2 *g2 = (G2 *) in2;
 	G1 g_id = pfc->mult(*g1, Big(0)); // get identity elements
 	G2 g2_id = pfc->mult(*g2, Big(0));
+	GT *gt = new GT();
+	// check whether g1 and g2 != identity element
+	if(*g1 == g_id || *g2 == g2_id) {
+		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
+//		cout << "One of the above is the identity element!" << endl;
+	}
+	else {
 #if BUILD_MNT_CURVE == 1
-	GT *gt = new GT();
-	// check whetehr g1 and g2 != identity element
-	if(*g1 == g_id || *g2 == g2_id) {
-		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
-//		cout << "One of the above is the identity element!" << endl;
-	}
-	else {
 		pfc->precomp_for_pairing(*g2);
-		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
-	}
-#elif BUILD_BN_CURVE == 1
-	GT *gt = new GT();
-	// check whetehr g1 and g2 != identity element
-	if(*g1 == g_id || *g2 == g2_id) {
-		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
-//		cout << "One of the above is the identity element!" << endl;
-	}
-	else {
-		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
-	}
 #endif
+		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
+	}
 //	cout << "Result of pairing => " << gt->g << endl;
 //	GT *gt_res = new GT(gt);
 //	cout << "Result of pairing2 => " << gt_res->g << endl;
@@ -914,7 +977,7 @@ element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1
 }
 
 /* Does NOT perform any error checking */
-element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length)
+element_t *_element_prod_pairing(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length)
 {
 	if(length <= 0) { return NULL; }
 
@@ -930,12 +993,57 @@ element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t
 	GT *gt = new GT(pfc->multi_pairing(length, g2_list, g1_list));
 	return (element_t *) gt;
 }
+//#else
+///* Note the following type definition from MIRACL pairing_3.h
+// * G1 is a point over the base field, and G2 is a point over an extension field.
+// * GT is a finite field point over the k-th extension, where k is the embedding degree.
+// */
+//element_t *_element_pairing_type1(const pairing_t *pairing, const element_t *in1, const element_t *in2) {
+//	// we assume that in1 is G1 and in2 is G2 otherwise bad things happen
+//	PFC *pfc = (PFC *) pairing;
+//	G1 *g1 = (G1 *) in1;
+//	G2 *g2 = (G1 *) in2;
+//	G1 g_id = pfc->mult(*g1, Big(0)); // get identity elements
+//	G1 g2_id = pfc->mult(*g1, Big(0));
+//	GT *gt = new GT();
+//	// check whether g1 and g2 != identity element
+//	if(*g1 == g_id || *g2 == g2_id) {
+//		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
+////		cout << "One of the above is the identity element!" << endl;
+//	}
+//	else {
+//		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
+//	}
+////	cout << "Result of pairing => " << gt->g << endl;
+////	GT *gt_res = new GT(gt);
+////	cout << "Result of pairing2 => " << gt_res->g << endl;
+//	return (element_t *) gt;
+//}
+//
+///* Does NOT perform any error checking */
+//element_t *_element_prod_pairing_type1(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length)
+//{
+//	if(length <= 0) { return NULL; }
+//
+//	PFC *pfc = (PFC *) pairing;
+//	G1 *g1_list[length];
+//	G1 *g2_list[length];
+//
+//	for(int i = 0; i < length; i++) {
+//		g1_list[i] = (G1 *) in1[i];
+//		g2_list[i] = (G1 *) in2[i];
+//	}
+//
+//	GT *gt = new GT(pfc->multi_pairing(length, g2_list, g1_list));
+//	return (element_t *) gt;
+//}
+//#endif
 
 int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 	char c[MAX_LEN+1];
 	memset(c, 0, MAX_LEN);
 	string t;
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *s = (Big *) e;
 		t.append(bigToBytes(*s));
 //		int size = to_binary(*s, MAX_LEN, c, FALSE);
@@ -945,7 +1053,7 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		return encoded.size();
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *p = (G1 *) e;
 		Big x, y;
 		p->g.get(x, y);
@@ -957,7 +1065,8 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		return encoded.size();
 	}
-	else if(type == G2_t) {
+#if ASYMMETRIC == 1
+	else if(type == pyG2_t) {
 		t = "";
 #if BUILD_MNT_CURVE == 1
 		G2 *P = (G2 *) e; // embeds an ECn3 element (for MNT curves)
@@ -994,7 +1103,8 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
 		return encoded.size();
 	}
-	else if(type == GT_t) {
+#endif
+	else if(type == pyGT_t) {
 		t = "";
 		// control this w/ a flag
 #if BUILD_MNT_CURVE == 1
@@ -1042,6 +1152,19 @@ int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e) {
 
 			delete [] a;
 		}
+#elif BUILD_SS_CURVE == 1
+		GT *P = (GT *) e;
+		// if(ctype == SS) {
+			Big *a = new Big[2];
+
+			P->g.get(a[0], a[1]);
+
+			for(int i = 0; i < 2; i++) {
+				t.append( bigToBytes(a[i]) );
+			}
+
+			delete [] a;
+		//}
 #endif
 		// base64 encode t and return
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
@@ -1057,7 +1180,7 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 	int enc_len;
 	string t;
 
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *s = (Big *) e;
 		t.append(bigToBytes(*s));
 		string encoded = _base64_encode(reinterpret_cast<const unsigned char*>(t.c_str()), t.size());
@@ -1069,11 +1192,10 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 //		printf("\n");
 		return enc_len;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *p = (G1 *) e;
 		Big x, y;
 		p->g.get(x, y);
-		string t;
 		t.append(bigToBytes(x));
 		t.append(bigToBytes(y));
 
@@ -1083,9 +1205,10 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 		data[enc_len] = '\0';
 		return enc_len;
 	}
-	else if(type == G2_t) {
+#if ASYMMETRIC == 1
+	else if(type == pyG2_t) {
 		G2 *P = (G2 *) e; // embeds an ECn3 element (for MNT curves)
-		string t;
+
 #if BUILD_MNT_CURVE == 1
 		if(ctype == MNT) { // handling only MNT curves at the moment
 			ZZn3 x, y;
@@ -1098,6 +1221,8 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 			for(int i = 0; i < 6; i++) {
 				t.append( bigToBytes(Big(a[i])) );
 			}
+
+			delete [] a;
 		}
 #elif BUILD_BN_CURVE == 1
 		if(ctype == BN) {
@@ -1122,7 +1247,8 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 		data[enc_len] = '\0';
 		return enc_len;
 	}
-	else if(type == GT_t) {
+#endif
+	else if(type == pyGT_t) {
 #if BUILD_MNT_CURVE == 1
 		if(ctype == MNT) {
 			GT *P = (GT *) e; // embeds an ZZn6 element (for MNT curves) is equivalent to
@@ -1135,7 +1261,6 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 			y.get(a[2], a[3]);
 		    z.get(a[4], a[5]);
 	//	    cout << "Point => (" << x << ", " << y << ", " << z << ")" << endl;
-		    string t;
 		    for(int i = 0; i < 6; i++) {
 		    	t.append( bigToBytes(a[i]) );
 		    }
@@ -1166,6 +1291,18 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 
 			delete [] a;
 		}
+#elif BUILD_SS_CURVE == 1
+		//if(ctype == SS) {
+			GT *P = (GT *) e;
+			Big *a = new Big[2];
+			P->g.get(a[0], a[1]);
+
+			for(int i = 0; i < 2; i++) {
+				t.append( bigToBytes(a[i]) );
+			}
+
+			delete [] a;
+		//}
 #endif
 //		cout << "Pre-encoding => ";
 //		_printf_buffer_as_hex((uint8_t *) t.c_str(), t.size());
@@ -1180,7 +1317,7 @@ int _element_to_bytes(unsigned char *data, Curve_t ctype, Group_t type, element_
 	return 0;
 }
 element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data) {
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		if(is_base64((unsigned char) data[0])) {
 			string b64_encoded((char *) data);
 			string s = _base64_decode(b64_encoded);
@@ -1189,23 +1326,27 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			return (element_t *) X;
 		}
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		if(is_base64((unsigned char) data[0])) {
 			string b64_encoded((char *) data);
 			string s = _base64_decode(b64_encoded);
 
 			int cnt = 0;
-			Big x,y;
-			x = *bytesToBig(s, &cnt);
+			Big *x, *y;
+//			cout << "point => (" << x << ", " << y << ")" << endl;
+			x = bytesToBig(s, &cnt);
 			s = s.substr(cnt);
-			y = *bytesToBig(s, &cnt);
-			cout << "point => (" << x << ", " << y << ")" << endl;
+			y = bytesToBig(s, &cnt);
+//			if (x == 0 || y == 0) { return NULL; }
 			G1 *p = new G1();
-			p->g.set(x,y);
+			p->g.set(*x, *y);
+			delete x;
+			delete y;
 			return (element_t *) p;
 		}
 	}
-	else if(type == G2_t) {
+#if ASYMMETRIC == 1
+	else if(type == pyG2_t) {
 #if BUILD_MNT_CURVE == 1
 		if(ctype == MNT && is_base64((unsigned char) data[0])) {
 			string b64_encoded((char *) data);
@@ -1214,8 +1355,10 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			int cnt = 0;
 			ZZn *a = new ZZn[6];
 			for(int i = 0; i < 6; i++) {
-				a[i] = ZZn(*bytesToBig(s, &cnt) ); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = ZZn(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
+				delete b;
 			}
 			ZZn3 x (a[0], a[1], a[2]);
 			ZZn3 y (a[3], a[4], a[5]);
@@ -1223,6 +1366,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			G2 *point = new G2();
 			point->g.set(x, y);
 			// cout << "Recovered pt => " << point->g << endl;
+			delete [] a;
 			return (element_t *) point;
 		}
 #elif BUILD_BN_CURVE == 1
@@ -1233,8 +1377,10 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			int cnt = 0;
 			Big *a = new Big[4];
 			for(int i = 0; i < 4; i++) {
-				a[i] = *bytesToBig(s, &cnt); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = Big(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
+				delete b;
 			}
 
 			ZZn2 x1(a[0], a[1]); // each zzn2 has a (x, y) coordinate of type Big
@@ -1242,11 +1388,13 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 
 			G2 *point = new G2();
 			point->g.set(x1, y1);
+			delete [] a;
 			return (element_t *) point;
 		}
 #endif
 	}
-	else if(type == GT_t) {
+#endif
+	else if(type == pyGT_t) {
 #if BUILD_MNT_CURVE == 1
 		if(ctype == MNT && is_base64((unsigned char) data[0])) {
 			string b64_encoded((char *) data);
@@ -1257,9 +1405,10 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			for(int i = 0; i < 6; i++) {
 				// cout << "buffer => ";
 			    // printf_buffer_as_hex((uint8_t *) s.c_str(), s.size());
-				a[i] = *bytesToBig(s, &cnt); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = Big(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
-				// cout << "i => " << a[i] << endl;
+				delete b;
 			}
 			ZZn2 x, y, z;
 			x.set(a[0], a[1]);
@@ -1268,6 +1417,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 
 			GT *point = new GT();
 			point->g.set(x, y, z);
+			delete [] a;
 			return (element_t *) point;
 		}
 #elif BUILD_BN_CURVE == 1
@@ -1280,8 +1430,10 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 			for(int i = 0; i < 12; i++) {
 				// cout << "buffer => ";
 			    // printf_buffer_as_hex((uint8_t *) s.c_str(), s.size());
-				a[i] = *bytesToBig(s, &cnt); // retrieve all six coordinates
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = Big(*b); // retrieve all six coordinates
 				s = s.substr(cnt);
+				delete b;
 				// cout << "i => " << a[i] << endl;
 			}
 
@@ -1299,6 +1451,26 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 
 			GT *point = new GT();
 			point->g.set(x, y, z);
+			delete [] a;
+			return (element_t *) point;
+		}
+#elif BUILD_SS_CURVE == 1
+		if(is_base64((unsigned char) data[0])) {
+			string b64_encoded((char *) data);
+			string s = _base64_decode(b64_encoded);
+	//		cout << "original => " << s << endl;
+			int cnt = 0;
+			Big *a = new Big[2];
+			for(int i = 0; i < 2; i++) {
+				Big *b = bytesToBig(s, &cnt);
+				a[i] = Big(*b); // retrieve all six coordinates
+				s = s.substr(cnt);
+				delete b;
+			}
+
+			GT *point = new GT();
+			point->g.set(a[0], a[1]);
+			delete [] a;
 			return (element_t *) point;
 		}
 #endif
@@ -1309,19 +1481,19 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 
 void element_delete(Group_t type, element_t *e) {
 
-	if(type == ZR_t) {
+	if(type == pyZR_t) {
 		Big *y = (Big *) e;
 		delete y;
 	}
-	else if(type == G1_t) {
+	else if(type == pyG1_t) {
 		G1 *point = (G1 *) e;
 		delete point;
 	}
-	else if(type == G2_t) {
+	else if(type == pyG2_t) {
 		G2 *point = (G2 *) e;
 		delete point;
 	}
-	else if(type == GT_t) {
+	else if(type == pyGT_t) {
 		GT *point = (GT *) e;
 		delete point;
 	}

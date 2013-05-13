@@ -13,7 +13,8 @@ Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composi
 :Authors:  J. Ayo Akinyele
 :Date:         1/2011
 '''
-from charm.toolbox.PKEnc import PKEnc
+from charm.toolbox.PKEnc import *
+from charm.toolbox.IBSig import *
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 
 debug = False
@@ -21,11 +22,11 @@ class CHK04(PKEnc):
     """
     >>> from charm.adapters.ibenc_adapt_identityhash import HashIDAdapter
     >>> from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
-    >>> from charm.schemes.pksig.pksig_bls04 import IBSig
+    >>> from charm.schemes.pksig.pksig_bls04 import BLS01
     >>> group = PairingGroup('SS512')
     >>> ibe = IBE_BB04(group)
     >>> hash_ibe = HashIDAdapter(ibe, group)
-    >>> ots = IBSig(group)
+    >>> ots = BLS01(group)
     >>> pkenc = CHK04(hash_ibe, ots, group)
     >>> (public_key, secret_key) = pkenc.keygen(0)
     >>> msg = group.random(GT)
@@ -35,9 +36,18 @@ class CHK04(PKEnc):
     True
     """
     def __init__(self, ibe_scheme, ots_scheme, groupObj):
+        PKEnc.__init__(self)
         global ibe, ots, group
-        ibe = ibe_scheme
-        ots = ots_scheme
+        criteria1 = [('secDef', 'IND_ID_CPA'), ('scheme', 'IBEnc'), ('id', str)]
+        criteria2 = [('secDef', 'EU_CMA'), ('scheme', 'IBSig')] 
+        if PKEnc.checkProperty(self, ibe_scheme, criteria1): # and PKEnc.checkProperty(self, ots_scheme, criteria2):
+            PKEnc.updateProperty(self, ibe_scheme, secDef=IND_CCA, secModel=SM)
+            ibe = ibe_scheme
+            ots = ots_scheme
+            #PKEnc.printProperties(self)
+        else:
+            assert False, "Input scheme does not satisfy adapter properties: %s" % criteria
+
         group = groupObj
 		
     def keygen(self, secparam):

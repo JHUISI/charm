@@ -1,8 +1,11 @@
 #!/bin/sh
 
+# Note: this script might require super-user privileges to install
+# binaries
+
 # untar MIRACL source into this directory, then run this script 
 set -x
-#[ -e miracl.zip ] && unzip -j -aa -L miracl.zip
+[ -e miracl.zip ] && unzip -j -aa -L miracl.zip
 
 # patch mnt_pair.cpp, ssp_pair.cpp, etc here
 curve=$1
@@ -11,12 +14,22 @@ if [ $curve = "mnt" ]; then
    curve=mnt
    echo "Building MNT curve in miracl."
    patch -N < mnt_pair.patch
+   rm -f *.rej
 fi
 
 if [ $curve = "bn" ]; then
    curve=bn
    echo "Building BN curve in miracl."
-   #patch -N < bn_pair.patch
+   patch -N < bn_pair.patch
+   rm -f *.rej
+fi
+
+if [ $curve = "ss" ]; then
+   curve=ss
+   echo "Building SS curve in miracl."
+   patch -N < pairing1.patch
+   patch -N < ssp_pair.patch
+   rm -f *.rej
 fi
 
 if [ -e miracl-$curve.a ]; then
@@ -114,9 +127,9 @@ fi
 
 if [ $curve = "bn" ]; then
    # Barreto-Naehrig curve
-   g++ -c -m64 -O2 bn_pair.cpp zzn12a.cpp zzn4.cpp ecn2.cpp zzn2.cpp
+   g++ -c -m64 -O2 bn_pair.cpp zzn12a.cpp zzn4.cpp ecn2.cpp ecn3.cpp zzn2.cpp
    cp miracl.a miracl-bn.a
-   ar r miracl-bn.a big.o zzn.o zzn2.o zzn4.o zzn12a.o ecn.o ecn2.o ecn3.o ec2.o flash.o crt.o bn_pair.o 
+   ar r miracl-bn.a big.o zzn.o zzn2.o zzn4.o zzn12a.o ecn.o ecn2.o ecn3.o ec2.o flash.o crt.o bn_pair.o
 fi
 
 if [ $curve = "kss" ]; then
@@ -125,7 +138,18 @@ if [ $curve = "kss" ]; then
    cp miracl.a miracl-kss.a
    ar r miracl-kss.a big.o zzn.o zzn3.o zzn6.o zzn18.o ecn.o ecn3.o ec2.o flash.o crt.o kss_pair.o
 fi
-ln -sf miracl-$curve.a miracl.a
 
-rm mr*.o
+if [ $curve = "ss" ]; then
+	# SS curve
+	g++ -c -m64 -O2 ssp_pair.cpp 
+	cp miracl.a miracl-ss.a
+	ar r miracl-ss.a big.o ecn.o zzn.o zzn2.o ssp_pair.o
+fi
+#ln -sf miracl-$curve.a miracl.a
+install -d /usr/local/include/miracl
+install -d /usr/local/lib
+install -m 0644 miracl-$curve.a /usr/local/lib
+install -m 0644 *.h /usr/local/include/miracl
+
+rm -f mr*.o *.a
 set +x

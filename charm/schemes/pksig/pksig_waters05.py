@@ -10,7 +10,7 @@
 :Date:			06/2011
 ''' 
 
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import * #PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.enum import Enum
 from charm.toolbox.hash_module import Waters
@@ -24,7 +24,6 @@ class IBE_N04_Sig(PKSig):
     >>> waters = Waters(group)
     >>> ibe = IBE_N04_Sig(group)
     >>> (public_key, secret_key) = ibe.keygen()
-    >>> ID = "bob@mail.com"
     >>> msg = waters.hash("This is a test.")    
     >>> signature = ibe.sign(public_key, secret_key, msg)
     >>> ibe.verify(public_key, msg, signature)
@@ -50,11 +49,11 @@ class IBE_N04_Sig(PKSig):
         n = int(math.floor(hLen / l))
         waters = Waters(group, n, l, sha1_func)
         
-        alpha = group.random()  #from Zp
+        alpha = group.random(ZR)  #from Zp
         g1    = g ** alpha      # G1
         g2    = group.random(G2)    #G2
         uprime = group.random(G2)
-        U = [group.random() for x in range(n)]
+        U = [group.random(G2) for x in range(n)]
         
         pk = {'g':g, 'g1':g1, 'g2': g2, 'uPrime':uprime, 'U': U, 
               'n':n, 'l':l, 'egg': pair(g, g2) ** alpha }
@@ -70,11 +69,11 @@ class IBE_N04_Sig(PKSig):
     
     def sign(self, pk, sk, m):
         '''v = (v1, .., vn) is an identity'''
-        r = group.random()
+        r = group.random(ZR)
         
         d1 = sk['uPrime']
         for i in range(sk['n']):
-            d1 *= sk['U'][i] ** m[i]
+            d1 *= (sk['U'][i] ** m[i])
             
         d1 = sk['g2^alpha'] * (d1 ** r)
         d2 = sk['g'] ** r
@@ -97,11 +96,9 @@ def main():
     (pk, sk) = ibe.keygen()
 
     # represents public identity
-    M = "bob@mail.com"
-    msg = waters.hash("This is a test.")    
+    msg = waters.hash("This is a test!")    
     sig = ibe.sign(pk, sk, msg)
     if debug:
-        print("original msg => '%s'" % M)
         print("msg => '%s'" % msg)
         print("sig => '%s'" % sig)
 

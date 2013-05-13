@@ -12,12 +12,15 @@ Toolbox Classes
    toolbox/bitstring
    toolbox/Commit
    toolbox/conversion
+   toolbox/DFA
    toolbox/eccurve
    toolbox/ecgroup
    toolbox/enum
+   toolbox/FSA
    toolbox/Hash
    toolbox/hash_module
    toolbox/IBEnc
+   toolbox/IBSig
    toolbox/integergroup
    toolbox/iterate
    toolbox/node
@@ -27,6 +30,7 @@ Toolbox Classes
    toolbox/PKEnc
    toolbox/PKSig
    toolbox/policytree
+   toolbox/reCompiler
    toolbox/redundancyschemes
    toolbox/schemebase
    toolbox/secretshare

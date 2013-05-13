@@ -52,7 +52,7 @@ class IBE_BonehFranklin(IBEnc):
     
     def extract(self, sk, ID):        
         d_ID = sk['s'] * group.hash(ID, G1)
-        k = { 'id':d_ID }
+        k = { 'id':d_ID, 'IDstr':ID }
         if(debug):
             print("Key for id => '%s'" % ID)
             group.debug(k)
@@ -67,7 +67,7 @@ class IBE_BonehFranklin(IBEnc):
         r = h.hashToZr(sig, M)
 
         enc_M = self.encodeToZn(M)
-        if bitsize(enc_M) <= group.messageSize():
+        if bitsize(enc_M) / 8 <= group.messageSize():
             C = { 'U':r * pk['P'], 'V':sig ^ h.hashToZn(g_id ** r) , 'W':enc_M ^ h.hashToZn(sig) }
         else:
             print("Message cannot be encoded.")

@@ -1,13 +1,9 @@
-try:
-  import charm.core.crypto.cryptobase
-  from charm.core.math.pairing import pairing,ZR
-  from charm.core.math.integer import integer,int2Bytes
-  from charm.toolbox.conversion import Conversion
-  from charm.toolbox.bitstring import Bytes
-  import hashlib, base64
-except Exception as err:
-  print(err)
-  exit(-1)
+import charm.core.crypto.cryptobase
+from charm.core.math.pairing import pairing,ZR
+from charm.core.math.integer import integer,int2Bytes
+from charm.toolbox.conversion import Conversion
+from charm.toolbox.bitstring import Bytes
+import hashlib, base64
 
 class Hash():
     def __init__(self, htype='sha1', pairingElement=None, integerElement=None):        

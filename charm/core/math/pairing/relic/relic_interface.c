@@ -129,9 +129,11 @@ status_t element_random(element_t e)
 			bn_inits(n);
 			g1_get_ord(n);
 
-			bn_t t = e->bn;
-			bn_rand(t, BN_POS, bn_bits(n));
-			bn_mod(t,  t, n);
+//			bn_t t;
+//			bn_inits(t);
+//			bn_copy(t, e->bn);
+			bn_rand(e->bn, BN_POS, bn_bits(n));
+			bn_mod(e->bn,  e->bn, n);
 			bn_free(n);
 		}
 		else if(e->type == G1) {
@@ -255,12 +257,12 @@ status_t element_add(element_t c, element_t a, element_t b)
 	else if(type == G1) {
 		LEAVE_IF( c->type != G1, "result initialized but invalid type.");
 		g1_add(c->g1, a->g1, b->g1);
-		g1_norm(c->g1, c->g1);
+		//g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
 		LEAVE_IF( c->type != G2, "result initialized but invalid type.");
 		g2_add(c->g2, a->g2, b->g2);
-		g2_norm(c->g2, c->g2);
+		//g2_norm(c->g2, c->g2);
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -284,11 +286,11 @@ status_t element_sub(element_t c, element_t a, element_t b)
 	}
 	else if(type == G1) {
 		g1_sub(c->g1, a->g1, b->g1);
-		g1_norm(c->g1, c->g1);
+		//g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
 		g2_sub(c->g2, a->g2, b->g2);
-		g2_norm(c->g2, c->g2);
+		//g2_norm(c->g2, c->g2);
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -306,15 +308,18 @@ status_t element_mul(element_t c, element_t a, element_t b)
 
 	if(type == ZR) {
 		bn_mul(c->bn, a->bn, b->bn);
-		bn_mod(c->bn, c->bn, c->order);
+		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
+		else {
+			bn_mod(c->bn, c->bn, c->order);
+		}
 	}
 	else if(type == G1) {
 		g1_add(c->g1, a->g1, b->g1);
-		g1_norm(c->g1, c->g1);
+		//g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
 		g2_add(c->g2, a->g2, b->g2);
-		g2_norm(c->g2, c->g2);
+		//g2_norm(c->g2, c->g2);
 	}
 	else if(type == GT) {
 		gt_mul(c->gt, a->gt, b->gt);
@@ -354,13 +359,15 @@ status_t element_mul_zr(element_t c, element_t a, element_t b)
 status_t element_mul_int(element_t c, element_t a, integer_t b)
 {
 	GroupType type = a->type;
-	// TODO: c (type) = a (type) * b (ZR)
 	LEAVE_IF(a->isInitialized != TRUE, "invalid argument.");
 	LEAVE_IF(c->isInitialized != TRUE || c->type != type, "result not initialized or invalid type.");
 
 	if(type == ZR) {
 		bn_mul(c->bn, a->bn, b);
-		bn_mod(c->bn, c->bn, c->order);
+		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
+		else {
+			bn_mod(c->bn, c->bn, c->order);
+		}
 	}
 	else if(type == G1) {
 		g1_mul(c->g1, a->g1, b);
@@ -405,11 +412,11 @@ status_t element_div(element_t c, element_t a, element_t b)
 	}
 	else if(type == G1) {
 		g1_sub(c->g1, a->g1, b->g1);
-		g1_norm(c->g1, c->g1);
+		//g1_norm(c->g1, c->g1);
 	}
 	else if(type == G2) {
 		g2_sub(c->g2, a->g2, b->g2);
-		g2_norm(c->g2, c->g2);
+		//g2_norm(c->g2, c->g2);
 	}
 	else if(type == GT) {
 		gt_t t;
@@ -510,7 +517,7 @@ status_t element_neg(element_t c, element_t a)
 
 	if(type == ZR) {
 		bn_neg(c->bn, a->bn);
-		bn_add(c->bn, c->bn, a->order);
+		if(bn_sign(c->bn) == BN_NEG) bn_add(c->bn, c->bn, a->order);
 	}
 	else if(type == G1) {
 		g1_neg(c->g1, a->g1);
@@ -711,7 +718,8 @@ status_t element_from_hash(element_t e, unsigned char *data, int len)
 
 	switch(type) {
 		case ZR: bn_read_bin(e->bn, digest, digest_len);
-				 if(bn_cmp(e->bn, e->order) == CMP_GT) bn_mod(e->bn, e->bn, e->order);
+			 if(bn_cmp(e->bn, e->order) == CMP_GT) bn_mod(e->bn, e->bn, e->order);
+//		    	 bn_print(e->bn);
 				 break;
 		case G1: g1_map(e->g1, digest, digest_len);
 				 break;
@@ -939,13 +947,14 @@ status_t gt_write_bin(gt_t g, uint8_t *data, int data_len)
 
 	memcpy(data, d, data_len);
 
+#ifdef DEBUG
 	uint8_t *d2 = data;
 	int i;
 	for(i = 0; i < 12; i++) {
 		print_as_hex(d2, FP_BYTES+1);
 		d2 = &(d2[FP_BYTES + 1]);
 	}
-
+#endif
 	memset(d, 0, GT_LEN);
 	return ELEMENT_OK;
 }
@@ -1077,10 +1086,18 @@ status_t hash_buffer_to_bytes(uint8_t *input, int input_len, uint8_t *output, in
 		input2[0] = 0xFF & label;
 		// copy remaining bytes
 		for(i = 1; i <= input_len; i++)
-			input2[i] = input[i];
+			input2[i] = input[i-1];
+#ifdef DEBUG
+		printf("%s: original input: ", __FUNCTION__);
+		print_as_hex(input, input_len);
+
+		printf("%s: new input: ", __FUNCTION__);
+		print_as_hex(input2, input_len + 1);
+#endif
 		memset(digest, 0, digest_len);
 		SHA_FUNC(digest, input2, input_len+1);
 		memcpy(output, digest, digest_len);
+
 #ifdef DEBUG
 		printf("%s: digest: ", __FUNCTION__);
 		print_as_hex(output, digest_len);

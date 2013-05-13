@@ -81,7 +81,7 @@ class Pai99(PKEnc):
         group = groupObj
     
     def L(self, u, n):
-        return integer(int(u - 1)) / n
+        return integer(int(u) - 1) / n
                 
     def keygen(self, secparam=1024):
         (p, q, n) = group.paramgen(secparam)

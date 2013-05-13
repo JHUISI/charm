@@ -18,7 +18,7 @@ class SecretShare:
             share += (coeff[i] * (x ** long(i)))
         return share
 
-    def genShares(self, secret, k, n, q=None, x_points=None):
+    def genShares(self, secret, k=0, n=0, q=None, x_points=None):
         if(k <= n):
             if q == None: 
                 q = [self.elem.random(ZR) for i in range(0, k)]
@@ -54,6 +54,19 @@ class SecretShare:
             result = self.elem.init(ZR, long(1))
 #            result = 1
             for j in list:
+                if not (i == j):
+                    # lagrange basis poly
+                    result *= (0 - j) / (i - j)
+            if self.verbose: print("coeff '%d' => '%s'" % (i, result))
+            coeff[i] = result
+        return coeff
+
+    # shares is a dictionary
+    def recoverCoefficientsDict(self, dict):
+        coeff = {}
+        for i in dict.values():
+            result = 1
+            for j in dict.values():
                 if not (i == j):
                     # lagrange basis poly
                     result *= (0 - j) / (i - j)

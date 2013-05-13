@@ -96,27 +96,72 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 		int cnt = 0;
 		for(i = 0; i < opListSize; i++) {
 			PyObject *item = PyList_GetItem(opList, i);
-			if(!_PyLong_Check(item)) continue;
-			MeasureType option = ConvertToInt(item);
-			if(option > 0 && option < NONE) {
-				data->options_selected[cnt] = option;
-				cnt++;
-				debug("Option '%d' selected...\n", option);
-				switch(option) {
-					case CPU_TIME:  data->cpu_option = TRUE; break;
-					case REAL_TIME:	data->real_option = TRUE; break;
-					case NATIVE_TIME: data->native_option = TRUE; break;
-					case ADDITION: 		data->op_add = 0; break;
-					case SUBTRACTION:  data->op_sub = 0; break;
-					case MULTIPLICATION:  data->op_mult = 0; break;
-					case DIVISION:	data->op_div = 0; break;
-					case EXPONENTIATION: data->op_exp = 0; break;
-					case PAIRINGS: data->op_pair = 0; break;
-					case GRANULAR: data->granular_option = TRUE; data->gran_init(); break; // data->gran_init();
-					default: debug("not a valid option.\n");
-							 break;
+			if(PyBytes_CharmCheck(item)) {
+				char *s = NULL;
+				PyBytes_ToString(s, item);
+				if(strcmp(s, _CPUTIME_OPT) == 0) {
+					data->options_selected[cnt] = CPU_TIME;
+					data->cpu_option = TRUE;
 				}
+				else if(strcmp(s, _REALTIME_OPT) == 0) {
+					data->options_selected[cnt] = REAL_TIME;
+					data->real_option = TRUE;
+				}
+				else if(strcmp(s, _ADD_OPT) == 0) {
+					data->options_selected[cnt] = ADDITION;
+					data->op_add = 0;
+				}
+				else if(strcmp(s, _SUB_OPT) == 0) {
+					data->options_selected[cnt] = SUBTRACTION;
+					data->op_sub = 0;
+				}
+				else if(strcmp(s, _MUL_OPT) == 0) {
+					data->options_selected[cnt] = MULTIPLICATION;
+					data->op_mult = 0;
+				}
+				else if(strcmp(s, _DIV_OPT) == 0) {
+					data->options_selected[cnt] = DIVISION;
+					data->op_div = 0;
+				}
+				else if(strcmp(s, _EXP_OPT) == 0) {
+					data->options_selected[cnt] = EXPONENTIATION;
+					data->op_exp = 0;
+				}
+				else if(strcmp(s, _PAIR_OPT) == 0) {
+					data->options_selected[cnt] = PAIRINGS;
+					data->op_pair = 0;
+				}
+				else if(strcmp(s, _GRAN_OPT) == 0) {
+					data->options_selected[cnt] = GRANULAR;
+					data->granular_option = TRUE;
+					data->gran_init();
+				}
+				else {
+					debug("not a valid option.\n");
+				}
+				cnt++;
 			}
+//			if(!_PyLong_Check(item)) continue;
+//			MeasureType option = ConvertToInt(item);
+//			if(option > 0 && option < NONE) {
+//				data->options_selected[cnt] = option;
+//				cnt++;
+//				debug("Option '%d' selected...\n", option);
+//				switch(option) {
+//					case CPU_TIME:  data->cpu_option = TRUE; break;
+//					case REAL_TIME:	data->real_option = TRUE; break;
+//					case NATIVE_TIME: data->native_option = TRUE; break;
+//					case ADDITION: 		data->op_add = 0; break;
+//					case SUBTRACTION:  data->op_sub = 0; break;
+//					case MULTIPLICATION:  data->op_mult = 0; break;
+//					case DIVISION:	data->op_div = 0; break;
+//					case EXPONENTIATION: data->op_exp = 0; break;
+//					case PAIRINGS: data->op_pair = 0; break;
+//					case GRANULAR: data->granular_option = TRUE; data->gran_init(); break; // data->gran_init();
+//					default: debug("not a valid option.\n");
+//							 break;
+//				}
+//			}
 		}
 		// set size of list
 		data->num_options = cnt;
@@ -295,41 +340,102 @@ PyObject *_benchmark_print(Benchmark *self) {
 PyObject *GetResults(Benchmark *self) {
 	if(self != NULL) {
 		PyObject *resultDict = PyDict_New();
-		PyDict_SetItem(resultDict, Py_BuildValue("i", CPU_TIME), PyFloat_FromDouble(self->cpu_time_ms));
-		PyDict_SetItem(resultDict, Py_BuildValue("i", REAL_TIME), PyFloat_FromDouble(self->real_time_ms));
-		PyDict_SetItem(resultDict, Py_BuildValue("i", NATIVE_TIME), PyFloat_FromDouble(self->native_time_ms));
-		PyDict_SetItem(resultDict, Py_BuildValue("i", ADDITION), Py_BuildValue("i", self->op_add));
-		PyDict_SetItem(resultDict, Py_BuildValue("i", SUBTRACTION), Py_BuildValue("i", self->op_sub));
-		PyDict_SetItem(resultDict, Py_BuildValue("i", MULTIPLICATION), Py_BuildValue("i", self->op_mult));
-		PyDict_SetItem(resultDict, Py_BuildValue("i", DIVISION), Py_BuildValue("i", self->op_div));
-		PyDict_SetItem(resultDict, Py_BuildValue("i", EXPONENTIATION), Py_BuildValue("i", self->op_exp));
-		PyDict_SetItem(resultDict, Py_BuildValue("i", PAIRINGS), Py_BuildValue("i", self->op_pair));
+		PyObject *CpuTime = PyFloat_FromDouble(self->cpu_time_ms);
+		PyObject *RealTime = PyFloat_FromDouble(self->real_time_ms);
+		PyObject *add  = Py_BuildValue("i", self->op_add);
+		PyObject *sub  = Py_BuildValue("i", self->op_sub);
+		PyObject *mult = Py_BuildValue("i", self->op_mult);
+		PyObject *div  = Py_BuildValue("i", self->op_div);
+		PyObject *exp  = Py_BuildValue("i", self->op_exp);
 
-//		PyClearBenchmark(self); // wipe benchmark data
+		PyDict_SetItemString(resultDict, "CpuTime", CpuTime);
+		PyDict_SetItemString(resultDict, "RealTime", RealTime);
+		PyDict_SetItemString(resultDict, "Add", add);
+		PyDict_SetItemString(resultDict, "Sub", sub);
+		PyDict_SetItemString(resultDict, "Mul", mult);
+		PyDict_SetItemString(resultDict, "Div", div);
+		PyDict_SetItemString(resultDict, "Exp", exp);
+
+		Py_DECREF(CpuTime);
+		Py_DECREF(RealTime);
+		Py_DECREF(add);
+		Py_DECREF(sub);
+		Py_DECREF(mult);
+		Py_DECREF(div);
+		Py_DECREF(exp);
+
 		return resultDict;
 	}
 
 	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
 }
 
-PyObject *Retrieve_result(Benchmark *self, MeasureType option) {
+PyObject *GetResultsWithPair(Benchmark *self) {
+	if(self != NULL) {
+		PyObject *resultDict = PyDict_New();
+		PyObject *CpuTime = PyFloat_FromDouble(self->cpu_time_ms);
+		PyObject *RealTime = PyFloat_FromDouble(self->real_time_ms);
+		PyObject *add  = Py_BuildValue("i", self->op_add);
+		PyObject *sub  = Py_BuildValue("i", self->op_sub);
+		PyObject *mult = Py_BuildValue("i", self->op_mult);
+		PyObject *div  = Py_BuildValue("i", self->op_div);
+		PyObject *exp  = Py_BuildValue("i", self->op_exp);
+		PyObject *pair = Py_BuildValue("i", self->op_pair);
+
+		PyDict_SetItemString(resultDict, "CpuTime", CpuTime);
+		PyDict_SetItemString(resultDict, "RealTime", RealTime);
+		PyDict_SetItemString(resultDict, "Add", add);
+		PyDict_SetItemString(resultDict, "Sub", sub);
+		PyDict_SetItemString(resultDict, "Mul", mult);
+		PyDict_SetItemString(resultDict, "Div", div);
+		PyDict_SetItemString(resultDict, "Exp", exp);
+		PyDict_SetItemString(resultDict, "Pair", pair);
+
+		Py_DECREF(CpuTime);
+		Py_DECREF(RealTime);
+		Py_DECREF(add);
+		Py_DECREF(sub);
+		Py_DECREF(mult);
+		Py_DECREF(div);
+		Py_DECREF(exp);
+		Py_DECREF(pair);
+		return resultDict;
+	}
+
+	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
+}
+
+
+PyObject *Retrieve_result(Benchmark *self, char *option) {
 	PyObject *result = NULL;
 
 	if(self != NULL) {
-		switch(option) {
-			case REAL_TIME:	result = PyFloat_FromDouble(self->real_time_ms); break;
-			case NATIVE_TIME: result = PyFloat_FromDouble(self->native_time_ms); break;
-			case CPU_TIME: result = PyFloat_FromDouble(self->cpu_time_ms); break;
-
-			case ADDITION: 	result = PyToLongObj(self->op_add); break;
-			case SUBTRACTION:  	result = PyToLongObj(self->op_sub); break;
-			case MULTIPLICATION: result = PyToLongObj(self->op_mult); break;
-			case DIVISION:		 result = PyToLongObj(self->op_div); break;
-			case EXPONENTIATION: result = PyToLongObj(self->op_exp); break;
-			case PAIRINGS: 		 result = PyToLongObj(self->op_pair); break;
-
-			default: debug("not a valid option.\n");
-					 break;
+		if(strcmp(option, _CPUTIME_OPT) == 0) {
+			result = PyFloat_FromDouble(self->cpu_time_ms);
+		}
+		else if(strcmp(option, _REALTIME_OPT) == 0) {
+			result = PyFloat_FromDouble(self->real_time_ms);
+		}
+		else if(strcmp(option, _ADD_OPT) == 0) {
+			result = PyToLongObj(self->op_add);
+		}
+		else if(strcmp(option, _SUB_OPT) == 0) {
+			result = PyToLongObj(self->op_sub);
+		}
+		else if(strcmp(option, _MUL_OPT) == 0) {
+			result = PyToLongObj(self->op_mult);
+		}
+		else if(strcmp(option, _DIV_OPT) == 0) {
+			result = PyToLongObj(self->op_div);
+		}
+		else if(strcmp(option, _EXP_OPT) == 0) {
+			result = PyToLongObj(self->op_exp);
+		}
+		else if(strcmp(option, _PAIR_OPT) == 0) {
+			result = PyToLongObj(self->op_pair);
+		}
+		else {
+			debug("not a valid option.\n");
 		}
 	}
 	return result;
@@ -466,17 +572,6 @@ void initbenchmark(void) 		{
 
 	Py_INCREF(&BenchmarkType);
 	PyModule_AddObject(module, "Benchmark", (PyObject *) &BenchmarkType);
-
-	// add constants from above
-	PyModule_AddIntConstant(module, "CpuTime", CPU_TIME);
-	PyModule_AddIntConstant(module, "RealTime", REAL_TIME);
-	PyModule_AddIntConstant(module, "NativeTime", NATIVE_TIME);
-	PyModule_AddIntConstant(module, "Add", ADDITION);
-	PyModule_AddIntConstant(module, "Sub", SUBTRACTION);
-	PyModule_AddIntConstant(module, "Mul", MULTIPLICATION);
-	PyModule_AddIntConstant(module, "Div", DIVISION);
-	PyModule_AddIntConstant(module, "Exp", EXPONENTIATION);
-	PyModule_AddIntConstant(module, "Pair", PAIRINGS);
 	// add exception handler
 #if PY_MAJOR_VERSION >= 3
 	return module;

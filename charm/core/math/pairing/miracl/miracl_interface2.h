@@ -26,7 +26,6 @@
 *   @author  ayo.akinyele@charm-crypto.com
 *
 ************************************************************************/
-
 #include <gmp.h>
 
 typedef void pairing_t;
@@ -37,14 +36,20 @@ extern "C" {
 #endif
 
 enum Curve {MNT, BN, SS, NONE_C}; // control what type of curve we are dealing with
-enum Group {ZR_t = 0, G1_t, G2_t, GT_t, NONE_G}; // clashes with types in pairing_3.h
+#if (BUILD_MNT_CURVE == 1 || BUILD_BN_CURVE == 1)
+enum Group {pyZR_t = 0, pyG1_t, pyG2_t, pyGT_t, NONE_G}; // clashes with types in pairing_3.h
+#else
+enum Group {pyZR_t = 0, pyG1_t, pyGT_t, NONE_G};
+#define pyG2_t 	pyG1_t // for backwards compatibility
+#define G2 	 	G1
+#endif
+
 typedef enum Group Group_t;
 typedef enum Curve Curve_t;
 
 #define TRUE		1
 #define FALSE		0
 #define CF        	2 // Co-factor = 2 in MNT curves
-#define MAX_LEN		40
 #define LEN_BITS	4
 #define aes_block_size 16
 
@@ -91,8 +96,9 @@ void _element_set(Curve_t ctype, Group_t type, element_t *dst, const element_t *
 char *print_mpz(mpz_t x, int base);
 void _element_set_mpz(Group_t type, element_t *dst, mpz_t src);
 void _element_to_mpz(Group_t type, element_t *src, mpz_t dst);
-element_t *_element_pairing_type3(const pairing_t *pairing, const element_t *in1, const element_t *in2);
-element_t *_element_prod_pairing_type3(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length);
+
+element_t *_element_pairing(const pairing_t *pairing, const element_t *in1, const element_t *in2);
+element_t *_element_prod_pairing(const pairing_t *pairing, const element_t **in1, const element_t **in2, int length);
 
 // I/O functions start
 int _element_length_in_bytes(Curve_t ctype, Group_t type, element_t *e);
@@ -103,7 +109,7 @@ element_t *_element_from_bytes(Curve_t ctype, Group_t type, unsigned char *data)
 void element_delete(Group_t type, element_t *e);
 
 void _init_hash(const pairing_t *pairing);
-void _element_add_str_hash(const pairing_t *pairing, void *data, int len);
+void _element_add_str_hash(const pairing_t *pairing, char *data, int len);
 void _element_add_to_hash(Group_t type, const pairing_t *pairing, const element_t *e);
 element_t *finish_hash(Group_t type, const pairing_t *pairing);
 

@@ -9,7 +9,7 @@ Group Abstractions
 We begin with the first stage of new scheme development which is selecting the appropriate group to instantiate a scheme. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking: 
 
 At the moment, there are three cryptographic settings covered by Charm: ``integergroups``, ``ecgroups``, and ``pairinggroups``. 
-To initialize a group in the elliptic curve (EC) settiing, refer to the ``toolbox.eccurve`` for all the full set of identifiers for supported NIST approved curves (e.g., ``prime192v1``). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric type of curves. For example, the ``'SS512'`` represents a symmetric curve with a 512-bit base field and ``'MNT159'`` represents an asymmetric curve with 159-bit base field.
+To initialize a group in the elliptic curve (EC) settiing, refer to the ``toolbox.eccurve`` for the full set of identifiers and supported NIST approved curves (e.g., ``prime192v1``). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric type of curves. For example, the ``'SS512'`` represents a symmetric curve with a 512-bit base field and ``'MNT159'`` represents an asymmetric curve with 159-bit base field.
 Finally, for integer groups, typically defining large primes ``p`` and ``q`` is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., ``p = 2q + 1``). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):
 
 ::
@@ -167,7 +167,7 @@ There are several benchmark flags you should be aware of such as: ``RealTime``, 
 	for a in range(trials):
 	    j = g * h	
 	    k = h ** group.random(ZR)
-	    t = (j ** group.random(ZR)) / m
+	    t = (j ** group.random(ZR)) / k
 	EndBenchmark(ID)
 
 	msmtDict = GetGeneralBenchmarks(ID)

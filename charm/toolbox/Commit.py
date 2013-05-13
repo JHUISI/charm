@@ -11,7 +11,7 @@ from charm.toolbox.schemebase import *
 class Commitment(SchemeBase):
     def __init__(self):
         SchemeBase.__init__(self)
-        SchemeBase.setProperty(self, scheme='Commitment')
+        SchemeBase._setProperty(self, scheme='Commitment')
         self.baseSecDefs = None
         
     def setup(self, securityparam):

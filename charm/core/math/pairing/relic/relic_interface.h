@@ -42,14 +42,14 @@
 #define SHA_LEN  	32
 #define SHA_FUNC	md_map_sh256
 /* move to the appropriate place */
-typedef enum _status_t { ELEMENT_OK = 0,
+typedef enum _status_t { ELEMENT_OK = 2,
 	   ELEMENT_INVALID_ARG,
 	   ELEMENT_INVALID_ARG_LEN,
 	   ELEMENT_INVALID_TYPES,
 	   ELEMENT_INVALID_RESULT,
 	   ELEMENT_PAIRING_INIT_FAILED,
 	   ELEMENT_UNINITIALIZED,
-	   ELEMENT_DIV_ZERO
+	   ELEMENT_DIV_ZERO,
 } status_t;
 
 enum Group {ZR, G1, G2, GT, NIL};

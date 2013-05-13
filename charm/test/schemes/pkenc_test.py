@@ -4,7 +4,7 @@ from charm.adapters.pkenc_adapt_bchk05 import BCHKIBEnc
 from charm.adapters.ibenc_adapt_identityhash import HashIDAdapter
 from charm.schemes.encap_bchk05 import EncapBCHK
 from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
-from charm.schemes.pksig.pksig_bls04 import IBSig
+from charm.schemes.pksig.pksig_bls04 import BLS01
 from charm.schemes.pkenc.pkenc_cs98 import CS98
 from charm.schemes.pkenc.pkenc_elgamal85 import ElGamal
 from charm.schemes.pkenc.pkenc_paillier99 import Pai99
@@ -53,7 +53,7 @@ class CHK04Test(unittest.TestCase):
         hash_ibe = HashIDAdapter(ibe, groupObj)
        
         # instantiate an one-time signature scheme such as BLS04
-        ots = IBSig(groupObj)
+        ots = BLS01(groupObj)
         
         pkenc = CHK04(hash_ibe, ots, groupObj)
         

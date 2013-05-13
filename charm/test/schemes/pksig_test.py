@@ -1,6 +1,7 @@
 from charm.adapters.pksig_adapt_naor01 import Sig_Generic_ibetosig_Naor01
+from charm.adapters.ibenc_adapt_identityhash import HashIDAdapter
 from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
-from charm.schemes.pksig.pksig_bls04 import IBSig
+from charm.schemes.pksig.pksig_bls04 import BLS01
 from charm.schemes.pksig.pksig_boyen import Boyen
 from charm.schemes.pksig.pksig_chch import CHCH
 from charm.schemes.pksig.pksig_chp import CHP
@@ -31,14 +32,13 @@ class PKSig_Naor01Test(unittest.TestCase):
         
         ibe = IBE_BB04(groupObj)
         
-        ibsig = Sig_Generic_ibetosig_Naor01(ibe, groupObj)
+        hashID = HashIDAdapter(ibe, groupObj)
+        ibsig = Sig_Generic_ibetosig_Naor01(hashID, groupObj)
 
         (mpk, msk) = ibsig.keygen()
         
-        #M = "I want a signature on this message!"
-        M = groupObj.random(ZR)
+        M = "I want a signature on this message!"
 
-        #TODO: M must be in Zp
         sigma = ibsig.sign(msk, M)
         if debug: print("\nMessage =>", M)
         if debug: print("Sigma =>", sigma)
@@ -47,12 +47,12 @@ class PKSig_Naor01Test(unittest.TestCase):
         if debug: print("Successful Verification!!!")
         del groupObj
 
-class BLS04Test(unittest.TestCase):
+class BLS01Test(unittest.TestCase):
     def testBLS04(self):
         groupObj = PairingGroup('MNT224')
         
         m = { 'a':"hello world!!!" , 'b':"test message" }
-        bls = IBSig(groupObj)
+        bls = BLS01(groupObj)
         
         (pk, sk) = bls.keygen(0)
         

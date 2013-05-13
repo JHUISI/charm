@@ -1,28 +1,26 @@
 '''
-Script to automatically generate documentation stubs for schemes
+Script to automatically generate documentation stubs for schemes, toolbox and test code
 
 Author: Gary Belvin
 '''
 import os, re
 import config
 
-skipList = config.skip_list # ['ake_ecmqv', 'pksig_rsa_hw09', 'bls04']
+skipList = config.skip_list
 
-def find_modules(path="."):
+def find_modules(path=".", excludeTests=True):
     if type(path) == str:
        path = [path]
     modules = list()
     for this_path in path: 
         for filename in os.listdir(this_path):
-#            print("file: ", filename)
+            #print("file: ", filename)
             if re.match("^[^_][\w]+\.py$", filename):
                module = filename[:-3]
                modules.append(module)
 
     #Exclude unit tests
-    modules = [mod for mod in modules if not re.match(".*_test$", mod)]
-    #modules = [mod for mod in modules if not re.match("batch.*", mod)]
-    #modules = [mod for mod in modules if not re.match("bench.*", mod)]
+    if excludeTests: modules = [mod for mod in modules if not re.match(".*_test$", mod)]
     try:
         for i in skipList:
             modules.remove(i)    
@@ -122,7 +120,7 @@ if __name__ == "__main__":
    mods = list()
    rel_path = '../'
    slash = '/'
-   mod_list = [config.scheme_path, config.abenc_path, config.dabenc_path, config.pkenc_path, config.pksig_path]
+   mod_list = [config.scheme_path, config.abenc_path, config.pkenc_path, config.pksig_path]
    for p in mod_list:
        mods.append( find_modules(rel_path + p) )
    for p in range(len(mod_list)):
@@ -135,7 +133,16 @@ if __name__ == "__main__":
    #Auto add toolbox classes
    print("Adding: ", config.toolbox_path)
    mods = find_modules(config.toolbox_path)
-   auto_add_rst(mods, 'source/toolbox/')
+   auto_add_rst(mods, 'source/toolbox/', True)
    replace_toc('source/toolbox.rst', 'auto_toolbox_list', mods, 'toolbox/')
 
+   #Auo add test case code 
+   print("Adding: ", config.test_path + "/schemes")
+   mods = find_modules(config.test_path + "/schemes", excludeTests=False)
+   auto_add_rst(mods, 'source/test/', True)
+   replace_toc('source/test_schemes.rst', 'auto_test_schemes_list', mods, 'test/')
   
+   print("Adding: ", config.test_path + "/toolbox")
+   mods = find_modules(config.test_path + "/toolbox", excludeTests=False)
+   auto_add_rst(mods, 'source/test/', True)
+   replace_toc('source/test_toolbox.rst', 'auto_test_toolbox_list', mods, 'test/')

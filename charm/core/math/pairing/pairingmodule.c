@@ -66,6 +66,7 @@ int div_rule(GroupType lhs, GroupType rhs)
 int pair_rule(GroupType lhs, GroupType rhs)
 {
 	if(lhs == G1 && rhs == G2) return TRUE;
+	else if(lhs == G2 && rhs == G1) return TRUE;
 	return FALSE; /* Fall all other cases: only for MNT case */
 }
 
@@ -107,11 +108,12 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
+// TODO: update these two functions to convert neg numbers
 PyObject *mpzToLongObj (mpz_t m)
 {
 	/* borrowed from gmpy */
 	int size = (mpz_sizeinbase (m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
-	int i;
+	int i, isNeg = (mpz_sgn(m) < 0) ? TRUE : FALSE;
 	mpz_t temp;
 	PyLongObject *l = _PyLong_New (size);
 	if (!l)
@@ -125,7 +127,12 @@ PyObject *mpzToLongObj (mpz_t m)
 	i = size;
 	while ((i > 0) && (l->ob_digit[i - 1] == 0))
 		i--;
-	Py_SIZE(l) = i;
+	if(isNeg) {
+		Py_SIZE(l) = -i;
+	}
+	else {
+		Py_SIZE(l) = i;
+	}
 	mpz_clear (temp);
 	return (PyObject *) l;
 }
@@ -133,13 +140,16 @@ PyObject *mpzToLongObj (mpz_t m)
 void longObjToMPZ (mpz_t m, PyLongObject * p)
 {
 	int size, i, tmp = Py_SIZE(p);
+	int isNeg = FALSE;
 	mpz_t temp, temp2;
 	mpz_init (temp);
 	mpz_init (temp2);
 	if (tmp > 0)
 		size = tmp;
-	else
+	else {
 		size = -tmp;
+		isNeg = TRUE;
+	}
 	mpz_set_ui (m, 0);
 	for (i = 0; i < size; i++)
 	{
@@ -149,6 +159,7 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 	}
 	mpz_clear (temp);
 	mpz_clear (temp2);
+	if(isNeg) mpz_neg(m, m);
 }
 
 char *convert_buffer_to_hex(uint8_t * data, size_t len)
@@ -639,8 +650,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	}
 	
 	debug("init an element.\n");
-//	if(type >= ZR && type <= GT) {
-	if(type == ZR) {
+	if(type >= ZR && type <= GT) {
 		retObject = createNewElement(type, group->pairing);
 	}
 	else {
@@ -755,7 +765,9 @@ static PyObject *Element_add(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_add(newObject->e, self->e, other->e);
 	//STOP_CLOCK(dBench);
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(ADDITION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -780,7 +792,9 @@ static PyObject *Element_sub(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_sub(newObject->e, self->e, other->e);		
 	//STOP_CLOCK(dBench);
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(SUBTRACTION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -855,8 +869,9 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	else {
 		EXIT_IF(TRUE, "invalid types.");
 	}
-
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -927,8 +942,9 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 		PyErr_SetString(ElementError, "invalid types");
 		return NULL;
 	}
-
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(DIVISION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
  
@@ -961,10 +977,8 @@ static PyObject *Element_negate(Element *self)
 	}
 #endif
 
-	//START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_neg(newObject->e, self->e);
-	//STOP_CLOCK(dBench);
 
 	return (PyObject *) newObject;
 }
@@ -1018,7 +1032,6 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		else {
 			EXIT_IF(TRUE, "undefined exponentiation operation.");
 		}
-		//STOP_CLOCK(dBench);
 	}
 	else if(Check_Elements(o1, o2)) {
 		debug("Starting '%s'\n", __func__);
@@ -1028,14 +1041,12 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		IS_SAME_GROUP(lhs_o1, rhs_o2);
 		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation");
 		if(rhs_o2->element_type == ZR) {
-			// element_pow_zn(newObject->e, lhs_o1->e, rhs_o1->e);
-			//START_CLOCK(dBench);
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
-			mpz_init(n);
-			element_to_mpz(n, rhs_o2->e);
-			element_pow_mpz(newObject->e, lhs_o1->e, n);
-			mpz_clear(n);
-			//STOP_CLOCK(dBench);
+			element_pow_zn(newObject->e, lhs_o1->e, rhs_o2->e);
+//			mpz_init(n);
+//			element_to_mpz(n, rhs_o2->e);
+//			element_pow_mpz(newObject->e, lhs_o1->e, n);
+//			mpz_clear(n);
 		}
 		else {
 			// we have a problem
@@ -1048,7 +1059,9 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 	
 	// STOP_CLOCK
+#ifdef BENCHMARK_ENABLED
 	if(newObject != NULL) UPDATE_BENCH(EXPONENTIATION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -1194,7 +1207,9 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			newObject = createNewElement(GT, lhs->pairing);
 			pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
 			//STOP_CLOCK(dBench);
+#ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(PAIRINGS, dBench);
+#endif
 			return (PyObject *) newObject;
 		}
 
@@ -1204,9 +1219,14 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			debug_e("RHS: '%B'\n", rhs->e);
 			//START_CLOCK(dBench);
 			newObject = createNewElement(GT, lhs->pairing);
-			pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
+			if(lhs->element_type == G1)
+				pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
+			else if(lhs->element_type == G2)
+				pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
 			//STOP_CLOCK(dBench);
+#ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(PAIRINGS, dBench);
+#endif
 			return (PyObject *) newObject;
 		}
 	}
@@ -1675,19 +1695,13 @@ void Operations_clear()
 
 PyObject *PyCreateList(MeasureType type)
 {
-//	int groupTypes = 4;
-	int count = -1;
-	PyObject *objList = PyList_New(0);
-	// Insert backwards from GT -> G2 -> G1 -> ZR
-	GetField(count, type, GT, dBench);
-	PyList_Insert(objList, 0, Py_BuildValue("i", count));
-	GetField(count, type, G2, dBench);
-	PyList_Insert(objList, 0, Py_BuildValue("i", count));
-	GetField(count, type, G1, dBench);
-	PyList_Insert(objList, 0, Py_BuildValue("i", count));
-	GetField(count, type, ZR, dBench);
-	PyList_Insert(objList, 0, Py_BuildValue("i", count));
+	int countZR = -1, countG1 = -1, countG2 = -1, countGT = -1;
+	GetField(countZR, type, ZR, dBench);
+	GetField(countG1, type, G1, dBench);
+	GetField(countG2, type, G2, dBench);
+	GetField(countGT, type, GT, dBench);
 
+	PyObject *objList = Py_BuildValue("[iiii]", countZR, countG1, countG2, countGT);
 	return objList;
 }
 
@@ -1702,12 +1716,28 @@ static PyObject *Granular_benchmark(PyObject *self, PyObject *args)
 	}
 
 	if(id == BenchmarkIdentifier) {
+		PyObject *MulList = PyCreateList(MULTIPLICATION);
+		PyObject *DivList = PyCreateList(DIVISION);
+		PyObject *AddList = PyCreateList(ADDITION);
+		PyObject *SubList = PyCreateList(SUBTRACTION);
+		PyObject *ExpList = PyCreateList(EXPONENTIATION);
 		dict = PyDict_New();
-		PyDict_SetItem(dict, Py_BuildValue("i", MULTIPLICATION), PyCreateList(MULTIPLICATION));
-		PyDict_SetItem(dict, Py_BuildValue("i", DIVISION), PyCreateList(DIVISION));
-		PyDict_SetItem(dict, Py_BuildValue("i", ADDITION), PyCreateList(ADDITION));
-		PyDict_SetItem(dict, Py_BuildValue("i", SUBTRACTION), PyCreateList(SUBTRACTION));
-		PyDict_SetItem(dict, Py_BuildValue("i", EXPONENTIATION), PyCreateList(EXPONENTIATION));
+		if(dict == NULL) return NULL;
+		//PrintPyRef('MulList Before =>', MulList);
+		PyDict_SetItemString(dict, "Mul", MulList);
+		PyDict_SetItemString(dict, "Div", DivList);
+		PyDict_SetItemString(dict, "Add", AddList);
+		PyDict_SetItemString(dict, "Sub", SubList);
+		PyDict_SetItemString(dict, "Exp", ExpList);
+		Py_DECREF(MulList);
+		Py_DECREF(DivList);
+		Py_DECREF(AddList);
+		Py_DECREF(SubList);
+		Py_DECREF(ExpList);
+		//PrintPyRef('MulList After =>', MulList);
+	}
+	else {
+		printf("%s: invalid id = '%d'\n", __FUNCTION__, id);
 	}
 
 	return dict;
@@ -1808,7 +1838,7 @@ InitBenchmark_CAPI(_init_benchmark, dBench, BenchmarkIdentifier);
 StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
-GetAllBenchmarks_CAPI(_get_all_results, dBench);
+GetAllBenchmarks_CAPI(_get_all_results, dBench, GetResultsWithPair);
 ClearBenchmarks_CAPI(_clear_benchmark, dBench);
 #endif
 // new
@@ -2039,7 +2069,7 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int pairings_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
-        Py_XDECREF(ElementError);
+    Py_XDECREF(ElementError);
 #ifdef BENCHMARK_ENABLED
 	Operations *c = (Operations *) dBench->data_ptr;
 	free(c);
@@ -2102,15 +2132,20 @@ void initpairing(void) 		{
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     if(st->dBench == NULL)
         CLEAN_EXIT;
+    Py_INCREF(st->dBench);
     dBench = st->dBench;
-    Py_INCREF(dBench);
-    dBench->bench_initialized = FALSE;
 
+    dBench->bench_initialized = FALSE;
     Operations *cntr = (Operations *) malloc(sizeof(Operations));
     dBench->data_ptr = (void *) cntr; // store data structure
     dBench->gran_init = &Operations_clear; // pointer to clearing the structure memory
     CLEAR_ALLDBENCH(dBench);
-    InitClear(dBench);
+    dBench->granular_option = FALSE;
+    dBench->op_add = 0;	dBench->op_sub = 0;
+    dBench->op_mult = 0; dBench->op_div = 0;
+    dBench->op_exp = 0; dBench->op_pair = 0;
+    dBench->cpu_time_ms = 0.0; dBench->real_time_ms = 0.0;
+    dBench->identifier = -1;
 #endif
 
     Py_INCREF(&PairingType);
@@ -2123,15 +2158,16 @@ void initpairing(void) 		{
 	PyModule_AddIntConstant(m, "G2", G2);
 	PyModule_AddIntConstant(m, "GT", GT);
 
-#ifdef BENCHMARK_ENABLED
+#if BENCHMARK_ENABLED == 1
 	ADD_BENCHMARK_OPTIONS(m);
-	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
-	PyModule_AddIntConstant(m, "Granular", GRANULAR);
+	PyModule_AddStringConstant(m, "Pair", 	  _PAIR_OPT);
+	PyModule_AddStringConstant(m, "Granular", _GRAN_OPT);
 #endif
 
 LEAVE:
     if (PyErr_Occurred()) {
-        Py_DECREF(m);
+		PyErr_Clear();
+        Py_XDECREF(m);
     	INITERROR;
     } 
 

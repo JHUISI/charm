@@ -9,7 +9,7 @@ class Hash(SchemeBase):
     
     def __init__(self):
         SchemeBase.__init__(self)
-        SchemeBase.setProperty(self, scheme='Hash')
+        SchemeBase._setProperty(self, scheme='Hash')
         self.baseSecDefs = None # Enum('EU_CMA')
     # base methods?
     def paramgen(self, *args):
@@ -29,7 +29,7 @@ class ChamHash(Hash):
     
     def __init__(self):
         Hash.__init__(self)
-        Hash.setProperty(self, scheme='ChamHash')
+        Hash._setProperty(self, scheme='ChamHash')
         self.baseSecDefs = None # Enum('EU_CMA')
         
     def paramgen(self, secparam, p=None, q=None):

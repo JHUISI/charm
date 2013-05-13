@@ -68,7 +68,7 @@
 #define HASH_LEN	20
 #define RESERVED_ENCODING_BYTES			2
 
-#ifdef BENCHMARK_ENABLED
+#if BENCHMARK_ENABLED == 1
 static Benchmark *dBench;
 #endif
 
@@ -163,5 +163,6 @@ EC_POINT *element_from_hash(EC_GROUP *group, uint8_t *input, int input_len);
 		PyErr_SetString(PyECErrorObject, "mixing group elements from different curves.");	\
 		return NULL;	\
 	}
+
 
 #endif

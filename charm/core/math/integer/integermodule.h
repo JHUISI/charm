@@ -57,23 +57,22 @@
 
 #if PY_MAJOR_VERSION >= 3
 
-#define Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)  \
-	if(PyInteger_Check(o1)) { \
-		lhs = (Integer *) o1; } \
-	else if(PyLong_Check(o1)) { \
-		lhs_value = PyLong_AsLong(o1); \
+#define Convert_Types(left, right, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured)  \
+	if(PyInteger_Check(left)) { \
+		lhs = (Integer *) left; } \
+	else if(PyLong_Check(left)) { \
+		longObjToMPZ(lhs_mpz, left);	\
 		foundLHS = TRUE;  } \
-	else { ErrorMsg("invalid left operand type."); } \
-							\
-	if(PyInteger_Check(o2)) {  \
-		rhs = (Integer *) o2; } \
-	else if(PyLong_Check(o2)) {  \
-		rhs_value = PyLong_AsLong(o2); \
-		foundRHS = TRUE; }  \
-	else { ErrorMsg("invalid right operand type."); }
+	else { errorOccured = TRUE; } \
+						\
+	if(PyInteger_Check(right)) {  \
+		rhs = (Integer *) right; } \
+	else if(PyLong_Check(right)) {  \
+		longObjToMPZ(rhs_mpz, right);	\
+		foundRHS = TRUE;  } \
+	else { errorOccured = TRUE; }
 
-
-#define Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
+#define Convert_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
 	if(PyInteger_Check(o1)) { \
 		lhs = (Integer *) o1; } \
 	else if(PyLong_Check(o1)) { \
@@ -88,35 +87,34 @@
 
 #else
 /* python 2.x series */
-#define Check_Types(o1, o2, lhs, rhs, foundLHS, foundRHS, lhs_value, rhs_value)  \
-	if(PyInteger_Check(o1)) { \
-		lhs = (Integer *) o1; } \
-	else if(PyLong_Check(o1) || PyInt_Check(o1)) { \
-		lhs_value = PyLong_AsLong(PyNumber_Long(o1)); \
-		foundLHS = TRUE;  } \
-	else { ErrorMsg("invalid left operand type."); } \
-							\
-	if(PyInteger_Check(o2)) {  \
-		rhs = (Integer *) o2; } \
-	else if(PyLong_Check(o2) || PyInt_Check(o2)) {  \
-		rhs_value = PyLong_AsLong(PyNumber_Long(o2)); \
-		foundRHS = TRUE; }  \
-	else { ErrorMsg("invalid right operand type."); }
-
+#define Convert_Types(left, right, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured)  \
+	if(PyInteger_Check(left)) { \
+		lhs = (Integer *) left; } \
+	else if(PyLong_Check(left) || PyInt_Check(left)) { \
+		PyObject *_left = PyNumber_Long(left); \
+		longObjToMPZ(lhs_mpz, _left);	\
+		foundLHS = TRUE;  Py_XDECREF(_left); } \
+	else { errorOccured = TRUE; } \
+						\
+	if(PyInteger_Check(right)) {  \
+		rhs = (Integer *) right; } \
+	else if(PyLong_Check(right) || PyInt_Check(right)) { \
+		PyObject *_right = PyNumber_Long(right); \
+		longObjToMPZ(rhs_mpz, _right);	\
+		foundRHS = TRUE;  Py_XDECREF(_right); } \
+	else { errorOccured = TRUE; }
 
 // TODO: revisit o1 & o2 in 2nd if blocks
-#define Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
+#define Convert_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
 	if(PyInteger_Check(o1)) { \
 		lhs = (Integer *) o1; } \
 	else if(PyLong_Check(o1) || PyInt_Check(o1)) { \
-		o1 = PyNumber_Long(o1); \
 		foundLHS = TRUE;  } \
 	else { ErrorMsg("invalid left operand type."); } \
 							\
 	if(PyInteger_Check(o2)) {  \
 		rhs = (Integer *) o2; } \
 	else if(PyLong_Check(o2) || PyInt_Check(o2)) {  \
-		o2 = PyNumber_Long(o2); \
 		foundRHS = TRUE; }  \
 	else { ErrorMsg("invalid right operand type."); }
 
@@ -154,8 +152,7 @@ void	Integer_dealloc(Integer* self);
 PyObject *Integer_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Integer_init(Integer *self, PyObject *args, PyObject *kwds);
 PyObject *Integer_print(Integer *self);
-Integer *createNewInteger(mpz_t m);
-Integer *createNewIntegerNoMod(void);
+Integer *createNewInteger(void);
 void print_mpz(mpz_t x, int base);
 void print_bn_dec(const BIGNUM *bn);
 
@@ -164,4 +161,7 @@ void print_bn_dec(const BIGNUM *bn);
 	PyErr_SetString(IntegerError, msg); \
 	return NULL;	}
 
+
 #endif
+
+

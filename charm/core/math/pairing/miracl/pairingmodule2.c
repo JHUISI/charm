@@ -37,29 +37,29 @@
 
 int exp_rule(Group_t lhs, Group_t rhs)
 {
-	if(lhs == ZR_t && rhs == ZR_t) return TRUE;
-	if(lhs == G1_t && rhs == ZR_t) return TRUE;
-	if(lhs == G2_t && rhs == ZR_t) return TRUE;
-	if(lhs == GT_t && rhs == ZR_t) return TRUE;
+	if(lhs == pyZR_t && rhs == pyZR_t) return TRUE;
+	if(lhs == pyG1_t && rhs == pyZR_t) return TRUE;
+	if(lhs == pyG2_t && rhs == pyZR_t) return TRUE;
+	if(lhs == pyGT_t && rhs == pyZR_t) return TRUE;
 	return FALSE; /* Fail all other cases */
 }
 
 int mul_rule(Group_t lhs, Group_t rhs)
 {
 	if(lhs == rhs) return TRUE;
-	if(lhs == ZR_t || rhs == ZR_t) return TRUE;
+	if(lhs == pyZR_t || rhs == pyZR_t) return TRUE;
 	return FALSE; /* Fail all other cases */
 }
 
 int add_rule(Group_t lhs, Group_t rhs)
 {
-	if(lhs == rhs && lhs != GT_t) return TRUE;
+	if(lhs == rhs && lhs != pyGT_t) return TRUE;
 	return FALSE; /* Fail all other cases */
 }
 
 int sub_rule(Group_t lhs, Group_t rhs)
 {
-	if(lhs == rhs && lhs != GT_t) return TRUE;
+	if(lhs == rhs && lhs != pyGT_t) return TRUE;
 	return FALSE; /* Fail all other cases */
 }
 
@@ -71,12 +71,13 @@ int div_rule(Group_t lhs, Group_t rhs)
 
 int pair_rule(Group_t lhs, Group_t rhs)
 {
-	if(lhs == G1_t && rhs == G2_t) return TRUE;
+	if(lhs == pyG1_t && rhs == pyG2_t) return TRUE;
+	else if(lhs == pyG2_t && rhs == pyG1_t) return TRUE;
 	return FALSE; /* Fall all other cases : assume MNT? */
 }
 
 int check_type(Group_t type) {
-	if(type == ZR_t || type == G1_t || type == G2_t || type == GT_t) return TRUE;
+	if(type == pyZR_t || type == pyG1_t || type == pyG2_t || type == pyGT_t) return TRUE;
 	return FALSE;
 }
 
@@ -110,39 +111,45 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
-PyObject *mpzToLongObj (mpz_t m)
-{
-	/* borrowed from gmpy */
-	int size = (mpz_sizeinbase (m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
-	int i;
+PyObject *mpzToLongObj(mpz_t m) {
+	/* borrowed from gmpy - then modified */
+	int size = (mpz_sizeinbase(m, 2) + PyLong_SHIFT - 1) / PyLong_SHIFT;
+	int i, isNeg = (mpz_sgn(m) < 0) ? TRUE : FALSE;
 	mpz_t temp;
-	PyLongObject *l = _PyLong_New (size);
+	PyLongObject *l = _PyLong_New(size);
 	if (!l)
 		return NULL;
-	mpz_init_set (temp, m);
-	for (i = 0; i < size; i++)
-	{
-		l->ob_digit[i] = (digit) (mpz_get_ui (temp) & PyLong_MASK);
-		mpz_fdiv_q_2exp (temp, temp, PyLong_SHIFT);
+	mpz_init_set(temp, m);
+	for (i = 0; i < size; i++) {
+		l->ob_digit[i] = (digit)(mpz_get_ui(temp) & PyLong_MASK);
+		mpz_fdiv_q_2exp(temp, temp, PyLong_SHIFT);
 	}
 	i = size;
 	while ((i > 0) && (l->ob_digit[i - 1] == 0))
 		i--;
-	Py_SIZE(l) = i;
-	mpz_clear (temp);
+	if(isNeg) {
+		Py_SIZE(l) = -i;
+	}
+	else {
+		Py_SIZE(l) = i;
+	}
+	mpz_clear(temp);
 	return (PyObject *) l;
 }
 
 void longObjToMPZ (mpz_t m, PyLongObject * p)
 {
 	int size, i, tmp = Py_SIZE(p);
+	int isNeg = FALSE;
 	mpz_t temp, temp2;
 	mpz_init (temp);
 	mpz_init (temp2);
 	if (tmp > 0)
 		size = tmp;
-	else
+	else {
 		size = -tmp;
+		isNeg = TRUE;
+	}
 	mpz_set_ui (m, 0);
 	for (i = 0; i < size; i++)
 	{
@@ -152,6 +159,7 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 	}
 	mpz_clear (temp);
 	mpz_clear (temp2);
+	if(isNeg) mpz_neg(m, m);
 }
 
 char *convert_buffer_to_hex(uint8_t * data, size_t len)
@@ -189,17 +197,17 @@ int Check_Types(Group_t l_type, Group_t r_type, char op)
 		// Rules: elements must be of the same type, multiplicative operations should be only used for
 		// elements in field GT
 		case 'a':	
-			if(l_type == GT_t || r_type == GT_t) { return FALSE; }
+			if(l_type == pyGT_t || r_type == pyGT_t) { return FALSE; }
 			break;
 		case 's':
-			if(l_type == GT_t || r_type == GT_t) { return FALSE; }
+			if(l_type == pyGT_t || r_type == pyGT_t) { return FALSE; }
 			break;
 		case 'e':
-			if(l_type != G1_t && r_type != G2_t) { return FALSE; }
+			if(l_type != pyG1_t && r_type != pyG2_t) { return FALSE; }
 			break;
 		case 'p':
 			// rule for exponentiation for types
-			if(l_type != G1_t && l_type != G2_t && l_type != GT_t && l_type != ZR_t) { return FALSE; }
+			if(l_type != pyG1_t && l_type != pyG2_t && l_type != pyGT_t && l_type != pyZR_t) { return FALSE; }
 			// && r_type != ZR)
 			// else { 
 			//	PyErr_SetString(ElementError, "Only fields => [G1_t,G2,GT,Zr] ** Zr");
@@ -218,21 +226,21 @@ int Check_Types(Group_t l_type, Group_t r_type, char op)
 static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 	debug("Create an object of type Element\n");
 	Element *retObject = PyObject_New(Element, &ElementType);
-	if(element_type == ZR_t) {
+	if(element_type == pyZR_t) {
 		retObject->e = element_init_ZR(0);
-		retObject->element_type = ZR_t;
+		retObject->element_type = pyZR_t;
 	}
-	else if(element_type == G1_t) {
+	else if(element_type == pyG1_t) {
 		retObject->e = element_init_G1();
-		retObject->element_type = G1_t;
+		retObject->element_type = pyG1_t;
 	}
-	else if(element_type == G2_t) {
+	else if(element_type == pyG2_t) {
 		retObject->e = element_init_G2();
-		retObject->element_type = G2_t;
+		retObject->element_type = pyG2_t;
 	}
-	else if(element_type == GT_t) {
+	else if(element_type == pyGT_t) {
 		retObject->e = element_init_GT(pairing);
-		retObject->element_type = GT_t;
+		retObject->element_type = pyGT_t;
 	}
 	else {
 		// init without a type -- caller must set e and element_type
@@ -246,7 +254,7 @@ static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 
 Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 	Element *self = (Element *) elemObj;
-	Element *new = createNewElement(ZR_t, self->pairing);
+	Element *new = createNewElement(pyZR_t, self->pairing);
 
 	mpz_t x;
 	mpz_init(x);
@@ -263,7 +271,7 @@ void 	Pairing_dealloc(Pairing *self)
 {
 	if(self->safe) {
 		pairing_clear(self->pair_obj);
-		element_delete(ZR_t, self->order);
+		element_delete(pyZR_t, self->order);
 		self->pair_obj = NULL;
 		self->order = NULL;
 	}
@@ -282,7 +290,7 @@ void	Element_dealloc(Element* self)
 	if(self->safe_pairing_clear) {
 		pairing_clear(self->pairing->pair_obj);
 		self->pairing->pair_obj = NULL;
-		element_delete(ZR_t, self->pairing->order);
+		element_delete(pyZR_t, self->pairing->order);
 		self->pairing->order = NULL;
 		PyObject_Del(self->pairing);
 	}
@@ -290,26 +298,6 @@ void	Element_dealloc(Element* self)
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-//// helper method
-//ssize_t read_file(FILE *f, char** out)
-//{
-//	if(f != NULL) {
-//		/* See how big the file is */
-//		fseek(f, 0L, SEEK_END);
-//		ssize_t out_len = ftell(f);
-//		debug("out_len: %zd\n", out_len);
-//		if(out_len <= MAX_LEN) {
-//			/* allocate that amount of memory only */
-//			if((*out = (char *) malloc(out_len+1)) != NULL) {
-//				fseek(f, 0L, SEEK_SET);
-//				fread(*out, sizeof(char), out_len, f);
-//				return out_len;
-//			}
-//		}
-//	}
-//
-//	return 0;
-//}
 
 /*!
  * Hash a null-terminated string to a byte array.
@@ -384,73 +372,6 @@ int hash_element_to_bytes(Element *element, int hash_size, uint8_t* output_buf, 
 	return TRUE;
 }
 
-// take a previous hash and concatenate with serialized bytes of element and hashes into output buf
-int hash2_element_to_bytes(Element *element, uint8_t* last_buf, int hash_size, uint8_t* output_buf) {
-	int result = TRUE;
-	// assume last buf contains a hash
-	unsigned int last_buflen = hash_size;
-	unsigned int buf_len = element_length_in_bytes(element);
-
-	uint8_t* temp_buf = (uint8_t *) malloc(buf_len + 1);
-	memset(temp_buf, '\0', buf_len);
-	if(temp_buf == NULL) {
-		return FALSE;
-	}
-
-	element_to_bytes((unsigned char *) temp_buf, element);
-	// create output buffer
-	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 4);
-	memset(temp2_buf, 0, (last_buflen + buf_len));
-//	// copy first input buffer (last_buf) into target buffer
-//	strncat((char *) temp2_buf, (char *) last_buf, last_buflen);
-//	// copy element buffer (temp_buf) into target buffer
-//	strncat((char *) temp2_buf, (char *) temp_buf, buf_len);
-	int i;
-	for(i = 0; i < last_buflen; i++) {
-		temp2_buf[i] = last_buf[i];
-	}
-
-	int j = 0;
-	for(i = last_buflen; i < (last_buflen + buf_len); i++) {
-		temp2_buf[i] = temp_buf[j];
-		j++;
-	}
-	// hash the temp2_buf to bytes
-	result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
-
-	free(temp2_buf);
-	free(temp_buf);
-	return TRUE;
-}
-
-int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash, int hash_size, uint8_t *output_buf) {
-
-	// concatenate last_buf + input_str (to len), then hash to bytes into output_buf
-	int result;
-	// copy the last hash buffer into temp buf
-	// copy the current input string into buffer
-	PyObject *last = PyBytes_FromStringAndSize((const char *) last_hash, (Py_ssize_t) hash_size);
-	PyObject *input = PyBytes_FromStringAndSize((const char *) input_str, (Py_ssize_t) input_len);
-
-	PyBytes_ConcatAndDel(&last, input);
-	uint8_t *temp_buf = (uint8_t *) PyBytes_AsString(last);
-
-	// hash the contents of temp_buf
-	debug("last_hash => ");
-	printf_buffer_as_hex(last_hash, hash_size);
-
-	debug("input_str => ");
-	printf_buffer_as_hex(input_str, input_len);
-
-	debug("temp_buf => ");
-	printf_buffer_as_hex(temp_buf, input_len + hash_size);
-
-	result = hash_to_bytes(temp_buf, (input_len + hash_size), hash_size, output_buf, HASH_FUNCTION_STRINGS);
-
-	PyObject_Del(last);
-	return TRUE;
-}
-
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     Element *self;
@@ -511,6 +432,13 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 			pairing->curve	  = BN; // only supported at this point
 			pairing_init_finished 	  = FALSE;
     	}
+    	else if(aes_sec == SS512) {
+    		pairing = PyObject_New(Pairing, &PairingType);
+			pairing->pair_obj = pairing_init(aes_sec);
+			pairing->order    = order(pairing->pair_obj);
+			pairing->curve	  = SS; // only supported at this point
+			pairing_init_finished 	  = FALSE;
+    	}
     }
 
 	self->pairing = pairing;
@@ -549,7 +477,7 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	
 	debug("init an element.\n");
 
-	if(type >= ZR_t && type <= GT_t) {
+	if(type >= pyZR_t && type <= pyGT_t) {
 		retObject = createNewElement(type, group->pairing);
 	}
 	else {
@@ -600,22 +528,21 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	if(!PyArg_ParseTuple(args, "Oi|i", &group, &arg1, &seed))
 		return NULL;
 
-	START_CLOCK(dBench);
 	retObject = PyObject_New(Element, &ElementType);
 	debug("init random element in '%d'\n", arg1);
-	if(arg1 == ZR_t) {
+	if(arg1 == pyZR_t) {
 		retObject->e = element_init_ZR(0);
-		retObject->element_type = ZR_t;
+		retObject->element_type = pyZR_t;
 	}
-	else if(arg1 == G1_t) {
+	else if(arg1 == pyG1_t) {
 		retObject->e = element_init_G1();
-		retObject->element_type = G1_t;
+		retObject->element_type = pyG1_t;
 	}
-	else if(arg1 == G2_t) {
+	else if(arg1 == pyG2_t) {
 		retObject->e = element_init_G2();
-		retObject->element_type = G2_t;
+		retObject->element_type = pyG2_t;
 	}
-	else if(arg1 == GT_t) {
+	else if(arg1 == pyGT_t) {
 		PyErr_SetString(ElementError, "cannot generate random element in GT directly.");
 		return NULL;
 	}
@@ -630,7 +557,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	/* create new Element object */
     element_random(retObject->element_type, group->pairing->pair_obj, retObject->e);
 
-	STOP_CLOCK(dBench);
+
 	retObject->elem_initialized = TRUE;
 	retObject->pairing = group->pairing;
 	retObject->safe_pairing_clear = FALSE;
@@ -656,11 +583,12 @@ static PyObject *Element_add(Element *self, Element *other)
 		return NULL;
 	}
 	// start micro benchmark
-	START_CLOCK(dBench);
+
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_add(newObject, self, other);
-	STOP_CLOCK(dBench);
-	UPDATE_BENCHMARK(ADDITION, dBench);
+#ifdef BENCHMARK_ENABLED
+	UPDATE_BENCH(ADDITION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -683,11 +611,12 @@ static PyObject *Element_sub(Element *self, Element *other)
 		return NULL;
 	}
 
-	START_CLOCK(dBench);
+
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_sub(newObject, self, other);
-	STOP_CLOCK(dBench);
-	UPDATE_BENCHMARK(SUBTRACTION, dBench);
+#ifdef BENCHMARK_ENABLED
+	UPDATE_BENCH(SUBTRACTION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -723,17 +652,17 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	debug("Starting '%s'\n", __func__);
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
-		// START_CLOCK(dBench);
+		//
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_mul_si(newObject, self, z);
-		// STOP_CLOCK(dBench);
+		//
 	}
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
-		// START_CLOCK(dBench);
+		//
 		newObject = createNewElement(other->element_type, other->pairing);
 		element_mul_si(newObject, other, z);
-		// STOP_CLOCK(dBench);
+		//
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
@@ -742,33 +671,26 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 			return NULL;
 		}
 
-		if(self->element_type != ZR_t && other->element_type == ZR_t) {
-			// START_CLOCK(dBench);
+		if(self->element_type != pyZR_t && other->element_type == pyZR_t) {
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul_zn(newObject, self, other);
-			// STOP_CLOCK(dBench);
 		}
-		else if(other->element_type != ZR_t && self->element_type == ZR_t) {
-			// START_CLOCK
-			// START_CLOCK(dBench);
+		else if(other->element_type != pyZR_t && self->element_type == pyZR_t) {
 			newObject = createNewElement(other->element_type, self->pairing);
 			element_mul_zn(newObject, other, self);
-			// STOP_CLOCK(dBench);
 		}
 		else { // all other cases
-			// START_CLOCK
-			// START_CLOCK(dBench);
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul(newObject, self, other);
-			// STOP_CLOCK(dBench);
 		}
 	}
 	else {
 		PyErr_SetString(ElementError, "invalid types");
 		return NULL;
 	}
-
-	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
+#ifdef BENCHMARK_ENABLED
+	UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -802,7 +724,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	debug("Starting '%s'\n", __func__);
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
-		START_CLOCK(dBench);
+
 		if(z != 0) {
 			newObject = createNewElement(self->element_type, self->pairing);
 			other = createNewElement(self->element_type, self->pairing);
@@ -813,11 +735,11 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			PyErr_SetString(ElementError, "divide by zero exception!");
 			goto divbyzero;
 		}
-		STOP_CLOCK(dBench);
+
 	}
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
-		START_CLOCK(dBench);
+
 		if(z > 1 || z <= 0) {
 			newObject = createNewElement(other->element_type, other->pairing);
 			self = createNewElement(other->element_type, other->pairing);
@@ -828,7 +750,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			newObject = createNewElement(other->element_type, other->pairing);
 			element_invert(newObject, other);
 		}
-		STOP_CLOCK(dBench);
+
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
@@ -837,17 +759,20 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			return NULL;
 		}
 
-		START_CLOCK(dBench);
+
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_div(newObject, self, other);
-		STOP_CLOCK(dBench);
+
 	}
 	else {
 		PyErr_SetString(ElementError, "invalid types");
 		return NULL;
 	}
 
-	UPDATE_BENCHMARK(DIVISION, dBench);
+#ifdef BENCHMARK_ENABLED
+	UPDATE_BENCH(DIVISION, newObject->element_type, dBench);
+#endif
+
 divbyzero:
 	return (PyObject *) newObject;
 }
@@ -864,12 +789,12 @@ static PyObject *Element_invert(Element *self)
 //	}
 //#endif
 
-	START_CLOCK(dBench);
+
 	if(check_type(self->element_type)) {
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_invert(newObject, self);
 	}
-	STOP_CLOCK(dBench);
+
 	return (PyObject *) newObject;
 }
 
@@ -877,10 +802,10 @@ static PyObject *Element_negate(Element *self)
 {
 	Element *newObject = NULL;
 
-	START_CLOCK(dBench);
+
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_neg(newObject, self);
-	STOP_CLOCK(dBench);
+
 
 	return (PyObject *) newObject;
 }
@@ -896,9 +821,9 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	if(longFoundLHS) {
 		// o1 is a long type and o2 is a element type
 		// o1 should be element and o2 should be mpz
-		printf("operation undefined: <Python Int> ^ '%d'\n", rhs_o2->element_type);
+		printf("operation undefined: '%d' ^ <pairing element>\n", rhs_o2->element_type);
 //		if(rhs_o2->element_type == ZR) {
-//			START_CLOCK(dBench);
+//
 //			mpz_init(n);
 //			element_to_mpz(n, rhs_o2);
 //
@@ -907,26 +832,25 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 //			element_pow_zr(newObject, lhs_o1, n);
 //			mpz_clear(n);
 //			PyObject_Del(lhs_o1);
-//			STOP_CLOCK(dBench);
+//
 //		}
 	}
 	else if(longFoundRHS) {
 		// o2 is a long type
-//		if(lhs_o1->element_type != ZR_t) {
-		START_CLOCK(dBench);
+//		if(lhs_o1->element_type != pyZR_t) {
+
 		long rhs = PyLong_AsLong(o2);
 		if(PyErr_Occurred() || rhs >= 0) {
 			// clear error and continue
 			//PyErr_Print(); // for debug purposes
 			PyErr_Clear();
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
-			rhs_o2 = createNewElement(ZR_t, lhs_o1->pairing);
-			if(newObject->element_type != ZR_t) {
+			rhs_o2 = createNewElement(pyZR_t, lhs_o1->pairing);
+			if(newObject->element_type != pyZR_t) {
 				mpz_init(n);
 				longObjToMPZ(n, (PyLongObject *) o2);
 				element_set_mpz(rhs_o2, n);
 				element_pow_zr(newObject, lhs_o1, rhs_o2);
-				PyObject_Del(rhs_o2);
 				mpz_clear(n);
 			}
 			else if(rhs >= 0 && rhs <= INT_MAX) {
@@ -938,15 +862,15 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 				longObjToMPZ(n, (PyLongObject *) o2);
 				element_set_mpz(rhs_o2, n);
 				element_pow_zr(newObject, lhs_o1, rhs_o2);
-				PyObject_Del(rhs_o2);
 				mpz_clear(n);
 			}
-			STOP_CLOCK(dBench);
+			Py_DECREF(rhs_o2);
+
 		}
 		else if(rhs == -1) {
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			element_invert(newObject, lhs_o1);
-			STOP_CLOCK(dBench);
+
 		}
 		else {
 			EXIT_IF(TRUE, "unexpected error.");
@@ -956,11 +880,11 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		debug("Starting '%s'\n", __func__);
 		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation.");
 
-		if(rhs_o2->element_type == ZR_t) {
-			START_CLOCK(dBench);
+		if(rhs_o2->element_type == pyZR_t) {
+
 			newObject = createNewElement(NONE_G, lhs_o1->pairing);
 			element_pow_zr(newObject, lhs_o1, rhs_o2);
-			STOP_CLOCK(dBench);
+
 		}
 	}
 	else {
@@ -968,7 +892,9 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		EXIT_IF(!PyElement_Check(o2), ERROR_TYPE(right, int, bytes, str));
 	}
 
-	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
+#ifdef BENCHMARK_ENABLED
+	UPDATE_BENCH(EXPONENTIATION, newObject->element_type, dBench);
+#endif
 	return (PyObject *) newObject;
 }
 
@@ -992,19 +918,19 @@ static PyObject *Element_set(Element *self, PyObject *args)
     if(PyArg_ParseTuple(args, "|lO", &value, &object)) {
             // convert into an int using PyArg_Parse(...)
             // set the element
-    	if(value == -1 && self->element_type == ZR_t) {
+    	if(value == -1 && self->element_type == pyZR_t) {
             debug("Setting element to '%li'\n", value);
-            START_CLOCK(dBench);
+
             debug("Value '%i'\n", (signed int) value);
             element_set_si(self, (signed int) value);
-            STOP_CLOCK(dBench);
+
 		}
     	else if(object != NULL) {
 
     		if(self->element_type == object->element_type) {
-    			START_CLOCK(dBench);
+
     			element_set(self, object);
-    			STOP_CLOCK(dBench);
+
     		}
     		else {
     	    	PyErr_SetString(ElementError, "types are not the same!");
@@ -1038,8 +964,8 @@ static PyObject *Element_setxy(Element *self, PyObject *args)
     if(PyArg_ParseTuple(args, "|OO", &object1, &object2)) {
             // convert into an int using PyArg_Parse(...)
             // set the element
-    	if(self->element_type == G1_t) {
-    		if(object1->element_type == object2->element_type && object1->element_type == ZR_t) {
+    	if(self->element_type == pyG1_t) {
+    		if(object1->element_type == object2->element_type && object1->element_type == pyZR_t) {
     			errcode = element_setG1(self, object1, object2);
     		}
     		else {
@@ -1082,14 +1008,14 @@ PyObject *multi_pairing_asymmetric(Element *groupObj, PyObject *listG1, PyObject
 			if(PyElement_Check(tmpObject1) && PyElement_Check(tmpObject2)) {
 				Element *tmp1 = (Element *) tmpObject1;
 				Element *tmp2 = (Element *) tmpObject2;
-				if(tmp1->element_type == G1_t) {
+				if(tmp1->element_type == pyG1_t) {
 					g1[l] = element_init_G1();
-					element_set_raw(groupObj, G1_t, g1[l], tmp1->e);
+					element_set_raw(groupObj, pyG1_t, g1[l], tmp1->e);
 					l++;
 				}
-				if(tmp2->element_type == G2_t) {
+				if(tmp2->element_type == pyG2_t) {
  					g2[r] = element_init_G2();
-					element_set_raw(groupObj, G2_t, g2[r], tmp2->e);
+					element_set_raw(groupObj, pyG2_t, g2[r], tmp2->e);
 					r++;
 				}
 			}
@@ -1099,7 +1025,7 @@ PyObject *multi_pairing_asymmetric(Element *groupObj, PyObject *listG1, PyObject
 
 		Element *newObject = NULL;
 		if(l == r) {
-			newObject = createNewElement(GT_t, groupObj->pairing);
+			newObject = createNewElement(pyGT_t, groupObj->pairing);
 			element_prod_pairing(newObject, &g1, &g2, l); // pairing product calculation
 		}
 		else {
@@ -1107,8 +1033,8 @@ PyObject *multi_pairing_asymmetric(Element *groupObj, PyObject *listG1, PyObject
 		}
 
 		/* clean up */
-		for(i = 0; i < l; i++) { element_delete(G1_t, g1[i]); }
-		for(i = 0; i < r; i++) { element_delete(G2_t, g2[i]); }
+		for(i = 0; i < l; i++) { element_delete(pyG1_t, g1[i]); }
+		for(i = 0; i < r; i++) { element_delete(pyG2_t, g2[i]); }
 		return (PyObject *) newObject;
 	}
 
@@ -1141,11 +1067,17 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 		rhs = (Element *) rhs2;
 
 		if(Check_Elements(lhs, rhs) && pair_rule(lhs->element_type, rhs->element_type) == TRUE) {
-			START_CLOCK(dBench);
 			newObject = createNewElement(NONE_G, lhs->pairing);
-			pairing_apply(newObject, lhs, rhs);
-			STOP_CLOCK(dBench);
-			UPDATE_BENCHMARK(PAIRINGS, dBench);
+			if(lhs->element_type == pyG1_t) {
+				pairing_apply(newObject, lhs, rhs);
+			}
+			else if(lhs->element_type == pyG2_t) {
+				pairing_apply(newObject, rhs, lhs);
+			}
+			//
+#ifdef BENCHMARK_ENABLED
+			UPDATE_BENCH(PAIRINGS, newObject->element_type, dBench);
+#endif
 			return (PyObject *) newObject;
 		}
 	}
@@ -1170,7 +1102,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 		PyErr_SetString(ElementError, "null element object");
 		return NULL;
 	}
-	START_CLOCK(dBench);
+
 	int hash_size = HASH_LEN;
 	uint8_t hash_buf[hash_size + 1];
 	if(!hash_element_to_bytes(object, hash_size, hash_buf, label)) {
@@ -1185,7 +1117,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 
 	str = PyBytes_FromString((const char *) hash_hex);
 	free(hash_hex);
-	STOP_CLOCK(dBench);
+
 	return str;
 }
 
@@ -1205,11 +1137,11 @@ PyObject *sha1_hash2(Element *self, PyObject *args) {
 		PyErr_SetString(ElementError, "null element object");
 		return NULL;
 	}
-	START_CLOCK(dBench);
+
 	int hash_size = HASH_LEN;
 	uint8_t hash_buf[hash_size + 1];
 	memset(hash_buf, 0, hash_size);
-	if(object->element_type == GT_t) {
+	if(object->element_type == pyGT_t) {
 		element_hash_to_key(object, hash_buf, hash_size);
 
 		hash_hex = convert_buffer_to_hex(hash_buf, hash_size);
@@ -1218,7 +1150,7 @@ PyObject *sha1_hash2(Element *self, PyObject *args) {
 
 	str = PyBytes_FromStringAndSize((const char *) hash_hex, hash_size);
 	free(hash_hex);
-	STOP_CLOCK(dBench);
+
 	return str;
 }
 
@@ -1227,7 +1159,8 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 {
 	Element *newObject = NULL, *object = NULL, *group = NULL;
 	PyObject *objList = NULL, *tmpObject = NULL;
-	Group_t type = ZR_t;
+	PyObject *tmp_obj = NULL;
+	Group_t type = pyZR_t;
 	int i;
 
 	char *tmp = NULL, *str;
@@ -1241,19 +1174,20 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 	// first case: is a string and type may or may not be set
 	if(PyBytes_CharmCheck(objList)) {
 		str = NULL;
-		PyBytes_ToString(str, objList);
-		if(type >= ZR_t && type < GT_t) {
+		if(type >= pyZR_t && type < pyGT_t) {
+			PyBytes_ToString2(str, objList, tmp_obj);
+			int len = strlen(str);
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
 			// hash bytes using SHA1
-			START_CLOCK(dBench);
 			newObject = createNewElement(NONE_G, group->pairing);
 			newObject->element_type = type;
 
 			element_init_hash(group);
-			element_add_str_hash(group, (char *) str, strlen((char *) str));
+			debug("Hashing string '%s' to Zr...: size=%d, newsize=%d\n", str, len, strlen(str));
+			element_add_str_hash(group, str, len);
 			element_finish_hash(newObject, type);
-			STOP_CLOCK(dBench);
+			Py_DECREF(tmp_obj);
 		}
 		else {
 			// not supported, right?
@@ -1270,16 +1204,16 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 			element_init_hash(group);
 			if(PyElement_Check(tmpObject)) {
 				object = (Element *) tmpObject;
-				START_CLOCK(dBench);
+
 				element_add_to_hash(object);
-				STOP_CLOCK(dBench);
+
 			}
 			else if(PyBytes_CharmCheck(tmpObject)) {
 				str = NULL;
 				PyBytes_ToString(str, tmpObject);
-				START_CLOCK(dBench);
-				element_add_str_hash(group, (char *) str, strlen((char *) str));
-				STOP_CLOCK(dBench);
+
+				element_add_str_hash(group, str, strlen(str));
+
 			}
 			Py_DECREF(tmpObject);
 
@@ -1288,21 +1222,20 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 				tmpObject = PySequence_GetItem(objList, i);
 				if(PyElement_Check(tmpObject)) {
 					object = (Element *) tmpObject;
-					START_CLOCK(dBench);
+
 					element_add_to_hash(object);
-					STOP_CLOCK(dBench);
 				}
 				else if(PyBytes_CharmCheck(tmpObject)) {
 					str = NULL;
 					PyBytes_ToString(str, tmpObject);
-					START_CLOCK(dBench);
-					element_add_str_hash(group, (char *) str, strlen((char *) str));
-					STOP_CLOCK(dBench);
+
+					element_add_str_hash(group, str, strlen(str));
+
 				}
 				Py_DECREF(tmpObject);
 			}
-			START_CLOCK(dBench);
-			if(type >= ZR_t && type < GT_t) { newObject = createNewElement(NONE_G, group->pairing); }
+
+			if(type >= pyZR_t && type < pyGT_t) { newObject = createNewElement(NONE_G, group->pairing); }
 			else {
 				tmp = "invalid object type";
 				goto cleanup;
@@ -1310,7 +1243,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 
 			newObject->element_type = type;
 			element_finish_hash(newObject, type);
-			STOP_CLOCK(dBench);
+
 		}
 	}
 	// third case: a tuple with one element and
@@ -1323,15 +1256,15 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 		}
 
 		// Hash an element of Zr to an element of G1_t.
-		if(type == G1_t) {
-			START_CLOCK(dBench);
+		if(type == pyG1_t) {
+
 			newObject = createNewElement(NONE_G, group->pairing);
 			newObject->element_type = type;
 			// hash the element to the G1_t field (uses sha1 as well)
 			element_init_hash(group);
 			element_add_to_hash(object);
 			element_finish_hash(newObject, type);
-			STOP_CLOCK(dBench);
+
 		}
 		else {
 			tmp = "can only hash an element of Zr to G1_t. Random Oracle.";
@@ -1348,7 +1281,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 
 cleanup:
 	PyErr_SetString(ElementError, tmp);
-	if(newObject != NULL) PyObject_Del(newObject);
+	if(newObject != NULL) Py_DECREF(newObject);
 	return NULL;
 }
 
@@ -1393,14 +1326,14 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 	}
 
 	debug("Starting '%s'\n", __func__);
-	START_CLOCK(dBench);
+
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
-		if(self->element_type == ZR_t)
+		if(self->element_type == pyZR_t)
 			result = element_is(self, z);
 	}
 	else if(PyElement_Check(rhs) && found_int) {
-		if(other->element_type == ZR_t)
+		if(other->element_type == pyZR_t)
 			result = element_is(other, z);
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
@@ -1413,7 +1346,7 @@ static PyObject *Element_equals(PyObject *lhs, PyObject *rhs, int opid) {
 			debug("One of the elements is not initialized.\n");
 		}
 	}
-	STOP_CLOCK(dBench);
+
 
 	if(result == -1) {
 		/* print error */
@@ -1441,7 +1374,7 @@ static PyObject *Element_long(PyObject *o1) {
 	if(PyElement_Check(o1)) {
 		Element *value = (Element *) o1;
 		/* can only handle elements in ZR */
-		if(value->element_type == ZR_t) {
+		if(value->element_type == pyZR_t) {
 			mpz_t val;
 			mpz_init(val);
 			element_to_mpz(value, val);
@@ -1458,14 +1391,14 @@ static long Element_index(Element *o1) {
 	long result = -1;
 
 	if(PyElement_Check(o1)) {
-		if(o1->element_type == ZR_t) {
+		if(o1->element_type == pyZR_t) {
 			mpz_t o;
 			mpz_init(o);
 			element_to_mpz(o1, o);
 			PyObject *temp = mpzToLongObj(o);
 			result = PyObject_Hash(temp);
 			mpz_clear(o);
-			PyObject_Del(temp);
+			Py_XDECREF(temp); //PyObject_Del(temp);
 		}
 	}
 	return result;
@@ -1493,7 +1426,7 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	int elem_len = 0;
 	uint8_t *data_buf = NULL;
 	size_t bytes_written;
-	START_CLOCK(dBench);
+
 
 //	printf("element type => '%d'\n", self->element_type);
 //	print("test output => ", self->element_type, self->e);
@@ -1506,6 +1439,7 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 			PyErr_SetString(ElementError, "out of memory.");
 			return NULL;
 		}
+
 		// write to char buffer
 		bytes_written = element_to_bytes(data_buf, self);
 		if(elem_len != bytes_written) {
@@ -1524,7 +1458,7 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	PyObject *result = PyBytes_FromFormat("%d:%s", self->element_type, (const char *) data_buf);
 	debug("enc => '%s'\n", data_buf);
 	free(data_buf);
-	STOP_CLOCK(dBench);
+
 	return result;
 }
 
@@ -1533,7 +1467,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 	PyObject *object;
 
 	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
-		START_CLOCK(dBench);
+
 		if(PyBytes_Check(object)) {
 			uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
 			int type = atoi((const char *) &(serial_buf[0]));
@@ -1547,7 +1481,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 				origObject = createNewElement(NONE_G, group->pairing);
 				origObject->element_type = type;
 				element_from_bytes(origObject, base64_buf);
-				STOP_CLOCK(dBench);
+
 				return (PyObject *) origObject;
 			}
 		}
@@ -1604,6 +1538,59 @@ static PyObject *Get_Order(Element *self, PyObject *args) {
 	}
 	return NULL;
 }
+
+#ifdef BENCHMARK_ENABLED
+void Operations_clear()
+{
+	CLEAR_ALLDBENCH(dBench);
+}
+
+PyObject *PyCreateList(MeasureType type)
+{
+	int countZR = -1, countG1 = -1, countG2 = -1, countGT = -1;
+	GetField(countZR, type, pyZR_t, dBench);
+	GetField(countG1, type, pyG1_t, dBench);
+	GetField(countG2, type, pyG2_t, dBench);
+	GetField(countGT, type, pyGT_t, dBench);
+
+	PyObject *objList = Py_BuildValue("[iiii]", countZR, countG1, countG2, countGT);
+	return objList;
+}
+
+static PyObject *Granular_benchmark(PyObject *self, PyObject *args)
+{
+	PyObject *dict = NULL;
+	int id = -1;
+
+	if(!PyArg_ParseTuple(args, "i", &id)) {
+		PyErr_SetString(ElementError, "invalid benchmark identifier.");
+		return NULL;
+	}
+
+	if(id == BenchmarkIdentifier) {
+		PyObject *MulList = PyCreateList(MULTIPLICATION);
+		PyObject *DivList = PyCreateList(DIVISION);
+		PyObject *AddList = PyCreateList(ADDITION);
+		PyObject *SubList = PyCreateList(SUBTRACTION);
+		PyObject *ExpList = PyCreateList(EXPONENTIATION);
+		dict = PyDict_New();
+		if(dict == NULL) return NULL;
+		PyDict_SetItemString(dict, "Mul", MulList);
+		PyDict_SetItemString(dict, "Div", DivList);
+		PyDict_SetItemString(dict, "Add", AddList);
+		PyDict_SetItemString(dict, "Sub", SubList);
+		PyDict_SetItemString(dict, "Exp", ExpList);
+		Py_DECREF(MulList);
+		Py_DECREF(DivList);
+		Py_DECREF(AddList);
+		Py_DECREF(SubList);
+		Py_DECREF(ExpList);
+	}
+
+	return dict;
+}
+#endif
+
 
 /* TODO: move to cryptobase */
 PyObject *AES_Encrypt(Element *self, PyObject *args)
@@ -1761,11 +1748,16 @@ PyTypeObject PairingType = {
 };
 
 #endif
+
+#ifdef BENCHMARK_ENABLED
+// Benchmark methods
 InitBenchmark_CAPI(_init_benchmark, dBench, 1);
 StartBenchmark_CAPI(_start_benchmark, dBench);
 EndBenchmark_CAPI(_end_benchmark, dBench);
 GetBenchmark_CAPI(_get_benchmark, dBench);
+GetAllBenchmarks_CAPI(_get_all_results, dBench, GetResultsWithPair);
 ClearBenchmarks_CAPI(_clear_benchmark, dBench);
+#endif
 
 // new
 #if PY_MAJOR_VERSION >= 3
@@ -1937,7 +1929,9 @@ PyTypeObject ElementType = {
 
 struct module_state {
 	PyObject *error;
+#ifdef BENCHMARK_ENABLED
 	Benchmark *dBench;
+#endif
 };
 
 #if PY_MAJOR_VERSION >= 3
@@ -1974,14 +1968,18 @@ PyMethodDef pairing_methods[] = {
 
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1_t and G2 and returns an element mapped to GT"},
 	{"hashPair", (PyCFunction)sha1_hash2, METH_VARARGS, "Compute a sha1 hash of an element type"},
-	{"SymEnc", (PyCFunction) AES_Encrypt, METH_VARARGS, "AES encryption args: key (bytes or str), message (str)"},
-	{"SymDec", (PyCFunction) AES_Decrypt, METH_VARARGS, "AES decryption args: key (bytes or str), ciphertext (str)"},
+//	{"SymEnc", (PyCFunction) AES_Encrypt, METH_VARARGS, "AES encryption args: key (bytes or str), message (str)"},
+//	{"SymDec", (PyCFunction) AES_Decrypt, METH_VARARGS, "AES decryption args: key (bytes or str), ciphertext (str)"},
+#if BENCHMARK_ENABLED
 	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
 	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
 	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
 	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
+	{"GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary"},
+	{"GetGranularBenchmarks", (PyCFunction) Granular_benchmark, METH_VARARGS, "Retrieve granular benchmarks as a dictionary"},
 	{"ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
-    {NULL}  /* Sentinel */
+#endif
+	{NULL}  /* Sentinel */
 };
 
 #if PY_MAJOR_VERSION >= 3
@@ -1992,7 +1990,12 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 
 static int pairings_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
-	Py_CLEAR(GETSTATE(m)->dBench);
+    Py_XDECREF(ElementError);
+#ifdef BENCHMARK_ENABLED
+	Operations *c = (Operations *) dBench->data_ptr;
+	free(c);
+	Py_XDECREF(dBench); //Py_CLEAR(GETSTATE(m)->dBench);
+#endif
 	return 0;
 }
 
@@ -2014,71 +2017,87 @@ static struct PyModuleDef moduledef = {
 		(freefunc) pairings_free
 };
 
+#define CLEAN_EXIT goto LEAVE;
 #define INITERROR return NULL
 PyMODINIT_FUNC
 PyInit_pairing(void) 		{
 #else
+#define CLEAN_EXIT goto LEAVE;
 #define INITERROR return
 void initpairing(void) 		{
 #endif
     PyObject* m;
 	
-    if(PyType_Ready(&PairingType) < 0)
-    	INITERROR;
-    if(PyType_Ready(&ElementType) < 0)
-        INITERROR;
 #if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);
 #else
     m = Py_InitModule("pairing", pairing_methods);
 #endif
 
-    if(m == NULL)
-		INITERROR;
-	struct module_state *st = GETSTATE(m);
-	st->error = PyErr_NewException("pairing.Error", NULL, NULL);
-	if(st->error == NULL) {
-		Py_DECREF(m);
-		INITERROR;
-	}
-	ElementError = st->error;
+    if(PyType_Ready(&PairingType) < 0)
+        CLEAN_EXIT;
+    if(PyType_Ready(&ElementType) < 0)
+        CLEAN_EXIT;
 
-    if(import_benchmark() < 0)
-    	INITERROR;
+    struct module_state *st = GETSTATE(m);
+    st->error = PyErr_NewException("pairing.Error", NULL, NULL);
+    if(st->error == NULL)
+        CLEAN_EXIT;
+    ElementError = st->error;
+    Py_INCREF(ElementError);
+#ifdef BENCHMARK_ENABLED
+    if(import_benchmark() < 0) {
+        CLEAN_EXIT;
+    }
     if(PyType_Ready(&BenchmarkType) < 0)
-    	INITERROR;
+        CLEAN_EXIT;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
+    if(st->dBench == NULL)
+        CLEAN_EXIT;
     dBench = st->dBench;
+//    Py_INCREF(dBench);
     dBench->bench_initialized = FALSE;
-    InitClear(dBench);
+
+    Operations *cntr = (Operations *) malloc(sizeof(Operations));
+    dBench->data_ptr = (void *) cntr; // store data structure
+    dBench->gran_init = &Operations_clear; // pointer to clearing the structure memory
+    CLEAR_ALLDBENCH(dBench);
+    dBench->granular_option = FALSE;
+    dBench->op_add = 0;	dBench->op_sub = 0;
+    dBench->op_mult = 0; dBench->op_div = 0;
+    dBench->op_exp = 0; dBench->op_pair = 0;
+    dBench->cpu_time_ms = 0.0; dBench->real_time_ms = 0.0;
+    dBench->identifier = -1;
+#endif
 
     Py_INCREF(&PairingType);
     PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
 
-    PyModule_AddIntConstant(m, "ZR", ZR_t);
-    PyModule_AddIntConstant(m, "G1", G1_t);
-    PyModule_AddIntConstant(m, "G2", G2_t);
-    PyModule_AddIntConstant(m, "GT", GT_t);
+	PyModule_AddIntConstant(m, "ZR", pyZR_t);
+	PyModule_AddIntConstant(m, "G1", pyG1_t);
+	PyModule_AddIntConstant(m, "G2", pyG2_t);
+	PyModule_AddIntConstant(m, "GT", pyGT_t);
 
-//  PyModule_AddIntConstant(m, "CpuTime", CPU_TIME);
-//	PyModule_AddIntConstant(m, "RealTime", REAL_TIME);
-//	PyModule_AddIntConstant(m, "NativeTime", NATIVE_TIME);
-//	PyModule_AddIntConstant(m, "Add", ADDITION);
-//	PyModule_AddIntConstant(m, "Sub", SUBTRACTION);
-//	PyModule_AddIntConstant(m, "Mul", MULTIPLICATION);
-//	PyModule_AddIntConstant(m, "Div", DIVISION);
-//	PyModule_AddIntConstant(m, "Exp", EXPONENTIATION);
-//	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
-
+#ifdef BENCHMARK_ENABLED
 	ADD_BENCHMARK_OPTIONS(m);
-	PyModule_AddIntConstant(m, "Pair", PAIRINGS);
+	PyModule_AddStringConstant(m, "Pair", 	  _PAIR_OPT);
+	PyModule_AddStringConstant(m, "Granular", _GRAN_OPT);
+#endif
 
-	pairing_init_finished = TRUE;
 	// builtin curves
 	PyModule_AddIntConstant(m, "MNT160", MNT160);
 	PyModule_AddIntConstant(m, "BN256", BN256);
+	PyModule_AddIntConstant(m, "SS512", SS512);
+
+LEAVE:
+    if (PyErr_Occurred()) {
+		PyErr_Clear();
+        Py_XDECREF(m);
+    	INITERROR;
+    }
+	pairing_init_finished = TRUE;
 
 #if PY_MAJOR_VERSION >= 3
 	return m;

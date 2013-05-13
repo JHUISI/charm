@@ -336,11 +336,12 @@ for opt do
   ;;
   --disable-benchmark) disable_benchmark="yes"
   ;;
-  --enable-pairing-miracl) 
+  --enable-pairing-miracl=*) 
     echo "Enabling this option assumes you have unzipped the MIRACL library into charm-src/pairingmath/miracl/ and make sure the library is built in that directory."
+  	pairing_arg="$optarg" ;
   	pairing_pbc="no";
   	pairing_miracl="yes" ;
-        pairing_relic="no"
+  	pairing_relic="no"
   ;;	
   --enable-pairing-pbc)
     pairing_pbc="yes" ;
@@ -450,7 +451,7 @@ echo "  --enable-debug           enable common debug build options"
 echo "  --disable-integer        disable INTEGER base module"
 echo "  --disable-ecc            disable ECC base module"
 echo "  --disable-pairing        disable PAIRING base module"
-echo "  --enable-pairing-miracl  enable use of MIRACL lib for pairing module"
+echo "  --enable-pairing-miracl= enable use of MIRACL lib for pairing module. Options: 'mnt', 'bn', 'ss'"
 echo "  --enable-pairing-pbc     enable use of PBC lib for pairing module (DEFAULT)"
 echo "  --enable-integer-openssl enable use of openssl for integer module"
 echo "  --enable-integer-gmp     enable use of GMP lib for integer module (DEFAULT)"
@@ -847,6 +848,22 @@ elif test "$pairing_relic" = "yes" ; then
     echo "USE_RELIC=$pairing_relic" >> $config_mk
     echo "USE_PBC=no" >> $config_mk
     echo "USE_MIRACL=no" >> $config_mk
+fi
+
+if test "$pairing_miracl" = "yes" ; then
+	if test "$pairing_arg" = "mnt" ; then
+		echo "MIRACL_MNT=yes" >> $config_mk
+		echo "MIRACL_BN=no" >> $config_mk
+		echo "MIRACL_SS=no" >> $config_mk
+	elif test "$pairing_arg" = "bn" ; then
+		echo "MIRACL_MNT=no" >> $config_mk
+		echo "MIRACL_BN=yes" >> $config_mk	
+		echo "MIRACL_SS=no" >> $config_mk
+	elif test "$pairing_arg" = "ss" ; then
+		echo "MIRACL_MNT=no" >> $config_mk
+		echo "MIRACL_BN=no" >> $config_mk	
+		echo "MIRACL_SS=yes" >> $config_mk
+	fi
 fi
 
 if test "$disable_benchmark" = "yes" ; then

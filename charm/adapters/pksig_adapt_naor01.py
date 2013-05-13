@@ -22,52 +22,64 @@ Notes:	This transform was first described by Boneh and Franklin but credited to 
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.toolbox.PKSig import PKSig
+from charm.toolbox.IBEnc import *
+from charm.toolbox.PKSig import *
 
 debug = False
 class Sig_Generic_ibetosig_Naor01(PKSig):
     """
     >>> from charm.toolbox.pairinggroup import PairingGroup,ZR
     >>> from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
+    >>> from charm.adapters.ibenc_adapt_identityhash import HashIDAdapter
     >>> group = PairingGroup('MNT224')
     >>> ibe = IBE_BB04(group)
-    >>> ibsig = Sig_Generic_ibetosig_Naor01(ibe, group)
+    >>> hashID = HashIDAdapter(ibe, group)    
+    >>> ibsig = Sig_Generic_ibetosig_Naor01(hashID, group)
     >>> (master_public_key, master_secret_key) = ibsig.keygen()
-    >>> msg = group.random(ZR)
+    >>> msg = "hello world!!!"
     >>> signature = ibsig.sign(master_secret_key, msg)
     >>> ibsig.verify(master_public_key, msg, signature) 
     True
     """
-    #TODO msg must be in Zp
     def __init__(self, ibe_scheme, groupObj):
+        PKSig.__init__(self)
         global ibe, group
-        ibe = ibe_scheme
+        # validate that we have the appropriate object
+        criteria = [('secDef', IND_ID_CPA), ('scheme', 'IBEnc'), ('messageSpace', GT)]
+        if PKSig.checkProperty(self, ibe_scheme, criteria):
+            # change our property as well
+            PKSig.updateProperty(self, ibe_scheme, secDef=EU_CMA, id=str, secModel=ROM)
+            ibe = ibe_scheme
+            #PKSig.printProperties(self)
+        else:
+            assert False, "Input scheme does not satisfy adapter properties: %s" % criteria        
         group = groupObj
 				
-    def keygen(self, secparam=None):
-        (mpk, msk) = ibe.setup(secparam)
+    def keygen(self):
+        (mpk, msk) = ibe.setup()
         if debug: print("Keygen...")
         group.debug(mpk)
         group.debug(msk)
         return (mpk, msk)
 
-    def sign(self, sk, message):
-        return ibe.extract(sk, message)
+    def sign(self, sk, m):
+        return ibe.extract(sk, m)
 		
     #TODO: this method does NOT validate the message it is given
     def verify(self, pk, m, sig):
         # Some IBE scheme support a native method for validating IBE keys.  Use this if it exists.
         if hasattr(ibe, 'verify'):
-            result = ibe.verify(pk, sig)
+            result = ibe.verify(pk, m, sig)
             if result == False: return False
 		
+        assert m == sig['IDstr'], "message not thesame as ID in signature"
         # Encrypt a random message in the IBE's message space and try to decrypt it
-        message = group.random(GT)
-        if debug: print("\nRandom message =>", message)
+        new_m = group.random(GT)
+        if debug: print("\nRandom message =>", new_m)
 
-        C = ibe.encrypt(pk, sig['id'], message)
+        C = ibe.encrypt(pk, sig['IDstr'], new_m)
          
-        if (ibe.decrypt(pk, sig, C) == message):
+        if (ibe.decrypt(pk, sig, C) == new_m):
             return True
         else:
             return False

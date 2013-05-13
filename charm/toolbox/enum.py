@@ -13,9 +13,10 @@ def Enum(*names):
              else: assert False, "Invalid input type."
          def __repr__(self):        return 'Enum' + str(names)
          def __str__(self):         return 'enum ' + str(constants)
+         def getList(self):         return list(names)
 
       class EnumValue(object):
-         __slots__ = ('__value')
+         #__slots__ = ('__value')
          def __init__(self, value): self.__value = value
          Value = property(lambda self: self.__value)
          EnumType = property(lambda self: EnumType)

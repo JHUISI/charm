@@ -54,7 +54,7 @@ int runABETest(Charm_t *pGroup)
 	Free(pkDict);
 	Free(mskDict);
 	Free(pKeys);
-
+	Free(pClass);
     return 0;
 }
 
@@ -122,7 +122,8 @@ int runHybridABETest(Charm_t *pGroup)
 	Free(pkDict);
 	Free(mskDict);
 	Free(pKeys);
-
+	Free(pClass);
+    Free(pABEClass);
 	return 0;
 }
 
@@ -130,16 +131,20 @@ int runHybridABETest(Charm_t *pGroup)
 
 int main(int argc, char *argv[])
 {
-	Charm_t *pModule = NULL, *pGroup;
+	Charm_t *pModule = NULL, *pGroup = NULL;
 
 	InitializeCharm();
 
     pGroup = InitPairingGroup(pModule, "SS512");
-    if(pGroup == NULL) return -1;
+    if(pGroup == NULL) {
+    	printf("could not import pairing group.\n");
+    	return -1;
+    }
 
     // runABETest(pGroup);
     runHybridABETest(pGroup);
 
+    Free(pGroup);
     CleanupCharm();
     return 0;
 }
