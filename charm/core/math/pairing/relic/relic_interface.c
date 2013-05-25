@@ -45,6 +45,52 @@ void print_as_hex(uint8_t *data, size_t len)
 	printf("\n");
 }
 
+void fp_write_bin(unsigned char *str, int len, fp_t a) {
+        bn_t t;
+
+        bn_null(t);
+
+        TRY {
+                bn_new(t);
+
+                fp_prime_back(t, a);
+
+                bn_write_bin(str, len, t);
+        } CATCH_ANY {
+                THROW(ERR_CAUGHT);
+        }
+        FINALLY {
+                bn_free(t);
+        }
+}
+
+void fp_read_bin(fp_t a, const unsigned char *str, int len) {
+        bn_t t;
+
+        bn_null(t);
+
+        TRY {
+                bn_new(t);
+                bn_read_bin(t, (unsigned char *) str, len);
+                if (bn_is_zero(t)) {
+                        fp_zero(a);
+                } else {
+                        if (t->used == 1) {
+                                fp_prime_conv_dig(a, t->dp[0]);
+                        } else {
+                                fp_prime_conv(a, t);
+                        }
+                }
+        }
+        CATCH_ANY {
+                THROW(ERR_CAUGHT);
+        }
+        FINALLY {
+                bn_free(t);
+        }
+}
+
+
 int bn_is_one(bn_t a)
 {
 	if(a->used == 0) return 0; // false
@@ -1112,7 +1158,8 @@ status_t pairing_apply(element_t et, element_t e1, element_t e2)
 	LEAVE_IF(e1->isInitialized != TRUE || e2->isInitialized != TRUE || et->isInitialized != TRUE, "uninitialized arguments.");
 	if(e1->type == G1 && e2->type == G2 && et->type == GT) {
 		/* compute optimal ate pairing */
-		pp_map_oatep(et->gt, e1->g1, e2->g2);
+		//pp_map_oatep(et->gt, e1->g1, e2->g2);
+		pp_map_k2(et->gt, e1->g1, e2->g2);
 		return ELEMENT_OK;
 	}
 	return ELEMENT_INVALID_ARG;

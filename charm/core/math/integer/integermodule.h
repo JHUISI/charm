@@ -47,7 +47,7 @@
 #include "openssl/bn.h"
 
 /* integermath */
-#define MAX_RUN 20
+#define MAX_RUN 25
 #define HASH_LEN 20
 #define MSG_LEN 128
 
