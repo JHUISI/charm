@@ -54,9 +54,12 @@ class ECGroup():
                 if type(i) == elliptic_curve:
                     s += serialize(i)
                 elif type(i) == str:
-                    s += str(i)
+                    s += bytes(str(i), 'utf8')
+                elif type(i) == bytes:
+                    s += i
                 # consider other types    
             #print("s => %s" % s)
+            assert len(s) != 0, "hash input is empty."
             return hashEC(self.group, str(s), _type)
         elif type(args) == elliptic_curve:
             msg = str(serialize(args))
