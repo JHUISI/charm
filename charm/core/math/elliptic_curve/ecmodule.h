@@ -129,7 +129,7 @@ typedef struct {
 #define Group_Init(obj) \
 	if(!PyEC_Check(obj))  {  \
 		PyErr_SetString(PyECErrorObject, "not an ecc object."); return NULL; } \
-	if(!obj->group_init || obj->group == NULL) { \
+	if(obj->group_init == FALSE || obj->group == NULL) { \
 		PyErr_SetString(PyECErrorObject, "group object not initialized.");   \
 	return NULL;	}
 

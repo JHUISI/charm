@@ -1110,8 +1110,8 @@ static PyObject *ECE_getOrder(ECElement *self, PyObject *arg) {
 		ECElement *gobj = (ECElement *) arg;
 		Group_Init(gobj);
 
-		ECElement *order = createNewPoint(ZR, gobj); // ->group, self->ctx);
-		EC_GROUP_get_order(self->group, order->elemZ, NULL);
+		ECElement *order = createNewPoint(ZR, gobj);
+		EC_GROUP_get_order(gobj->group, order->elemZ, order->ctx);
 		// return the order of the group
 		return (PyObject *) order;
 	}
