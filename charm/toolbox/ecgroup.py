@@ -47,7 +47,7 @@ class ECGroup():
         return deserialize(self.group, bytes_object)
     
     # needs work to iterate over tuple
-    def hash(self, args, _type=ZR):
+    def hash(self, args, target_type=ZR):
         if isinstance(args, tuple):
             s = bytes()
             for i in args:
@@ -60,13 +60,13 @@ class ECGroup():
                 # consider other types    
             #print("s => %s" % s)
             assert len(s) != 0, "hash input is empty."
-            return hashEC(self.group, str(s), _type)
+            return hashEC(self.group, str(s), target_type)
         elif type(args) == elliptic_curve:
             msg = str(serialize(args))
-            return hashEC(self.group, msg, _type)
-        elif type(args) == str:
-            return hashEC(self.group, args, _type)
-        return None
+            return hashEC(self.group, msg, target_type)
+        elif type(args) in [str, bytes]:
+            return hashEC(self.group, args, target_type)
+        raise Exception("ECGroup - invalid input for hash")
     
     def zr(self, point):
         if type(point) == elliptic_curve:
