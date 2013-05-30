@@ -1482,7 +1482,7 @@ static PyObject *Element_long(PyObject *o1) {
 			return obj;
 		}
 	}
-	EXIT_IF(TRUE, "cannot cast pairing object to an integer.");
+	EXIT_IF(TRUE, "cannot convert this type of object to an integer.");
 }
 
 static long Element_index(Element *o1) {

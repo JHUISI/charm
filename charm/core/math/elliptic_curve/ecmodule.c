@@ -62,7 +62,34 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 	mpz_clear (temp2);
 }
 
-// TODO: implement a longObjToBN(PyLongObject *a, BIGNUM **b)
+// TODO: fix this
+//PyObject *bnToLongObj(BIGNUM *m) {
+//	PyLongObject *v = NULL;
+//	BN_ULONG t;
+//	int bits = BN_num_bits(m), i;
+//	int size = (bits + (PyLong_SHIFT - 1)) / PyLong_SHIFT;
+//	int digitsleft = size;
+//	int bitsleft = bits;
+//
+//	v = _PyLong_New(size);
+//	if (v != NULL) {
+////		digit *p = v->ob_digit;
+//		for(i = 0; i < size; i++) {
+//			t = m->d[i];
+//			v->ob_digit[i] = (digit)(t & PyLong_MASK);
+//			digitsleft--;
+//			bitsleft -= PyLong_SHIFT;
+//		}
+//
+////		if (!BN_is_negative(m))
+////			Py_SIZE(v) = -ndigits;
+////		else
+////			Py_SIZE(v) = ndigits;
+//	}
+//
+//	return (PyObject *) v;
+//}
+
 
 void setBigNum(PyLongObject *obj, BIGNUM **value) {
 	mpz_t tmp;
@@ -1020,8 +1047,19 @@ static PyObject *ECE_neg(PyObject *o1) {
 	EXIT_IF(TRUE, "invalid argument.");
 }
 
+// TODO: finish implementing this
 static PyObject *ECE_long(PyObject *o1) {
-	return NULL;
+	ECElement *obj1 = NULL;
+	if(PyEC_Check(o1)) {
+		obj1 = (ECElement *) o1;
+		if(obj1->type == ZR) {
+			// now convert to python integer
+//			PyObject *obj = bnToLongObj(obj1->elemZ);
+//			return obj;
+			return NULL;
+		}
+	}
+	EXIT_IF(TRUE, "cannot convert this type of object to an integer.");
 }
 
 static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
@@ -1392,7 +1430,8 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 	if(PyArg_ParseTuple(args, "OO", &gobj, &obj)) {
 		Group_Init(gobj);
 
-		if(PyEC_Check(obj)) {
+		// make sure it is a point and not a scalar
+		if(PyEC_Check(obj) && isPoint(obj)) {
 			BIGNUM *x = BN_new(), *y = BN_new();
 			// TODO: verify that element is on the curve before getting coordinates
 			EC_POINT_get_affine_coordinates_GFp(gobj->group, obj->P, x, y, gobj->ctx);

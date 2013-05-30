@@ -137,6 +137,7 @@ typedef struct {
 	printf("ERROR: element not initialized.\n");		\
 	return NULL;  }
 
+#define isPoint(a) a->type == G
 #define ElementG(a, b) a->type == G && b->type == G
 #define ElementZR(a, b) a->type == ZR && b->type == ZR
 
