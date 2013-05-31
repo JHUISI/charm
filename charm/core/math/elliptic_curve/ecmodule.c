@@ -68,9 +68,9 @@ void setBigNum(PyLongObject *obj, BIGNUM **value) {
 	// convert long object into an mpz_t type
 	longObjToMPZ(tmp, obj);
 	// now convert tmp into a decimal string
-	size_t tmp_len = mpz_sizeinbase(tmp, 10) + 2;
+	size_t tmp_len = mpz_sizeinbase(tmp, BASE_DEC) + 2;
 	char *tmp_str = (char *) malloc(tmp_len);
-	tmp_str = mpz_get_str(tmp_str, 10, tmp);
+	tmp_str = mpz_get_str(tmp_str, BASE_DEC, tmp);
 	debug("Element => '%s'\n", tmp_str);
 	//debug("Order of Element => '%zd'\n", tmp_len);
 
@@ -183,6 +183,7 @@ void ECGroup_dealloc(ECGroup *self)
 		Py_BEGIN_ALLOW_THREADS;
 		debug("clearing ec group struct.\n");
 		EC_GROUP_clear_free(self->ec_group);
+		BN_free(self->order);
 		BN_CTX_free(self->ctx);
 		self->group_init = FALSE;
 		Py_END_ALLOW_THREADS;
@@ -199,6 +200,7 @@ PyObject *ECGroup_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 		self->group_init = FALSE;
 		self->nid        = -1;
 		self->ec_group   = NULL;
+		self->order		 = BN_new();
     	self->ctx        = BN_CTX_new();
 	}
 
@@ -285,8 +287,9 @@ int ECGroup_init(ECGroup *self, PyObject *args, PyObject *kwds)
 		PyErr_SetString(PyECErrorObject, "invalid input. try again.");
 		return -1;
     }
-    // check if file was provided
-    // check if param_string provided
+
+	// obtain the order of the elliptic curve and store in group object
+	EC_GROUP_get_order(self->ec_group, self->order, self->ctx);
 	self->group_init = TRUE;
     return 0;
 }
@@ -387,13 +390,13 @@ PyObject *ECE_random(ECElement *self, PyObject *args)
 			// call 'EC_POINT_set_affine_coordinates_GFp' w/ group, P, x/y, ctx
 			// test group membership 'EC_POINT_is_on_curve'
 			ECElement *objG = createNewPoint(G, gobj);
-			BIGNUM *x = BN_new(), *y = BN_new(), *order = BN_new();
-			EC_GROUP_get_order(gobj->ec_group, order, gobj->ctx);
+			BIGNUM *x = BN_new(), *y = BN_new(); // *order = BN_new();
+			//EC_GROUP_get_order(gobj->ec_group, order, gobj->ctx);
 			int FindAnotherPoint = TRUE;
 			//START_CLOCK(dBench);
 			do {
 				// generate random point
-				BN_rand_range(x, order);
+				BN_rand_range(x, gobj->order);
 				EC_POINT_set_compressed_coordinates_GFp(gobj->ec_group, objG->P, x, 1, gobj->ctx);
 				EC_POINT_get_affine_coordinates_GFp(gobj->ec_group, objG->P, x, y, gobj->ctx);
 				// make sure point is on curve and not zero
@@ -414,21 +417,15 @@ PyObject *ECE_random(ECElement *self, PyObject *args)
 //				OPENSSL_free(ystr);
 			} while(FindAnotherPoint);
 
-			//STOP_CLOCK(dBench);
 			BN_free(x);
 			BN_free(y);
-			BN_free(order);
+//			BN_free(order);
 			return (PyObject *) objG;
 		}
 		else if(type == ZR) {
-			ECElement *objZR = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
-			BIGNUM *order = BN_new();
-			EC_GROUP_get_order(gobj->ec_group, order, gobj->ctx);
+			ECElement *objZR = createNewPoint(ZR, gobj);
 			objZR->elemZ = BN_new();
-			//START_CLOCK(dBench);
-			BN_rand_range(objZR->elemZ, order);
-			//STOP_CLOCK(dBench);
-			BN_free(order);
+			BN_rand_range(objZR->elemZ, gobj->order);
 
 			return (PyObject *) objZR;
 		}
@@ -447,21 +444,18 @@ static PyObject *ECE_is_infinity(ECElement *self, PyObject *args) {
 	Point_Init(self);
 	EXIT_IF(self->type != G, "element not of type G.");
 
-	//START_CLOCK(dBench);
 	 if(EC_POINT_is_at_infinity(self->group->ec_group, self->P)) {
-		//STOP_CLOCK(dBench);
 		 Py_INCREF(Py_True);
 		 return Py_True;
 	 }
 
-	 //STOP_CLOCK(dBench);
 	 Py_INCREF(Py_False);
 	 return Py_False;
 }
 
 static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
-	BIGNUM *order = NULL;
+//	BIGNUM *order = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
 
 	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
@@ -471,15 +465,11 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 		// if rhs == ZR, then convert lhs to a bn otherwise fail.
 		if(rhs->point_init && rhs->type == ZR) {
 			BIGNUM *lhs_val = BN_new();
-			order = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
-			ans = createNewPoint(ZR, rhs->group); // ->group, rhs->ctx);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			//START_CLOCK(dBench);
-			BN_mod_add(ans->elemZ, lhs_val, rhs->elemZ, order, ans->group->ctx);
-			//STOP_CLOCK(dBench);
+			ans = createNewPoint(ZR, rhs->group);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_add(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
-			BN_free(order);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(ADDITION, dBench);
 #endif
@@ -491,15 +481,11 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 		// if lhs == ZR, then convert rhs to a bn otherwise fail.
 		if(lhs->point_init && lhs->type == ZR) {
 			BIGNUM *rhs_val = BN_new();
-			order = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
 			ans = createNewPoint(ZR, lhs->group); // ->group, lhs->ctx);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			//START_CLOCK(dBench);
-			BN_mod_add(ans->elemZ, lhs->elemZ, rhs_val, order, ans->group->ctx);
-			//STOP_CLOCK(dBench);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_add(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
-			BN_free(order);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(ADDITION, dBench);
 #endif
@@ -514,13 +500,9 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 
 			IS_SAME_GROUP(lhs, rhs);
 			// easy, just call BN_add
-			order = BN_new();
-			ans = createNewPoint(ZR, lhs->group); // ->group, lhs->ctx);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			//START_CLOCK(dBench);
-			BN_mod_add(ans->elemZ, lhs->elemZ, rhs->elemZ, order, ans->group->ctx);
-			//STOP_CLOCK(dBench);
-			BN_free(order);
+			ans = createNewPoint(ZR, lhs->group);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_add(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(ADDITION, dBench);
 #endif
@@ -542,7 +524,6 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
  */
 static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
-	BIGNUM *order = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
 
 	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
@@ -553,15 +534,10 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 		// only supported for elements of Long (lhs) and ZR (rhs)
 		if(rhs->point_init && rhs->type == ZR) {
 			BIGNUM *lhs_val = BN_new();
-			order = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
 			ans = createNewPoint(ZR, rhs->group); // ->group, rhs->ctx);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			//START_CLOCK(dBench);
-			BN_mod_sub(ans->elemZ, lhs_val, rhs->elemZ, order, ans->group->ctx);
-			//STOP_CLOCK(dBench);
+			BN_mod_sub(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
-			BN_free(order);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(SUBTRACTION, dBench);
 #endif
@@ -574,15 +550,11 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 		// only supported for elements of ZR (lhs) and Long (rhs)
 		if(lhs->point_init && lhs->type == ZR) {
 			BIGNUM *rhs_val = BN_new();
-			order = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
-			ans = createNewPoint(ZR, lhs->group); // ->group, lhs->ctx);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			//START_CLOCK(dBench);
-			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs_val, order, ans->group->ctx);
-			//STOP_CLOCK(dBench);
+			ans = createNewPoint(ZR, lhs->group);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
-			BN_free(order);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(SUBTRACTION, dBench);
 #endif
@@ -596,12 +568,9 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 
 		if(ElementZR(lhs, rhs)) {
 			IS_SAME_GROUP(lhs, rhs);
-			order = BN_new();
-			ans = createNewPoint(ZR, lhs->group); // ->group, lhs->ctx);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			//START_CLOCK(dBench);
-			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs->elemZ, order, ans->group->ctx);
-			//STOP_CLOCK(dBench);
+			ans = createNewPoint(ZR, lhs->group);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(SUBTRACTION, dBench);
 #endif
@@ -619,7 +588,6 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 
 static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
-	BIGNUM *order = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
 
 	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
@@ -630,13 +598,11 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 		// only supported for elements of Long (lhs) and ZR (rhs)
 		if(rhs->point_init && rhs->type == ZR) {
 			BIGNUM *lhs_val = BN_new();
-			order = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
 			ans = createNewPoint(ZR, rhs->group);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			BN_mod_mul(ans->elemZ, lhs_val, rhs->elemZ, order, ans->group->ctx);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_mul(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
-			BN_free(order);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(MULTIPLICATION, dBench);
 #endif
@@ -649,13 +615,11 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 		// only supported for elements of ZR (lhs) and Long (rhs)
 		if(lhs->point_init && lhs->type == ZR) {
 			BIGNUM *rhs_val = BN_new();
-			order = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
 			ans = createNewPoint(ZR, lhs->group); // ->group, lhs->ctx);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs_val, order, ans->group->ctx);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
-			BN_free(order);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(MULTIPLICATION, dBench);
 #endif
@@ -673,11 +637,9 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 			EC_POINT_add(ans->group->ec_group, ans->P, lhs->P, rhs->P, ans->group->ctx);
 		}
 		else if(ElementZR(lhs, rhs)) {
-			order = BN_new();
 			ans = createNewPoint(ZR, lhs->group);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs->elemZ, order, ans->group->ctx);
-			BN_free(order);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 		}
 		else {
 
@@ -825,7 +787,7 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 
 static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
-	BIGNUM *order = NULL;
+//	BIGNUM *order = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
 
 	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
@@ -834,13 +796,11 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		// TODO: implement for elements of Long ** ZR
 		if(rhs->point_init && rhs->type == ZR) {
 			BIGNUM *lhs_val = BN_new();
-			order = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
 			ans = createNewPoint(ZR, rhs->group);
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			BN_mod_exp(ans->elemZ, lhs_val, rhs->elemZ, order, ans->group->ctx);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_exp(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
-			BN_free(order);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(EXPONENTIATION, dBench);
 #endif
@@ -857,15 +817,12 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 //					PyErr_Print(); // for debug purposes
 					PyErr_Clear();
 					BIGNUM *rhs_val = BN_new();
-					order = BN_new();
 					setBigNum((PyLongObject *) o2, &rhs_val);
 
 					ans = createNewPoint(ZR, lhs->group);
-					EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-					BN_mod_exp(ans->elemZ, lhs->elemZ, rhs_val, order, ans->group->ctx);
+//					EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+					BN_mod_exp(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 					BN_free(rhs_val);
-					BN_free(order);
-					//STOP_CLOCK(dBench);
 			}
 			else if(rhs == -1) {
 				debug("finding modular inverse.\n");
@@ -915,10 +872,8 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		}
 		else if(ElementZR(lhs, rhs)) {
 			ans = createNewPoint(ZR, lhs->group);
-			order = BN_new();
-			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
-			BN_mod_exp(ans->elemZ, lhs->elemZ, rhs->elemZ, order, ans->group->ctx);
-			BN_free(order);
+//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
+			BN_mod_exp(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 		}
 		else {
 
@@ -945,19 +900,19 @@ ECElement *invertECElement(ECElement *self) {
 		Py_XDECREF(newObj);
 	}
 	else if(self->type == ZR) {
-		// get modulus p and feed into
-		BIGNUM *p = BN_new();
-		EC_GROUP_get_order(self->group->ec_group, p, self->group->ctx);
-		BIGNUM *x = BN_mod_inverse(NULL, self->elemZ, p, self->group->ctx);
+		// get modulus and compute mod_inverse
+//		BIGNUM *p = BN_new();
+//		EC_GROUP_get_order(self->group->ec_group, p, self->group->ctx);
+		BIGNUM *x = BN_mod_inverse(NULL, self->elemZ, self->group->order, self->group->ctx);
 		if(x != NULL) {
 			newObj = createNewPoint(ZR, self->group);
 			BN_copy(newObj->elemZ, x);
 			BN_free(x);
-			BN_free(p);
+//			BN_free(p);
 			return newObj;
 		}
 		Py_XDECREF(newObj);
-		BN_free(p);
+//		BN_free(p);
 
 	}
 	/* error */
@@ -1033,7 +988,6 @@ static PyObject *ECE_neg(PyObject *o1) {
 	EXIT_IF(TRUE, "invalid argument.");
 }
 
-// TODO: finish implementing this
 static PyObject *ECE_long(PyObject *o1) {
 	ECElement *obj1 = NULL;
 	if(PyEC_Check(o1)) {
@@ -1100,7 +1054,8 @@ static PyObject *ECE_getOrder(ECElement *self, PyObject *arg) {
 		Group_Init(gobj);
 
 		ECElement *order = createNewPoint(ZR, gobj);
-		EC_GROUP_get_order(gobj->ec_group, order->elemZ, gobj->ctx);
+//		EC_GROUP_get_order(gobj->ec_group, order->elemZ, gobj->ctx);
+		BN_copy(order->elemZ, gobj->order);
 		// return the order of the group
 		return (PyObject *) order;
 	}
@@ -1112,12 +1067,12 @@ static PyObject *ECE_bitsize(ECElement *self, PyObject *arg) {
 		ECGroup *gobj = (ECGroup *) arg;
 		Group_Init(gobj);
 
-		BIGNUM *elemZ = BN_new();
-		EC_GROUP_get_order(gobj->ec_group, elemZ, NULL);
-		size_t max_len = BN_num_bytes(elemZ) - RESERVED_ENCODING_BYTES;
+//		BIGNUM *elemZ = BN_new();
+//		EC_GROUP_get_order(gobj->ec_group, elemZ, NULL);
+//		BN_free(elemZ);
+		size_t max_len = BN_num_bytes(gobj->order) - RESERVED_ENCODING_BYTES;
 		debug("order len in bytes => '%zd'\n", max_len);
 
-		BN_free(elemZ);
 		// maximum bitsize for messages encoded for the selected group
 		return Py_BuildValue("i", max_len);
 	}
@@ -1319,9 +1274,9 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 			EXIT_IF(TRUE, "message not a bytes object");
 		}
 		// make sure msg will fit into group (get order num bits / 8)
-		BIGNUM *order = BN_new();
-		EC_GROUP_get_order(gobj->ec_group, order, NULL);
-		int max_len = (BN_num_bits(order) / BYTE);
+//		BIGNUM *order = BN_new();
+//		EC_GROUP_get_order(gobj->ec_group, order, NULL);
+		int max_len = (BN_num_bits(gobj->order) / BYTE);
 		debug("max msg len => '%d'\n", max_len);
 
 		char msg[max_len+2];
@@ -1330,7 +1285,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 		msg_len = msg_len + 1; //we added an extra byte
 
 		debug("msg_len accepted => '%d'\n", msg_len);
-		BN_free(order);
+//		BN_free(order);
 
 		if(bits > 0) {
 			debug("bits were specified.\n");

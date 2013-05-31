@@ -51,6 +51,7 @@
 #define TRUE	1
 #define FALSE	0
 #define BYTE	8
+#define BASE_DEC 10
 #define BASE_HEX 16
 #define MAX_BUF  256
 #define RAND_MAX_BYTES	2048
@@ -83,17 +84,16 @@ typedef struct {
 	int group_init;
 	int nid;
 	BN_CTX *ctx;
+	BIGNUM *order;
 } ECGroup;
 
 typedef struct {
 	PyObject_HEAD
 	GroupType type;
-//	EC_GROUP *group;
 	ECGroup *group;
 	EC_POINT *P;
 	BIGNUM *elemZ;
-	// BN_CTX *ctx; // not sure how this is used in Openssl lib.
-	int point_init; // , safe_ec_clear; // , group_init, nid;
+	int point_init;
 } ECElement;
 
 #if PY_MAJOR_VERSION >= 3
