@@ -5,17 +5,19 @@ except Exception as err:
    print(err)
    exit(-1)
 
+ec_element = 'elliptic_curve.Element'
+
 class ECGroup():
     def __init__(self, builtin_cv):
-        self.group = elliptic_curve(nid=builtin_cv)
+        self.ec_group = elliptic_curve(nid=builtin_cv)
         self.param = builtin_cv
         self._verbose = True
 
     def order(self):
-        return order(self.group)
+        return order(self.ec_group)
 
     def bitsize(self):
-        return bitsize(self.group)
+        return bitsize(self.ec_group)
     
     def paramgen(self, secparam):
         return None
@@ -27,55 +29,57 @@ class ECGroup():
         return self.param
 
     def init(self, _type=ZR):
-        return init(self.group, _type)
+        return init(self.ec_group, _type)
     
     def random(self, _type=ZR):
         if _type == ZR or _type == G:
-            return random(self.group, _type)
+            return random(self.ec_group, _type)
         return None
     
     def encode(self, message):
-        return encode(self.group, message)
+        return encode(self.ec_group, message)
     
     def decode(self, msg_bytes):
-        return decode(self.group, msg_bytes)
+        return decode(self.ec_group, msg_bytes)
     
     def serialize(self, object):
         return serialize(object)
     
     def deserialize(self, bytes_object):
-        return deserialize(self.group, bytes_object)
+        return deserialize(self.ec_group, bytes_object)
     
     # needs work to iterate over tuple
     def hash(self, args, target_type=ZR):
         if isinstance(args, tuple):
             s = bytes()
             for i in args:
-                if type(i) == elliptic_curve:
+                if ec_element in str(i.__class__):
                     s += serialize(i)
                 elif type(i) == str:
                     s += bytes(str(i), 'utf8')
                 elif type(i) == bytes:
                     s += i
+                else:
+                    print("unexpected type: ", type(i))
                 # consider other types    
             #print("s => %s" % s)
             assert len(s) != 0, "hash input is empty."
-            return hashEC(self.group, str(s), target_type)
-        elif type(args) == elliptic_curve:
+            return hashEC(self.ec_group, str(s), target_type)
+        elif ec_element in str(args.__class__): # type(args) == elliptic_curve:
             msg = str(serialize(args))
-            return hashEC(self.group, msg, target_type)
+            return hashEC(self.ec_group, msg, target_type)
         elif type(args) in [str, bytes]:
-            return hashEC(self.group, args, target_type)
+            return hashEC(self.ec_group, args, target_type)
         raise Exception("ECGroup - invalid input for hash")
     
     def zr(self, point):
-        if type(point) == elliptic_curve:
-            return getXY(self.group, point, False)
+        if ec_element in str(point.__class__): # type(point) == elliptic_curve:
+            return getXY(self.ec_group, point, False)
         return None
 
     def coordinates(self, point):
-        if type(point) == elliptic_curve:
-            return getXY(self.group, point, True)
+        if ec_element in str(point.__class__): # type(point) == elliptic_curve:
+            return getXY(self.ec_group, point, True)
         
     def debug(self, data, prefix=None):
         if type(data) == dict and self._verbose:

@@ -2148,10 +2148,10 @@ void initpairing(void) 		{
     dBench->identifier = -1;
 #endif
 
-    Py_INCREF(&PairingType);
-    PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
+    Py_INCREF(&PairingType);
+    PyModule_AddObject(m, "params", (PyObject *)&PairingType);
 
 	PyModule_AddIntConstant(m, "ZR", ZR);
 	PyModule_AddIntConstant(m, "G1", G1);

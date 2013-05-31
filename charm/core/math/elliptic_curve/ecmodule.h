@@ -46,14 +46,6 @@
 #include "openssl/objects.h"
 #include "openssl/rand.h"
 #include "openssl/bn.h"
-#ifdef PROFILER
-#include <google/profiler.h>
-#define PROFILE_START(name) ProfilerStart(name".prof")
-#define PROFILE_STOP  ProfilerStop()
-#else
-#define PROFILE_START
-#define PROFILE_STOP
-#endif
 
 //#define DEBUG	1
 #define TRUE	1
@@ -73,8 +65,10 @@ static Benchmark *dBench;
 #endif
 
 PyTypeObject ECType;
+PyTypeObject ECGroupType;
 static PyObject *PyECErrorObject;
 #define PyEC_Check(obj) PyObject_TypeCheck(obj, &ECType)
+#define PyECGroup_Check(obj) PyObject_TypeCheck(obj, &ECGroupType)
 enum Group {ZR = 0, G, NONE_G};
 typedef enum Group GroupType;
 
@@ -84,12 +78,21 @@ PyNumberMethods ecc_number;
 // TODO: consider adding ref_cnt for keeping track of group ptr references.
 typedef struct {
 	PyObject_HEAD
+	EC_GROUP *ec_group;
+	int group_init;
+	int nid;
+	BN_CTX *ctx;
+} ECGroup;
+
+typedef struct {
+	PyObject_HEAD
 	GroupType type;
-	EC_GROUP *group;
+//	EC_GROUP *group;
+	ECGroup *group;
 	EC_POINT *P;
 	BIGNUM *elemZ;
-	BN_CTX *ctx; // not sure how this is used in Openssl lib.
-	int point_init, group_init, nid;
+	// BN_CTX *ctx; // not sure how this is used in Openssl lib.
+	int point_init; // , safe_ec_clear; // , group_init, nid;
 } ECElement;
 
 #if PY_MAJOR_VERSION >= 3
@@ -102,6 +105,7 @@ typedef struct {
 
 #define ErrorMsg(msg) \
 	PyErr_SetString(PyECErrorObject, msg); \
+	debug("%s: %d error occured here!", __FUNCTION__, __LINE__); \
 	return NULL;
 
 #define Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
@@ -111,7 +115,7 @@ typedef struct {
     } \
 	else if(PyLongCheck(o1)) { \
 		foundLHS = TRUE;  }		\
-	else  {  ErrorMsg("invalid type specified.");   \
+	else  {  ErrorMsg("invalid type specified.");    \
 		}				\
 	if(PyEC_Check(o2)) {  \
 		rhs = (ECElement *) o2; \
@@ -122,14 +126,14 @@ typedef struct {
 	else  {  ErrorMsg("invalid type specified.");   \
 		}
 
-#define Group_NULL(obj) if(obj->group == NULL) {  \
+#define Group_NULL(obj) if(obj->ec_group == NULL) {  \
 	PyErr_SetString(PyECErrorObject, "group object not allocated."); \
 	return NULL;    }
 
 #define Group_Init(obj) \
-	if(!PyEC_Check(obj))  {  \
+	if(!PyECGroup_Check(obj))  {  \
 		PyErr_SetString(PyECErrorObject, "not an ecc object."); return NULL; } \
-	if(obj->group_init == FALSE || obj->group == NULL) { \
+	if(obj->group_init == FALSE || obj->ec_group == NULL) { \
 		PyErr_SetString(PyECErrorObject, "group object not initialized.");   \
 	return NULL;	}
 
@@ -160,7 +164,7 @@ EC_POINT *element_from_hash(EC_GROUP *group, uint8_t *input, int input_len);
 	return NULL;	}
 
 #define IS_SAME_GROUP(a, b) \
-	if(a->nid != b->nid) {	\
+	if(a->group->nid != b->group->nid) {	\
 		PyErr_SetString(PyECErrorObject, "mixing group elements from different curves.");	\
 		return NULL;	\
 	}
