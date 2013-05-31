@@ -62,35 +62,6 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 	mpz_clear (temp2);
 }
 
-// TODO: fix this
-//PyObject *bnToLongObj(BIGNUM *m) {
-//	PyLongObject *v = NULL;
-//	BN_ULONG t;
-//	int bits = BN_num_bits(m), i;
-//	int size = (bits + (PyLong_SHIFT - 1)) / PyLong_SHIFT;
-//	int digitsleft = size;
-//	int bitsleft = bits;
-//
-//	v = _PyLong_New(size);
-//	if (v != NULL) {
-////		digit *p = v->ob_digit;
-//		for(i = 0; i < size; i++) {
-//			t = m->d[i];
-//			v->ob_digit[i] = (digit)(t & PyLong_MASK);
-//			digitsleft--;
-//			bitsleft -= PyLong_SHIFT;
-//		}
-//
-////		if (!BN_is_negative(m))
-////			Py_SIZE(v) = -ndigits;
-////		else
-////			Py_SIZE(v) = ndigits;
-//	}
-//
-//	return (PyObject *) v;
-//}
-
-
 void setBigNum(PyLongObject *obj, BIGNUM **value) {
 	mpz_t tmp;
 	mpz_init(tmp);
@@ -1068,10 +1039,12 @@ static PyObject *ECE_long(PyObject *o1) {
 	if(PyEC_Check(o1)) {
 		obj1 = (ECElement *) o1;
 		if(obj1->type == ZR) {
+			/* borrowed from mixminion 0.0.7.1 */
 			// now convert to python integer
-//			PyObject *obj = bnToLongObj(obj1->elemZ);
-//			return obj;
-			return NULL;
+	        char *hex = BN_bn2hex(obj1->elemZ);
+	        PyObject *output = PyLong_FromString(hex, NULL, BASE_HEX);
+	        OPENSSL_free(hex);
+	        return output; /* pass along errors */
 		}
 	}
 	EXIT_IF(TRUE, "cannot convert this type of object to an integer.");
@@ -1107,7 +1080,7 @@ static PyObject *ECE_convertToZR(ECElement *self, PyObject *args) {
 					}
 					else {
 						BN_free(y);
-						ECElement *newObj = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
+						ECElement *newObj = createNewPoint(ZR, gobj);
 						BN_copy(newObj->elemZ, x);
 						BN_free(x);
 						return (PyObject *) newObj;

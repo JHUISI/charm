@@ -51,6 +51,7 @@
 #define TRUE	1
 #define FALSE	0
 #define BYTE	8
+#define BASE_HEX 16
 #define MAX_BUF  256
 #define RAND_MAX_BYTES	2048
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
