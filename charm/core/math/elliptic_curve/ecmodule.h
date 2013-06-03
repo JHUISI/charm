@@ -35,7 +35,6 @@
 #include <longintrepr.h>
 #include <math.h>
 #include <gmp.h>
-#include "sha1.h"
 #include "benchmarkmodule.h"
 #include "base64.h"
 
@@ -46,6 +45,7 @@
 #include "openssl/objects.h"
 #include "openssl/rand.h"
 #include "openssl/bn.h"
+#include "openssl/sha.h"
 
 //#define DEBUG	1
 #define TRUE	1
@@ -56,10 +56,10 @@
 #define MAX_BUF  256
 #define RAND_MAX_BYTES	2048
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
-#define HASH_FUNCTION_STR_TO_G_CRH		0
-#define HASH_FUNCTION_STR_TO_ZR_CRH		1
-#define HASH_FUNCTION_KEM_DERIVE		2
-#define HASH_LEN	20
+#define HASH_FUNCTION_STR_TO_ZR_CRH		10
+#define HASH_FUNCTION_STR_TO_G_CRH		11
+#define HASH_FUNCTION_KEM_DERIVE		12
+#define HASH_LEN						SHA256_DIGEST_LENGTH
 #define RESERVED_ENCODING_BYTES			2
 
 #if BENCHMARK_ENABLED == 1
@@ -156,8 +156,8 @@ void	ECElement_dealloc(ECElement* self);
 
 ECElement *negatePoint(ECElement *self);
 ECElement *invertECElement(ECElement *self);
-int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t *output_buf, uint32_t hash_num);
-EC_POINT *element_from_hash(EC_GROUP *group, uint8_t *input, int input_len);
+int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix);
+EC_POINT *element_from_hash(EC_GROUP *group, BIGNUM *order, uint8_t *input, int input_len);
 
 #define EXIT_IF(check, msg) \
 	if(check) { 						\

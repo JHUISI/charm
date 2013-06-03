@@ -86,44 +86,64 @@ void setBigNum(PyLongObject *obj, BIGNUM **value) {
  *
  * @param input_buf		The input buffer.
  * @param input_len		The input buffer length (in bytes).
- * @param hash_len		Length of the output hash (in bytes).
- * @param output_buf	A pre-allocated output buffer.
- * @param hash_num		Index number of the hash function to use (changes the output).
- * @return				FENC_ERROR_NONE or an error code.
+ * @param output_buf	A pre-allocated output buffer of size hash_len.
+ * @param hash_len		Length of the output hash (in bytes). Should be approximately bit size of curve group order.
+ * @param hash_prefix	prefix for hash function.
  */
-int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t *output_buf, uint32_t hash_num)
+int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA1Context sha_context;
-	// int output_size = 0;
-	uint32_t block_hdr[2];
+	SHA256_CTX sha2;
+	int i, new_input_len = input_len + 1; // extra byte for prefix
+	uint8_t first_block = 0;
+	uint8_t new_input[new_input_len+1];
 
-	/* Compute an arbitrary number of SHA1 hashes of the form:
-	 * output_buf[0...19] = SHA1(hash_num || 0 || input_buf)
-	 * output_buf[20..39] = SHA1(hash_num || 1 || output_buf[0...19])
-	 * ...
-	 */
-	block_hdr[0] = hash_num;
-	for (block_hdr[1] = 0; hash_size > 0; (block_hdr[1])++) {
-		/* Initialize the SHA1 function.	*/
-		SHA1Reset(&sha_context);
+	memset(new_input, 0, new_input_len);
+	new_input[0] = first_block; // block number (always 0 by default)
+	new_input[1] = hash_prefix; // set hash prefix
+	memcpy((uint8_t *)(new_input+2), input_buf, input_len); // copy input bytes
 
-		SHA1Input(&sha_context, (uint8_t *)&(block_hdr[0]), sizeof(block_hdr));
-		SHA1Input(&sha_context, (uint8_t *)input_buf, input_len);
+	debug("new input => \n");
+	printf_buffer_as_hex(new_input, new_input_len);
+	// prepare output buf
+	memset(output_buf, 0, hash_len);
 
-		SHA1Result(&sha_context);
-		if (hash_size <= HASH_LEN) {
-			memcpy(output_buf, sha_context.Message_Digest, hash_size);
-			hash_size = 0;
-		} else {
-			memcpy(output_buf, sha_context.Message_Digest, HASH_LEN);
-			input_buf = (uint8_t *) output_buf;
-			hash_size -= HASH_LEN;
-			output_buf += HASH_LEN;
+	if (hash_len <= HASH_LEN) {
+		SHA256_Init(&sha2);
+		SHA256_Update(&sha2, new_input, new_input_len);
+		uint8_t md[HASH_LEN+1];
+		SHA256_Final(md, &sha2);
+		memcpy(output_buf, md, hash_len);
+	}
+	else {
+		// apply variable-size hash technique to get desired size
+		// determine block count.
+		int blocks = (int) ceil(((double) hash_len) / HASH_LEN);
+		debug("Num blocks needed: %d\n", blocks);
+		uint8_t md[HASH_LEN+1];
+		uint8_t md2[(blocks * HASH_LEN)+1];
+		uint8_t *target_buf = md2;
+		for(i = 0; i < blocks; i++) {
+			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
+			target_buf += (i * HASH_LEN);
+			new_input[0] = (uint8_t) i;
+			SHA256_Init(&sha2);
+			debug("input %d => ", i);
+			printf_buffer_as_hex(new_input, new_input_len);
+			SHA256_Update(&sha2, new_input, new_input_len);
+			SHA256_Final(md, &sha2);
+			memcpy(target_buf, md, hash_len);
+			debug("block %d => ", i);
+			printf_buffer_as_hex(md, HASH_LEN);
+			memset(md, 0, HASH_LEN);
 		}
+		// copy back to caller
+		memcpy(output_buf, md2, hash_len);
 	}
 
+	OPENSSL_cleanse(&sha2,sizeof(sha2));
 	return TRUE;
 }
+
 
 /*
  * Create a new point with an existing group object
@@ -1054,7 +1074,6 @@ static PyObject *ECE_getOrder(ECElement *self, PyObject *arg) {
 		Group_Init(gobj);
 
 		ECElement *order = createNewPoint(ZR, gobj);
-//		EC_GROUP_get_order(gobj->ec_group, order->elemZ, gobj->ctx);
 		BN_copy(order->elemZ, gobj->order);
 		// return the order of the group
 		return (PyObject *) order;
@@ -1067,9 +1086,6 @@ static PyObject *ECE_bitsize(ECElement *self, PyObject *arg) {
 		ECGroup *gobj = (ECGroup *) arg;
 		Group_Init(gobj);
 
-//		BIGNUM *elemZ = BN_new();
-//		EC_GROUP_get_order(gobj->ec_group, elemZ, NULL);
-//		BN_free(elemZ);
 		size_t max_len = BN_num_bytes(gobj->order) - RESERVED_ENCODING_BYTES;
 		debug("order len in bytes => '%zd'\n", max_len);
 
@@ -1162,20 +1178,15 @@ static PyObject *ECE_getGen(ECElement *self, PyObject *arg) {
 /*
  * Takes an arbitrary string and returns a group element
  */
-EC_POINT *element_from_hash(EC_GROUP *group, uint8_t *input, int input_len) {
-
+EC_POINT *element_from_hash(EC_GROUP *group, BIGNUM *order, uint8_t *input, int input_len)
+{
 	EC_POINT *P = NULL;
 	BIGNUM *x = BN_new(), *y = BN_new();
 	int TryNextX = TRUE;
-	BIGNUM *p = BN_new(), *a = BN_new(), *b = BN_new();
 	BN_CTX *ctx = BN_CTX_new();
-	EC_GROUP_get_curve_GFp(group, p, a, b, ctx);
-	BN_free(a);
-	BN_free(b); // a,b not needed here...
-
 	// assume input string is a binary string, then set x to (x mod q)
 	x = BN_bin2bn((const uint8_t *) input, input_len, NULL);
-	BN_mod(x, x, p, ctx);
+	BN_mod(x, x, order, ctx);
 	P = EC_POINT_new(group);
 	do {
 		// set x coordinate and then test whether it's on curve
@@ -1200,7 +1211,6 @@ EC_POINT *element_from_hash(EC_GROUP *group, uint8_t *input, int input_len) {
 
 	BN_free(x);
 	BN_free(y);
-	BN_free(p);
 	BN_CTX_free(ctx);
 	return P;
 }
@@ -1213,29 +1223,31 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 	ECElement *hashObj = NULL;
 	ECGroup *gobj = NULL;
 
-	// TODO: consider hashing string then generating an element from it's output
 	if(PyArg_ParseTuple(args, "Os#i", &gobj, &msg, &msg_len, &type)) {
 		Group_Init(gobj);
-		// hash the message, then generate an element from the hash_buf
-		uint8_t hash_buf[HASH_LEN+1];
+		// compute bit size of group
+		int hash_len = BN_num_bytes(gobj->order);
+		debug("hash_len => %d\n", hash_len);
+		uint8_t hash_buf[hash_len+1];
 		if(type == G) {
-			hash_to_bytes((uint8_t *) msg, msg_len, HASH_LEN, hash_buf, HASH_FUNCTION_STR_TO_G_CRH);
+			// hash input bytes
+			hash_to_bytes((uint8_t *) msg, msg_len, hash_buf, hash_len, HASH_FUNCTION_STR_TO_G_CRH);
 			debug("Message => '%s'\n", msg);
-			debug("Hash output => ");
-			printf_buffer_as_hex(hash_buf, HASH_LEN);
-
+			debug("Digest  => ");
+			printf_buffer_as_hex(hash_buf, hash_len);
+			// generate an EC element from message digest
 			hashObj = createNewPoint(G, gobj);
-			hashObj->P = element_from_hash(gobj->ec_group, (uint8_t *) hash_buf, HASH_LEN);
+			hashObj->P = element_from_hash(gobj->ec_group, gobj->order, (uint8_t *) hash_buf, hash_len);
 			return (PyObject *) hashObj;
 		}
 		else if(type == ZR) {
-			hash_to_bytes((uint8_t *) msg, msg_len, HASH_LEN, hash_buf, HASH_FUNCTION_STR_TO_ZR_CRH);
+			hash_to_bytes((uint8_t *) msg, msg_len, hash_buf, hash_len, HASH_FUNCTION_STR_TO_ZR_CRH);
 			debug("Message => '%s'\n", msg);
-			debug("Hash output => ");
-			printf_buffer_as_hex(hash_buf, HASH_LEN);
+			debug("Digest  => ");
+			printf_buffer_as_hex(hash_buf, hash_len);
 
 			hashObj = createNewPoint(ZR, gobj);
-			BN_bin2bn((const uint8_t *) hash_buf, HASH_LEN, hashObj->elemZ);
+			BN_bin2bn((const uint8_t *) hash_buf, hash_len, hashObj->elemZ);
 			return (PyObject *) hashObj;
 		}
 		else {
