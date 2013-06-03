@@ -80,7 +80,6 @@ void setBigNum(PyLongObject *obj, BIGNUM **value) {
 	mpz_clear(tmp);
 }
 
-/* START: module function definitions */
 /*!
  * Hash a null-terminated string to a byte array.
  *

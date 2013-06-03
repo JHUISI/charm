@@ -344,49 +344,113 @@ char * init_pbc_param(char *file, pairing_t *pairing)
 	return buf;
 }
 
+///*!
+// * Hash a null-terminated string to a byte array.
+// *
+// * @param input_buf		The input buffer.
+// * @param input_len		The input buffer length (in bytes).
+// * @param hash_len		Length of the output hash (in bytes).
+// * @param output_buf	A pre-allocated output buffer.
+// * @param hash_num		Index number of the hash function to use (changes the output).
+// * @return				FENC_ERROR_NONE or an error code.
+// */
+//int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* output_buf, uint32_t hash_num)
+//{
+//	SHA1Context sha_context;
+//	// int output_size = 0;
+//	uint32_t block_hdr[2];
+//
+//	/* Compute an arbitrary number of SHA1 hashes of the form:
+//	 * output_buf[0...19] = SHA1(hash_num || 0 || input_buf)
+//	 * output_buf[20..39] = SHA1(hash_num || 1 || output_buf[0...19])
+//	 * ...
+//	 */
+//	block_hdr[0] = hash_num;
+//	for (block_hdr[1] = 0; hash_size > 0; (block_hdr[1])++) {
+//		/* Initialize the SHA1 function.	*/
+//		SHA1Reset(&sha_context);
+//
+//		SHA1Input(&sha_context, (unsigned char*)&(block_hdr[0]), sizeof(block_hdr));
+//		SHA1Input(&sha_context, (unsigned char *)input_buf, input_len);
+//
+//		SHA1Result(&sha_context);
+//		if (hash_size <= 20) {
+//			memcpy(output_buf, sha_context.Message_Digest, hash_size);
+//			hash_size = 0;
+//		} else {
+//			memcpy(output_buf, sha_context.Message_Digest, 20);
+//			input_buf = (uint8_t *) output_buf;
+//			hash_size -= 20;
+//			output_buf += 20;
+//		}
+//	}
+//
+//	return TRUE;
+//}
+
 /*!
  * Hash a null-terminated string to a byte array.
  *
  * @param input_buf		The input buffer.
  * @param input_len		The input buffer length (in bytes).
- * @param hash_len		Length of the output hash (in bytes).
- * @param output_buf	A pre-allocated output buffer.
- * @param hash_num		Index number of the hash function to use (changes the output).
- * @return				FENC_ERROR_NONE or an error code.
+ * @param output_buf	A pre-allocated output buffer of size hash_len.
+ * @param hash_len		Length of the output hash (in bytes). Should be approximately bit size of curve group order.
+ * @param hash_prefix	prefix for hash function.
  */
-int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* output_buf, uint32_t hash_num)
+int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA1Context sha_context;
-	// int output_size = 0;
-	uint32_t block_hdr[2];
-	
-	/* Compute an arbitrary number of SHA1 hashes of the form:
-	 * output_buf[0...19] = SHA1(hash_num || 0 || input_buf)
-	 * output_buf[20..39] = SHA1(hash_num || 1 || output_buf[0...19])
-	 * ...
-	 */
-	block_hdr[0] = hash_num;
-	for (block_hdr[1] = 0; hash_size > 0; (block_hdr[1])++) {
-		/* Initialize the SHA1 function.	*/
-		SHA1Reset(&sha_context);
-		
-		SHA1Input(&sha_context, (unsigned char*)&(block_hdr[0]), sizeof(block_hdr));
-		SHA1Input(&sha_context, (unsigned char *)input_buf, input_len);
-		
-		SHA1Result(&sha_context);
-		if (hash_size <= 20) {
-			memcpy(output_buf, sha_context.Message_Digest, hash_size);
-			hash_size = 0;
-		} else {
-			memcpy(output_buf, sha_context.Message_Digest, 20);
-			input_buf = (uint8_t *) output_buf;
-			hash_size -= 20;
-			output_buf += 20;
-		}
+	SHA256_CTX sha2;
+	int i, new_input_len = input_len + 1; // extra byte for prefix
+	uint8_t first_block = 0;
+	uint8_t new_input[new_input_len+1];
+
+	memset(new_input, 0, new_input_len);
+	new_input[0] = first_block; // block number (always 0 by default)
+	new_input[1] = hash_prefix; // set hash prefix
+	memcpy((uint8_t *)(new_input+2), input_buf, input_len); // copy input bytes
+
+	debug("new input => \n");
+	printf_buffer_as_hex(new_input, new_input_len);
+	// prepare output buf
+	memset(output_buf, 0, hash_len);
+
+	if (hash_len <= HASH_LEN) {
+		SHA256_Init(&sha2);
+		SHA256_Update(&sha2, new_input, new_input_len);
+		uint8_t md[HASH_LEN+1];
+		SHA256_Final(md, &sha2);
+		memcpy(output_buf, md, hash_len);
 	}
-	
+	else {
+		// apply variable-size hash technique to get desired size
+		// determine block count.
+		int blocks = (int) ceil(((double) hash_len) / HASH_LEN);
+		debug("Num blocks needed: %d\n", blocks);
+		uint8_t md[HASH_LEN+1];
+		uint8_t md2[(blocks * HASH_LEN)+1];
+		uint8_t *target_buf = md2;
+		for(i = 0; i < blocks; i++) {
+			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
+			target_buf += (i * HASH_LEN);
+			new_input[0] = (uint8_t) i;
+			SHA256_Init(&sha2);
+			debug("input %d => ", i);
+			printf_buffer_as_hex(new_input, new_input_len);
+			SHA256_Update(&sha2, new_input, new_input_len);
+			SHA256_Final(md, &sha2);
+			memcpy(target_buf, md, hash_len);
+			debug("block %d => ", i);
+			printf_buffer_as_hex(md, HASH_LEN);
+			memset(md, 0, HASH_LEN);
+		}
+		// copy back to caller
+		memcpy(output_buf, md2, hash_len);
+	}
+
+	OPENSSL_cleanse(&sha2,sizeof(sha2));
 	return TRUE;
 }
+
 
 /*!
  * Hash a group element to a byte array.  This calls hash_to_bytes().
@@ -413,7 +477,7 @@ int hash_element_to_bytes(element_t *element, int hash_size, uint8_t* output_buf
 	else if(prefix < 0)
 		// convert into a positive number
 		prefix *= -1;
-	int result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
+	int result = hash_to_bytes(temp_buf, buf_len, output_buf, hash_size, prefix);
 	free(temp_buf);
 	
 	return result;
@@ -446,7 +510,7 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 		j++;
 	}
 	// hash the temp2_buf to bytes
-	int result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), hash_size, output_buf, HASH_FUNCTION_ELEMENTS);
+	int result = hash_to_bytes(temp2_buf, (last_buflen + buf_len), output_buf, hash_size, HASH_FUNCTION_ELEMENTS);
 
 	free(temp2_buf);
 	free(temp_buf);
@@ -475,9 +539,8 @@ int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash,
 	debug("temp_buf => ");
 	printf_buffer_as_hex(temp_buf, input_len + hash_size);
 
-	result = hash_to_bytes(temp_buf, (input_len + hash_size), hash_size, output_buf, HASH_FUNCTION_STRINGS);
+	result = hash_to_bytes(temp_buf, (input_len + hash_size), output_buf, hash_size, HASH_FUNCTION_STRINGS);
 
-	//PyObject_Del(last);
 	Py_XDECREF(last);
 	return result;
 }
@@ -549,7 +612,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 		if(buf != NULL) {
 			debug("Initialized pairings type: '%s'\n", self->params);
 			self->param_buf = buf;
-			hash_to_bytes((uint8_t *) buf, strlen(buf), HASH_LEN, hash_id, HASH_FUNCTION_STRINGS);
+			hash_to_bytes((uint8_t *) buf, strlen(buf), hash_id, HASH_LEN, HASH_FUNCTION_STRINGS);
 			strncpy((char *) pairing->hash_id, (char *) hash_id, ID_LEN);
 			printf_buffer_as_hex(pairing->hash_id, ID_LEN);
 		}
@@ -562,7 +625,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
 		debug("hashing pairing parameters...\n");
 
-		hash_to_bytes((uint8_t *) param_buf2, b_len, HASH_LEN, hash_id, HASH_FUNCTION_STRINGS);
+		hash_to_bytes((uint8_t *) param_buf2, b_len, hash_id, HASH_LEN, HASH_FUNCTION_STRINGS);
 		strncpy((char *) pairing->hash_id, (char *) hash_id, ID_LEN);
 		printf_buffer_as_hex(pairing->hash_id, ID_LEN);
 	}
@@ -830,17 +893,13 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	debug("Starting '%s'\n", __func__);	
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
-		//START_CLOCK(dBench);
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_mul_si(newObject->e, self->e, z);
-		//STOP_CLOCK(dBench);
 	}
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
-		//START_CLOCK(dBench);
 		newObject = createNewElement(other->element_type, other->pairing);
 		element_mul_si(newObject->e, other->e, z);
-		//STOP_CLOCK(dBench);
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
@@ -848,22 +907,16 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		EXIT_IF(mul_rule(self->element_type, other->element_type) == FALSE, "invalid mul operation.");
 
 		if(self->element_type != ZR && other->element_type == ZR) {
-			//START_CLOCK(dBench);
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul_zn(newObject->e, self->e, other->e);		
-			//STOP_CLOCK(dBench);
 		}
 		else if(other->element_type != ZR && self->element_type == ZR) {
-			//START_CLOCK(dBench);
 			newObject = createNewElement(other->element_type, self->pairing);
 			element_mul_zn(newObject->e, other->e, self->e);
-			//STOP_CLOCK(dBench);
 		}
 		else { // all other cases
-			//START_CLOCK(dBench);
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul(newObject->e, self->e, other->e);		
-			//STOP_CLOCK(dBench);
 		}
 	}
 	else {
@@ -905,7 +958,6 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	debug("Starting '%s'\n", __func__);	
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
-		//START_CLOCK(dBench);
 		newObject = createNewElement(self->element_type, self->pairing);
 		if(z == 2) element_halve(newObject->e, self->e);
 		else {
@@ -913,11 +965,9 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			element_set_si(other->e, z);
 			element_div(newObject->e, self->e, other->e);
 		}
-		//STOP_CLOCK(dBench);
 	}
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
-		//START_CLOCK(dBench);
 		newObject = createNewElement(other->element_type, other->pairing);
 		if(z == 2) element_halve(newObject->e, other->e);
 		else {
@@ -925,17 +975,14 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			element_set_si(self->e, z);
 			element_div(newObject->e, self->e, other->e);
 		}
-		//STOP_CLOCK(dBench);
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
 		IS_SAME_GROUP(self, other);
 		EXIT_IF(div_rule(self->element_type, other->element_type) == FALSE, "invalid div operation.");
 
-		//START_CLOCK(dBench);
 		newObject = createNewElement(self->element_type, self->pairing);
 		element_div(newObject->e, self->e, other->e);
-		//STOP_CLOCK(dBench);
 	}
 	else {
 		EXIT_IF(TRUE, "invalid types.");
@@ -959,10 +1006,8 @@ static PyObject *Element_invert(Element *self)
 	}
 #endif
 	
-	//START_CLOCK(dBench);
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_invert(newObject->e, self->e);
-	//STOP_CLOCK(dBench);
 	return (PyObject *) newObject;
 }
 
@@ -1247,7 +1292,6 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 	}
 	
 	EXIT_IF(object->elem_initialized == FALSE, "null element object.");
-	//START_CLOCK(dBench);
 	int hash_size = HASH_LEN;
 	uint8_t hash_buf[hash_size + 1];
 	if(!hash_element_to_bytes(&object->e, hash_size, hash_buf, label)) {
@@ -1259,31 +1303,29 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 
 	str = PyBytes_FromString((const char *) hash_hex);
 	free(hash_hex);
-	//STOP_CLOCK(dBench);
 	return str;
 }
 
-// note that this is a class instance function and thus, self will refer to the class object 'element'
-// the args will contain the references to the objects passed in by the caller.
 // The hash function should be able to handle elements of various types and accept
 // a field to hash too. For example, a string can be hashed to Zr or G1, an element in G1 can be
 static PyObject *Element_hash(Element *self, PyObject *args) {
 	Element *newObject = NULL, *object = NULL, *group = NULL;
 	PyObject *objList = NULL, *tmpObject = NULL;
-	// hashing element to Zr
-	uint8_t hash_buf[HASH_LEN+1];
-	memset(hash_buf, '\0', HASH_LEN);
 	int result, i;
 	GroupType type = ZR;
 	
 	char *tmp = NULL, *str;
 	// make sure args have the right type -- check that args contain a "string" and "string"
 	if(!PyArg_ParseTuple(args, "OO|i", &group, &objList, &type)) {
-		tmp = "invalid object types";
-		goto cleanup;
+		EXIT_IF(TRUE, "invalid object types");
 	}
 
 	VERIFY_GROUP(group);
+	int hash_len = mpz_sizeinbase(group->pairing->pair_obj->r, 2) / BYTE;
+	debug("hash_len : %d\n", hash_len);
+	uint8_t hash_buf[hash_len+1];
+	memset(hash_buf, 0, hash_len);
+
 	// first case: is a string and type may or may not be set
 	if(PyBytes_CharmCheck(objList)) {
 		str = NULL;
@@ -1292,40 +1334,34 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
 			// hash bytes using SHA1
-			//START_CLOCK(dBench);
 			newObject = createNewElement(ZR, group->pairing);
-			result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, type);
+			result = hash_to_bytes((uint8_t *) str, strlen((char *) str), hash_buf, hash_len, type);
 			// extract element in hash
 			if(!result) { 
 				tmp = "could not hash to bytes.";
 				goto cleanup; 
-			}			 
-			element_from_hash(newObject->e, hash_buf, HASH_LEN);
-			//STOP_CLOCK(dBench);
+			}
+			element_from_hash(newObject->e, hash_buf, hash_len);
 		}
-		else if(type == G1 || type == G2) {
+		else if(type == G1 || type == G2) { // depending on the curve hashing to G2 might not be supported
 		    // element to G1	
 			debug("Hashing string '%s'\n", str);
 			debug("Target GroupType => '%d'", type);
-			//START_CLOCK(dBench);
 			newObject = createNewElement(type, group->pairing);
 			// hash bytes using SHA1
-			result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, type);
+			result = hash_to_bytes((uint8_t *) str, strlen((char *) str), hash_buf, hash_len, type);
 			if(!result) { 
 				tmp = "could not hash to bytes.";
 				goto cleanup; 
 			}			
-			element_from_hash(newObject->e, hash_buf, HASH_LEN);
-			//STOP_CLOCK(dBench);
+			element_from_hash(newObject->e, hash_buf, hash_len);
 		}
 		else {
-			// not supported, right?
 			tmp = "cannot hash a string to that field. Only Zr or G1.";
 			goto cleanup;
 		}
 	}
 	// element type to ZR or G1. Can also contain multiple elements
-//	else if(PyArg_ParseTuple(args, "O|i", &objList, &type)) {
 	// second case: is a tuple of elements of which could be a string or group elements
 	else if(PySequence_Check(objList)) {
 		int size = PySequence_Length(objList);
@@ -1334,18 +1370,14 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			tmpObject = PySequence_GetItem(objList, 0);
 			if(PyElement_Check(tmpObject)) {
 				object = (Element *) tmpObject;
-				//START_CLOCK(dBench);
-				result = hash_element_to_bytes(&object->e, HASH_LEN, hash_buf, 0);
-				//STOP_CLOCK(dBench);
+				result = hash_element_to_bytes(&object->e, hash_len, hash_buf, 0);
 			}
 			else if(PyBytes_CharmCheck(tmpObject)) {
 				str = NULL;
 				PyBytes_ToString(str, tmpObject);
-				//START_CLOCK(dBench);
-				result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
-				//STOP_CLOCK(dBench);
+				result = hash_to_bytes((uint8_t *) str, strlen((char *) str), hash_buf, hash_len, HASH_FUNCTION_STR_TO_Zr_CRH);
 				debug("hash str element =>");
-				printf_buffer_as_hex(hash_buf, HASH_LEN);
+				printf_buffer_as_hex(hash_buf, hash_len);
 			}
 			Py_DECREF(tmpObject);
 
@@ -1354,29 +1386,22 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				tmpObject = PySequence_GetItem(objList, i);
 				if(PyElement_Check(tmpObject)) {
 					object = (Element *) tmpObject;
-					//START_CLOCK(dBench);
-					uint8_t out_buf[HASH_LEN+1];
-					memset(out_buf, '\0', HASH_LEN);
+					uint8_t out_buf[hash_len+1];
+					memset(out_buf, 0, hash_len);
 					// current hash_buf output concatenated with object are sha1 hashed into hash_buf
-					result = hash2_element_to_bytes(&object->e, hash_buf, HASH_LEN, out_buf);
-					//STOP_CLOCK(dBench);
+					result = hash2_element_to_bytes(&object->e, hash_buf, hash_len, out_buf);
 					debug("hash element => ");
-					printf_buffer_as_hex(out_buf, HASH_LEN);
-					memcpy(hash_buf, out_buf, HASH_LEN);
+					printf_buffer_as_hex(out_buf, hash_len);
+					memcpy(hash_buf, out_buf, hash_len);
 				}
 				else if(PyBytes_CharmCheck(tmpObject)) {
 					str = NULL;
 					PyBytes_ToString(str, tmpObject);
-					//START_CLOCK(dBench);
-					// this assumes that the string is the first object (NOT GOOD, change)
-//					result = hash_to_bytes((uint8_t *) str, strlen((char *) str), HASH_LEN, (unsigned char *) hash_buf, HASH_FUNCTION_STR_TO_Zr_CRH);
-					result = hash2_buffer_to_bytes((uint8_t *) str, strlen((char *) str), hash_buf, HASH_LEN, hash_buf);
-					// hash2_element_to_bytes()
-					//STOP_CLOCK(dBench);
+					result = hash2_buffer_to_bytes((uint8_t *) str, strlen((char *) str), hash_buf, hash_len, hash_buf);
 				}
 				Py_DECREF(tmpObject);
 			}
-			//START_CLOCK(dBench);
+
 			if(type == ZR) { newObject = createNewElement(ZR, group->pairing); }
 			else if(type == G1) { newObject = createNewElement(G1, group->pairing); }
 			else {
@@ -1384,8 +1409,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				goto cleanup;
 			}
 
-			element_from_hash(newObject->e, hash_buf, HASH_LEN);
-			//STOP_CLOCK(dBench);
+			element_from_hash(newObject->e, hash_buf, hash_len);
 		}
 	}
 	// third case: a tuple with one element and
@@ -1400,17 +1424,15 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 		// TODO: add type == ZR?
 		// Hash an element of Zr to an element of G1.
 		if(type == G1) {
-			//START_CLOCK(dBench);
 			newObject = createNewElement(G1, group->pairing);
 			debug_e("Hashing element '%B' to G1...\n", object->e);
 			// hash the element to the G1 field (uses sha1 as well)
-			result = hash_element_to_bytes(&object->e, HASH_LEN, (unsigned char *) hash_buf, 0);
+			result = hash_element_to_bytes(&object->e, hash_len, (unsigned char *) hash_buf, 0);
 			if(!result) {
 				tmp = "could not hash to bytes";
 				goto cleanup;
 			}
-			element_from_hash(newObject->e, hash_buf, HASH_LEN);
-			//STOP_CLOCK(dBench);
+			element_from_hash(newObject->e, hash_buf, hash_len);
 		}
 		else {
 			tmp = "can only hash an element of Zr to G1. Random Oracle model.";
@@ -1426,7 +1448,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	return (PyObject *) newObject;
 
 cleanup:
-	if(newObject != NULL) PyObject_Del(newObject);
+	if(newObject != NULL) Py_XDECREF(newObject);
 	EXIT_IF(TRUE, tmp);
 }
 
@@ -1495,7 +1517,6 @@ static long Element_index(Element *o1) {
 		PyObject *temp = mpzToLongObj(o);
 		result = PyObject_Hash(temp);
 		mpz_clear(o);
-		//PyObject_Del(temp);
 		Py_XDECREF(temp);
 	}
 	return result;
