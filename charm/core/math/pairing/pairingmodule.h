@@ -39,17 +39,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "sha1.h"
 #include "benchmarkmodule.h"
 #include "base64.h"
+#include "openssl/objects.h"
+#include "openssl/sha.h"
 
 //#define DEBUG	1
 //#define TRUE	1
 //#define FALSE	0
 #define BenchmarkIdentifier 1
-#define MAX_LEN 2048
-#define HASH_LEN 20
-#define ID_LEN   4
+#define BYTE		8
+#define MAX_LEN 	2048
+#define HASH_LEN	SHA256_DIGEST_LENGTH
+#define ID_LEN   	4
 #define MAX_BENCH_OBJECTS	2
 // define element_types
 enum Group {ZR = 0, G1, G2, GT, NONE_G};

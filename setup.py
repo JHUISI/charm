@@ -154,9 +154,8 @@ if opt.get('PAIR_MOD') == 'yes':
                             include_dirs = [utils_path,
                                             benchmark_path], 
                             sources = [math_path+'pairing/pairingmodule.c', 
-                                        utils_path+'sha1.c',
                                         utils_path+'base64.c'],
-                            libraries=['pbc', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
+                            libraries=['pbc', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
 
     elif opt.get('USE_RELIC') == 'yes':
         # check if RELIC lib has been built. if not, bail
@@ -183,7 +182,6 @@ if opt.get('PAIR_MOD') == 'yes':
                             include_dirs = [utils_path,
                                             benchmark_path, miracl_inc],
                             sources = [math_path + 'pairing/miracl/pairingmodule2.c',
-                                        utils_path + 'sha1.c', 
                                         math_path + 'pairing/miracl/miracl_interface2.cc'],
                             libraries=['gmp','stdc++'], define_macros=_macros, undef_macros=_undef_macro,
                             extra_objects=[miracl_lib], extra_compile_args=None)
@@ -196,7 +194,6 @@ if opt.get('INT_MOD') == 'yes':
                             include_dirs = [utils_path,
                                             benchmark_path],
                             sources = [math_path + 'integer/integermodule.c', 
-                                        utils_path + 'sha1.c', 
                                         utils_path + 'base64.c'], 
                             libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
    _ext_modules.append(integer_module)
@@ -207,7 +204,6 @@ if opt.get('ECC_MOD') == 'yes':
                 include_dirs = [utils_path,
                                 benchmark_path], 
 				sources = [math_path + 'elliptic_curve/ecmodule.c',
-                            utils_path + 'sha1.c',
                             utils_path + 'base64.c'], 
 				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
    _ext_modules.append(ecc_module)

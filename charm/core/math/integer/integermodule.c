@@ -206,50 +206,69 @@ void printf_buffer_as_hex(uint8_t *data, size_t len) {
 #endif
 }
 
-/* START: module function definitions */
 /*!
  * Hash a null-terminated string to a byte array.
  *
  * @param input_buf		The input buffer.
  * @param input_len		The input buffer length (in bytes).
- * @param hash_len		Length of the output hash (in bytes).
- * @param output_buf	A pre-allocated output buffer.
- * @param hash_num		Index number of the hash function to use (changes the output).
- * @return				FENC_ERROR_NONE or an error code.
+ * @param output_buf	A pre-allocated output buffer of size hash_len.
+ * @param hash_len		Length of the output hash (in bytes). Should be approximately bit size of curve group order.
+ * @param hash_prefix	prefix for hash function.
  */
-int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size,
-		uint8_t *output_buf, uint32_t hash_num) {
-	SHA1Context sha_context;
-	// int output_size = 0;
-	uint32_t block_hdr[2];
+int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
+{
+	SHA256_CTX sha2;
+	int i, new_input_len = input_len + 1; // extra byte for prefix
+	uint8_t first_block = 0;
+	uint8_t new_input[new_input_len+1];
 
-	/* Compute an arbitrary number of SHA1 hashes of the form:
-	 * output_buf[0...19] = SHA1(hash_num || 0 || input_buf)
-	 * output_buf[20..39] = SHA1(hash_num || 1 || output_buf[0...19])
-	 * ...
-	 */
-	block_hdr[0] = hash_num;
-	for (block_hdr[1] = 0; hash_size > 0; (block_hdr[1])++) {
-		/* Initialize the SHA1 function.	*/
-		SHA1Reset(&sha_context);
+	memset(new_input, 0, new_input_len);
+	new_input[0] = first_block; // block number (always 0 by default)
+	new_input[1] = hash_prefix; // set hash prefix
+	memcpy((uint8_t *)(new_input+2), input_buf, input_len); // copy input bytes
 
-		SHA1Input(&sha_context, (uint8_t *) &(block_hdr[0]), sizeof(block_hdr));
-		SHA1Input(&sha_context, (uint8_t *) input_buf, input_len);
+	debug("new input => \n");
+	printf_buffer_as_hex(new_input, new_input_len);
+	// prepare output buf
+	memset(output_buf, 0, hash_len);
 
-		SHA1Result(&sha_context);
-		if (hash_size <= HASH_LEN) {
-			memcpy(output_buf, sha_context.Message_Digest, hash_size);
-			hash_size = 0;
-		} else {
-			memcpy(output_buf, sha_context.Message_Digest, HASH_LEN);
-			input_buf = (uint8_t *) output_buf;
-			hash_size -= HASH_LEN;
-			output_buf += HASH_LEN;
+	if (hash_len <= HASH_LEN) {
+		SHA256_Init(&sha2);
+		SHA256_Update(&sha2, new_input, new_input_len);
+		uint8_t md[HASH_LEN+1];
+		SHA256_Final(md, &sha2);
+		memcpy(output_buf, md, hash_len);
+	}
+	else {
+		// apply variable-size hash technique to get desired size
+		// determine block count.
+		int blocks = (int) ceil(((double) hash_len) / HASH_LEN);
+		debug("Num blocks needed: %d\n", blocks);
+		uint8_t md[HASH_LEN+1];
+		uint8_t md2[(blocks * HASH_LEN)+1];
+		uint8_t *target_buf = md2;
+		for(i = 0; i < blocks; i++) {
+			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
+			target_buf += (i * HASH_LEN);
+			new_input[0] = (uint8_t) i;
+			SHA256_Init(&sha2);
+			debug("input %d => ", i);
+			printf_buffer_as_hex(new_input, new_input_len);
+			SHA256_Update(&sha2, new_input, new_input_len);
+			SHA256_Final(md, &sha2);
+			memcpy(target_buf, md, hash_len);
+			debug("block %d => ", i);
+			printf_buffer_as_hex(md, HASH_LEN);
+			memset(md, 0, HASH_LEN);
 		}
+		// copy back to caller
+		memcpy(output_buf, md2, hash_len);
 	}
 
+	OPENSSL_cleanse(&sha2,sizeof(sha2));
 	return TRUE;
 }
+
 
 int hash_to_group_element(mpz_t x, int block_num, uint8_t *output_buf) {
 
@@ -273,11 +292,11 @@ int hash_to_group_element(mpz_t x, int block_num, uint8_t *output_buf) {
 		debug("tmp_buf after strcat...\n");
 		printf_buffer_as_hex(tmp_buf, len);
 
-		hash_to_bytes(tmp_buf, len, HASH_LEN, output_buf,
+		hash_to_bytes(tmp_buf, len, output_buf, HASH_LEN,
 				HASH_FUNCTION_KEM_DERIVE);
 		free(tmp_buf);
 	} else {
-		hash_to_bytes(rop_buf, (int) count, HASH_LEN, output_buf,
+		hash_to_bytes(rop_buf, (int) count, output_buf, HASH_LEN,
 				HASH_FUNCTION_KEM_DERIVE);
 	}
 
@@ -998,7 +1017,8 @@ leave:
 
 /*
  * Description: hash elements into a group element
- * inputs: group elements, p, q, and True or False (return value mod p when TRUE and value mod q when FALSE)
+ * inputs: group elements, p, q, and True or False
+ * (return value mod p when TRUE and value mod q when FALSE)
  */
 static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 	PyObject *object, *order, *order2;
@@ -1073,7 +1093,7 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 
 			// hash the buffer
 			uint8_t hash_buf2[HASH_LEN + 1];
-			hash_to_bytes(rop_buf, o_size, HASH_LEN, hash_buf2,
+			hash_to_bytes(rop_buf, o_size, hash_buf2, HASH_LEN,
 					HASH_FUNCTION_KEM_DERIVE);
 			free(rop_buf);
 
@@ -1161,7 +1181,7 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 
 			// hash the buffer
 			uint8_t hash_buf[HASH_LEN + 1];
-			hash_to_bytes(rop_buf, (int) count, HASH_LEN, hash_buf,
+			hash_to_bytes(rop_buf, (int) count, hash_buf, HASH_LEN,
 					HASH_FUNCTION_KEM_DERIVE);
 
 			// mpz_import hash to a element from 1 to q-1 inclusive.

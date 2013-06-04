@@ -38,18 +38,18 @@
 #include <math.h>
 #include <string.h>
 #include <gmp.h>
-#include "sha1.h"
 #include "benchmarkmodule.h"
 #include "base64.h"
 /* used to initialize the RNG */
 #include "openssl/objects.h"
 #include "openssl/rand.h"
 #include "openssl/bn.h"
+#include "openssl/sha.h"
 
 /* integermath */
-#define MAX_RUN 20
-#define HASH_LEN 20
-#define MSG_LEN 128
+#define MAX_RUN  	25
+#define HASH_LEN 	SHA256_DIGEST_LENGTH
+#define MSG_LEN  	128
 
 #define ErrorMsg(msg) \
 	PyErr_SetString(IntegerError, msg); \

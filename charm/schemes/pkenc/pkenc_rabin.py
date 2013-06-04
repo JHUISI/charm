@@ -105,19 +105,19 @@ class Rabin_Enc(Rabin,PKEnc):
         m4 = s2 % int(sk['N'])
 
         if(self.paddingscheme.name == "SAEPEncryptionPadding"):        
-            if(m1 < int(sk['N']/2)):
+            if(m1 < integer(int(sk['N'])//2)):
                 os1 = Conversion.IP2OS(int(m1))
-                if(m2 < int(sk['N']/2)):
+                if(m2 < integer(int(sk['N'])//2)):
                     os2 = Conversion.IP2OS(int(m2))
                 else:
-                    if(m3 < int(sk['N']/2)):
+                    if(m3 < integer(int(sk['N'])//2)):
                         os2 = Conversion.IP2OS(int(m3))
                     else:
                         os2 = Conversion.IP2OS(int(m4))
             else:
-                if(m2 < int(sk['N']/2)):
+                if(m2 < integer(int(sk['N'])//2)):
                     os1 = Conversion.IP2OS(int(m2))
-                    if(m3 < int(sk['N']/2)):
+                    if(m3 < integer(int(sk['N'])//2)):
                         os2 = Conversion.IP2OS(int(m3))
                     else:
                         os2 = Conversion.IP2OS(int(m4))
@@ -231,4 +231,13 @@ class Rabin_Sig(Rabin, PKSig):
 
         return (dec_mess == M)
     
-    
+def main():
+    rabin = Rabin_Enc()
+    (public_key, secret_key) = rabin.keygen(128, 1024)
+    msg = b'This is a test'
+    cipher_text = rabin.encrypt(public_key, msg)
+    decrypted_msg = rabin.decrypt(public_key, secret_key, cipher_text)
+    print(decrypted_msg == msg)
+
+if __name__ == "__main__":
+    main()   
