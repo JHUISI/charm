@@ -105,19 +105,19 @@ class Rabin_Enc(Rabin,PKEnc):
         m4 = s2 % int(sk['N'])
 
         if(self.paddingscheme.name == "SAEPEncryptionPadding"):        
-            if(m1 < integer(int(sk['N'])//2)):
+            if(m1 < integer(int(sk['N'])/2)):
                 os1 = Conversion.IP2OS(int(m1))
-                if(m2 < integer(int(sk['N'])//2)):
+                if(m2 < integer(int(sk['N'])/2)):
                     os2 = Conversion.IP2OS(int(m2))
                 else:
-                    if(m3 < integer(int(sk['N'])//2)):
+                    if(m3 < integer(int(sk['N'])/2)):
                         os2 = Conversion.IP2OS(int(m3))
                     else:
                         os2 = Conversion.IP2OS(int(m4))
             else:
-                if(m2 < integer(int(sk['N'])//2)):
+                if(m2 < integer(int(sk['N'])/2)):
                     os1 = Conversion.IP2OS(int(m2))
-                    if(m3 < integer(int(sk['N'])//2)):
+                    if(m3 < integer(int(sk['N'])/2)):
                         os2 = Conversion.IP2OS(int(m3))
                     else:
                         os2 = Conversion.IP2OS(int(m4))
