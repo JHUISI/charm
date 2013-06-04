@@ -1363,9 +1363,11 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 		// make sure it is a point and not a scalar
 		if(PyEC_Check(obj) && isPoint(obj)) {
 			BIGNUM *x = BN_new(), *y = BN_new();
-			// TODO: verify that element is on the curve before getting coordinates
+			// verifies that element is on the curve then gets coordinates
 			EC_POINT_get_affine_coordinates_GFp(gobj->ec_group, obj->P, x, y, gobj->ctx);
 
+			int max_byte_len = BN_num_bytes(gobj->order) - RESERVED_ENCODING_BYTES;
+			debug("Size of order => '%d'\n", max_byte_len);
 			int x_len = BN_num_bytes(x);
 			uint8_t *xstr = (uint8_t*) malloc(x_len + 1);
 			memset(xstr, 0, x_len);
@@ -1373,27 +1375,19 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 			BN_bn2bin(x, xstr);
 			debug("Decoded x => ");
 			printf_buffer_as_hex((uint8_t *) xstr, x_len);
-
-//			printf_buffer_as_hex((uint8_t *) xstr, x_len-sizeof(uint32_t));
-//			uint8_t msg[x_len-sizeof(uint32_t) + 1];
-//			strncpy((char *) msg, (char *) xstr, x_len-sizeof(uint32_t));
-
 			BN_free(x);
 			BN_free(y);
 
-			// TODO: redo this portion
-			// int size_msg = msg[0];
-			int size_msg = xstr[0];  // first byte should be length of string and can throw away the rest.
-//			char m[129];
-//			*m = '\0';
-//			strncat(m, (char*)(msg+1), size_msg);
-			char m[129];
-			*m = '\0';
-			strncat(m, (char*)(xstr+1), size_msg);
+			int size_msg = xstr[0];  // first byte should be length of string
+			debug("size_msg to decode = '%d'\n", size_msg);
+			if(size_msg > max_byte_len) {
+				OPENSSL_free(xstr);
+				EXIT_IF(TRUE, "unable to decode this message.\n");
+			}
 
+			PyObject *decObj = PyBytes_FromStringAndSize((char *)(xstr + 1), size_msg);
 			OPENSSL_free(xstr);
-			//return PyUnicode_FromFormat("%s", m);
-			return PyBytes_FromStringAndSize(m, size_msg);
+			return decObj;
 		}
 	}
 
@@ -1409,17 +1403,14 @@ static PyObject *Serialize(ECElement *self, PyObject *args) {
 		return NULL;
 	}
 
-
 	if(obj != NULL && PyEC_Check(obj)) {
 		// allows export a compressed string
 		if(obj->point_init && obj->type == G) {
 			uint8_t p_buf[MAX_BUF+1];
 			memset(p_buf, 0, MAX_BUF);
-			//START_CLOCK(dBench);
 			size_t len = EC_POINT_point2oct(obj->group->ec_group, obj->P, POINT_CONVERSION_COMPRESSED,  p_buf, MAX_BUF, obj->group->ctx);
 			EXIT_IF(len == 0, "could not serialize point.");
 
-			//STOP_CLOCK(dBench);
 			debug("Serialized point => ");
 			printf_buffer_as_hex(p_buf, len);
 			size_t length = 0;

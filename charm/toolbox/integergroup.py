@@ -17,7 +17,12 @@ class IntegerGroup:
         else:
             print("p and q are not safe primes!")
         return False
-
+    
+    def __str__(self):
+        outStr = ""
+        outStr += "p = " + str(self.p) + "\n"
+        outStr += "q = " + str(self.q) + "\n"
+        return outStr
         
     def paramgen(self, bits, r=2):
         # determine which group
@@ -81,6 +86,21 @@ class IntegerGroup:
 class IntegerGroupQ:
     def __init__(self, start=0):
         pass
+
+    def __str__(self):
+        outStr = ""
+        outStr += "p = " + str(self.p) + "\n"
+        outStr += "q = " + str(self.q) + "\n"
+        return outStr
+
+    def setparam(self, p, q): 
+        if p == (2 * q) + 1 and isPrime(p) and isPrime(q):
+            self.p = integer(p)
+            self.q = integer(q)
+            return True
+        else:
+            print("p and q are not safe primes!")
+        return False
         
     def paramgen(self, bits, r=2):
         # determine which group
@@ -151,15 +171,24 @@ class IntegerGroupQ:
 class RSAGroup:
     def __init__(self):
         self.p = self.q = self.n = 0
+
+    def __str__(self):
+        outStr = ""
+        outStr += "p = " + str(self.p) + "\n"
+        outStr += "q = " + str(self.q) + "\n"
+        outStr += "N = " + str(self.n) + "\n"
+        return outStr
     
     def paramgen(self, secparam):
         while True:
            p, q = randomPrime(secparam), randomPrime(secparam)
            if isPrime(p) and isPrime(q) and gcd(p * q, (p - 1) * (q - 1)) == 1:
               break
+        n = p * q
         self.p = p
         self.q = q
-        return (p, q, p * q)    
+        self.n = n
+        return (p, q, n)
 
     def setparam(self, p, q): 
         if isPrime(p) and isPrime(q) and p != q:
