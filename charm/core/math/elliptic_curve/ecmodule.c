@@ -318,6 +318,25 @@ PyObject *ECElement_call(ECElement *intObject, PyObject *args, PyObject *kwds) {
 	return NULL;
 }
 
+PyObject *ECGroup_print(ECGroup *self) {
+	if(!self->group_init)
+		return PyUnicode_FromString("");
+	BIGNUM *p = BN_new(), *a = BN_new(), *b = BN_new();
+	EC_GROUP_get_curve_GFp(self->ec_group, p, a, b, self->ctx);
+
+	const char *id;
+	if(self->nid == -1) id = "custom";
+	else id = OBJ_nid2sn(self->nid);
+	char *pstr = BN_bn2dec(p);
+	char *astr = BN_bn2dec(a);
+	char *bstr = BN_bn2dec(b);
+	PyObject *strObj = PyUnicode_FromFormat("Curve '%s' => y^2 = x^3 + a*x + b  (mod p):\np = %s\na = %s\nb = %s", id, (const char *) pstr,
+											(const char *) astr, (const char *) bstr);
+	OPENSSL_free(pstr); OPENSSL_free(astr); OPENSSL_free(bstr);
+	BN_free(p); BN_free(a); BN_free(b);
+	return strObj;
+}
+
 PyObject *ECElement_print(ECElement *self) {
 	if(self->type == ZR) {
 		if(!self->point_init)
@@ -345,27 +364,27 @@ PyObject *ECElement_print(ECElement *self) {
 		BN_free(y);
 		return strObj;
 	}
-	else {
-		/* must be group object */
-		if(!self->group->group_init)
-			return PyUnicode_FromString("");
-		BIGNUM *p = BN_new(), *a = BN_new(), *b = BN_new();
-		Group_Init(self->group);
-
-		EC_GROUP_get_curve_GFp(self->group->ec_group, p, a, b, self->group->ctx);
-
-		const char *id;
-		if(self->group->nid == -1) id = "custom";
-		else id = OBJ_nid2sn(self->group->nid);
-		char *pstr = BN_bn2dec(p);
-		char *astr = BN_bn2dec(a);
-		char *bstr = BN_bn2dec(b);
-		PyObject *strObj = PyUnicode_FromFormat("Curve '%s' => y^2 = x^3 + a*x + b  (mod p):\np = %s\na = %s\nb = %s", id, (const char *) pstr,
-												(const char *) astr, (const char *) bstr);
-		OPENSSL_free(pstr); OPENSSL_free(astr); OPENSSL_free(bstr);
-		BN_free(p); BN_free(a); BN_free(b);
-		return strObj;
-	}
+//	else {
+//		/* must be group object */
+//		if(!self->group->group_init)
+//			return PyUnicode_FromString("");
+//		BIGNUM *p = BN_new(), *a = BN_new(), *b = BN_new();
+//		Group_Init(self->group);
+//
+//		EC_GROUP_get_curve_GFp(self->group->ec_group, p, a, b, self->group->ctx);
+//
+//		const char *id;
+//		if(self->group->nid == -1) id = "custom";
+//		else id = OBJ_nid2sn(self->group->nid);
+//		char *pstr = BN_bn2dec(p);
+//		char *astr = BN_bn2dec(a);
+//		char *bstr = BN_bn2dec(b);
+//		PyObject *strObj = PyUnicode_FromFormat("Curve '%s' => y^2 = x^3 + a*x + b  (mod p):\np = %s\na = %s\nb = %s", id, (const char *) pstr,
+//												(const char *) astr, (const char *) bstr);
+//		OPENSSL_free(pstr); OPENSSL_free(astr); OPENSSL_free(bstr);
+//		BN_free(p); BN_free(a); BN_free(b);
+//		return strObj;
+//	}
 
 	return (PyObject *) PyUnicode_FromString("");
 }
@@ -1720,7 +1739,7 @@ PyTypeObject ECGroupType = {
 	0,                         /*tp_getattr*/
 	0,                         /*tp_setattr*/
 	0,			   				/*tp_reserved*/
-	0, /*tp_repr*/
+    (reprfunc)ECGroup_print,   /*tp_str*/
 	0,               /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/
