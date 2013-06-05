@@ -27,25 +27,13 @@ class PairingGroup():
  
         self.secparam = secparam # number of bits
         self._verbose = False
-
+    
+    def __str__(self):
+        return str(self.Pairing)
+    
     # will be used to define curve parameters and such
     def paramgen(self, qbits, rbits):
         return None
-
-#        if type(obj) in [set, tuple, list]:
-#           for i in obj:
-#               if type(i) == pairing:
-#                  if ismember(self.Pairing, i) == False: return False 
-#           return True
-#        elif type(obj) == dict:
-#           for i in obj.keys():
-#               if type(i) == pairing:
-#                  if ismember(self.Pairing, obj[i]) == False: return False
-#           return True
-#        else:
-#           if type(obj) == pairing:
-#               return ismember(self.Pairing, obj)
-#           return None # ignore non-pairing types
 
     def ismember(self, obj):
 #        assert type(obj) == pairing, "not a pairing object."

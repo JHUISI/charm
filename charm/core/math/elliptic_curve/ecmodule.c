@@ -318,6 +318,25 @@ PyObject *ECElement_call(ECElement *intObject, PyObject *args, PyObject *kwds) {
 	return NULL;
 }
 
+PyObject *ECGroup_print(ECGroup *self) {
+	if(!self->group_init)
+		return PyUnicode_FromString("");
+	BIGNUM *p = BN_new(), *a = BN_new(), *b = BN_new();
+	EC_GROUP_get_curve_GFp(self->ec_group, p, a, b, self->ctx);
+
+	const char *id;
+	if(self->nid == -1) id = "custom";
+	else id = OBJ_nid2sn(self->nid);
+	char *pstr = BN_bn2dec(p);
+	char *astr = BN_bn2dec(a);
+	char *bstr = BN_bn2dec(b);
+	PyObject *strObj = PyUnicode_FromFormat("Curve '%s' => y^2 = x^3 + a*x + b  (mod p):\np = %s\na = %s\nb = %s", id, (const char *) pstr,
+											(const char *) astr, (const char *) bstr);
+	OPENSSL_free(pstr); OPENSSL_free(astr); OPENSSL_free(bstr);
+	BN_free(p); BN_free(a); BN_free(b);
+	return strObj;
+}
+
 PyObject *ECElement_print(ECElement *self) {
 	if(self->type == ZR) {
 		if(!self->point_init)
@@ -343,27 +362,6 @@ PyObject *ECElement_print(ECElement *self) {
 		OPENSSL_free(ystr);
 		BN_free(x);
 		BN_free(y);
-		return strObj;
-	}
-	else {
-		/* must be group object */
-		if(!self->group->group_init)
-			return PyUnicode_FromString("");
-		BIGNUM *p = BN_new(), *a = BN_new(), *b = BN_new();
-		Group_Init(self->group);
-
-		EC_GROUP_get_curve_GFp(self->group->ec_group, p, a, b, self->group->ctx);
-
-		const char *id;
-		if(self->group->nid == -1) id = "custom";
-		else id = OBJ_nid2sn(self->group->nid);
-		char *pstr = BN_bn2dec(p);
-		char *astr = BN_bn2dec(a);
-		char *bstr = BN_bn2dec(b);
-		PyObject *strObj = PyUnicode_FromFormat("Curve '%s' => y^2 = x^3 + a*x + b  (mod p):\np = %s\na = %s\nb = %s", id, (const char *) pstr,
-												(const char *) astr, (const char *) bstr);
-		OPENSSL_free(pstr); OPENSSL_free(astr); OPENSSL_free(bstr);
-		BN_free(p); BN_free(a); BN_free(b);
 		return strObj;
 	}
 
@@ -474,7 +472,6 @@ static PyObject *ECE_is_infinity(ECElement *self, PyObject *args) {
 
 static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
-//	BIGNUM *order = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
 
 	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
@@ -486,7 +483,6 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 			BIGNUM *lhs_val = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
 			ans = createNewPoint(ZR, rhs->group);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_add(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
 #ifdef BENCHMARK_ENABLED
@@ -502,7 +498,6 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 			BIGNUM *rhs_val = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
 			ans = createNewPoint(ZR, lhs->group); // ->group, lhs->ctx);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_add(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
 #ifdef BENCHMARK_ENABLED
@@ -520,7 +515,6 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 			IS_SAME_GROUP(lhs, rhs);
 			// easy, just call BN_add
 			ans = createNewPoint(ZR, lhs->group);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_add(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(ADDITION, dBench);
@@ -571,7 +565,6 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 			BIGNUM *rhs_val = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
 			ans = createNewPoint(ZR, lhs->group);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
 #ifdef BENCHMARK_ENABLED
@@ -588,7 +581,6 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 		if(ElementZR(lhs, rhs)) {
 			IS_SAME_GROUP(lhs, rhs);
 			ans = createNewPoint(ZR, lhs->group);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(SUBTRACTION, dBench);
@@ -619,7 +611,6 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 			BIGNUM *lhs_val = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
 			ans = createNewPoint(ZR, rhs->group);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_mul(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
 #ifdef BENCHMARK_ENABLED
@@ -636,7 +627,6 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 			BIGNUM *rhs_val = BN_new();
 			setBigNum((PyLongObject *) o2, &rhs_val);
 			ans = createNewPoint(ZR, lhs->group); // ->group, lhs->ctx);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
 #ifdef BENCHMARK_ENABLED
@@ -657,7 +647,6 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 		}
 		else if(ElementZR(lhs, rhs)) {
 			ans = createNewPoint(ZR, lhs->group);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 		}
 		else {
@@ -806,7 +795,6 @@ static PyObject *ECE_rem(PyObject *o1, PyObject *o2) {
 
 static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	ECElement *lhs = NULL, *rhs = NULL, *ans = NULL;
-//	BIGNUM *order = NULL;
 	int foundLHS = FALSE, foundRHS = FALSE;
 
 	Check_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS);
@@ -817,7 +805,6 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			BIGNUM *lhs_val = BN_new();
 			setBigNum((PyLongObject *) o1, &lhs_val);
 			ans = createNewPoint(ZR, rhs->group);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_exp(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
 #ifdef BENCHMARK_ENABLED
@@ -839,7 +826,6 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 					setBigNum((PyLongObject *) o2, &rhs_val);
 
 					ans = createNewPoint(ZR, lhs->group);
-//					EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 					BN_mod_exp(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 					BN_free(rhs_val);
 			}
@@ -860,8 +846,6 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 					setBigNum((PyLongObject *) o2, &rhs_val);
 					ans = createNewPoint(G, lhs->group); // ->group, lhs->ctx);
 					EC_POINT_mul(ans->group->ec_group, ans->P, NULL, lhs->P, rhs_val, ans->group->ctx);
-
-//					ans = ec_point_mul(lhs->group, lhs->P, rhs_val, lhs->ctx);
 			}
 			else if(rhs == -1) {
 				debug("finding modular inverse.\n");
@@ -891,7 +875,6 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 		}
 		else if(ElementZR(lhs, rhs)) {
 			ans = createNewPoint(ZR, lhs->group);
-//			EC_GROUP_get_order(ans->group->ec_group, order, ans->group->ctx);
 			BN_mod_exp(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 		}
 		else {
@@ -920,19 +903,14 @@ ECElement *invertECElement(ECElement *self) {
 	}
 	else if(self->type == ZR) {
 		// get modulus and compute mod_inverse
-//		BIGNUM *p = BN_new();
-//		EC_GROUP_get_order(self->group->ec_group, p, self->group->ctx);
 		BIGNUM *x = BN_mod_inverse(NULL, self->elemZ, self->group->order, self->group->ctx);
 		if(x != NULL) {
 			newObj = createNewPoint(ZR, self->group);
 			BN_copy(newObj->elemZ, x);
 			BN_free(x);
-//			BN_free(p);
 			return newObj;
 		}
 		Py_XDECREF(newObj);
-//		BN_free(p);
-
 	}
 	/* error */
 	return NULL;
@@ -1285,8 +1263,6 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 			EXIT_IF(TRUE, "message not a bytes object");
 		}
 		// make sure msg will fit into group (get order num bits / 8)
-//		BIGNUM *order = BN_new();
-//		EC_GROUP_get_order(gobj->ec_group, order, NULL);
 		int max_len = (BN_num_bits(gobj->order) / BYTE);
 		debug("max msg len => '%d'\n", max_len);
 
@@ -1296,8 +1272,6 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 		msg_len = msg_len + 1; //we added an extra byte
 
 		debug("msg_len accepted => '%d'\n", msg_len);
-//		BN_free(order);
-
 		if(bits > 0) {
 			debug("bits were specified.\n");
 		}
@@ -1389,9 +1363,11 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 		// make sure it is a point and not a scalar
 		if(PyEC_Check(obj) && isPoint(obj)) {
 			BIGNUM *x = BN_new(), *y = BN_new();
-			// TODO: verify that element is on the curve before getting coordinates
+			// verifies that element is on the curve then gets coordinates
 			EC_POINT_get_affine_coordinates_GFp(gobj->ec_group, obj->P, x, y, gobj->ctx);
 
+			int max_byte_len = BN_num_bytes(gobj->order) - RESERVED_ENCODING_BYTES;
+			debug("Size of order => '%d'\n", max_byte_len);
 			int x_len = BN_num_bytes(x);
 			uint8_t *xstr = (uint8_t*) malloc(x_len + 1);
 			memset(xstr, 0, x_len);
@@ -1399,27 +1375,19 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 			BN_bn2bin(x, xstr);
 			debug("Decoded x => ");
 			printf_buffer_as_hex((uint8_t *) xstr, x_len);
-
-//			printf_buffer_as_hex((uint8_t *) xstr, x_len-sizeof(uint32_t));
-//			uint8_t msg[x_len-sizeof(uint32_t) + 1];
-//			strncpy((char *) msg, (char *) xstr, x_len-sizeof(uint32_t));
-
 			BN_free(x);
 			BN_free(y);
 
-			// TODO: redo this portion
-			// int size_msg = msg[0];
-			int size_msg = xstr[0];  // first byte should be length of string and can throw away the rest.
-//			char m[129];
-//			*m = '\0';
-//			strncat(m, (char*)(msg+1), size_msg);
-			char m[129];
-			*m = '\0';
-			strncat(m, (char*)(xstr+1), size_msg);
+			int size_msg = xstr[0];  // first byte should be length of string
+			debug("size_msg to decode = '%d'\n", size_msg);
+			if(size_msg > max_byte_len) {
+				OPENSSL_free(xstr);
+				EXIT_IF(TRUE, "unable to decode this message.\n");
+			}
 
+			PyObject *decObj = PyBytes_FromStringAndSize((char *)(xstr + 1), size_msg);
 			OPENSSL_free(xstr);
-			//return PyUnicode_FromFormat("%s", m);
-			return PyBytes_FromStringAndSize(m, size_msg);
+			return decObj;
 		}
 	}
 
@@ -1435,17 +1403,14 @@ static PyObject *Serialize(ECElement *self, PyObject *args) {
 		return NULL;
 	}
 
-
 	if(obj != NULL && PyEC_Check(obj)) {
 		// allows export a compressed string
 		if(obj->point_init && obj->type == G) {
 			uint8_t p_buf[MAX_BUF+1];
 			memset(p_buf, 0, MAX_BUF);
-			//START_CLOCK(dBench);
 			size_t len = EC_POINT_point2oct(obj->group->ec_group, obj->P, POINT_CONVERSION_COMPRESSED,  p_buf, MAX_BUF, obj->group->ctx);
 			EXIT_IF(len == 0, "could not serialize point.");
 
-			//STOP_CLOCK(dBench);
 			debug("Serialized point => ");
 			printf_buffer_as_hex(p_buf, len);
 			size_t length = 0;
@@ -1720,7 +1685,7 @@ PyTypeObject ECGroupType = {
 	0,                         /*tp_getattr*/
 	0,                         /*tp_setattr*/
 	0,			   				/*tp_reserved*/
-	0, /*tp_repr*/
+    (reprfunc)ECGroup_print,   /*tp_str*/
 	0,               /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/

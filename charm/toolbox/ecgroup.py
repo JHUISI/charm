@@ -13,6 +13,9 @@ class ECGroup():
         self.param = builtin_cv
         self._verbose = True
 
+    def __str__(self):
+        return str(self.ec_group)
+
     def order(self):
         return order(self.ec_group)
 
