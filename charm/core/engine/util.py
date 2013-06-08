@@ -2,39 +2,39 @@ import io, pickle
 import json, zlib
 from base64 import *
 
-def serializeDict(object, group):
+def serializeDict(Object, group):
     bytes_object = {}
     if not hasattr(group, 'serialize'):
         return None
-    if isinstance(object, dict):
-        for i in object.keys():
+    if isinstance(Object, dict):
+        for i in Object.keys():
             # check the type of the object[i]
-            if type(object[i]) in [str, int]:
-                bytes_object[i] = object[i] # don't convert to bytes, if string
-            elif type(object[i]) == dict:
-                bytes_object[i] = serializeDict(object[i], group) #; print("dict found in ser => '%s'" % i); 
-            elif type(object[i]) == list:
-                bytes_object[i] = serializeList(object[i], group)                           
-            elif type(object[i]) == bytes:
-                tmp = b'bytes'+object[i]
+            if type(Object[i]) in [str, int]:
+                bytes_object[i] = Object[i] # don't convert to bytes, if string
+            elif type(Object[i]) == dict:
+                bytes_object[i] = serializeDict(Object[i], group) #; print("dict found in ser => '%s'" % i); 
+            elif type(Object[i]) == list:
+                bytes_object[i] = serializeList(Object[i], group)                           
+            elif type(Object[i]) == bytes:
+                tmp = b'bytes'+Object[i]
                 bytes_object[i] = tmp
             else: # typically group object
                #print("DEBUG = k: %s, v: %s" % (i, object[i]))
-                bytes_object[i] = group.serialize(object[i])
+                bytes_object[i] = group.serialize(Object[i])
         return bytes_object
     else:
         # just one bytes object and it's a string
-        if type(object) == str: return bytes(object, 'utf8')
-        else: return group.serialize(object)
+        if type(Object) == str: return bytes(Object, 'utf8')
+        else: return group.serialize(Object)
 
-def serializeList(object, group):
+def serializeList(Object, group):
     bytes_object_ = []
     if not hasattr(group, 'serialize'):
         return None
     
-    if type(object) == list:
-        for i in object:
-            # check the type of the object[i]
+    if type(Object) == list:
+        for i in Object:
+            # check the type of the Object[i]
             if type(i) in [str, int]:
                 bytes_object_.append(i)
             elif type(i) == dict:
@@ -48,9 +48,9 @@ def serializeList(object, group):
                #print("DEBUG = k: %s, v: %s" % (i, object[i]))
                 bytes_object_.append(group.serialize(i))
         return bytes_object_
-    elif type(object) == tuple:
-        for i in object:
-            # check the type of the object[i]
+    elif type(Object) == tuple:
+        for i in Object:
+            # check the type of the Object[i]
             if type(i) in [str, int]:
                 bytes_object_.append(i)
             elif type(i) == dict:
@@ -66,55 +66,55 @@ def serializeList(object, group):
         return tuple(bytes_object_)
     else:
         # just one bytes object and it's a string
-        if type(object) == str: 
-           return b'str:' + bytes(object, 'utf8')
-        elif type(object) == bytes:
-           return b'byte:' + object 
-        else: return group.serialize(object)
+        if type(Object) == str: 
+           return b'str:' + bytes(Object, 'utf8')
+        elif type(Object) == bytes:
+           return b'byte:' + Object 
+        else: return group.serialize(Object)
 
-def serializeObject(objects, group):
-    if type(objects) == dict: 
-       return serializeDict(objects, group)
+def serializeObject(Objects, group):
+    if type(Objects) == dict: 
+       return serializeDict(Objects, group)
     # handles lists, tuples, sets, and even individual elements
     else: 
-       return serializeList(objects, group)
+       return serializeList(Objects, group)
 
 
-def deserializeDict(object, group):
+def deserializeDict(Object, group):
     bytes_object = {}
     if not hasattr(group, 'deserialize'):
        return None
 
-    if type(object) == dict:    
-        for i in object.keys():
-            _type = type(object[i])
+    if type(Object) == dict:    
+        for i in Object.keys():
+            _type = type(Object[i])
             if _type == bytes:
-                if(object[i][:5] == b'bytes'):
-                    bytes_object[i] = object[i][5:]
+                if(Object[i][:5] == b'bytes'):
+                    bytes_object[i] = Object[i][5:]
                 else:
-                    bytes_object[i] = group.deserialize(object[i])
+                    bytes_object[i] = group.deserialize(Object[i])
             elif _type == dict:
-                bytes_object[i] = deserializeDict(object[i], group) # ; print("dict found in des => '%s'" % i);
+                bytes_object[i] = deserializeDict(Object[i], group) # ; print("dict found in des => '%s'" % i);
             elif _type == list:
-                bytes_object[i] = deserializeList(object[i], group)
+                bytes_object[i] = deserializeList(Object[i], group)
             elif _type == str:
-                bytes_object[i] = object[i]
+                bytes_object[i] = Object[i]
             elif _type == int:
-                bytes_object[i] = object[i]
+                bytes_object[i] = Object[i]
         return bytes_object
-    elif type(object) == bytes:
-        return group.deserialize(object)
+    elif type(Object) == bytes:
+        return group.deserialize(Object)
     else:
-        # just one bytes object
-        return object
+        # just one bytes Object
+        return Object
     
-def deserializeList(object, group):
+def deserializeList(Object, group):
     _bytes_object = []
     if not hasattr(group, 'deserialize'):
        return None
 
-    if type(object) == list:
-        for i in object:
+    if type(Object) == list:
+        for i in Object:
             _typeL = type(i)
             if _typeL == bytes:
                 if(i[:5] == b'bytes'):
@@ -130,8 +130,8 @@ def deserializeList(object, group):
             elif _typeL == int:
                 _bytes_object.append(i)
         return _bytes_object
-    elif type(object) == tuple:
-        for i in object:
+    elif type(Object) == tuple:
+        for i in Object:
             _typeL = type(i)
             if _typeL == bytes:
                 if(i[:5] == b'bytes'):
@@ -149,39 +149,39 @@ def deserializeList(object, group):
         return tuple(_bytes_object)        
     else:
         delim = b':'
-        if type(object) == str and object.split(delim)[0] == b'str':
-            return bytes.decode(object.split(delim)[1])
-        elif type(object) == bytes and object.split(delim)[0] == b'byte':
-            return object.split(delim)[1] # keep as a byte object
-        # just one bytes object
-        return group.deserialize(object)
+        if type(Object) == str and Object.split(delim)[0] == b'str':
+            return bytes.decode(Object.split(delim)[1])
+        elif type(Object) == bytes and Object.split(delim)[0] == b'byte':
+            return Object.split(delim)[1] # keep as a byte Object
+        # just one bytes Object
+        return group.deserialize(Object)
         # return object
 
-def deserializeObject(objects, group):
-    if type(objects) == dict: return deserializeDict(objects, group)
-    else: return deserializeList(objects, group)
+def deserializeObject(Objects, group):
+    if type(Objects) == dict: return deserializeDict(Objects, group)
+    else: return deserializeList(Objects, group)
     
-def pickleObject(object):
+def pickleObject(Object):
     valid_types = [bytes, dict, list, str, int]    
     file = io.BytesIO()
     # check that dictionary is all bytes (if not, return None)
-    if isinstance(object, dict):
-        for k in object.keys():
-            _type = type(object[k])
+    if isinstance(Object, dict):
+        for k in Object.keys():
+            _type = type(Object[k])
             if not _type in valid_types:
-               print("DEBUG: pickleObject Error!!! only bytes or dictionaries of bytes accepted."); print("invalid type =>", type(object[k]))
+               print("DEBUG: pickleObject Error!!! only bytes or dictionaries of bytes accepted."); print("invalid type =>", type(Object[k]))
                return None
-    pickle.dump(object, file, pickle.HIGHEST_PROTOCOL)
+    pickle.dump(Object, file, pickle.HIGHEST_PROTOCOL)
     result = file.getvalue()
     encoded = b64encode(result)
     file.close()
     return encoded
 
-def unpickleObject(object):
-    if type(object) == str:
-       byte_object = bytes(object, 'utf-8')
-    elif type(object) == bytes:
-       byte_object = object
+def unpickleObject(Object):
+    if type(Object) == str:
+       byte_object = bytes(Object, 'utf-8')
+    elif type(Object) == bytes:
+       byte_object = Object
     else:
        return None
     decoded = b64decode(byte_object)
@@ -191,8 +191,8 @@ def unpickleObject(object):
 
 # Two new API calls to simplify serializing to a blob of bytes
 # objectToBytes() and bytesToObject()
-def objectToBytes(object, group):
-    object_ser = serializeObject(object, group)
+def objectToBytes(Object, group):
+    object_ser = serializeObject(Object, group)
     return pickleObject(object_ser)
     
 def bytesToObject(byteobject, group):

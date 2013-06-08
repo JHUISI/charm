@@ -36,7 +36,7 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
     >>> hashID = HashIDAdapter(ibe, group)    
     >>> ibsig = Sig_Generic_ibetosig_Naor01(hashID, group)
     >>> (master_public_key, master_secret_key) = ibsig.keygen()
-    >>> msg = "hello world!!!"
+    >>> msg = b"hello world!!!"
     >>> signature = ibsig.sign(master_secret_key, msg)
     >>> ibsig.verify(master_public_key, msg, signature) 
     True
@@ -63,9 +63,9 @@ class Sig_Generic_ibetosig_Naor01(PKSig):
         return (mpk, msk)
 
     def sign(self, sk, m):
+        assert type(m) in [str, bytes], "invalid message type!"
         return ibe.extract(sk, m)
 		
-    #TODO: this method does NOT validate the message it is given
     def verify(self, pk, m, sig):
         # Some IBE scheme support a native method for validating IBE keys.  Use this if it exists.
         if hasattr(ibe, 'verify'):

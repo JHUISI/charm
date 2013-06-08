@@ -1877,7 +1877,7 @@ void initelliptic_curve(void) 		{
 #endif
 
 	Py_INCREF(&ECType);
-	if(PyModule_AddObject(m, "ec_params", (PyObject *)&ECType) != 0)
+	if(PyModule_AddObject(m, "ec_element", (PyObject *)&ECType) != 0)
 		CLEAN_EXIT;
     Py_INCREF(&ECGroupType);
     if(PyModule_AddObject(m, "elliptic_curve", (PyObject *)&ECGroupType) != 0)

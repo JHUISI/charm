@@ -1,11 +1,9 @@
 try:
-   from charm.core.math.elliptic_curve import elliptic_curve,ZR,G,init,random,order,getGenerator,bitsize,serialize,deserialize,hashEC,encode,decode,getXY
+   from charm.core.math.elliptic_curve import elliptic_curve,ec_element,ZR,G,init,random,order,getGenerator,bitsize,serialize,deserialize,hashEC,encode,decode,getXY
    #from charm.core.math.elliptic_curve import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,ClearBenchmark
 except Exception as err:
    print(err)
    exit(-1)
-
-ec_element = 'elliptic_curve.Element'
 
 class ECGroup():
     def __init__(self, builtin_cv):
@@ -56,7 +54,7 @@ class ECGroup():
         if isinstance(args, tuple):
             s = bytes()
             for i in args:
-                if ec_element in str(i.__class__):
+                if type(i) == ec_element:
                     s += serialize(i)
                 elif type(i) == str:
                     s += bytes(str(i), 'utf8')
@@ -68,7 +66,7 @@ class ECGroup():
             #print("s => %s" % s)
             assert len(s) != 0, "hash input is empty."
             return hashEC(self.ec_group, str(s), target_type)
-        elif ec_element in str(args.__class__): # type(args) == elliptic_curve:
+        elif type(args) == ec_element:
             msg = str(serialize(args))
             return hashEC(self.ec_group, msg, target_type)
         elif type(args) in [str, bytes]:
@@ -76,12 +74,12 @@ class ECGroup():
         raise Exception("ECGroup - invalid input for hash")
     
     def zr(self, point):
-        if ec_element in str(point.__class__): # type(point) == elliptic_curve:
+        if type(point) == ec_element:
             return getXY(self.ec_group, point, False)
         return None
 
     def coordinates(self, point):
-        if ec_element in str(point.__class__): # type(point) == elliptic_curve:
+        if type(point) == ec_element:
             return getXY(self.ec_group, point, True)
         
     def debug(self, data, prefix=None):

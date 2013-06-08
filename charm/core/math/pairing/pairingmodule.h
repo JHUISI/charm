@@ -51,7 +51,7 @@
 #define BYTE		8
 #define MAX_LEN 	2048
 #define HASH_LEN	SHA256_DIGEST_LENGTH
-#define ID_LEN   	4
+#define ID_LEN   	8
 #define MAX_BENCH_OBJECTS	2
 // define element_types
 enum Group {ZR = 0, G1, G2, GT, NONE_G};
@@ -89,21 +89,19 @@ PyNumberMethods element_number;
 typedef struct {
 	PyObject_HEAD
 	pbc_param_t p;
+	char *params;
+	char *param_buf;
 	pairing_t pair_obj;
-	int safe;
+	int group_init;
 	uint8_t hash_id[ID_LEN+1];
 } Pairing;
 
 typedef struct {
     PyObject_HEAD
-	char *params;
-	char *param_buf;
-
 	Pairing *pairing;
 	element_t e;
 	GroupType element_type;
     int elem_initialized;
-	int safe_pairing_clear;
 } Element;
 
 #ifdef BENCHMARK_ENABLED
@@ -147,11 +145,11 @@ typedef struct {
     else {  element_set_si(obj, (signed int) value); }
 
 #define VERIFY_GROUP(g) \
-	if(PyElement_Check(g) && g->safe_pairing_clear == FALSE) {	\
-		PyErr_SetString(ElementError, "invalid group object specified.");  \
+	if(PyPairing_Check(g) && g->group_init == FALSE) {	\
+		PyErr_SetString(ElementError, "Not a Pairing group object.");  \
 		return NULL;  } 	\
-	if(g->pairing == NULL) {	\
-		PyErr_SetString(ElementError, "pairing object is NULL.");	\
+	if(g->pair_obj == NULL) {	\
+		PyErr_SetString(ElementError, "Pairing object not initialized.");	\
 		return NULL;  }		\
 
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
