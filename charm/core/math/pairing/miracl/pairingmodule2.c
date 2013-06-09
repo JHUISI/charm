@@ -248,7 +248,7 @@ static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 	
 	retObject->elem_initialized = TRUE;
 	retObject->pairing = pairing;
-	retObject->safe_pairing_clear = FALSE;
+	Py_INCREF(retObject->pairing);
 	return retObject;	
 }
 
@@ -269,7 +269,7 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 
 void 	Pairing_dealloc(Pairing *self)
 {
-	if(self->safe) {
+	if(self->group_init) {
 		pairing_clear(self->pair_obj);
 		element_delete(pyZR_t, self->order);
 		self->pair_obj = NULL;
@@ -283,63 +283,120 @@ void	Element_dealloc(Element* self)
 {
 	// add reference count to objects
 	if(self->elem_initialized) {
-//		debug_e("Clear element_t => '%B'\n", self->e);
 		element_delete(self->element_type, self->e);
+		Py_DECREF(self->pairing);
 	}
 	
-	if(self->safe_pairing_clear) {
-		pairing_clear(self->pairing->pair_obj);
-		self->pairing->pair_obj = NULL;
-		element_delete(pyZR_t, self->pairing->order);
-		self->pairing->order = NULL;
-		PyObject_Del(self->pairing);
-	}
-
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
+
+///*!
+// * Hash a null-terminated string to a byte array.
+// *
+// * @param input_buf		The input buffer.
+// * @param input_len		The input buffer length (in bytes).
+// * @param hash_len		Length of the output hash (in bytes).
+// * @param output_buf	A pre-allocated output buffer.
+// * @param hash_num		Index number of the hash function to use (changes the output).
+// * @return				FENC_ERROR_NONE or an error code.
+// */
+//int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* output_buf, uint32_t hash_num)
+//{
+//	SHA1Context sha_context;
+//	// int output_size = 0;
+//	uint32_t block_hdr[2];
+//
+//	/* Compute an arbitrary number of SHA1 hashes of the form:
+//	 * output_buf[0...19] = SHA1(hash_num || 0 || input_buf)
+//	 * output_buf[20..39] = SHA1(hash_num || 1 || output_buf[0...19])
+//	 * ...
+//	 */
+//	block_hdr[0] = hash_num;
+//	for (block_hdr[1] = 0; hash_size > 0; (block_hdr[1])++) {
+//		/* Initialize the SHA1 function.	*/
+//		SHA1Reset(&sha_context);
+//
+//		SHA1Input(&sha_context, (unsigned char*)&(block_hdr[0]), sizeof(block_hdr));
+//		SHA1Input(&sha_context, (unsigned char *)input_buf, input_len);
+//
+//		SHA1Result(&sha_context);
+//		if (hash_size <= 20) {
+//			memcpy(output_buf, sha_context.Message_Digest, hash_size);
+//			hash_size = 0;
+//		} else {
+//			memcpy(output_buf, sha_context.Message_Digest, 20);
+//			input_buf = (uint8_t *) output_buf;
+//			hash_size -= 20;
+//			output_buf += 20;
+//		}
+//	}
+//
+//	return TRUE;
+//}
 
 /*!
  * Hash a null-terminated string to a byte array.
  *
  * @param input_buf		The input buffer.
  * @param input_len		The input buffer length (in bytes).
- * @param hash_len		Length of the output hash (in bytes).
- * @param output_buf	A pre-allocated output buffer.
- * @param hash_num		Index number of the hash function to use (changes the output).
- * @return				FENC_ERROR_NONE or an error code.
+ * @param output_buf	A pre-allocated output buffer of size hash_len.
+ * @param hash_len		Length of the output hash (in bytes). Should be approximately bit size of curve group order.
+ * @param hash_prefix	prefix for hash function.
  */
-int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* output_buf, uint32_t hash_num)
+int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA1Context sha_context;
-	// int output_size = 0;
-	uint32_t block_hdr[2];
+	SHA256_CTX sha2;
+	int i, new_input_len = input_len + 1; // extra byte for prefix
+	uint8_t first_block = 0;
+	uint8_t new_input[new_input_len+1];
+//	printf("orig input => \n");
+//	printf_buffer_as_hex(input_buf, input_len);
 
-	/* Compute an arbitrary number of SHA1 hashes of the form:
-	 * output_buf[0...19] = SHA1(hash_num || 0 || input_buf)
-	 * output_buf[20..39] = SHA1(hash_num || 1 || output_buf[0...19])
-	 * ...
-	 */
-	block_hdr[0] = hash_num;
-	for (block_hdr[1] = 0; hash_size > 0; (block_hdr[1])++) {
-		/* Initialize the SHA1 function.	*/
-		SHA1Reset(&sha_context);
+	memset(new_input, 0, new_input_len);
+	new_input[0] = first_block; // block number (always 0 by default)
+	new_input[1] = hash_prefix; // set hash prefix
+	memcpy((uint8_t *)(new_input+2), input_buf, input_len); // copy input bytes
 
-		SHA1Input(&sha_context, (unsigned char*)&(block_hdr[0]), sizeof(block_hdr));
-		SHA1Input(&sha_context, (unsigned char *)input_buf, input_len);
+//	printf("new input => \n");
+//	printf_buffer_as_hex(new_input, new_input_len);
+	// prepare output buf
+	memset(output_buf, 0, hash_len);
 
-		SHA1Result(&sha_context);
-		if (hash_size <= 20) {
-			memcpy(output_buf, sha_context.Message_Digest, hash_size);
-			hash_size = 0;
-		} else {
-			memcpy(output_buf, sha_context.Message_Digest, 20);
-			input_buf = (uint8_t *) output_buf;
-			hash_size -= 20;
-			output_buf += 20;
+	if (hash_len <= HASH_LEN) {
+		SHA256_Init(&sha2);
+		SHA256_Update(&sha2, new_input, new_input_len);
+		uint8_t md[HASH_LEN+1];
+		SHA256_Final(md, &sha2);
+		memcpy(output_buf, md, hash_len);
+	}
+	else {
+		// apply variable-size hash technique to get desired size
+		// determine block count.
+		int blocks = (int) ceil(((double) hash_len) / HASH_LEN);
+		debug("Num blocks needed: %d\n", blocks);
+		uint8_t md[HASH_LEN+1];
+		uint8_t md2[(blocks * HASH_LEN)+1];
+		uint8_t *target_buf = md2;
+		for(i = 0; i < blocks; i++) {
+			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
+			target_buf += (i * HASH_LEN);
+			new_input[0] = (uint8_t) i;
+			SHA256_Init(&sha2);
+			debug("input %d => ", i);
+			printf_buffer_as_hex(new_input, new_input_len);
+			SHA256_Update(&sha2, new_input, new_input_len);
+			SHA256_Final(md, &sha2);
+			memcpy(target_buf, md, hash_len);
+			debug("block %d => ", i);
+			printf_buffer_as_hex(md, HASH_LEN);
+			memset(md, 0, HASH_LEN);
 		}
+		// copy back to caller
+		memcpy(output_buf, md2, hash_len);
 	}
 
+	OPENSSL_cleanse(&sha2,sizeof(sha2));
 	return TRUE;
 }
 
@@ -352,7 +409,6 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, int hash_size, uint8_t* out
  * @param hash_num		Index number of the hash function to use (changes the output).
  * @return				FENC_ERROR_NONE or an error code.
  */
-
 int hash_element_to_bytes(Element *element, int hash_size, uint8_t* output_buf, int prefix)
 {
 	int result = TRUE;
@@ -365,8 +421,7 @@ int hash_element_to_bytes(Element *element, int hash_size, uint8_t* output_buf, 
 	}
 
 	element_to_bytes(temp_buf, element);
-	result = hash_to_bytes(temp_buf, buf_len, hash_size, output_buf, prefix);
-
+	result = hash_to_bytes(temp_buf, buf_len, output_buf, hash_size, prefix);
 	free(temp_buf);
 
 	return TRUE;
@@ -379,7 +434,6 @@ PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self = (Element *)type->tp_alloc(type, 0);
     if (self != NULL) {
         self->elem_initialized = FALSE;
-		self->safe_pairing_clear = FALSE;
 		self->pairing = NULL;
 		self->element_type = NONE_G;
     }
@@ -391,21 +445,21 @@ PyObject *Pairing_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
 	Pairing *self = (Pairing *) type->tp_alloc(type, 0);
 	if(self != NULL) {
-		self->safe = TRUE;
+		self->group_init = FALSE;
+		self->curve      = -1;
 	}
 
 	return (PyObject *) self;
 }
 
-int Pairing_init(Pairing *self, PyObject *args)
+int Element_init(Element *self, PyObject *args, PyObject *kwds)
 {
-	return 0;
+	return -1;
 }
 
 
-int Element_init(Element *self, PyObject *args, PyObject *kwds)
+int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 {
-	Pairing *pairing = NULL;
 	char *params = NULL, *param_string = NULL;
 	size_t b_len = 0;
 	int aes_sec = -1;
@@ -419,34 +473,30 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 
     if(aes_sec != -1) {
     	if(aes_sec == MNT160) {
-    		pairing = PyObject_New(Pairing, &PairingType);
-			pairing->pair_obj = pairing_init(aes_sec);
-			pairing->order    = order(pairing->pair_obj);
-			pairing->curve	  = MNT; // only supported at this point
+			self->pair_obj = pairing_init(aes_sec);
+			self->order    = order(self->pair_obj);
+			self->curve	  = MNT; // only supported at this point
 			pairing_init_finished 	  = FALSE;
     	}
     	else if(aes_sec == BN256) {
-    		pairing = PyObject_New(Pairing, &PairingType);
-			pairing->pair_obj = pairing_init(aes_sec);
-			pairing->order    = order(pairing->pair_obj);
-			pairing->curve	  = BN; // only supported at this point
+			self->pair_obj = pairing_init(aes_sec);
+			self->order    = order(self->pair_obj);
+			self->curve	  = BN; // only supported at this point
 			pairing_init_finished 	  = FALSE;
     	}
     	else if(aes_sec == SS512) {
-    		pairing = PyObject_New(Pairing, &PairingType);
-			pairing->pair_obj = pairing_init(aes_sec);
-			pairing->order    = order(pairing->pair_obj);
-			pairing->curve	  = SS; // only supported at this point
+			self->pair_obj = pairing_init(aes_sec);
+			self->order    = order(self->pair_obj);
+			self->curve	  = SS; // only supported at this point
 			pairing_init_finished 	  = FALSE;
     	}
     }
 
-	self->pairing = pairing;
-	self->elem_initialized = FALSE;
-	self->safe_pairing_clear = TRUE;
+    self->group_init = TRUE;
     return 0;
 }
 
+/*
 PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
 {
 	PyObject *object;
@@ -463,7 +513,8 @@ PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds)
 	
 	return NULL;
 }
- 
+*/
+
 static PyObject *Element_elem(Element* self, PyObject* args)
 {
 	Element *retObject, *group = NULL;
@@ -494,7 +545,12 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	}
 	
 	/* return Element object */
-	return (PyObject *) retObject;		
+	return (PyObject *) retObject;
+}
+
+PyObject *Pairing_print(Element* self)
+{
+	return PyUnicode_FromString("");
 }
 
 // TODO: use element_vnprintf to copy the result into element type
@@ -520,7 +576,8 @@ PyObject *Element_print(Element* self)
 
 static PyObject *Element_random(Element* self, PyObject* args)
 {
-	Element *retObject, *group = NULL;
+	Element *retObject;
+	Pairing *group = NULL;
 	int arg1;
 	int seed = -1;
 	
@@ -528,6 +585,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	if(!PyArg_ParseTuple(args, "Oi|i", &group, &arg1, &seed))
 		return NULL;
 
+	VERIFY_GROUP(group);
 	retObject = PyObject_New(Element, &ElementType);
 	debug("init random element in '%d'\n", arg1);
 	if(arg1 == pyZR_t) {
@@ -555,14 +613,14 @@ static PyObject *Element_random(Element* self, PyObject* args)
 //		pbc_random_set_deterministic((uint32_t) seed);
 	}
 	/* create new Element object */
-    element_random(retObject->element_type, group->pairing->pair_obj, retObject->e);
-
+    element_random(retObject->element_type, group->pair_obj, retObject->e);
 
 	retObject->elem_initialized = TRUE;
-	retObject->pairing = group->pairing;
-	retObject->safe_pairing_clear = FALSE;
+	retObject->pairing = group;
+	Py_INCREF(retObject->pairing);
 	return (PyObject *) retObject;	
 }
+
 static PyObject *Element_add(Element *self, Element *other)
 {
 	Element *newObject = NULL;
@@ -621,7 +679,6 @@ static PyObject *Element_sub(Element *self, Element *other)
 }
 
 
-/* requires more care -- understand possibilities first */
 static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 {
 	Element *self = NULL, *other = NULL, *newObject = NULL;
@@ -980,14 +1037,8 @@ static PyObject *Element_setxy(Element *self, PyObject *args)
 }
 
 /* Takes a list of two objects in G1 & G2 respectively and computes the multi-pairing */
-PyObject *multi_pairing_asymmetric(Element *groupObj, PyObject *listG1, PyObject *listG2) {
-
-//	int GroupSymmetric = FALSE;
-	// check for symmetric vs. asymmetric
-//	if(pairing_is_symmetric(groupObj->pairing->pair_obj)) {
-//		GroupSymmetric = TRUE;
-//	}
-
+PyObject *multi_pairing_asymmetric(Pairing *groupObj, PyObject *listG1, PyObject *listG2)
+{
 	int length = PySequence_Length(listG1);
 
 	if(length != PySequence_Length(listG2)) {
@@ -1025,7 +1076,7 @@ PyObject *multi_pairing_asymmetric(Element *groupObj, PyObject *listG1, PyObject
 
 		Element *newObject = NULL;
 		if(l == r) {
-			newObject = createNewElement(pyGT_t, groupObj->pairing);
+			newObject = createNewElement(pyGT_t, groupObj);
 			element_prod_pairing(newObject, &g1, &g2, l); // pairing product calculation
 		}
 		else {
@@ -1048,7 +1099,8 @@ PyObject *multi_pairing_asymmetric(Element *groupObj, PyObject *listG1, PyObject
 PyObject *Apply_pairing(Element *self, PyObject *args)
 {
 	// lhs => G1_t and rhs => G2
-	Element *newObject = NULL, *lhs, *rhs, *group = NULL;
+	Element *newObject = NULL, *lhs, *rhs;
+	Pairing *group = NULL;
 	PyObject *lhs2, *rhs2;
 	
 	debug("Applying pairing...\n");
@@ -1058,7 +1110,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 	}
 
 	if(PySequence_Check(lhs2) && PySequence_Check(rhs2)) {
-		VERIFY_GROUP(group);
+		VERIFY_GROUP(group); /* defined iff using as multi-pairing */
 		return multi_pairing_asymmetric(group, lhs2, rhs2);
 	}
 	else if(PyElement_Check(lhs2) && PyElement_Check(rhs2)) {
@@ -1157,7 +1209,8 @@ PyObject *sha1_hash2(Element *self, PyObject *args) {
 // new version that uses same approach as Charm-C++
 static PyObject *Element_hash(Element *self, PyObject *args)
 {
-	Element *newObject = NULL, *object = NULL, *group = NULL;
+	Element *newObject = NULL, *object = NULL;
+	Pairing *group = NULL;
 	PyObject *objList = NULL, *tmpObject = NULL;
 	PyObject *tmp_obj = NULL;
 	Group_t type = pyZR_t;
@@ -1180,7 +1233,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
 			// hash bytes using SHA1
-			newObject = createNewElement(NONE_G, group->pairing);
+			newObject = createNewElement(NONE_G, group);
 			newObject->element_type = type;
 
 			element_init_hash(group);
@@ -1235,7 +1288,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 				Py_DECREF(tmpObject);
 			}
 
-			if(type >= pyZR_t && type < pyGT_t) { newObject = createNewElement(NONE_G, group->pairing); }
+			if(type >= pyZR_t && type < pyGT_t) { newObject = createNewElement(NONE_G, group); }
 			else {
 				tmp = "invalid object type";
 				goto cleanup;
@@ -1258,7 +1311,7 @@ static PyObject *Element_hash(Element *self, PyObject *args)
 		// Hash an element of Zr to an element of G1_t.
 		if(type == pyG1_t) {
 
-			newObject = createNewElement(NONE_G, group->pairing);
+			newObject = createNewElement(NONE_G, group);
 			newObject->element_type = type;
 			// hash the element to the G1_t field (uses sha1 as well)
 			element_init_hash(group);
@@ -1463,11 +1516,12 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 }
 
 static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
-	Element *origObject = NULL, *group = NULL;
+	Element *origObject = NULL;
+	Pairing *group = NULL;
 	PyObject *object;
 
 	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
-
+		VERIFY_GROUP(group);
 		if(PyBytes_Check(object)) {
 			uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
 			int type = atoi((const char *) &(serial_buf[0]));
@@ -1478,7 +1532,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 			if(check_type(type) == TRUE && strlen((char *) base64_buf) > 0) {
 //				debug("result => ");
 //				printf_buffer_as_hex(binary_buf, deserialized_len);
-				origObject = createNewElement(NONE_G, group->pairing);
+				origObject = createNewElement(NONE_G, group);
 				origObject->element_type = type;
 				element_from_bytes(origObject, base64_buf);
 
@@ -1495,14 +1549,12 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 
 static PyObject *Group_Check(Element *self, PyObject *args) {
 
-	Element *group = NULL;
-	PyObject *object = NULL;
+	Pairing *group = NULL;
+	Element *object = NULL;
 	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
-		if(PyElement_Check(group) && PyElement_Check(object)) {
-			IS_PAIRING_OBJ_NULL(group); /* verify group object is still active */
-			Element *elem = (Element *) object;
-
-			if(check_membership(elem) == TRUE) {
+		VERIFY_GROUP(group);
+		if(PyElement_Check(object)) {
+			if(check_membership(object) == TRUE) {
 				Py_INCREF(Py_True);
 				return Py_True;
 			}
@@ -1519,24 +1571,19 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 
 static PyObject *Get_Order(Element *self, PyObject *args) {
 
-	Element *group = NULL;
-	PyObject *obj  = NULL;
-	if(!PyArg_ParseTuple(args, "O", &obj)) {
+	Pairing *group = NULL;
+	if(!PyArg_ParseTuple(args, "O", &group)) {
 		PyErr_SetString(ElementError, "invalid group object.");
 		return NULL;
 	}
 
-	if(PyElement_Check(obj)) {
-		group = (Element *) obj;
-		IS_PAIRING_OBJ_NULL(group);
-		mpz_t d;
-		mpz_init(d);
-		object_to_mpz(group->pairing->order, d);
-		PyObject *object = (PyObject *) mpzToLongObj(d);
-		mpz_clear(d);
-		return object; /* returns a PyInt */
-	}
-	return NULL;
+	VERIFY_GROUP(group);
+	mpz_t d;
+	mpz_init(d);
+	object_to_mpz(group->order, d);
+	PyObject *object = (PyObject *) mpzToLongObj(d);
+	mpz_clear(d);
+	return object; /* returns a PyInt */
 }
 
 #ifdef BENCHMARK_ENABLED
@@ -1673,13 +1720,13 @@ PyTypeObject PairingType = {
 	0,                         /*tp_getattr*/
 	0,                         /*tp_setattr*/
 	0,			   				/*tp_reserved*/
-	0, /*tp_repr*/
+	(reprfunc)Pairing_print, 	/*tp_repr*/
 	0,               /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/
 	0,                         /*tp_hash */
 	0,                         /*tp_call*/
-	0,                         /*tp_str*/
+    (reprfunc)Pairing_print,   /*tp_str*/
 	0,                         /*tp_getattro*/
 	0,                         /*tp_setattro*/
 	0,                         /*tp_as_buffer*/
@@ -1716,13 +1763,13 @@ PyTypeObject PairingType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
+    (reprfunc)Pairing_print,   /*tp_repr*/
     0,       /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0, 						/*tp_call*/
-    (reprfunc)Element_print,   /*tp_str*/
+    (reprfunc)Pairing_print,   /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
@@ -2070,10 +2117,10 @@ void initpairing(void) 		{
     dBench->identifier = -1;
 #endif
 
-    Py_INCREF(&PairingType);
-    PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
-    PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
+    PyModule_AddObject(m, "pc_element", (PyObject *)&ElementType);
+    Py_INCREF(&PairingType);
+    PyModule_AddObject(m, "pairing", (PyObject *)&PairingType);
 
 	PyModule_AddIntConstant(m, "ZR", pyZR_t);
 	PyModule_AddIntConstant(m, "G1", pyG1_t);

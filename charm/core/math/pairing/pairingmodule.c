@@ -265,7 +265,9 @@ void 	Pairing_dealloc(Pairing *self)
 	}
 
 	debug("Clear pairing => 0x%p\n", self->pair_obj);
-	pairing_clear(self->pair_obj);
+	if(self->group_init == TRUE) {
+		pairing_clear(self->pair_obj);
+	}
 
 	debug("Releasing pairing object!\n");
 	Py_TYPE(self)->tp_free((PyObject *) self);
@@ -522,105 +524,6 @@ PyObject *Pairing_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
 int Element_init(Element *self, PyObject *args, PyObject *kwds)
 {
-//	Pairing *pairing;
-//	static char *buf;
-//	char *param_buf2 = NULL;
-//	PyObject *n = NULL, *short_val = NULL;
-//	int qbits = 0, rbits = 0;
-//	size_t b_len = 0;
-//	int seed = -1;
-//	uint8_t hash_id[HASH_LEN+1];
-//
-//    static char *kwlist[] = {"file", "n", "qbits", "rbits", "short", "string", "seed", NULL};
-//
-//    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|sOiiOs#i", kwlist,
-//                                      &self->params, &n, &qbits, &rbits, &short_val, &param_buf2, &b_len, &seed)) {
-//    	PyErr_SetString(ElementError, "invalid arguments");
-//        return -1;
-//	}
-//	if (self->params && !n && !qbits && !rbits && !short_val && !param_buf2) {
-//		// check if file exists
-//		int f = open(self->params, O_RDONLY);
-//		if(f < 0) {
-//			PyErr_SetString(ElementError, "failed to read params file.");
-//			return 0;
-//		}
-//		close(f);
-//		pairing = PyObject_New(Pairing, &PairingType);
-//		buf = init_pbc_param(self->params, &pairing->pair_obj);
-//
-//		if(buf != NULL) {
-//			debug("Initialized pairings type: '%s'\n", self->params);
-//			self->param_buf = buf;
-//			hash_to_bytes((uint8_t *) buf, strlen(buf), hash_id, HASH_LEN, HASH_FUNCTION_STRINGS);
-//			strncpy((char *) pairing->hash_id, (char *) hash_id, ID_LEN);
-//			printf_buffer_as_hex(pairing->hash_id, ID_LEN);
-//		}
-//	}
-//	else if(param_buf2 && !n && !qbits && !rbits && !short_val) {
-//		// parameters is provided in string
-//		debug("Paramter String => '%s'\n", param_buf2);
-//		pairing = PyObject_New(Pairing, &PairingType);
-//		pbc_param_init_set_buf(pairing->p, param_buf2, b_len);
-//		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
-//		debug("hashing pairing parameters...\n");
-//
-//		hash_to_bytes((uint8_t *) param_buf2, b_len, hash_id, HASH_LEN, HASH_FUNCTION_STRINGS);
-//		strncpy((char *) pairing->hash_id, (char *) hash_id, ID_LEN);
-//		printf_buffer_as_hex(pairing->hash_id, ID_LEN);
-//	}
-//	else if (n && !(qbits || rbits)) {
-//		// if n is provided, and qbits and rbits are not
-//		debug("n set, but q and r are NOT set!\n");
-//		pairing = PyObject_New(Pairing, &PairingType);
-//		if(short_val == Py_True) {
-//			// type f curve
-//			if(!PyLong_Check(n)) {
-//				PyErr_SetString(ElementError, "n is expected to be short and an int or long type.");
-//				PyObject_Del(pairing);
-//				return -1;
-//			}
-//			long bits = PyLong_AsLong(n);
-//			pbc_param_init_f_gen(pairing->p, (int) bits);
-//		}
-//		else {
-//			if(!PyLong_Check(n)) {
-//				PyErr_SetString(ElementError, "n is expected to be large and a long type.");
-//				PyObject_Del(pairing);
-//				return -1;
-//			}
-//
-//			// type a1 curve
-//			mpz_t n_val;
-//			mpz_init(n_val);
-//			longObjToMPZ(n_val, (PyLongObject *) n);
-//
-//			pbc_param_init_a1_gen(pairing->p, n_val);
-//			mpz_clear(n_val);
-//			// TODO: add hash_id to these calls
-//		}
-//		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
-//	}
-//    // if qbits and rbits are provided, and n is not
-//	else if (qbits && rbits && !n) {
-//		debug("q and r set, but NOT n!\n");
-//		pairing = PyObject_New(Pairing, &PairingType);
-//		if(short_val == Py_True)
-//			pbc_param_init_e_gen(pairing->p, rbits, qbits);
-//		else
-//			pbc_param_init_a_gen(pairing->p, rbits, qbits);
-//		pairing_init_pbc_param(pairing->pair_obj, pairing->p);
-//		// TODO: add hash_id to these calls
-//	}
-//	// figure out how to expose func to find type d and g curves
-//	else {
-//		PyErr_SetString(ElementError, "cannot derive curve type and parameters.");
-//		return -1;
-//	}
-//
-//	self->pairing = pairing;
-//	self->elem_initialized = FALSE;
-//	self->safe_pairing_clear = TRUE;
 	return -1;
 }
 

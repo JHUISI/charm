@@ -184,7 +184,7 @@ if opt.get('PAIR_MOD') == 'yes':
                                             benchmark_path, miracl_inc],
                             sources = [math_path + 'pairing/miracl/pairingmodule2.c',
                                         math_path + 'pairing/miracl/miracl_interface2.cc'],
-                            libraries=['gmp','stdc++'], define_macros=_macros, undef_macros=_undef_macro,
+                            libraries=['gmp', 'crypto', 'stdc++'], define_macros=_macros, undef_macros=_undef_macro,
                             extra_objects=[miracl_lib], extra_compile_args=None)
 
     _ext_modules.append(pairing_module)
