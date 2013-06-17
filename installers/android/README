@@ -1,0 +1,26 @@
+This directory contains scripts to assist in cross compiling charm for android.
+
+First, create an empty directory to work in. This will be refered to as $BD.
+This directory will be refered to as $SCRIPTS
+Into this directory, download and decrompress charm and its dependencies. The folder should contain the following subdirectories
+
+android-ndk-r8e
+android-sdk-linux
+android-python27
+gmp
+pbc
+charm
+python-lib (from the PY4A project)
+
+At the beggining of each script is a definition for the $BD variable. Set these to the path of the directory you just created.
+
+To build the dependencies:
+cd $BD/android-python27 && $SCRIPTS/python.sh
+cd $BD/gmp && $SCRIPTS/gmp.sh
+cd $BD/pbc && $SCRIPTS/pbc.sh
+cd $BD/charm && $SCRIPTS/charm.sh
+
+Finnally, to package charm into a zip, run:
+cd $BD && $SCRIPTS/collect.sh
+
+This will create a file at $BD/out/python_27.zip. This zip contains the cross compile python, charm, and dependencies.
