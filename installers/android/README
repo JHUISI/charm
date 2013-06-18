@@ -12,7 +12,7 @@ pbc
 charm
 python-lib (from the PY4A project)
 
-At the beggining of each script is a definition for the $BD variable. Set these to the path of the directory you just created.
+At the beggining of each script is a definition for the $BD variable. Either set these to the path of the directory you just created, or set BD to said directory in your shell
 
 To build the dependencies:
 cd $BD/android-python27 && $SCRIPTS/python.sh

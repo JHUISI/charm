@@ -6,7 +6,7 @@
 #deletung the semicolon in these lines fixes the problem
 
 
-export BD="/home/charm/android-python27/android-python27/python-build-brandon-clean/"
+export BD="$BD"
 export NDK="$BD/android-ndk-r8e"
 export SDK="$BD/android-sdk-linux_x86/"
 export NDKPLATFORM="$NDK/platforms/android-9/arch-arm"

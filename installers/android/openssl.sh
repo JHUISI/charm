@@ -5,7 +5,7 @@
 exit
 
 
-export BD="/home/charm/android-python27/android-python27/python-build-brandon-clean"
+export BD="$BD"
 export NDK="$BD/android-ndk-r8e"
 
 $NDK/ndk-build

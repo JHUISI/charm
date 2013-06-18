@@ -3,7 +3,7 @@
 #replace config.sub and config.guess from http://git.savannah.gnu.org/gitweb/?p=config.git;a=tree
 #TODO, confirm the above is nessasary
 
-export BD="/home/charm/android-python27/android-python27/python-build-brandon-clean"
+export BD="$BD"
 export NDK="$BD/android-ndk-r8e"
 
 export HOST="arm-linux-androideabi"
