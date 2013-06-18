@@ -68,28 +68,11 @@
 PyTypeObject ElementType;
 PyTypeObject PairingType;
 static PyObject *ElementError;
+#ifdef BENCHMARK_ENABLED
 static Benchmark *dBench;
+#endif
 #define PyElement_Check(obj) PyObject_TypeCheck(obj, &ElementType)
 #define PyPairing_Check(obj) PyObject_TypeCheck(obj, &PairingType)
-#if PY_MAJOR_VERSION >= 3
-/* check for both unicode and bytes objects */
-#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
-#else
-/* check for just unicode stuff */
-#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
-#endif
-
-#if PY_MAJOR_VERSION >= 3
-/* if unicode then add extra conversion step. two possibilities: unicode or bytes */
-#define PyBytes_ToString(a, obj) \
-	if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AS_STRING(_obj); Py_DECREF(_obj); }	\
-	else { a = PyBytes_AS_STRING(obj); }
-#else
-/* treat everything as string in 2.x */
-#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
-#endif
-
-// static Benchmark *dObjects[MAX_BENCH_OBJECTS], *activeObject = NULL;
 
 PyMethodDef Element_methods[];
 PyMethodDef pairing_methods[];
@@ -100,14 +83,14 @@ typedef struct {
 	PyObject_HEAD
 //	pbc_param_t p;
 //	pairing_t pair_obj;
-	int safe;
+	int group_init;
 	uint8_t hash_id[ID_LEN+1];
 } Pairing;
 
 typedef struct {
     PyObject_HEAD
-	char *params;
-	char *param_buf;
+//	char *params;
+//	char *param_buf;
 
 	Pairing *pairing;
 	element_t e;
@@ -156,12 +139,9 @@ typedef struct {
     else {  element_set_si(obj, (signed int) value); }
 
 #define VERIFY_GROUP(g) \
-	if(PyElement_Check(g) && g->safe_pairing_clear == FALSE) {	\
-		PyErr_SetString(ElementError, "invalid group object specified.");  \
-		return NULL;  } 	\
-//	if(g->pairing == NULL) {
-//		PyErr_SetString(ElementError, "pairing object is NULL.");
-//		return NULL;  }
+	if(PyPairing_Check(g) && g->group_init == FALSE) {	\
+		PyErr_SetString(ElementError, "Not a Pairing group object.");  \
+		return NULL;  }
 
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int Element_init(Element *self, PyObject *args, PyObject *kwds);

@@ -1177,10 +1177,8 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			debug("Pairing is symmetric.\n");
 			debug_e("LHS: '%B'\n", lhs->e);
 			debug_e("RHS: '%B'\n", rhs->e);
-			//START_CLOCK(dBench);
 			newObject = createNewElement(GT, lhs->pairing);
 			pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
-			//STOP_CLOCK(dBench);
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(PAIRINGS, dBench);
 #endif
@@ -1191,13 +1189,12 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			// apply pairing
 			debug_e("LHS: '%B'\n", lhs->e);
 			debug_e("RHS: '%B'\n", rhs->e);
-			//START_CLOCK(dBench);
 			newObject = createNewElement(GT, lhs->pairing);
 			if(lhs->element_type == G1)
 				pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
 			else if(lhs->element_type == G2)
 				pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
-			//STOP_CLOCK(dBench);
+
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(PAIRINGS, dBench);
 #endif
@@ -2090,10 +2087,6 @@ void initpairing(void) 		{
     dBench->identifier = -1;
 #endif
 
-//    Py_INCREF(&ElementType);
-//    PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
-//    Py_INCREF(&PairingType);
-//    PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pc_element", (PyObject *)&ElementType);
     Py_INCREF(&PairingType);
@@ -2104,7 +2097,7 @@ void initpairing(void) 		{
 	PyModule_AddIntConstant(m, "G2", G2);
 	PyModule_AddIntConstant(m, "GT", GT);
 
-#if BENCHMARK_ENABLED == 1
+#ifdef BENCHMARK_ENABLED
 	ADD_BENCHMARK_OPTIONS(m);
 	PyModule_AddStringConstant(m, "Pair", 	  _PAIR_OPT);
 	PyModule_AddStringConstant(m, "Granular", _GRAN_OPT);

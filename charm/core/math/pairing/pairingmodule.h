@@ -102,6 +102,9 @@ typedef struct {
 	element_t e;
 	GroupType element_type;
     int elem_initialized;
+//#ifdef BENCHMARK_ENABLED
+//    Benchmark dBench;
+//#endif
 } Element;
 
 #ifdef BENCHMARK_ENABLED

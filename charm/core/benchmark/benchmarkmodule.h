@@ -39,7 +39,9 @@ else { a = PyBytes_AsString(obj); }
 if(PyBytes_Check(obj)) { a = PyBytes_AsString(obj); } \
 else if(PyUnicode_Check(obj)) { tmp_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AsString(tmp_obj); }	\
 else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
+
 #else
+	/* python 2.x definitions */
 	#define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
 	#define ConvertToInt(o) PyInt_AsLong(o)
 	#define PyToLongObj(o) PyInt_FromSize_t(o)
@@ -48,6 +50,7 @@ else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
 	/* treat everything as string in 2.x */
 	#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
 	#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
+
 #endif
 
 #define BENCHMARK_MOD_NAME "charm.core.benchmark._C_API"

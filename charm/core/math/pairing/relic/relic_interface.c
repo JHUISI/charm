@@ -1117,40 +1117,65 @@ status_t element_to_key(element_t e, uint8_t *data, int data_len, uint8_t label)
 	return ELEMENT_INVALID_ARG;
 }
 
-status_t hash_buffer_to_bytes(uint8_t *input, int input_len, uint8_t *output, int output_len, uint8_t label)
+/*!
+ * Hash a null-terminated string to a byte array.
+ *
+ * @param input_buf		The input buffer.
+ * @param input_len		The input buffer length (in bytes).
+ * @param output_buf	A pre-allocated output buffer of size hash_len.
+ * @param hash_len		Length of the output hash (in bytes). Should be approximately bit size of curve group order.
+ * @param hash_prefix	prefix for hash function.
+ */
+status_t hash_buffer_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	LEAVE_IF(input == NULL || output == NULL, "uninitialized argument.");
-	// adds an extra null byte by default - will use this last byte for the label
-	int digest_len = SHA_LEN, i;
+	LEAVE_IF(input_buf == NULL || output_buf == NULL, "uninitialized argument.");
+	int i, new_input_len = input_len + 1; // extra byte for prefix
+	uint8_t first_block = 0;
+	uint8_t new_input[new_input_len+1];
+//	printf("orig input => \n");
+//	print_as_hex(input_buf, input_len);
 
-	if(digest_len <= output_len) {
-		// hash buf using md_map_sh256 and store data_len bytes in data
-		uint8_t digest[digest_len + 1];
-		uint8_t input2[input_len + 2];
-		memset(input2, 0, input_len + 1);
-		// set prefix
-		input2[0] = 0xFF & label;
-		// copy remaining bytes
-		for(i = 1; i <= input_len; i++)
-			input2[i] = input[i-1];
-#ifdef DEBUG
-		printf("%s: original input: ", __FUNCTION__);
-		print_as_hex(input, input_len);
+	memset(new_input, 0, new_input_len);
+	new_input[0] = first_block; // block number (always 0 by default)
+	new_input[1] = hash_prefix; // set hash prefix
+	memcpy((uint8_t *)(new_input+2), input_buf, input_len); // copy input bytes
 
-		printf("%s: new input: ", __FUNCTION__);
-		print_as_hex(input2, input_len + 1);
-#endif
-		memset(digest, 0, digest_len);
-		SHA_FUNC(digest, input2, input_len+1);
-		memcpy(output, digest, digest_len);
+//	printf("new input => \n");
+//	print_as_hex(new_input, new_input_len);
+	// prepare output buf
+	memset(output_buf, 0, hash_len);
 
-#ifdef DEBUG
-		printf("%s: digest: ", __FUNCTION__);
-		print_as_hex(output, digest_len);
-#endif
-		return ELEMENT_OK;
+	if (hash_len <= SHA_LEN) {
+		uint8_t md[SHA_LEN+1];
+		SHA_FUNC(md, new_input, new_input_len);
+		memcpy(output_buf, md, hash_len);
 	}
-	return ELEMENT_INVALID_ARG;
+	else {
+		// apply variable-size hash technique to get desired size
+		// determine block count.
+		int blocks = (int) ceil(((double) hash_len) / SHA_LEN);
+		//debug("Num blocks needed: %d\n", blocks);
+		uint8_t md[SHA_LEN+1];
+		uint8_t md2[(blocks * SHA_LEN)+1];
+		uint8_t *target_buf = md2;
+		for(i = 0; i < blocks; i++) {
+			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
+			target_buf += (i * SHA_LEN);
+			new_input[0] = (uint8_t) i;
+			//debug("input %d => ", i);
+			//print_as_hex(new_input, new_input_len);
+
+			SHA_FUNC(md, new_input, new_input_len);
+			memcpy(target_buf, md, hash_len);
+			//debug("block %d => ", i);
+			//print_as_hex(md, SHA_LEN);
+			memset(md, 0, SHA_LEN);
+		}
+		// copy back to caller
+		memcpy(output_buf, md2, hash_len);
+	}
+
+	return ELEMENT_OK;
 }
 
 status_t pairing_apply(element_t et, element_t e1, element_t e2)
@@ -1158,8 +1183,8 @@ status_t pairing_apply(element_t et, element_t e1, element_t e2)
 	LEAVE_IF(e1->isInitialized != TRUE || e2->isInitialized != TRUE || et->isInitialized != TRUE, "uninitialized arguments.");
 	if(e1->type == G1 && e2->type == G2 && et->type == GT) {
 		/* compute optimal ate pairing */
-		//pp_map_oatep(et->gt, e1->g1, e2->g2);
-		pp_map_k2(et->gt, e1->g1, e2->g2);
+		pp_map_oatep(et->gt, e1->g1, e2->g2);
+		//pp_map_k2(et->gt, e1->g1, e2->g2);
 		return ELEMENT_OK;
 	}
 	return ELEMENT_INVALID_ARG;

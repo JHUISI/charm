@@ -1561,7 +1561,7 @@ PyTypeObject ECType = {
 	0,                         /*tp_as_mapping*/
 	0,                         /*tp_hash */
 	0,                         /*tp_call*/
-	0,                         /*tp_str*/
+	(reprfunc)ECElement_print, /*tp_str*/
 	0,                         /*tp_getattro*/
 	0,                         /*tp_setattro*/
 	0,                         /*tp_as_buffer*/
@@ -1640,7 +1640,7 @@ PyTypeObject ECType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
+    (reprfunc)ECElement_print,  /*tp_repr*/
     &ec_number,       /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
@@ -1842,6 +1842,12 @@ void initelliptic_curve(void) 		{
 		CLEAN_EXIT;
     if(PyType_Ready(&ECType) < 0)
     	CLEAN_EXIT;
+#ifdef BENCHMARK_ENABLED
+    if(import_benchmark() < 0)
+        CLEAN_EXIT;
+    if(PyType_Ready(&BenchmarkType) < 0)
+        CLEAN_EXIT;
+#endif
 
 #if PY_MAJOR_VERSION >= 3
 	m = PyModule_Create(&moduledef);
@@ -1856,13 +1862,7 @@ void initelliptic_curve(void) 		{
 	PyECErrorObject = st->error;
     Py_INCREF(PyECErrorObject);
 
-#if BENCHMARK_ENABLED == 1
-    if(import_benchmark() < 0)
-    	CLEAN_EXIT;
-
-    if(PyType_Ready(&BenchmarkType) < 0)
-    	INITERROR;
-
+#ifdef BENCHMARK_ENABLED
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     if(st->dBench == NULL)
         CLEAN_EXIT;

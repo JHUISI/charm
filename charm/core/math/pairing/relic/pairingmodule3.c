@@ -271,9 +271,10 @@ static Element *createNewElement(GroupType element_type, Pairing *pairing) {
 	}
 	
 	retObject->elem_initialized = TRUE;
-	retObject->pairing = NULL;
-	retObject->safe_pairing_clear = FALSE;
-	retObject->param_buf = NULL;		
+	retObject->pairing = pairing;
+	Py_INCREF(retObject->pairing);
+//	retObject->safe_pairing_clear = FALSE;
+//	retObject->param_buf = NULL;
 	
 	return retObject;	
 }
@@ -295,10 +296,10 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 
 void 	Pairing_dealloc(Pairing *self)
 {
-	//if(self->safe) {
+	if(self->group_init == TRUE) {
 		debug("Clear pairing => \n");
 		pairing_clear();
-	//}
+	}
 
 	debug("Releasing pairing object!\n");
 	Py_TYPE(self)->tp_free((PyObject *) self);
@@ -309,17 +310,16 @@ void	Element_dealloc(Element* self)
 	if(self->elem_initialized && self->e) {
 		debug_e("Clear element_t => \n", self->e);
 		element_clear(self->e);
-		Py_XDECREF(self->pairing);
+		Py_DECREF(self->pairing);
 	}
 	
-	if(self->param_buf) {
+//	if(self->param_buf) {
 //		debug("param_buf => %p\n", ); get_config?
-	}
+//	}
 	
-	if(self->safe_pairing_clear) {
+//	if(self->safe_pairing_clear) {
 		/* do nothing */
-		Py_XDECREF(self->pairing);
-	}
+//	}
 
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
@@ -411,10 +411,9 @@ PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self = (Element *)type->tp_alloc(type, 0);
     if (self != NULL) {
         self->elem_initialized = FALSE;
-		self->safe_pairing_clear = FALSE;
-//		self->pairing = NULL;
+		self->pairing = NULL;
 		self->element_type = NIL;
-		self->param_buf = NULL;
+//		self->param_buf = NULL;
     }
 	
     return (PyObject *)self;
@@ -424,19 +423,19 @@ PyObject *Pairing_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
 	Pairing *self = (Pairing *) type->tp_alloc(type, 0);
 	if(self != NULL) {
-		self->safe = TRUE;
+		self->group_init = FALSE;
 	}
 
 	return (PyObject *) self;
 }
 
-int Pairing_init(Pairing *self, PyObject *args)
+int Element_init(Element *self, PyObject *args, PyObject *kwds)
 {
-	return 0;
+	return -1;
 }
 
 
-int Element_init(Element *self, PyObject *args, PyObject *kwds)
+int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 {
 	int bits = 0, string_len = 0;
 	int seed = -1;
@@ -458,24 +457,25 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
     	return -1;
     }
 
-	self->elem_initialized = FALSE;
-	self->safe_pairing_clear = TRUE;
+    self->group_init = TRUE;
     return 0;
 }
  
 static PyObject *Element_elem(Element* self, PyObject* args)
 {
-	Element *retObject, *group = NULL;
+	Element *retObject;
+	Pairing *group = NULL;
 	int type;
 	PyObject *long_obj = NULL;
 	
 	if(!PyArg_ParseTuple(args, "Oi|O", &group, &type, &long_obj)) {
 		EXIT_IF(TRUE, "invalid arguments.");
 	}
+	VERIFY_GROUP(group);
 	
 	debug("init an element.\n");
 	if(type >= ZR && type <= GT) {
-		retObject = createNewElement(type, group->pairing);
+		retObject = createNewElement(type, group);
 	}
 	else {
 		EXIT_IF(TRUE, "unrecognized group type.");
@@ -493,6 +493,10 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	return (PyObject *) retObject;		
 }
 
+PyObject *Pairing_print(Pairing* self)
+{
+	return PyUnicode_FromString("");
+}
 
 PyObject *Element_print(Element* self)
 {
@@ -519,14 +523,14 @@ PyObject *Element_print(Element* self)
 
 static PyObject *Element_random(Element* self, PyObject* args)
 {
-	Element *retObject,*group = NULL;
+	Element *retObject;
+	Pairing *group = NULL;
 	int arg1;
 	int e_type = -1, seed = -1;
 
 	/* create a new object */
 	if(!PyArg_ParseTuple(args, "Oi|i", &group, &arg1, &seed))
 		return NULL;
-
 
 	VERIFY_GROUP(group);
 	retObject = PyObject_New(Element, &ElementType);
@@ -556,9 +560,10 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	element_random(retObject->e);
 
 	retObject->elem_initialized = TRUE;
-	retObject->pairing = NULL;
-	retObject->safe_pairing_clear = FALSE;
-	retObject->param_buf = NULL;
+	retObject->pairing = group;
+	Py_INCREF(retObject->pairing);
+//	retObject->safe_pairing_clear = FALSE;
+//	retObject->param_buf = NULL;
 	retObject->element_type = e_type;
 	return (PyObject *) retObject;
 }
@@ -1075,7 +1080,8 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 // The hash function should be able to handle elements of various types and accept
 // a field to hash too. For example, a string can be hashed to Zr or G1, an element in G1 can be
 static PyObject *Element_hash(Element *self, PyObject *args) {
-	Element *newObject = NULL, *object = NULL, *group = NULL;
+	Element *newObject = NULL, *object = NULL;
+	Pairing *group = NULL;
 	PyObject *objList = NULL, *tmpObject = NULL;
 	// hashing element to Zr
 	uint8_t hash_buf[SHA_LEN+1];
@@ -1100,7 +1106,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			// create an element of Zr
 			// hash bytes using SHA1
 
-			newObject = createNewElement(ZR, group->pairing);
+			newObject = createNewElement(ZR, group);
 			// extract element in hash
 			result = element_from_hash(newObject->e, (uint8_t *) str, strlen(str));
 			if(result != ELEMENT_OK) {
@@ -1114,7 +1120,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			debug("Hashing string '%s'\n", str);
 			debug("Target GroupType => '%d'", type);
 
-			newObject = createNewElement(type, group->pairing);
+			newObject = createNewElement(type, group);
 			// hash bytes using SHA
 			result = element_from_hash(newObject->e, (uint8_t *) str, strlen(str));
 			if(result != ELEMENT_OK) {
@@ -1173,8 +1179,8 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				}
 				Py_DECREF(tmpObject);
 			}
-			if(type == ZR) { newObject = createNewElement(ZR, group->pairing); }
-			else if(type == G1) { newObject = createNewElement(G1, group->pairing); }
+			if(type == ZR) { newObject = createNewElement(ZR, group); }
+			else if(type == G1) { newObject = createNewElement(G1, group); }
 			else {
 				tmp = "invalid object type";
 				goto cleanup;
@@ -1195,7 +1201,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 		// TODO: add type == ZR?
 		// Hash an element of Zr to an element of G1.
 		if(type == G1) {
-			newObject = createNewElement(G1, group->pairing);
+			newObject = createNewElement(G1, group);
 			// hash the element to the G1 field (uses sha2 as well)
 			result = element_to_key(object->e, hash_buf, SHA_LEN, 0);
 			if(result != ELEMENT_OK) {
@@ -1329,7 +1335,8 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 }
 
 static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
-	Element *origObject = NULL, *group = NULL;
+	Element *origObject = NULL;
+	Pairing *group = NULL;
 	PyObject *object;
 
 	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
@@ -1346,7 +1353,7 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 			if((type >= ZR && type <= GT) && deserialized_len > 0) {
 				debug("result => ");
 				printf_buffer_as_hex(binary_buf, deserialized_len);
-				origObject = createNewElement(type, group->pairing);
+				origObject = createNewElement(type, group);
 				element_from_bytes(origObject->e, binary_buf, deserialized_len);
 				free(binary_buf);
 
@@ -1361,11 +1368,11 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 
 static PyObject *Group_Check(Element *self, PyObject *args) {
 
-	Element *group = NULL;
+	Pairing *group = NULL;
 	PyObject *object = NULL;
 	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
+		VERIFY_GROUP(group); /* verify group object is still active */
 		if(PyElement_Check(object)) {
-			IS_PAIRING_OBJ_NULL(group); /* verify group object is still active */
 			Element *elem = (Element *) object;
 
 			int result = element_is_member(elem->e);
@@ -1387,21 +1394,17 @@ static PyObject *Group_Check(Element *self, PyObject *args) {
 }
 
 static PyObject *Get_Order(Element *self, PyObject *args) {
-	PyObject *obj = NULL;
-	EXIT_IF(!PyArg_ParseTuple(args, "O", &obj), "invalid group object");
+	Pairing *group = NULL;
+	EXIT_IF(!PyArg_ParseTuple(args, "O", &group), "invalid group object");
 
-	if(PyElement_Check(obj)) {
-//		Element *group = (Element *) obj;
-//		IS_PAIRING_OBJ_NULL(group);
-		integer_t x;
-		bn_inits(x);
-		get_order(x);
-		PyObject *object = (PyObject *) intToLongObj(x);
-		bn_free(x);
-		return object; /* returns a PyInt */
-	}
+	VERIFY_GROUP(group);
 
-	return NULL; /* most likely invalid */
+	integer_t x;
+	bn_inits(x);
+	get_order(x);
+	PyObject *object = (PyObject *) intToLongObj(x);
+	bn_free(x);
+	return object; /* returns a PyInt */
 }
 
 #ifdef BENCHMARK_ENABLED
@@ -1468,13 +1471,13 @@ PyTypeObject PairingType = {
 	0,                         /*tp_getattr*/
 	0,                         /*tp_setattr*/
 	0,			   				/*tp_reserved*/
-	0, /*tp_repr*/
+	(reprfunc)Pairing_print,    /*tp_repr*/
 	0,               /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/
 	0,                         /*tp_hash */
 	0,                         /*tp_call*/
-	0,                         /*tp_str*/
+	(reprfunc)Pairing_print,   /*tp_str*/
 	0,                         /*tp_getattro*/
 	0,                         /*tp_setattro*/
 	0,                         /*tp_as_buffer*/
@@ -1511,13 +1514,13 @@ PyTypeObject PairingType = {
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
     0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
+    (reprfunc)Pairing_print,   /*tp_repr*/
     0,       /*tp_as_number*/
     0,                         /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0, 						/*tp_call*/
-    (reprfunc)Element_print,   /*tp_str*/
+    (reprfunc)Pairing_print,   /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
@@ -1737,8 +1740,6 @@ static struct module_state _state;
 
 // end
 PyMemberDef Element_members[] = {
-	{"params", T_STRING, offsetof(Element, params), 0,
-		"pairing type"},
 	{"type", T_INT, offsetof(Element, element_type), 0,
 		"group type"},
     {"initialized", T_INT, offsetof(Element, elem_initialized), 0,
@@ -1824,6 +1825,14 @@ void initpairing(void) 		{
         CLEAN_EXIT;
     if(PyType_Ready(&ElementType) < 0)
         CLEAN_EXIT;
+#ifdef BENCHMARK_ENABLED
+    if(import_benchmark() < 0) {
+        CLEAN_EXIT;
+    }
+    if(PyType_Ready(&BenchmarkType) < 0)
+        CLEAN_EXIT;
+#endif
+
 #if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);
 #else
@@ -1839,11 +1848,6 @@ void initpairing(void) 		{
     ElementError = st->error;
     Py_INCREF(ElementError);
 #ifdef BENCHMARK_ENABLED
-    if(import_benchmark() < 0) {
-        CLEAN_EXIT;
-    }
-    if(PyType_Ready(&BenchmarkType) < 0)
-        CLEAN_EXIT;
     st->dBench = PyObject_New(Benchmark, &BenchmarkType);
     if(st->dBench == NULL)
         CLEAN_EXIT;
@@ -1864,10 +1868,10 @@ void initpairing(void) 		{
 
 #endif
 
-    Py_INCREF(&PairingType);
-    PyModule_AddObject(m, "params", (PyObject *)&PairingType);
     Py_INCREF(&ElementType);
-    PyModule_AddObject(m, "pairing", (PyObject *)&ElementType);
+    PyModule_AddObject(m, "pc_element", (PyObject *)&ElementType);
+    Py_INCREF(&PairingType);
+    PyModule_AddObject(m, "pairing", (PyObject *)&PairingType);
 
     PyModule_AddIntConstant(m, "ZR", ZR);
     PyModule_AddIntConstant(m, "G1", G1);
