@@ -200,8 +200,12 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 	unsigned char temp[BLOCK_SIZE];
 	int i, j, len;
 	PyObject *result;
-  
+
+#if PY_MAJOR_VERSION >= 3
 	if (!PyArg_ParseTuple(args, "s#", &str, &len))
+#else
+	if (!PyArg_ParseTuple(args, "y#", &str, &len))
+#endif
 		return NULL;
 	if (len==0)			/* Handle empty string */
 	{
@@ -466,7 +470,11 @@ ALG_Decrypt(ALGobject *self, PyObject *args)
 	if (self->mode == MODE_CTR)
 		return ALG_Encrypt(self, args);
 
+#if PY_MAJOR_VERSION >= 3
 	if (!PyArg_ParseTuple(args, "y#", &str, &len))
+#else
+	if (!PyArg_ParseTuple(args, "s#", &str, &len))
+#endif
 		return NULL;
 	if (len==0)			/* Handle empty string */
 	{

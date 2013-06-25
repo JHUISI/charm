@@ -5,7 +5,7 @@ double CalcUsecs(struct timeval *start, struct timeval *stop) {
 	double usec_per_second = 1000000;
 	double result = usec_per_second * (stop->tv_sec - start->tv_sec);
 
-	if(stop->tv_usec >= stop->tv_usec) {
+	if(stop->tv_usec >= start->tv_usec) {
 		result += (stop->tv_usec - start->tv_usec);
 	}
 	else {
@@ -48,11 +48,12 @@ int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds) {
 
 	// initializing object
 	if(self->bench_initialized == FALSE) {
-		// self->bench_initialized = TRUE; not true until we StartBenchmark( ... )
+		self->bench_inprogress = FALSE;  // false until we StartBenchmark( ... )
 		self->op_add = self->op_sub = self->op_mult = 0;
 		self->op_div = self->op_exp = self->op_pair = 0;
-		self->native_time_ms = self->cpu_time_ms = self->real_time_ms = 0.0;
-		self->native_option = self->cpu_option = self->real_option = FALSE;
+		self->cpu_time_ms = self->real_time_ms = 0.0;
+		self->cpu_option = self->real_option = FALSE;
+		self->identifier = -1;
 		debug("Initialized benchmark object.\n");
 	}
 
@@ -65,22 +66,22 @@ void Benchmark_dealloc(Benchmark *self) {
 
 static int PyStartTBenchmark(MeasureType option, Benchmark *data)
 {
-	if(data->native_option) {
-		if(option == NATIVE_TIME) // last thing we do before returning
-			return gettimeofday(&data->native_time, NULL);
-	}
+//	if(data->native_option) {
+//		if(option == NATIVE_TIME) // last thing we do before returning
+//			return gettimeofday(&data->native_time, NULL);
+//	}
 	return FALSE;
 }
 
 static int PyStopTBenchmark(MeasureType option, Benchmark *data)
 {
-	struct timeval stop; gettimeofday(&stop, NULL);
-	if(data->native_option) {
-		if(option == NATIVE_TIME)
-			data->native_time_ms += CalcUsecs(&data->native_time,  &stop);
-			// data->aux_time_ms += ((double)(stop - data->aux_time))/CLOCKS_PER_SEC;
-		return TRUE;
-	}
+//	struct timeval stop; gettimeofday(&stop, NULL);
+//	if(data->native_option) {
+//		if(option == NATIVE_TIME)
+//			data->native_time_ms += CalcUsecs(&data->native_time,  &stop);
+//			// data->aux_time_ms += ((double)(stop - data->aux_time))/CLOCKS_PER_SEC;
+//		return TRUE;
+//	}
 	return FALSE;
 }
 
@@ -134,43 +135,22 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 				else if(strcmp(s, _GRAN_OPT) == 0) {
 					data->options_selected[cnt] = GRANULAR;
 					data->granular_option = TRUE;
-					data->gran_init();
+					//data->gran_init((void *) data);
 				}
 				else {
 					debug("not a valid option.\n");
 				}
 				cnt++;
 			}
-//			if(!_PyLong_Check(item)) continue;
-//			MeasureType option = ConvertToInt(item);
-//			if(option > 0 && option < NONE) {
-//				data->options_selected[cnt] = option;
-//				cnt++;
-//				debug("Option '%d' selected...\n", option);
-//				switch(option) {
-//					case CPU_TIME:  data->cpu_option = TRUE; break;
-//					case REAL_TIME:	data->real_option = TRUE; break;
-//					case NATIVE_TIME: data->native_option = TRUE; break;
-//					case ADDITION: 		data->op_add = 0; break;
-//					case SUBTRACTION:  data->op_sub = 0; break;
-//					case MULTIPLICATION:  data->op_mult = 0; break;
-//					case DIVISION:	data->op_div = 0; break;
-//					case EXPONENTIATION: data->op_exp = 0; break;
-//					case PAIRINGS: data->op_pair = 0; break;
-//					case GRANULAR: data->granular_option = TRUE; data->gran_init(); break; // data->gran_init();
-//					default: debug("not a valid option.\n");
-//							 break;
-//				}
-//			}
 		}
 		// set size of list
 		data->num_options = cnt;
 		debug("num_options set: %d\n", data->num_options);
 		data->bench_initialized = TRUE;
+		data->bench_inprogress = TRUE;
 
 		//set timers for time-based measures (reduces the overhead of timer)
 		if(data->cpu_option) { data->start_clock = clock(); }
-		if(data->native_option) { gettimeofday(&data->native_time, NULL); }
 		if(data->real_option) { gettimeofday(&data->start_time, NULL); }
 		return TRUE;
 	}
@@ -179,7 +159,8 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 
 static int PyEndBenchmark(Benchmark *data)
 {
-	struct timeval stop_t; gettimeofday(&stop_t, NULL); // stop real time clock
+	struct timeval stop_t;
+	gettimeofday(&stop_t, NULL); // stop real time clock
 	int i, stop_c = clock();
 	if(data != NULL && data->bench_initialized) {
 		debug("Results....\n");
@@ -192,7 +173,6 @@ static int PyEndBenchmark(Benchmark *data)
 								data->cpu_time_ms = ((double)(data->stop_clock - data->start_clock))/CLOCKS_PER_SEC;
 								debug("CPU Time:\t%f\n", data->cpu_time_ms);
 								break;
-				case NATIVE_TIME: debug("Native time in C:\t%f\n", data->native_time_ms); break;
 				case REAL_TIME:	// time(&data->stop_time);
 								// data->real_time_ms = difftime(stop_t, data->start_time);
 								data->real_time_ms = CalcUsecs(&data->start_time, &stop_t);
@@ -208,7 +188,8 @@ static int PyEndBenchmark(Benchmark *data)
 				default: debug("not a valid option.\n"); break;
 			}
 		}
-		data->bench_initialized = FALSE;
+		//data->bench_initialized = FALSE;
+		data->bench_inprogress = FALSE;
 		return TRUE;
 	}
 	return FALSE;
@@ -249,9 +230,11 @@ static int PyClearBenchmark(Benchmark *data) {
 	data->identifier = -1;
 	data->op_add = data->op_sub = data->op_mult = 0;
 	data->op_div = data->op_exp = data->op_pair = 0;
-	data->native_time_ms = data->cpu_time_ms = data->real_time_ms = 0.0;
-	if(data->granular_option == TRUE) data->gran_init();
-	data->native_option = data->cpu_option = data->real_option = data->granular_option = FALSE;
+	data->cpu_time_ms = 0.0;
+	data->real_time_ms = 0.0;
+	data->cpu_option = FALSE;
+	data->real_option = FALSE;
+	data->granular_option = FALSE;
 	debug("Initialized benchmark object.\n");
 	return TRUE;
 }
@@ -322,10 +305,9 @@ static PyObject *_updateBenchmark(Benchmark *self, PyObject *args) {
 PyObject *Benchmark_print(Benchmark *self) {
 	if(self != NULL) {
 		PyObject *cpu = PyFloat_FromDouble(self->cpu_time_ms);
-		PyObject *native = PyFloat_FromDouble(self->native_time_ms);
 		PyObject *real = PyFloat_FromDouble(self->real_time_ms);
-		PyObject *results = PyUnicode_FromFormat("<--- Results --->\nCPU Time:  %Sms\nReal Time: %Ss\nNative Time: %Ss\nAdd:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
-								cpu, real, native, self->op_add, self->op_sub, self->op_mult, self->op_div, self->op_exp, self->op_pair);
+		PyObject *results = PyUnicode_FromFormat("<--- Results --->\nCPU Time:  %Sms\nReal Time: %Ss\nAdd:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
+								cpu, real, self->op_add, self->op_sub, self->op_mult, self->op_div, self->op_exp, self->op_pair);
 
 		PyClearBenchmark(self);
 		return results;
@@ -339,32 +321,37 @@ PyObject *_benchmark_print(Benchmark *self) {
 
 PyObject *GetResults(Benchmark *self) {
 	if(self != NULL) {
-		PyObject *resultDict = PyDict_New();
-		PyObject *CpuTime = PyFloat_FromDouble(self->cpu_time_ms);
-		PyObject *RealTime = PyFloat_FromDouble(self->real_time_ms);
-		PyObject *add  = Py_BuildValue("i", self->op_add);
-		PyObject *sub  = Py_BuildValue("i", self->op_sub);
-		PyObject *mult = Py_BuildValue("i", self->op_mult);
-		PyObject *div  = Py_BuildValue("i", self->op_div);
-		PyObject *exp  = Py_BuildValue("i", self->op_exp);
+//		PyObject *resultDict = PyDict_New();
+//		PyObject *add  = Py_BuildValue("i", self->op_add);
+//		PyObject *sub  = Py_BuildValue("i", self->op_sub);
+//		PyObject *mult = Py_BuildValue("i", self->op_mult);
+//		PyObject *div  = Py_BuildValue("i", self->op_div);
+//		PyObject *exp  = Py_BuildValue("i", self->op_exp);
+//		PyObject *CpuTime =  Py_BuildValue("f", self->cpu_time_ms);
+//		PyObject *RealTime = Py_BuildValue("f", self->real_time_ms);
+//
+//
+//		PyDict_SetItemString(resultDict, "CpuTime", CpuTime);
+//		PyDict_SetItemString(resultDict, "RealTime", RealTime);
+//		PyDict_SetItemString(resultDict, "Add", add);
+//		PyDict_SetItemString(resultDict, "Sub", sub);
+//		PyDict_SetItemString(resultDict, "Mul", mult);
+//		PyDict_SetItemString(resultDict, "Div", div);
+//		PyDict_SetItemString(resultDict, "Exp", exp);
+//
+//		Py_DECREF(CpuTime);
+//		Py_DECREF(RealTime);
+//		Py_DECREF(add);
+//		Py_DECREF(sub);
+//		Py_DECREF(mult);
+//		Py_DECREF(div);
+//		Py_DECREF(exp);
 
-		PyDict_SetItemString(resultDict, "CpuTime", CpuTime);
-		PyDict_SetItemString(resultDict, "RealTime", RealTime);
-		PyDict_SetItemString(resultDict, "Add", add);
-		PyDict_SetItemString(resultDict, "Sub", sub);
-		PyDict_SetItemString(resultDict, "Mul", mult);
-		PyDict_SetItemString(resultDict, "Div", div);
-		PyDict_SetItemString(resultDict, "Exp", exp);
-
-		Py_DECREF(CpuTime);
-		Py_DECREF(RealTime);
-		Py_DECREF(add);
-		Py_DECREF(sub);
-		Py_DECREF(mult);
-		Py_DECREF(div);
-		Py_DECREF(exp);
-
-		return resultDict;
+/*		return resultDict; */
+		return Py_BuildValue("{sfsfsisisisisi}",
+						"CpuTime", self->cpu_time_ms, "RealTime", self->real_time_ms,
+						"Add", self->op_add, "Sub", self->op_sub, "Mul", self->op_mult,
+						"Div", self->op_div, "Exp", self->op_exp);
 	}
 
 	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
@@ -372,34 +359,40 @@ PyObject *GetResults(Benchmark *self) {
 
 PyObject *GetResultsWithPair(Benchmark *self) {
 	if(self != NULL) {
-		PyObject *resultDict = PyDict_New();
-		PyObject *CpuTime = PyFloat_FromDouble(self->cpu_time_ms);
-		PyObject *RealTime = PyFloat_FromDouble(self->real_time_ms);
-		PyObject *add  = Py_BuildValue("i", self->op_add);
-		PyObject *sub  = Py_BuildValue("i", self->op_sub);
-		PyObject *mult = Py_BuildValue("i", self->op_mult);
-		PyObject *div  = Py_BuildValue("i", self->op_div);
-		PyObject *exp  = Py_BuildValue("i", self->op_exp);
-		PyObject *pair = Py_BuildValue("i", self->op_pair);
-
-		PyDict_SetItemString(resultDict, "CpuTime", CpuTime);
-		PyDict_SetItemString(resultDict, "RealTime", RealTime);
-		PyDict_SetItemString(resultDict, "Add", add);
-		PyDict_SetItemString(resultDict, "Sub", sub);
-		PyDict_SetItemString(resultDict, "Mul", mult);
-		PyDict_SetItemString(resultDict, "Div", div);
-		PyDict_SetItemString(resultDict, "Exp", exp);
-		PyDict_SetItemString(resultDict, "Pair", pair);
-
-		Py_DECREF(CpuTime);
-		Py_DECREF(RealTime);
-		Py_DECREF(add);
-		Py_DECREF(sub);
-		Py_DECREF(mult);
-		Py_DECREF(div);
-		Py_DECREF(exp);
-		Py_DECREF(pair);
-		return resultDict;
+		return Py_BuildValue("{sfsfsisisisisisi}",
+						"CpuTime", self->cpu_time_ms, "RealTime", self->real_time_ms,
+						"Add", self->op_add, "Sub", self->op_sub, "Mul", self->op_mult,
+						"Div", self->op_div, "Exp", self->op_exp, "Pair", self->op_pair);
+//		PyObject *resultDict = PyDict_New();
+////		PyObject *CpuTime = PyFloat_FromDouble(self->cpu_time_ms);
+////		PyObject *RealTime = PyFloat_FromDouble(self->real_time_ms);
+//		PyObject *add  = Py_BuildValue("i", self->op_add);
+//		PyObject *sub  = Py_BuildValue("i", self->op_sub);
+//		PyObject *mult = Py_BuildValue("i", self->op_mult);
+//		PyObject *div  = Py_BuildValue("i", self->op_div);
+//		PyObject *exp  = Py_BuildValue("i", self->op_exp);
+//		PyObject *pair = Py_BuildValue("i", self->op_pair);
+//		PyObject *CpuTime =  Py_BuildValue("f", self->cpu_time_ms);
+//		PyObject *RealTime = Py_BuildValue("f", self->real_time_ms);
+//
+//		PyDict_SetItemString(resultDict, "CpuTime", CpuTime);
+//		PyDict_SetItemString(resultDict, "RealTime", RealTime);
+//		PyDict_SetItemString(resultDict, "Add", add);
+//		PyDict_SetItemString(resultDict, "Sub", sub);
+//		PyDict_SetItemString(resultDict, "Mul", mult);
+//		PyDict_SetItemString(resultDict, "Div", div);
+//		PyDict_SetItemString(resultDict, "Exp", exp);
+//		PyDict_SetItemString(resultDict, "Pair", pair);
+//
+//		Py_DECREF(CpuTime);
+//		Py_DECREF(RealTime);
+//		Py_DECREF(add);
+//		Py_DECREF(sub);
+//		Py_DECREF(mult);
+//		Py_DECREF(div);
+//		Py_DECREF(exp);
+//		Py_DECREF(pair);
+//		return resultDict;
 	}
 
 	return PyUnicode_FromString("Benchmark object has not been initialized properly.");

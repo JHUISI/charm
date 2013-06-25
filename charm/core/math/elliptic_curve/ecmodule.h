@@ -46,6 +46,10 @@
 #include "openssl/rand.h"
 #include "openssl/bn.h"
 #include "openssl/sha.h"
+#ifdef BENCHMARK_ENABLED
+#include "benchmark_util.h"
+#endif
+
 
 //#define DEBUG	1
 #define TRUE	1
@@ -62,9 +66,9 @@
 #define HASH_LEN						SHA256_DIGEST_LENGTH
 #define RESERVED_ENCODING_BYTES			2
 
-#if BENCHMARK_ENABLED == 1
-static Benchmark *dBench;
-#endif
+//#if BENCHMARK_ENABLED == 1
+//static Benchmark *dBench;
+//#endif
 
 PyTypeObject ECType;
 PyTypeObject ECGroupType;
@@ -85,6 +89,9 @@ typedef struct {
 	int nid;
 	BN_CTX *ctx;
 	BIGNUM *order;
+#ifdef BENCHMARK_ENABLED
+    Benchmark *dBench;
+#endif
 } ECGroup;
 
 typedef struct {
@@ -131,7 +138,7 @@ typedef struct {
 	PyErr_SetString(PyECErrorObject, "group object not allocated."); \
 	return NULL;    }
 
-#define Group_Init(obj) \
+#define VERIFY_GROUP(obj) \
 	if(!PyECGroup_Check(obj))  {  \
 		PyErr_SetString(PyECErrorObject, "not an ecc object."); return NULL; } \
 	if(obj->group_init == FALSE || obj->ec_group == NULL) { \
@@ -169,6 +176,37 @@ EC_POINT *element_from_hash(EC_GROUP *group, BIGNUM *order, uint8_t *input, int 
 		PyErr_SetString(PyECErrorObject, "mixing group elements from different curves.");	\
 		return NULL;	\
 	}
+
+#ifdef BENCHMARK_ENABLED
+
+#define IsBenchSet(obj)  obj->dBench != NULL
+
+typedef struct {
+	int exp_ZR, exp_G;
+	int mul_ZR, mul_G;
+	int div_ZR, div_G;
+
+	int add_ZR, add_G;
+	int sub_ZR, sub_G;
+} Operations;
+
+#define Update_Op(name, op_type, elem_type, bench_obj)	\
+	Op_ ##name(op_type, elem_type, ZR, bench_obj)	\
+	Op_ ##name(op_type, elem_type, G, bench_obj)	\
+
+#define CLEAR_ALLDBENCH(bench_obj)  \
+	    CLEAR_DBENCH(bench_obj, ZR);	\
+	    CLEAR_DBENCH(bench_obj, G);
+
+#else
+
+#define UPDATE_BENCH(op_type, elem_type, bench_obj)  /* ... */
+// #define UPDATE_BENCHMARK(op_type, bench_obj)  /* ... */
+#define CLEAR_ALLDBENCH(bench_obj) /* ... */
+#define GetField(count, type, group, bench_obj)  /* ... */
+
+#endif
+
 
 
 #endif

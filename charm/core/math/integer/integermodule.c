@@ -29,6 +29,35 @@
 
 #include "integermodule.h"
 
+#if PY_MAJOR_VERSION >= 3
+#define GETSTATE(m) ((struct module_state *) PyModule_GetState(m))
+#else
+#define GETSTATE(m) (&_state)
+static struct module_state _state;
+#endif
+
+struct module_state {
+	PyObject *error;
+#ifdef BENCHMARK_ENABLED
+	Benchmark *dBench;
+#endif
+};
+
+#ifdef BENCHMARK_ENABLED
+static Benchmark *tmpBench;
+#endif
+
+#define SET_BENCH(mod_obj, obj)	\
+	struct module_state *st = GETSTATE(mod_obj);	\
+	obj->dBench = (Benchmark *) st->dBench;		\
+	Py_INCREF(obj->dBench);
+	//printf("%s: Refcnt dBench = '%i'\n", __FUNCTION__, (int) Py_REFCNT(obj->dBench));
+
+#define COPY_BENCH(obj_dst, obj_src)  \
+		if(obj_src->dBench != NULL && obj_dst->dBench == NULL) {	\
+			obj_dst->dBench = obj_src->dBench; \
+			Py_INCREF(obj_dst->dBench); }
+
 #define CAST_TO_LONG(obj, lng) 	\
 	if(PyInt_Check(obj)) { 			\
 		lng = PyInt_AS_LONG(obj); }	\
@@ -312,6 +341,12 @@ void Integer_dealloc(Integer* self) {
 	/* clear structure */
 	mpz_clear(self->m);
 	mpz_clear(self->e);
+//#ifdef BENCHMARK_ENABLED
+//	if(self->dBench != NULL) {
+//		printf("Integer_dealloc: Refcnt dBench = '%i'\n", (int) Py_REFCNT(self->dBench));
+//		Py_DECREF(self->dBench);
+//	}
+//#endif
 	Py_TYPE(self)->tp_free((PyObject*) self);
 }
 
@@ -324,6 +359,9 @@ PyObject *Integer_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 		mpz_init(self->e);
 		mpz_init(self->m);
 		self->initialized = TRUE;
+//#ifdef BENCHMARK_ENABLED
+//		self->dBench = NULL;
+//#endif
 	}
 	return (PyObject *) self;
 }
@@ -384,7 +422,6 @@ int Integer_init(Integer *self, PyObject *args, PyObject *kwds) {
 		}
 	}
 	// else leave self->m set to 0.
-
 	return 0;
 }
 
@@ -601,7 +638,7 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 //	}
 
 #ifdef BENCHMARK_ENABLED
-	UPDATE_BENCHMARK(ADDITION, dBench);
+	UPDATE_BENCHMARK(ADDITION, tmpBench);
 #endif
 	return (PyObject *) rop;
 }
@@ -665,7 +702,7 @@ static PyObject *Integer_sub(PyObject *o1, PyObject *o2) {
 		mpz_add(rop->e, rop->e, rop->m);
 	}
 #ifdef BENCHMARK_ENABLED
-	UPDATE_BENCHMARK(SUBTRACTION, dBench);
+	UPDATE_BENCHMARK(SUBTRACTION, tmpBench);
 #endif
 	return (PyObject *) rop;
 }
@@ -731,7 +768,7 @@ static PyObject *Integer_mul(PyObject *o1, PyObject *o2) {
 	mpz_clear(rhs_mpz);
 //	_reduce(rop);
 #ifdef BENCHMARK_ENABLED
-	UPDATE_BENCHMARK(MULTIPLICATION, dBench);
+	UPDATE_BENCHMARK(MULTIPLICATION, tmpBench);
 #endif
 	return (PyObject *) rop;
 }
@@ -749,6 +786,7 @@ static PyObject *Integer_invert(PyObject *o1) {
 			if (errcode > 0) {
 				return (PyObject *) rop;
 			}
+			Py_DECREF(rop);
 			EXIT_IF(TRUE, "could not find a modular inverse");
 		}
 	}
@@ -798,7 +836,7 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 		else if(mpz_sgn(rop->m) > 0 && mpz_cmp_ui(rhs_mpz, 1) == 0) {
 			mpz_mod(rop->e, rop->e, rop->m);
 			if(mpz_cmp(rop->e, rop->m) < 0) { // check if e < m, then divide e / rhs_value.
-				printf("Unimplemented.\n");
+//				EXIT_IF(TRUE, "unimplemented operation.");
 //				mpz_init_set_ui(tmp, lhs_value);
 //				mpz_gcd(tmp, tmp, rop->m);
 //				mpz_div(rop->e, tmp, rop->e);
@@ -859,11 +897,11 @@ static PyObject *Integer_div(PyObject *o1, PyObject *o2) {
 	mpz_clear(rhs_mpz);
 	if (rop != NULL && mpz_sgn(rop->e) == 0) {
 		//PyObject_Del(rop);
-		Py_XDECREF(rop);
+		Py_DECREF(rop);
 		EXIT_IF(TRUE, "division failed: could not find modular inverse.");
 	}
 #ifdef BENCHMARK_ENABLED
-	UPDATE_BENCHMARK(DIVISION, dBench);
+	UPDATE_BENCHMARK(DIVISION, tmpBench);
 #endif
 	return (PyObject *) rop;
 }
@@ -882,7 +920,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 #if PY_MAJOR_VERSION < 3
 		PyObject *_o2 = PyNumber_Long(o2);
 		longObjToMPZ(exponent, _o2);
-		Py_XDECREF(_o2);
+		Py_DECREF(_o2);
 #else
 		longObjToMPZ(exponent, o2);
 #endif
@@ -1010,7 +1048,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 
 leave:
 #ifdef BENCHMARK_ENABLED
-	UPDATE_BENCHMARK(EXPONENTIATION, dBench);
+	UPDATE_BENCHMARK(EXPONENTIATION, tmpBench);
 #endif
 	return (PyObject *) rop;
 }
@@ -1312,14 +1350,13 @@ static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 			mpz_mod(rop->e, lhs->e, rop->m);
 		}
 	}
-
 	return (PyObject *) rop;
 }
 
 /* END: module function definitions */
 
 /* START: helper function definition */
-#define MAX_RABIN_MILLER_ROUNDS 255
+//#define MAX_RABIN_MILLER_ROUNDS 255
 
 static PyObject *testPrimality(PyObject *self, PyObject *arg) {
 	int result = -1;
@@ -1354,7 +1391,7 @@ static PyObject *testPrimality(PyObject *self, PyObject *arg) {
 	}
 }
 
-static PyObject *genRandomBits(Integer *self, PyObject *args) {
+static PyObject *genRandomBits(PyObject *self, PyObject *args) {
 	unsigned int bits;
 
 	if (PyArg_ParseTuple(args, "i", &bits)) {
@@ -1394,7 +1431,7 @@ static PyObject *genRandomBits(Integer *self, PyObject *args) {
 	EXIT_IF(TRUE, "number of bits must be > 0.");
 }
 
-static PyObject *genRandom(Integer *self, PyObject *args) {
+static PyObject *genRandom(PyObject *self, PyObject *args) {
 	PyObject *obj = NULL;
 	Integer *rop = NULL;
 	mpz_t N;
@@ -1431,7 +1468,7 @@ static PyObject *genRandom(Integer *self, PyObject *args) {
 }
 
 /* takes as input the number of bits and produces a prime number of that size. */
-static PyObject *genRandomPrime(Integer *self, PyObject *args) {
+static PyObject *genRandomPrime(PyObject *self, PyObject *args) {
 	int bits, safe = FALSE;
 
 	if (PyArg_ParseTuple(args, "i|i", &bits, &safe)) {
@@ -2012,7 +2049,6 @@ static PyObject *getMod(PyObject *self, PyObject *args) {
 		Integer *rop = createNewInteger();
 		mpz_init_set(rop->e, intObj->m);
 		mpz_init(rop->m);
-
 		return (PyObject *) rop;
 	}
 
@@ -2040,13 +2076,101 @@ static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 }
 
 #ifdef BENCHMARK_ENABLED
-/* END: helper function definition */
-InitBenchmark_CAPI(int_init_benchmark, dBench, 3);
-StartBenchmark_CAPI(int_start_benchmark, dBench);
-EndBenchmark_CAPI(int_end_benchmark, dBench);
-GetBenchmark_CAPI(int_get_benchmark, dBench);
-GetAllBenchmarks_CAPI(int_get_all_results, dBench, GetResults);
-ClearBenchmarks_CAPI(int_clear_benchmark, dBench);
+#define BenchmarkIdentifier 	3
+
+PyObject *InitBenchmark(PyObject *self, PyObject *args) {
+	Benchmark *b = GETSTATE(self)->dBench;
+	if(b == NULL) {
+		GETSTATE(self)->dBench = PyObject_New(Benchmark, &BenchmarkType);
+	    Py_INCREF(GETSTATE(self)->dBench);
+	    tmpBench = GETSTATE(self)->dBench;
+		Benchmark *dBench = GETSTATE(self)->dBench;
+		PyClearBenchmark(dBench);
+		dBench->bench_initialized = TRUE;
+		dBench->bench_inprogress = FALSE;
+		dBench->identifier = BenchmarkIdentifier;
+		Py_RETURN_TRUE;
+	}
+	else if(b != NULL && b->bench_initialized == FALSE) {
+		debug("%s: bench init: '%i'\n", __FUNCTION__, b->bench_initialized);
+		debug("%s: bench id set: '%i'\n", __FUNCTION__, b->identifier);
+		b->bench_initialized = TRUE;
+		b->identifier = BenchmarkIdentifier;
+		debug("Initialized benchmark object.\n");
+		Py_RETURN_TRUE;
+	}
+	else if(b != NULL && b->bench_inprogress == FALSE && b->bench_initialized == TRUE) {
+		PyClearBenchmark(b);
+		b->bench_initialized = TRUE;
+		b->bench_inprogress = FALSE;
+		b->identifier = BenchmarkIdentifier;
+		Py_RETURN_TRUE;
+	}
+	else if(b != NULL && b->bench_inprogress == TRUE) {
+		printf("Benchmark in progress.\n");
+	}
+
+	debug("Benchmark already initialized.\n");
+	Py_RETURN_FALSE;
+}
+
+PyObject *StartBenchmark(PyObject *self, PyObject *args) {
+	PyObject *list = NULL;
+	Benchmark *b = GETSTATE(self)->dBench;
+	if(PyArg_ParseTuple(args, "O", &list)) {
+		// assert it's a list
+		if(PyList_Check(list) && b->bench_initialized == TRUE && b->bench_inprogress == FALSE && BenchmarkIdentifier == b->identifier) {
+			debug("%s: bench id: '%i'\n", __FUNCTION__, b->identifier);
+			size_t size = PyList_Size(list);
+			PyStartBenchmark(b, list, size);
+			debug("list size => %zd\n", size);
+			debug("benchmark enabled and initialized!\n");
+			Py_RETURN_TRUE;
+		}
+		Py_RETURN_FALSE;
+	}
+	return NULL;
+}
+
+PyObject *EndBenchmark(PyObject *self, PyObject *args) {
+	Benchmark *b = GETSTATE(self)->dBench;
+	if(b != NULL) {
+		debug("%s: bench init: '%i'\n", __FUNCTION__, b->bench_initialized);
+		debug("%s: bench id: '%i'\n", __FUNCTION__, b->identifier);
+		if(b->bench_initialized == TRUE && b->bench_inprogress == TRUE && BenchmarkIdentifier == b->identifier) {
+			PyEndBenchmark(b);
+			//b->bench_initialized = FALSE;
+			//b->identifier = BenchmarkIdentifier;
+			debug("%s: bench id: '%i'\n", __FUNCTION__, b->identifier);
+			Py_RETURN_TRUE;
+		}
+		debug("Invalid benchmark identifier.\n");
+	}
+	Py_RETURN_FALSE;
+}
+
+static PyObject *GetBenchmark(PyObject *self, PyObject *args) {
+	char *opt = NULL;
+	Benchmark *b = GETSTATE(self)->dBench;
+	if(PyArg_ParseTuple(args, "s", &opt))
+	{
+		if(b->bench_initialized == TRUE && b->bench_inprogress == FALSE && b->identifier == BenchmarkIdentifier)
+			return Retrieve_result(b, opt);
+	}
+	Py_RETURN_FALSE;
+}
+
+static PyObject *GetAllBenchmarks(PyObject *self, PyObject *args) {
+	Benchmark *b = GETSTATE(self)->dBench;
+	if(b != NULL) {
+		debug("%s: bench id: '%i'\n", __FUNCTION__, b->identifier);
+		if(b->bench_initialized == TRUE && b->bench_inprogress == FALSE && b->identifier == BenchmarkIdentifier)
+			return GetResults(b);
+		debug("Invalid benchmark identifier.\n");
+	}
+	Py_RETURN_FALSE;
+}
+
 #endif
 
 PyMethodDef Integer_methods[] = {
@@ -2223,22 +2347,9 @@ PyTypeObject IntegerType = {
 
 #endif
 
-struct module_state {
-	PyObject *error;
-#ifdef BENCHMARK_ENABLED
-	Benchmark *dBench;
-#endif
-};
-
-#if PY_MAJOR_VERSION >= 3
-#define GETSTATE(m) ((struct module_state *) PyModule_GetState(m))
-#else
-#define GETSTATE(m) (&_state)
-static struct module_state _state;
-#endif
-
 /* global module methods (include isPrime, randomPrime, etc. here). */
 PyMethodDef module_methods[] = {
+//	{ "setBench"
 	{ "randomBits", (PyCFunction) genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1." },
 	{ "random", (PyCFunction) genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number." },
 	{ "randomPrime", (PyCFunction) genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits." },
@@ -2253,12 +2364,12 @@ PyMethodDef module_methods[] = {
 	{ "serialize", (PyCFunction) serialize, METH_VARARGS, "Serialize an integer type into bytes." },
 	{ "deserialize", (PyCFunction) deserialize, METH_VARARGS, "De-serialize an bytes object into an integer object" },
 #ifdef BENCHMARK_ENABLED
-	{ "InitBenchmark", (PyCFunction) int_init_benchmark, METH_NOARGS, "Initialize a benchmark object" },
-	{ "StartBenchmark", (PyCFunction) int_start_benchmark, METH_VARARGS, "Start a new benchmark with some options" },
-	{ "EndBenchmark", (PyCFunction) int_end_benchmark, METH_VARARGS, "End a given benchmark" },
-	{ "GetBenchmark", (PyCFunction) int_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object" },
-	{ "GetGeneralBenchmarks", (PyCFunction) int_get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
-	{ "ClearBenchmark", (PyCFunction) int_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
+	{ "InitBenchmark", (PyCFunction) InitBenchmark, METH_NOARGS, "Initialize a benchmark object" },
+	{ "StartBenchmark", (PyCFunction) StartBenchmark, METH_VARARGS, "Start a new benchmark with some options" },
+	{ "EndBenchmark", (PyCFunction) EndBenchmark, METH_NOARGS, "End a given benchmark" },
+	{ "GetBenchmark", (PyCFunction) GetBenchmark, METH_VARARGS, "Returns contents of a benchmark object" },
+	{ "GetGeneralBenchmarks", (PyCFunction) GetAllBenchmarks, METH_NOARGS, "Retrieve general benchmark info as a dictionary."},
+//	{ "ClearBenchmark", (PyCFunction) int_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 #endif
 	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object."},
 	{ "toInt", (PyCFunction) toInt, METH_O, "convert modular integer into an integer object."},
@@ -2269,6 +2380,7 @@ PyMethodDef module_methods[] = {
 #if PY_MAJOR_VERSION >= 3
 static int int_traverse(PyObject *m, visitproc visit, void *arg) {
 	Py_VISIT(GETSTATE(m)->error);
+	Py_VISIT(GETSTATE(m)->dBench);
 	return 0;
 }
 
@@ -2276,8 +2388,9 @@ static int int_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
     Py_XDECREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-	Py_CLEAR(GETSTATE(m)->dBench);
-	Py_XDECREF(dBench);
+	printf("int_clear: Refcnt dBench = '%i'\n", (int) Py_REFCNT(GETSTATE(m)->dBench));
+	Py_XDECREF(GETSTATE(m)->dBench);
+//	Py_XDECREF(GETSTATE(m)->dBench);
 #endif
 	return 0;
 }
@@ -2310,6 +2423,14 @@ void initinteger(void) {
 	PyObject *m;
 	if (PyType_Ready(&IntegerType) < 0)
 		CLEAN_EXIT;
+#ifdef BENCHMARK_ENABLED
+    if(import_benchmark() < 0)
+    	CLEAN_EXIT;
+
+    if(PyType_Ready(&BenchmarkType) < 0)
+    	INITERROR;
+#endif
+
 	// initialize module
 #if PY_MAJOR_VERSION >= 3
 	m = PyModule_Create(&moduledef);
@@ -2324,25 +2445,19 @@ void initinteger(void) {
 	IntegerError = st->error;
 //    Py_INCREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-    if(import_benchmark() < 0)
-    	CLEAN_EXIT;
-
-    if(PyType_Ready(&BenchmarkType) < 0)
-    	INITERROR;
-    st->dBench = PyObject_New(Benchmark, &BenchmarkType);
-    if(st->dBench == NULL)
-        CLEAN_EXIT;
-    Py_INCREF(st->dBench);
-    dBench = st->dBench;
-    dBench->bench_initialized = FALSE;
-    dBench->op_add = 0;	dBench->op_sub = 0;
-    dBench->op_mult = 0; dBench->op_div = 0;
-    dBench->op_exp = 0;
-    dBench->cpu_time_ms = 0.0; dBench->real_time_ms = 0.0;
-    dBench->identifier = -1;
-
-    //printf("DEBUG: Refcnt dBench = '%i'\n", (int) Py_REFCNT(dBench));
+	st->dBench = NULL;
+	tmpBench = NULL;
 #endif
+//    st->dBench = PyObject_New(Benchmark, &BenchmarkType);
+//    if(st->dBench == NULL)
+//        CLEAN_EXIT;
+//    Py_INCREF(st->dBench);
+//    tmpBench = st->dBench;
+//    printf("DEBUG: Refcnt dBench = '%i'\n", (int) Py_REFCNT(st->dBench));
+//	Py_INCREF(&BenchmarkType);
+//	PyModule_AddObject(m, "benchmark", (PyObject *) &BenchmarkType);
+//#endif
+
 
 	Py_INCREF(&IntegerType);
 	PyModule_AddObject(m, "integer", (PyObject *) &IntegerType);

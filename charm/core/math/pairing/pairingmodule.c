@@ -249,9 +249,12 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 	mpz_t x;
 	mpz_init(x);
 #if PY_MAJOR_VERSION < 3
-	longObj = PyNumber_Long(longObj);
-#endif
+	PyObject *longObj2 = PyNumber_Long(longObj);
+	longObjToMPZ(x, (PyLongObject *) longObj2);
+	Py_DECREF(longObj2);
+#else
 	longObjToMPZ(x, (PyLongObject *) longObj);
+#endif
 	element_set_mpz(new->e, x);
 	mpz_clear(x);
 	return new;
@@ -269,6 +272,16 @@ void 	Pairing_dealloc(Pairing *self)
 		pairing_clear(self->pair_obj);
 	}
 
+#ifdef BENCHMARK_ENABLED
+	if(self->dBench != NULL) {
+		PrintPyRef("releasing benchmark object", self->dBench);
+		Py_XDECREF(self->dBench);
+//		CLEAR_ALLDBENCH(self->dBench);
+		Operations *c = (Operations *) self->dBench->data_ptr;
+		free(c);
+//		PyObject_Del(self->dBench);
+	}
+#endif
 	debug("Releasing pairing object!\n");
 	Py_TYPE(self)->tp_free((PyObject *) self);
 }
@@ -517,6 +530,9 @@ PyObject *Pairing_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 		self->group_init = FALSE;
 		self->param_buf = NULL;
 		memset(self->hash_id, 0, ID_LEN);
+#ifdef BENCHMARK_ENABLED
+		self->dBench = NULL;
+#endif
 	}
 
 	return (PyObject *) self;
@@ -526,7 +542,6 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 {
 	return -1;
 }
-
 
 int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 {
@@ -770,7 +785,7 @@ static PyObject *Element_add(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_add(newObject->e, self->e, other->e);
 #ifdef BENCHMARK_ENABLED
-	if(newObject != NULL) UPDATE_BENCH(ADDITION, newObject->element_type, dBench);
+	UPDATE_BENCH(ADDITION, newObject->element_type, newObject->pairing->dBench);
 #endif
 	return (PyObject *) newObject;
 }
@@ -795,7 +810,7 @@ static PyObject *Element_sub(Element *self, Element *other)
 	newObject = createNewElement(self->element_type, self->pairing);
 	element_sub(newObject->e, self->e, other->e);
 #ifdef BENCHMARK_ENABLED
-	if(newObject != NULL) UPDATE_BENCH(SUBTRACTION, newObject->element_type, dBench);
+	UPDATE_BENCH(SUBTRACTION, newObject->element_type, newObject->pairing->dBench);
 #endif
 	return (PyObject *) newObject;
 }
@@ -862,7 +877,7 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		EXIT_IF(TRUE, "invalid types.");
 	}
 #ifdef BENCHMARK_ENABLED
-	if(newObject != NULL) UPDATE_BENCH(MULTIPLICATION, newObject->element_type, dBench);
+	UPDATE_BENCH(MULTIPLICATION, newObject->element_type, newObject->pairing->dBench);
 #endif
 	return (PyObject *) newObject;
 }
@@ -903,6 +918,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			other = createNewElement(self->element_type, self->pairing);
 			element_set_si(other->e, z);
 			element_div(newObject->e, self->e, other->e);
+			Py_DECREF(other);
 		}
 	}
 	else if(PyElement_Check(rhs) && found_int) {
@@ -913,6 +929,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 			self = createNewElement(other->element_type, other->pairing);
 			element_set_si(self->e, z);
 			element_div(newObject->e, self->e, other->e);
+			Py_DECREF(self);
 		}
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
@@ -929,7 +946,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 		return NULL;
 	}
 #ifdef BENCHMARK_ENABLED
-	if(newObject != NULL) UPDATE_BENCH(DIVISION, newObject->element_type, dBench);
+	UPDATE_BENCH(DIVISION, newObject->element_type, newObject->pairing->dBench);
 #endif
 	return (PyObject *) newObject;
 }
@@ -986,7 +1003,8 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			newObject = createNewElement(rhs_o2->element_type, rhs_o2->pairing);
 			element_pow_mpz(newObject->e, lhs_o1->e, n);
 			mpz_clear(n);
-			PyObject_Del(lhs_o1);
+			Py_DECREF(lhs_o1);
+			//PyObject_Del(lhs_o1);
 		}
 		else {
 			EXIT_IF(TRUE, "undefined exponentiation operation.");
@@ -1040,7 +1058,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 	}
 	
 #ifdef BENCHMARK_ENABLED
-	if(newObject != NULL) UPDATE_BENCH(EXPONENTIATION, newObject->element_type, dBench);
+	UPDATE_BENCH(EXPONENTIATION, newObject->element_type, newObject->pairing->dBench);
 #endif
 	return (PyObject *) newObject;
 }
@@ -1180,7 +1198,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			newObject = createNewElement(GT, lhs->pairing);
 			pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCHMARK(PAIRINGS, dBench);
+			UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
 #endif
 			return (PyObject *) newObject;
 		}
@@ -1196,7 +1214,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 				pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
 
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCHMARK(PAIRINGS, dBench);
+			UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
 #endif
 			return (PyObject *) newObject;
 		}
@@ -1625,12 +1643,14 @@ static PyObject *Get_Order(Element *self, PyObject *args) {
 }
 
 #ifdef BENCHMARK_ENABLED
-void Operations_clear()
-{
-	CLEAR_ALLDBENCH(dBench);
-}
 
-PyObject *PyCreateList(MeasureType type)
+#define BenchmarkIdentifier 1
+#define GET_RESULTS_FUNC	GetResultsWithPair
+#define GROUP_OBJECT		Pairing
+#define GRANULAR
+#define BENCH_ERROR			ElementError
+/* helper function for granularBenchmar */
+PyObject *PyCreateList(Benchmark *dBench, MeasureType type)
 {
 	int countZR = -1, countG1 = -1, countG2 = -1, countGT = -1;
 	GetField(countZR, type, ZR, dBench);
@@ -1642,43 +1662,177 @@ PyObject *PyCreateList(MeasureType type)
 	return objList;
 }
 
-static PyObject *Granular_benchmark(PyObject *self, PyObject *args)
-{
-	PyObject *dict = NULL;
-	int id = -1;
+#include "benchmark_util.c"
 
-	if(!PyArg_ParseTuple(args, "i", &id)) {
-		PyErr_SetString(ElementError, "invalid benchmark identifier.");
-		return NULL;
-	}
-
-	if(id == BenchmarkIdentifier) {
-		PyObject *MulList = PyCreateList(MULTIPLICATION);
-		PyObject *DivList = PyCreateList(DIVISION);
-		PyObject *AddList = PyCreateList(ADDITION);
-		PyObject *SubList = PyCreateList(SUBTRACTION);
-		PyObject *ExpList = PyCreateList(EXPONENTIATION);
-		dict = PyDict_New();
-		if(dict == NULL) return NULL;
-		//PrintPyRef('MulList Before =>', MulList);
-		PyDict_SetItemString(dict, "Mul", MulList);
-		PyDict_SetItemString(dict, "Div", DivList);
-		PyDict_SetItemString(dict, "Add", AddList);
-		PyDict_SetItemString(dict, "Sub", SubList);
-		PyDict_SetItemString(dict, "Exp", ExpList);
-		Py_DECREF(MulList);
-		Py_DECREF(DivList);
-		Py_DECREF(AddList);
-		Py_DECREF(SubList);
-		Py_DECREF(ExpList);
-		//PrintPyRef('MulList After =>', MulList);
-	}
-	else {
-		printf("%s: invalid id = '%d'\n", __FUNCTION__, id);
-	}
-
-	return dict;
-}
+//PyObject *InitBenchmark(PyObject *self, PyObject *args) {
+//	Benchmark *benchObj = NULL;
+//	Pairing *group = NULL;
+//	if(!PyArg_ParseTuple(args, "O", &group))
+//		return NULL;
+//
+//	VERIFY_GROUP(group);
+//	if(group->dBench == NULL) {
+//		benchObj = PyObject_New(Benchmark, &BenchmarkType);
+//		/* setup granular options */
+//		Operations *cntr = (Operations *) malloc(sizeof(Operations));
+//		benchObj->data_ptr = (void *) cntr; // store data structure
+//		CLEAR_ALLDBENCH(benchObj);
+//		benchObj->bench_initialized = TRUE;
+//		benchObj->bench_inprogress = FALSE;
+//		benchObj->identifier = BenchmarkIdentifier;
+//		benchObj->granular_option = FALSE;
+//		benchObj->op_add = 0;	benchObj->op_sub = 0;
+//		benchObj->op_mult = 0; benchObj->op_div = 0;
+//		benchObj->op_exp = 0; benchObj->op_pair = 0;
+//		benchObj->cpu_time_ms = 0.0; benchObj->real_time_ms = 0.0;
+//		debug("%s: bench id set: '%i'\n", __FUNCTION__, benchObj->identifier);
+//		debug("Initialized benchmark object.\n");
+//
+//		// set benchmark field in group object
+//		group->dBench = benchObj;
+//		Py_RETURN_TRUE;
+//	}
+//	else if(group->dBench->bench_inprogress == FALSE && group->dBench->bench_initialized == TRUE) {
+//		// if we have initialized the benchmark object and ended a benchmark execution:
+//		// action: reset the fields
+//		printf("Starting over!!!\n");
+//		CLEAR_ALLDBENCH(group->dBench);
+//		PyClearBenchmark(group->dBench);
+//		group->dBench->bench_initialized = TRUE;
+//		group->dBench->bench_inprogress = FALSE;
+//		group->dBench->identifier = BenchmarkIdentifier;
+//		Py_RETURN_TRUE;
+//	}
+//	else if(group->dBench->bench_inprogress == TRUE) {
+//		printf("Benchmark in progress.\n");
+//	}
+//	debug("Benchmark already initialized.\n");
+//	Py_RETURN_FALSE;
+//}
+//
+//PyObject *StartBenchmark(PyObject *self, PyObject *args)
+//{
+//	PyObject *list = NULL;
+//	Pairing *group = NULL;
+//	if(PyArg_ParseTuple(args, "OO", &group, &list))
+//	{
+//		VERIFY_GROUP(group);
+//		if(group->dBench->bench_initialized == TRUE && group->dBench->bench_inprogress == FALSE && BenchmarkIdentifier == group->dBench->identifier)
+//		{
+//			debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
+//			size_t size = PyList_Size(list);
+//			PyStartBenchmark(group->dBench, list, size);
+//			debug("list size => %zd\n", size);
+//			debug("benchmark enabled and initialized!\n");
+//			Py_RETURN_TRUE;
+//		}
+//		Py_RETURN_FALSE;
+//	}
+//	return NULL;
+//}
+//
+//PyObject *EndBenchmark(PyObject *self, PyObject *args)
+//{
+//	Pairing *group = NULL;
+//	if(PyArg_ParseTuple(args, "O", &group)) {
+//		debug("%s: bench init: '%i'\n", __FUNCTION__, b->bench_initialized);
+//		debug("%s: bench id: '%i'\n", __FUNCTION__, b->identifier);
+//		if(group->dBench->bench_initialized == TRUE && group->dBench->bench_inprogress == TRUE && group->dBench->identifier == BenchmarkIdentifier) {
+//			PyEndBenchmark(group->dBench);
+//			debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
+////			Operations *c = (Operations *) group->dBench->data_ptr;
+////			free(c);
+//			Py_RETURN_TRUE;
+//		}
+//	}
+//	printf("Invalid benchmark identifier.\n");
+//	Py_RETURN_FALSE;
+//}
+//
+//PyObject *GetAllBenchmarks(PyObject *self, PyObject *args)
+//{
+//	Pairing *group = NULL;
+//	if(PyArg_ParseTuple(args, "O", &group)) {
+//		VERIFY_GROUP(group);
+//
+//		if(group->dBench->bench_inprogress == FALSE && group->dBench->identifier == BenchmarkIdentifier) {
+//			printf("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
+//			return GetResultsWithPair(group->dBench);
+//		}
+//		else if(group->dBench->bench_inprogress == TRUE) {
+//			printf("Benchmark in progress.\n");
+//		}
+//		else {
+//			printf("Invalid benchmark identifier.\n");
+//		}
+//	}
+//	Py_RETURN_FALSE;
+//}
+//
+//PyObject *GetBenchmark(PyObject *self, PyObject *args) {
+//	char *opt = NULL;
+//	Pairing *group = NULL;
+//	if(PyArg_ParseTuple(args, "Os", &group, &opt))
+//	{
+//		VERIFY_GROUP(group);
+//		if(group->dBench->bench_inprogress == FALSE && group->dBench->identifier == BenchmarkIdentifier) {
+//			return Retrieve_result(group->dBench, opt);
+//		}
+//	}
+//	Py_RETURN_FALSE;
+//}
+//
+///* helper function for granularBenchmar */
+//PyObject *PyCreateList(Benchmark *dBench, MeasureType type)
+//{
+//	int countZR = -1, countG1 = -1, countG2 = -1, countGT = -1;
+//	GetField(countZR, type, ZR, dBench);
+//	GetField(countG1, type, G1, dBench);
+//	GetField(countG2, type, G2, dBench);
+//	GetField(countGT, type, GT, dBench);
+//
+//	PyObject *objList = Py_BuildValue("[iiii]", countZR, countG1, countG2, countGT);
+//	return objList;
+//}
+//
+//static PyObject *GranularBenchmark(PyObject *self, PyObject *args)
+//{
+//	PyObject *dict = NULL;
+//	Pairing *group = NULL;
+//	int id = -1;
+//
+//	if(!PyArg_ParseTuple(args, "O", &group)) {
+//		PyErr_SetString(ElementError, "invalid benchmark identifier.");
+//		return NULL;
+//	}
+//
+//	if(BenchmarkIdentifier == group->dBench->identifier) {
+//		PyObject *MulList = PyCreateList(group->dBench, MULTIPLICATION);
+//		PyObject *DivList = PyCreateList(group->dBench, DIVISION);
+//		PyObject *AddList = PyCreateList(group->dBench, ADDITION);
+//		PyObject *SubList = PyCreateList(group->dBench, SUBTRACTION);
+//		PyObject *ExpList = PyCreateList(group->dBench, EXPONENTIATION);
+//		dict = PyDict_New();
+//		if(dict == NULL) return NULL;
+//		//PrintPyRef('MulList Before =>', MulList);
+//		PyDict_SetItemString(dict, "Mul", MulList);
+//		PyDict_SetItemString(dict, "Div", DivList);
+//		PyDict_SetItemString(dict, "Add", AddList);
+//		PyDict_SetItemString(dict, "Sub", SubList);
+//		PyDict_SetItemString(dict, "Exp", ExpList);
+//		Py_DECREF(MulList);
+//		Py_DECREF(DivList);
+//		Py_DECREF(AddList);
+//		Py_DECREF(SubList);
+//		Py_DECREF(ExpList);
+//		//PrintPyRef('MulList After =>', MulList);
+//	}
+//	else {
+//		printf("%s: invalid id = '%d'\n", __FUNCTION__, id);
+//	}
+//
+//	return dict;
+//}
 #endif
 
 #if PY_MAJOR_VERSION >= 3
@@ -1769,16 +1923,6 @@ PyTypeObject PairingType = {
 
 #endif
 
-#ifdef BENCHMARK_ENABLED
-// Benchmark methods
-InitBenchmark_CAPI(_init_benchmark, dBench, BenchmarkIdentifier);
-StartBenchmark_CAPI(_start_benchmark, dBench);
-EndBenchmark_CAPI(_end_benchmark, dBench);
-GetBenchmark_CAPI(_get_benchmark, dBench);
-GetAllBenchmarks_CAPI(_get_all_results, dBench, GetResultsWithPair);
-ClearBenchmarks_CAPI(_clear_benchmark, dBench);
-#endif
-// new
 #if PY_MAJOR_VERSION >= 3
 PyNumberMethods element_number = {
 	    instance_add,            /* nb_add */
@@ -1948,9 +2092,9 @@ PyTypeObject ElementType = {
 
 struct module_state {
 	PyObject *error;
-#ifdef BENCHMARK_ENABLED
-	Benchmark *dBench;
-#endif
+//#ifdef BENCHMARK_ENABLED
+//	Benchmark *dBench;
+//#endif
 };
 
 #if PY_MAJOR_VERSION >= 3
@@ -1962,8 +2106,6 @@ static struct module_state _state;
 
 // end
 PyMemberDef Element_members[] = {
-//	{"params", T_STRING, offsetof(Element, params), 0,
-//		"pairing type"},
 	{"type", T_INT, offsetof(Element, element_type), 0,
 		"group type"},
     {"initialized", T_INT, offsetof(Element, elem_initialized), 0,
@@ -1977,7 +2119,7 @@ PyMethodDef Element_methods[] = {
 };
 
 PyMethodDef pairing_methods[] = {
-	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in group ZR and optionally set value."},
+	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in group Zr and optionally set value."},
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1 and G2 and returns an element mapped to GT"},
 	{"hashPair", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
@@ -1987,13 +2129,12 @@ PyMethodDef pairing_methods[] = {
 	{"ismember", (PyCFunction) Group_Check, METH_VARARGS, "Group membership test for element objects."},
 	{"order", (PyCFunction) Get_Order, METH_VARARGS, "Get the group order for a particular field."},
 #ifdef BENCHMARK_ENABLED
-	{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
-	{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
-	{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
-	{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
-	{"GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary"},
-	{"GetGranularBenchmarks", (PyCFunction) Granular_benchmark, METH_VARARGS, "Retrieve granular benchmarks as a dictionary"},
-	{"ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
+	{"InitBenchmark", (PyCFunction)InitBenchmark, METH_VARARGS, "Initialize a benchmark object"},
+	{"StartBenchmark", (PyCFunction)StartBenchmark, METH_VARARGS, "Start a new benchmark with some options"},
+	{"EndBenchmark", (PyCFunction)EndBenchmark, METH_VARARGS, "End a given benchmark"},
+	{"GetBenchmark", (PyCFunction)GetBenchmark, METH_VARARGS, "Returns contents of a benchmark object"},
+	{"GetGeneralBenchmarks", (PyCFunction)GetAllBenchmarks, METH_VARARGS, "Retrieve general benchmark info as a dictionary"},
+	{"GetGranularBenchmarks", (PyCFunction) GranularBenchmark, METH_VARARGS, "Retrieve granular benchmarks as a dictionary"},
 #endif
     {NULL}  /* Sentinel */
 };
@@ -2007,11 +2148,6 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 static int pairings_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
     Py_XDECREF(ElementError);
-#ifdef BENCHMARK_ENABLED
-	Operations *c = (Operations *) dBench->data_ptr;
-	free(c);
-	Py_XDECREF(dBench); //Py_CLEAR(GETSTATE(m)->dBench);
-#endif
 	return 0;
 }
 
@@ -2067,25 +2203,6 @@ void initpairing(void) 		{
         CLEAN_EXIT;
     ElementError = st->error;
     Py_INCREF(ElementError);
-#ifdef BENCHMARK_ENABLED
-    st->dBench = PyObject_New(Benchmark, &BenchmarkType);
-    if(st->dBench == NULL)
-        CLEAN_EXIT;
-    Py_INCREF(st->dBench);
-    dBench = st->dBench;
-
-    dBench->bench_initialized = FALSE;
-    Operations *cntr = (Operations *) malloc(sizeof(Operations));
-    dBench->data_ptr = (void *) cntr; // store data structure
-    dBench->gran_init = &Operations_clear; // pointer to clearing the structure memory
-    CLEAR_ALLDBENCH(dBench);
-    dBench->granular_option = FALSE;
-    dBench->op_add = 0;	dBench->op_sub = 0;
-    dBench->op_mult = 0; dBench->op_div = 0;
-    dBench->op_exp = 0; dBench->op_pair = 0;
-    dBench->cpu_time_ms = 0.0; dBench->real_time_ms = 0.0;
-    dBench->identifier = -1;
-#endif
 
     Py_INCREF(&ElementType);
     PyModule_AddObject(m, "pc_element", (PyObject *)&ElementType);

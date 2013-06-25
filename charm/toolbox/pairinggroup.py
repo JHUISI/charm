@@ -1,6 +1,7 @@
 try:
   from charm.toolbox.pairingcurves import params as param_info
   from charm.core.math.pairing import pairing,pc_element,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
+  import charm.core.math.pairing as pg
   from charm.config import libs,pairing_lib
 except Exception as err:
   print(err)
@@ -29,24 +30,27 @@ class PairingGroup():
     
     def __str__(self):
         return str(self.Pairing)
+
+    def order(self):
+        """returns the order of the group"""
+        return order(self.Pairing)
     
-    # will be used to define curve parameters and such
     def paramgen(self, qbits, rbits):
         return None
 
     def ismember(self, obj):
-#        assert type(obj) == pairing, "not a pairing object."
+        """membership test for a pairing object"""
         return ismember(self.Pairing, obj)
 
     def ismemberList(self, obj):
+        """membership test for a list of pairing objects"""        
         for i in range(len(obj)):
-#            assert type(obj[i]) == pairing, "not a pairing object."
             if ismember(self.Pairing, obj[i]) == False: return False
         return True
 
     def ismemberDict(self, obj):
+        """membership test for a dict of pairing objects"""                
         for i in obj.keys():
-#            assert type(obj[i]) == pairing, "not a pairing object."
             if ismember(self.Pairing, obj[i]) == False: return False
         return True
 
@@ -60,11 +64,13 @@ class PairingGroup():
         return self.secparam / 8        
 
     def init(self, type, value=None):
+        """initializes an object with a specified type and value""" 
         if value != None:
             return init(self.Pairing, type, value)
         return init(self.Pairing, type)
             
     def random(self, _type=ZR, count=1, seed=None):
+        """selects a random element in ZR, G1, G2 and GT"""
         if _type == GT: return self.__randomGT()
         elif _type in [ZR, G1, G2]:
             if seed != None and count == 1:
@@ -88,12 +94,15 @@ class PairingGroup():
         raise NotImplementedException 
     
     def hash(self, args, type=ZR):
+        """hashes objects into ZR, G1 or G2 depending on the pairing curve"""
         return H(self.Pairing, args, type)
     
     def serialize(self, obj):
+        """serializes a pairing object into bytes"""
         return serialize(obj)
     
     def deserialize(self, obj):
+        """deserializes into a pairing object"""
         return deserialize(self.Pairing, obj)
     
     def debug(self, data, prefix=None):
@@ -109,4 +118,31 @@ class PairingGroup():
         return None
     
     def pair_prod(self, lhs, rhs):
+        """takes two lists of G1 & G2 and computes a pairing product"""
         return pair(lhs, rhs, self.Pairing)
+
+    def InitBenchmark(self):
+        """initiates the benchmark state"""
+        return pg.InitBenchmark(self.Pairing)
+    
+    def StartBenchmark(self, options):
+        """starts the benchmark with any of these options: 
+        RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Pair, Granular"""
+        return pg.StartBenchmark(self.Pairing, options)
+    
+    def EndBenchmark(self):
+        """ends an ongoing benchmark"""
+        return pg.EndBenchmark(self.Pairing)
+        
+    def GetGeneralBenchmarks(self):
+        """retrieves benchmark count for all group operations"""
+        return pg.GetGeneralBenchmarks(self.Pairing)
+    
+    def GetGranularBenchmarks(self):
+        """retrieves group operation count per type: ZR, G1, G2, and GT"""
+        return pg.GetGranularBenchmarks(self.Pairing)
+    
+    def GetBenchmark(self, option):
+        """retrieves benchmark results for any of these options: 
+        RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Pair, Granular"""
+        return pg.GetBenchmark(self.Pairing, option)
