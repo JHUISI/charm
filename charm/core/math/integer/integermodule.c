@@ -329,6 +329,7 @@ int hash_to_group_element(mpz_t x, int block_num, uint8_t *output_buf) {
 				HASH_FUNCTION_KEM_DERIVE);
 	}
 
+	free(rop_buf);
 	return TRUE;
 }
 
@@ -1265,6 +1266,7 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 				mpz_init_set(modulus, p);
 			}
 
+			free(rop_buf);
 			print_mpz(v, 10);
 			Integer *rop = createNewInteger();
 			mpz_init_set(rop->e, v);
@@ -1655,7 +1657,9 @@ static PyObject *decode_message(PyObject *self, PyObject *args) {
 			mpz_clear(p);
 			mpz_clear(q);
 
-			return PyBytes_FromFormat("%s", m);
+			PyObject *newObj = PyBytes_FromFormat("%s", m);
+			free(Rop);
+			return newObj;
 		}
 	}
 
@@ -1909,6 +1913,7 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 		bytes1 = PyBytes_FromFormat("%d:%d:%s:", isNeg, (int) length,
 				(const char *) base64_rop);
 		free(base64_rop);
+		free(rop);
 //	}
 
 	if (mpz_sgn(obj->m) > 0) {
@@ -1920,6 +1925,7 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 		bytes2 = PyBytes_FromFormat("%d:%s:", (int) length2,
 				(const char *) base64_rop2);
 		free(base64_rop2);
+		free(rop2);
 	}
 
 	if (bytes2 != NULL && bytes1 != NULL) {
@@ -2018,7 +2024,9 @@ static PyObject *toBytes(PyObject *self, PyObject *args) {
 		unsigned char *Rop = (unsigned char *) mpz_export(NULL, &count, 1,
 				sizeof(char), 0, 0, intObj->e);
 		debug("Rop => '%s', len =>'%zd'\n", Rop, count);
-		return PyBytes_FromStringAndSize((const char *) Rop, (Py_ssize_t) count);
+		PyObject *newObj = PyBytes_FromStringAndSize((const char *) Rop, (Py_ssize_t) count);
+		free(Rop);
+		return newObj;
 	}
 
 	EXIT_IF(TRUE, "invalid type.");
