@@ -275,10 +275,10 @@ void 	Pairing_dealloc(Pairing *self)
 #ifdef BENCHMARK_ENABLED
 	if(self->dBench != NULL) {
 		PrintPyRef("releasing benchmark object", self->dBench);
-		Py_XDECREF(self->dBench);
 //		CLEAR_ALLDBENCH(self->dBench);
 		Operations *c = (Operations *) self->dBench->data_ptr;
 		free(c);
+		Py_XDECREF(self->dBench);
 //		PyObject_Del(self->dBench);
 	}
 #endif
@@ -1223,7 +1223,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 	EXIT_IF(TRUE, "pairings only apply to elements of G1 x G2 --> GT");
 }
 
-PyObject *sha1_hash(Element *self, PyObject *args) {
+PyObject *sha2_hash(Element *self, PyObject *args) {
 	Element *object;
 	PyObject *str;
 	char *hash_hex = NULL;
@@ -1255,7 +1255,7 @@ PyObject *sha1_hash(Element *self, PyObject *args) {
 static PyObject *Element_hash(Element *self, PyObject *args) {
 	Element *newObject = NULL, *object = NULL;
 	Pairing *group = NULL;
-	PyObject *objList = NULL, *tmpObject = NULL;
+	PyObject *objList = NULL, *tmpObject = NULL, *tmpObj = NULL;
 	int result, i;
 	GroupType type = ZR;
 	
@@ -1274,7 +1274,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	// first case: is a string and type may or may not be set
 	if(PyBytes_CharmCheck(objList)) {
 		str = NULL;
-		PyBytes_ToString(str, objList);
+		PyBytes_ToString2(str, objList, tmpObj);
 		if(type == ZR) {
 			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
@@ -1321,7 +1321,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			}
 			else if(PyBytes_CharmCheck(tmpObject)) {
 				str = NULL;
-				PyBytes_ToString(str, tmpObject);
+				PyBytes_ToString2(str, tmpObject, tmpObj);
 				int str_length = strlen((char *) str);
 				result = hash_to_bytes((uint8_t *) str, str_length, hash_buf, hash_len, HASH_FUNCTION_STR_TO_Zr_CRH);
 				debug("hash str element =>");
@@ -1344,7 +1344,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				}
 				else if(PyBytes_CharmCheck(tmpObject)) {
 					str = NULL;
-					PyBytes_ToString(str, tmpObject);
+					PyBytes_ToString2(str, tmpObject, tmpObj);
 					result = hash2_buffer_to_bytes((uint8_t *) str, strlen((char *) str), hash_buf, hash_len, hash_buf);
 				}
 				Py_DECREF(tmpObject);
@@ -1392,11 +1392,13 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 		goto cleanup;
 	}
 
-	
+
+	if(tmpObj != NULL) Py_XDECREF(tmpObj);
 	return (PyObject *) newObject;
 
 cleanup:
 	if(newObject != NULL) Py_XDECREF(newObject);
+	if(tmpObj != NULL) Py_XDECREF(tmpObj);
 	EXIT_IF(TRUE, tmp);
 }
 
@@ -2121,7 +2123,7 @@ PyMethodDef Element_methods[] = {
 PyMethodDef pairing_methods[] = {
 	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in group Zr and optionally set value."},
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1 and G2 and returns an element mapped to GT"},
-	{"hashPair", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"hashPair", (PyCFunction)sha2_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
 	{"random", (PyCFunction)Element_random, METH_VARARGS, "Return a random element in a specific group: G1, G2, Zr"},
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},

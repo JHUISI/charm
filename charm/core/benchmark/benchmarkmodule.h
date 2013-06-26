@@ -50,6 +50,7 @@ else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
 	/* treat everything as string in 2.x */
 	#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
 	#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
+	#define PyBytes_ToString2(a, obj, tmpObj) a = PyString_AsString(obj);
 
 #endif
 

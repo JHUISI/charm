@@ -135,7 +135,6 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 				else if(strcmp(s, _GRAN_OPT) == 0) {
 					data->options_selected[cnt] = GRANULAR;
 					data->granular_option = TRUE;
-					//data->gran_init((void *) data);
 				}
 				else {
 					debug("not a valid option.\n");

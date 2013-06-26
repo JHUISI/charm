@@ -211,11 +211,11 @@ void ECGroup_dealloc(ECGroup *self)
 #ifdef BENCHMARK_ENABLED
 	if(self->dBench != NULL) {
 		//PrintPyRef("releasing benchmark object", self->dBench);
-		Py_DECREF(self->dBench);
-		CLEAR_ALLDBENCH(self->dBench);
+//		CLEAR_ALLDBENCH(self->dBench);
 		Operations *c = (Operations *) self->dBench->data_ptr;
 		free(c);
-		PyObject_Del(self->dBench);
+		Py_DECREF(self->dBench);
+//		PyObject_Del(self->dBench);
 	}
 #endif
 	debug("Releasing ECGroup object!\n");

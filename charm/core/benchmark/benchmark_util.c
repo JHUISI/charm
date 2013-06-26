@@ -89,7 +89,7 @@ PyObject *GetAllBenchmarks(PyObject *self, PyObject *args)
 		VERIFY_GROUP(group);
 
 		if(group->dBench->bench_inprogress == FALSE && group->dBench->identifier == BenchmarkIdentifier) {
-			printf("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
+			debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
 			// return GetResultsWithPair(group->dBench);
 			return GET_RESULTS_FUNC(group->dBench);
 		}
@@ -120,8 +120,6 @@ static PyObject *GranularBenchmark(PyObject *self, PyObject *args)
 {
 	PyObject *dict = NULL;
 	GROUP_OBJECT *group = NULL;
-	int id = -1;
-
 	if(!PyArg_ParseTuple(args, "O", &group)) {
 		PyErr_SetString(BENCH_ERROR, "invalid benchmark identifier.");
 		return NULL;
@@ -149,7 +147,7 @@ static PyObject *GranularBenchmark(PyObject *self, PyObject *args)
 		//PrintPyRef('MulList After =>', MulList);
 	}
 	else {
-		printf("%s: invalid id = '%d'\n", __FUNCTION__, id);
+		debug("%s: invalid id = '%d'\n", __FUNCTION__, id);
 	}
 
 	return dict;
