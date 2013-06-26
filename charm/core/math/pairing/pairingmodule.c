@@ -274,7 +274,7 @@ void 	Pairing_dealloc(Pairing *self)
 
 #ifdef BENCHMARK_ENABLED
 	if(self->dBench != NULL) {
-		PrintPyRef("releasing benchmark object", self->dBench);
+		// PrintPyRef("releasing benchmark object", self->dBench);
 //		CLEAR_ALLDBENCH(self->dBench);
 		Operations *c = (Operations *) self->dBench->data_ptr;
 		free(c);
