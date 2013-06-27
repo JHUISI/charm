@@ -1915,7 +1915,7 @@ void initelliptic_curve(void) 		{
 	// replace with read from some source of randomness
 #ifndef MS_WINDOWS
 	debug("Linux: seeding openssl prng.\n");
-	char *rand_file = "/dev/random";
+	char *rand_file = "/dev/urandom";
 	RAND_load_file(rand_file, RAND_MAX_BYTES);
 #else
 	debug("Windows: seeding openssl prng.\n");
