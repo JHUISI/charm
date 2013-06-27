@@ -94,13 +94,16 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 		return FALSE;
 	}
 
+	PyObject *tmpObj;
+	char *s;
 	if(data != NULL) {
 		int cnt = 0;
 		for(i = 0; i < opListSize; i++) {
 			PyObject *item = PyList_GetItem(opList, i);
 			if(PyBytes_CharmCheck(item)) {
-				char *s = NULL;
-				PyBytes_ToString(s, item);
+				s = NULL;
+				tmpObj = NULL;
+				PyBytes_ToString2(s, item, tmpObj);
 				if(strcmp(s, _CPUTIME_OPT) == 0) {
 					debug("enabled cputime option!\n");
 					data->options_selected[cnt] = CPU_TIME;
@@ -150,6 +153,7 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 					debug("not a valid option.\n");
 				}
 				cnt++;
+				Py_DECREF(tmpObj);
 			}
 		}
 		// set size of list

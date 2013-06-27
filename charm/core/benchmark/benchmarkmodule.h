@@ -32,9 +32,6 @@ extern "C" {
 	/* check for both unicode and bytes objects */
 	#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
 	/* if unicode then add extra conversion step. two possibilities: unicode or bytes */
-	#define PyBytes_ToString(a, obj)	\
-if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AsString(_obj); Py_DECREF(_obj); }	\
-else { a = PyBytes_AsString(obj); }
 	#define PyBytes_ToString2(a, obj, tmp_obj)	\
 if(PyBytes_Check(obj)) { a = PyBytes_AsString(obj); } \
 else if(PyUnicode_Check(obj)) { tmp_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AsString(tmp_obj); }	\
@@ -49,7 +46,6 @@ else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
     #define PyUnicode_FromString PyString_FromString
 	/* treat everything as string in 2.x */
 	#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
-	#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
 	#define PyBytes_ToString2(a, obj, tmpObj) a = PyString_AsString(obj);
 
 #endif
