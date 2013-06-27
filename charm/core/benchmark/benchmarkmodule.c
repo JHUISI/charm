@@ -13,8 +13,8 @@ double CalcUsecs(struct timeval *start, struct timeval *stop) {
 	}
 
 //	if(result < 0) {
-//		printf("start secs => '%ld' and usecs => '%d'\n", start->tv_sec, start->tv_usec);
-//		printf("stop secs => '%ld' and usecs => '%d'\n", stop->tv_sec, stop->tv_usec);
+//		debug("start secs => '%ld' and usecs => '%d'\n", start->tv_sec, start->tv_usec);
+//		debug("stop secs => '%ld' and usecs => '%d'\n", stop->tv_sec, stop->tv_usec);
 //	}
 
 	return result / usec_per_second;
@@ -43,6 +43,7 @@ PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     }
     return (PyObject *) self;
 }
+
 // benchmark init
 int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds) {
 
@@ -101,38 +102,47 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 				char *s = NULL;
 				PyBytes_ToString(s, item);
 				if(strcmp(s, _CPUTIME_OPT) == 0) {
+					debug("enabled cputime option!\n");
 					data->options_selected[cnt] = CPU_TIME;
 					data->cpu_option = TRUE;
 				}
 				else if(strcmp(s, _REALTIME_OPT) == 0) {
+					debug("enabled realtime option!\n");
 					data->options_selected[cnt] = REAL_TIME;
 					data->real_option = TRUE;
 				}
 				else if(strcmp(s, _ADD_OPT) == 0) {
+					debug("enabled add option!\n");
 					data->options_selected[cnt] = ADDITION;
 					data->op_add = 0;
 				}
 				else if(strcmp(s, _SUB_OPT) == 0) {
+					debug("enabled sub option!\n");
 					data->options_selected[cnt] = SUBTRACTION;
 					data->op_sub = 0;
 				}
 				else if(strcmp(s, _MUL_OPT) == 0) {
+					debug("enabled mul option!\n");
 					data->options_selected[cnt] = MULTIPLICATION;
 					data->op_mult = 0;
 				}
 				else if(strcmp(s, _DIV_OPT) == 0) {
+					debug("enabled div option!\n");
 					data->options_selected[cnt] = DIVISION;
 					data->op_div = 0;
 				}
 				else if(strcmp(s, _EXP_OPT) == 0) {
+					debug("enabled exp option!\n");
 					data->options_selected[cnt] = EXPONENTIATION;
 					data->op_exp = 0;
 				}
 				else if(strcmp(s, _PAIR_OPT) == 0) {
+					debug("enabled pair option!\n");
 					data->options_selected[cnt] = PAIRINGS;
 					data->op_pair = 0;
 				}
 				else if(strcmp(s, _GRAN_OPT) == 0) {
+					debug("enabled granular option!\n");
 					data->options_selected[cnt] = GRANULAR;
 					data->granular_option = TRUE;
 				}
@@ -158,23 +168,28 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 
 static int PyEndBenchmark(Benchmark *data)
 {
-	struct timeval stop_t;
-	gettimeofday(&stop_t, NULL); // stop real time clock
-	int i, stop_c = clock();
+	gettimeofday(&data->stop_time, NULL); // stop real time clock
+	data->stop_clock = clock(); // stop cpu time clock
+	int i;
+//	struct timeval stop_t;
+//	gettimeofday(&stop_t, NULL); // stop real time clock
+//	int i, stop_c = clock();
 	if(data != NULL && data->bench_initialized) {
 		debug("Results....\n");
 		for(i = 0; i < data->num_options; i++) {
 			MeasureType option = data->options_selected[i];
 			debug("option => %d\n", option);
 			switch(option) {
-				case CPU_TIME:  data->stop_clock = stop_c;
+				case CPU_TIME:  // data->stop_clock = stop_c;
 								// compute processor time or clocks per sec
 								data->cpu_time_ms = ((double)(data->stop_clock - data->start_clock))/CLOCKS_PER_SEC;
 								debug("CPU Time:\t%f\n", data->cpu_time_ms);
 								break;
 				case REAL_TIME:	// time(&data->stop_time);
 								// data->real_time_ms = difftime(stop_t, data->start_time);
-								data->real_time_ms = CalcUsecs(&data->start_time, &stop_t);
+								debug("realtime option was set!\n");
+//								data->real_time_ms = CalcUsecs(&data->start_time, &stop_t);
+								data->real_time_ms = CalcUsecs(&data->start_time, &data->stop_time);
 								debug("Real Time:\t%f\n", data->real_time_ms);
 								break;
 				case ADDITION: 		debug("add operations:\t\t%d\n", data->op_add); break;
@@ -183,7 +198,7 @@ static int PyEndBenchmark(Benchmark *data)
 				case DIVISION:	debug("div operations:\t\t%d\n", data->op_div); break;
 				case EXPONENTIATION: debug("exp operations:\t\t%d\n", data->op_exp); break;
 				case PAIRINGS: debug("pairing operations:\t\t%d\n", data->op_pair); break;
-				case GRANULAR: debug("disabling granular measurement option.\n"); break;
+				case GRANULAR: debug("granular option was set!\n"); break;
 				default: debug("not a valid option.\n"); break;
 			}
 		}
@@ -234,6 +249,7 @@ static int PyClearBenchmark(Benchmark *data) {
 	data->cpu_option = FALSE;
 	data->real_option = FALSE;
 	data->granular_option = FALSE;
+	memset(data->options_selected, 0, MAX_MEASURE);
 	debug("Initialized benchmark object.\n");
 	return TRUE;
 }

@@ -10,10 +10,10 @@ PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 	if(group->dBench == NULL) {
 		benchObj = PyObject_New(Benchmark, &BenchmarkType);
 		/* setup granular options */
-#ifdef GRANULAR
+// #ifdef GRANULAR
 		Operations *cntr = (Operations *) malloc(sizeof(Operations));
 		benchObj->data_ptr = (void *) cntr; // store data structure
-#endif
+// #endif
 		CLEAR_ALLDBENCH(benchObj);
 		PyClearBenchmark(benchObj);
 		benchObj->bench_initialized = TRUE;
@@ -29,6 +29,7 @@ PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 	else if(group->dBench->bench_inprogress == FALSE && group->dBench->bench_initialized == TRUE) {
 		// if we have initialized the benchmark object and ended a benchmark execution:
 		// action: reset the fields
+		debug("Reset benchmark state.\n");
 		CLEAR_ALLDBENCH(group->dBench);
 		PyClearBenchmark(group->dBench);
 		group->dBench->bench_initialized = TRUE;
@@ -37,7 +38,7 @@ PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 		Py_RETURN_TRUE;
 	}
 	else if(group->dBench->bench_inprogress == TRUE) {
-		printf("Benchmark in progress.\n");
+		debug("Benchmark in progress.\n");
 	}
 	debug("Benchmark already initialized.\n");
 	Py_RETURN_FALSE;
@@ -50,7 +51,8 @@ PyObject *StartBenchmark(PyObject *self, PyObject *args)
 	if(PyArg_ParseTuple(args, "OO", &group, &list))
 	{
 		VERIFY_GROUP(group);
-		if(PyList_Check(list) && group->dBench->bench_initialized == TRUE && group->dBench->bench_inprogress == FALSE && BenchmarkIdentifier == group->dBench->identifier)
+		if(PyList_Check(list) && group->dBench->bench_initialized == TRUE && group->dBench->bench_inprogress == FALSE
+				&& group->dBench->identifier == BenchmarkIdentifier)
 		{
 			debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
 			size_t size = PyList_Size(list);
@@ -78,7 +80,7 @@ PyObject *EndBenchmark(PyObject *self, PyObject *args)
 			Py_RETURN_TRUE;
 		}
 	}
-	printf("Invalid benchmark identifier.\n");
+	debug("Invalid benchmark identifier.\n");
 	Py_RETURN_FALSE;
 }
 
@@ -97,7 +99,7 @@ PyObject *GetAllBenchmarks(PyObject *self, PyObject *args)
 			printf("Benchmark in progress.\n");
 		}
 		else {
-			printf("Invalid benchmark identifier.\n");
+			debug("Invalid benchmark identifier.\n");
 		}
 	}
 	Py_RETURN_FALSE;
