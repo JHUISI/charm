@@ -270,6 +270,7 @@ void 	Pairing_dealloc(Pairing *self)
 	debug("Clear pairing => 0x%p\n", self->pair_obj);
 	if(self->group_init == TRUE) {
 		pairing_clear(self->pair_obj);
+		pbc_param_clear(self->p);
 	}
 
 #ifdef BENCHMARK_ENABLED
