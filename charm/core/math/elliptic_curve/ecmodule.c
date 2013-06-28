@@ -454,7 +454,6 @@ PyObject *ECE_random(ECElement *self, PyObject *args)
 		}
 		else if(type == ZR) {
 			ECElement *objZR = createNewPoint(ZR, gobj);
-			objZR->elemZ = BN_new();
 			BN_rand_range(objZR->elemZ, gobj->order);
 
 			return (PyObject *) objZR;
@@ -731,8 +730,8 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 			if(rhs_neg != NULL) {
 				ans = createNewPoint(G, lhs->group);
 				EC_POINT_add(ans->group->ec_group, ans->P, lhs->P, rhs_neg->P, ans->group->ctx);
-				Py_XDECREF(rhs_neg);
 			}
+			Py_DECREF(rhs_neg);
 		}
 		else if(ElementZR(lhs, rhs)) {
 			ans = createNewPoint(ZR, lhs->group);
@@ -959,6 +958,8 @@ ECElement *negatePoint(ECElement *self) {
 
 	newObj = createNewPoint(G, self->group);
 	EC_POINT_set_affine_coordinates_GFp(newObj->group->ec_group, newObj->P, x, y, newObj->group->ctx);
+	BN_free(x);
+	BN_free(y);
 	if(EC_POINT_is_on_curve(newObj->group->ec_group, newObj->P, newObj->group->ctx)) {
 		return newObj;
 	}
@@ -1433,7 +1434,7 @@ static PyObject *Serialize(ECElement *self, PyObject *args) {
 			PyObject *result = PyBytes_FromString((const char *) base64_buf);
 			PyObject *obj2 = PyBytes_FromFormat("%d:", obj->type);
 			PyBytes_ConcatAndDel(&obj2, result);
-
+			free(base64_buf);
 			return obj2;
 		}
 		else if(obj->point_init && obj->type == ZR) {
@@ -1449,6 +1450,7 @@ static PyObject *Serialize(ECElement *self, PyObject *args) {
 				PyObject *result = PyBytes_FromString((const char *) base64_buf);
 				PyObject *obj2 = PyBytes_FromFormat("%d:", obj->type);
 				PyBytes_ConcatAndDel(&obj2, result);
+				free(base64_buf);
 				return obj2;
 			}
 		}
