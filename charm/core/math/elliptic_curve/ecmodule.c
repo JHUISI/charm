@@ -1507,7 +1507,6 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 #define GET_RESULTS_FUNC	GetResults
 #define GROUP_OBJECT		ECGroup
 #define BENCH_ERROR			PyECErrorObject
-#define GRANULAR
 
 PyObject *PyCreateList(Operations *gBench, MeasureType type)
 {

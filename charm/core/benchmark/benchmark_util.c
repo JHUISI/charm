@@ -167,7 +167,7 @@ PyObject *GetAllBenchmarks(PyObject *self, PyObject *args)
 {
 	GROUP_OBJECT *group = NULL;
 	if(!PyArg_ParseTuple(args, "O", &group)) {
-		PyErr_SetString(BENCH_ERROR, "GetAllBenchmarks - invalid argument.");
+		PyErr_SetString(BENCH_ERROR, "GetGeneralBenchmarks - invalid argument.");
 		return NULL;
 	}
 	VERIFY_GROUP(group);
@@ -217,7 +217,7 @@ static PyObject *GranularBenchmark(PyObject *self, PyObject *args)
 	PyObject *dict = NULL;
 	GROUP_OBJECT *group = NULL;
 	if(!PyArg_ParseTuple(args, "O", &group)) {
-		PyErr_SetString(BENCH_ERROR, "GranularBenchmark - invalid argument.");
+		PyErr_SetString(BENCH_ERROR, "GetGranularBenchmark - invalid argument.");
 		return NULL;
 	}
 
