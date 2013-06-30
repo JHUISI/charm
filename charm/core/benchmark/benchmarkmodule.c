@@ -62,6 +62,7 @@ int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds) {
 }
 // benchmark dealloc
 void Benchmark_dealloc(Benchmark *self) {
+	debug("Releasing benchmark object.\n");
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -260,7 +261,6 @@ static int PyClearBenchmark(Benchmark *data) {
 
 /*
  * @description: takes as input an identifier, a list of options to measure.
- */
 static PyObject *_startBenchmark(Benchmark *self, PyObject *args) {
 	int errcode = FALSE;
 	PyObject *list;
@@ -319,7 +319,7 @@ static PyObject *_updateBenchmark(Benchmark *self, PyObject *args) {
 
 	return Py_BuildValue("i", errcode);
 }
-
+*/
 
 PyObject *Benchmark_print(Benchmark *self) {
 	if(self != NULL) {
@@ -340,33 +340,6 @@ PyObject *_benchmark_print(Benchmark *self) {
 
 PyObject *GetResults(Benchmark *self) {
 	if(self != NULL) {
-//		PyObject *resultDict = PyDict_New();
-//		PyObject *add  = Py_BuildValue("i", self->op_add);
-//		PyObject *sub  = Py_BuildValue("i", self->op_sub);
-//		PyObject *mult = Py_BuildValue("i", self->op_mult);
-//		PyObject *div  = Py_BuildValue("i", self->op_div);
-//		PyObject *exp  = Py_BuildValue("i", self->op_exp);
-//		PyObject *CpuTime =  Py_BuildValue("f", self->cpu_time_ms);
-//		PyObject *RealTime = Py_BuildValue("f", self->real_time_ms);
-//
-//
-//		PyDict_SetItemString(resultDict, "CpuTime", CpuTime);
-//		PyDict_SetItemString(resultDict, "RealTime", RealTime);
-//		PyDict_SetItemString(resultDict, "Add", add);
-//		PyDict_SetItemString(resultDict, "Sub", sub);
-//		PyDict_SetItemString(resultDict, "Mul", mult);
-//		PyDict_SetItemString(resultDict, "Div", div);
-//		PyDict_SetItemString(resultDict, "Exp", exp);
-//
-//		Py_DECREF(CpuTime);
-//		Py_DECREF(RealTime);
-//		Py_DECREF(add);
-//		Py_DECREF(sub);
-//		Py_DECREF(mult);
-//		Py_DECREF(div);
-//		Py_DECREF(exp);
-
-/*		return resultDict; */
 		return Py_BuildValue("{sfsfsisisisisi}",
 						"CpuTime", self->cpu_time_ms, "RealTime", self->real_time_ms,
 						"Add", self->op_add, "Sub", self->op_sub, "Mul", self->op_mult,
@@ -382,36 +355,6 @@ PyObject *GetResultsWithPair(Benchmark *self) {
 						"CpuTime", self->cpu_time_ms, "RealTime", self->real_time_ms,
 						"Add", self->op_add, "Sub", self->op_sub, "Mul", self->op_mult,
 						"Div", self->op_div, "Exp", self->op_exp, "Pair", self->op_pair);
-//		PyObject *resultDict = PyDict_New();
-////		PyObject *CpuTime = PyFloat_FromDouble(self->cpu_time_ms);
-////		PyObject *RealTime = PyFloat_FromDouble(self->real_time_ms);
-//		PyObject *add  = Py_BuildValue("i", self->op_add);
-//		PyObject *sub  = Py_BuildValue("i", self->op_sub);
-//		PyObject *mult = Py_BuildValue("i", self->op_mult);
-//		PyObject *div  = Py_BuildValue("i", self->op_div);
-//		PyObject *exp  = Py_BuildValue("i", self->op_exp);
-//		PyObject *pair = Py_BuildValue("i", self->op_pair);
-//		PyObject *CpuTime =  Py_BuildValue("f", self->cpu_time_ms);
-//		PyObject *RealTime = Py_BuildValue("f", self->real_time_ms);
-//
-//		PyDict_SetItemString(resultDict, "CpuTime", CpuTime);
-//		PyDict_SetItemString(resultDict, "RealTime", RealTime);
-//		PyDict_SetItemString(resultDict, "Add", add);
-//		PyDict_SetItemString(resultDict, "Sub", sub);
-//		PyDict_SetItemString(resultDict, "Mul", mult);
-//		PyDict_SetItemString(resultDict, "Div", div);
-//		PyDict_SetItemString(resultDict, "Exp", exp);
-//		PyDict_SetItemString(resultDict, "Pair", pair);
-//
-//		Py_DECREF(CpuTime);
-//		Py_DECREF(RealTime);
-//		Py_DECREF(add);
-//		Py_DECREF(sub);
-//		Py_DECREF(mult);
-//		Py_DECREF(div);
-//		Py_DECREF(exp);
-//		Py_DECREF(pair);
-//		return resultDict;
 	}
 
 	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
@@ -456,10 +399,10 @@ PyObject *Retrieve_result(Benchmark *self, char *option) {
 // benchmark object methods (object instance scope)
 PyMethodDef Benchmark_methods[] = {
 //	{"InitBenchmark", (PyCFunction)_initBenchmark, METH_NOARGS, "Initialize the benchmark object with an identifier"}
-	{"StartBenchmark", (PyCFunction)_startBenchmark, METH_VARARGS, "Start a new benchmark with some options"},
-	{"EndBenchmark", (PyCFunction)_endBenchmark, METH_VARARGS, "End a given benchmark"},
-	{"GetGeneralBenchmarks", (PyCFunction)GetResults, METH_NOARGS, "Retrieve general benchmark info as a dictionary."},
-	{"UpdateBenchmark", (PyCFunction)_updateBenchmark, METH_VARARGS, "Update a given option counter for a benchmark object"},
+//	{"StartBenchmark", (PyCFunction)_startBenchmark, METH_VARARGS, "Start a new benchmark with some options"},
+//	{"EndBenchmark", (PyCFunction)_endBenchmark, METH_VARARGS, "End a given benchmark"},
+//	{"GetGeneralBenchmarks", (PyCFunction)GetResults, METH_NOARGS, "Retrieve general benchmark info as a dictionary."},
+//	{"UpdateBenchmark", (PyCFunction)_updateBenchmark, METH_VARARGS, "Update a given option counter for a benchmark object"},
 	{NULL}
 };
 

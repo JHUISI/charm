@@ -42,6 +42,7 @@
 #include "benchmarkmodule.h"
 #include "base64.h"
 #include "openssl/objects.h"
+#include "openssl/rand.h"
 #include "openssl/sha.h"
 #ifdef BENCHMARK_ENABLED
 #include "benchmark_util.h"
@@ -85,6 +86,21 @@ PyMethodDef pairing_methods[];
 PyMemberDef Element_members[];
 PyNumberMethods element_number;
 
+#ifdef BENCHMARK_ENABLED
+
+typedef struct {
+	PyObject_HEAD
+	int op_init;
+	int exp_ZR, exp_G1, exp_G2, exp_GT;
+	int mul_ZR, mul_G1, mul_G2, mul_GT;
+	int div_ZR, div_G1, div_G2, div_GT;
+	// optional
+	int add_ZR, add_G1, add_G2, add_GT;
+	int sub_ZR, sub_G1, sub_G2, sub_GT;
+} Operations;
+
+#endif
+
 typedef struct {
 	PyObject_HEAD
 	pbc_param_t p;
@@ -94,7 +110,9 @@ typedef struct {
 	int group_init;
 	uint8_t hash_id[ID_LEN+1];
 #ifdef BENCHMARK_ENABLED
+	Operations *gBench;
     Benchmark *dBench;
+	uint8_t bench_id[ID_LEN+1];
 #endif
 } Pairing;
 
@@ -105,12 +123,6 @@ typedef struct {
 	GroupType element_type;
     int elem_initialized;
 } Element;
-
-#define IS_PAIRING_OBJ_NULL(obj) \
-	if(obj->pairing == NULL) {	\
-		PyErr_SetString(ElementError, "pairing structure not initialized.");	\
-		return NULL;	\
-	}
 
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)
 #define Check_Types2(o1, o2, lhs_o1, rhs_o2, longLHS_o1, longRHS_o2)  \
@@ -163,16 +175,17 @@ void print_mpz(mpz_t x, int base);
 
 #ifdef BENCHMARK_ENABLED
 
-#define IsBenchSet(obj)  obj->dBench != NULL
+#define IS_SAME_GROUP(a, b) \
+	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
+		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
+		return NULL;	\
+	}			\
+	if(strncmp((const char *) a->pairing->bench_id, (const char *) b->pairing->bench_id, ID_LEN) != 0) { \
+		PyErr_SetString(ElementError, "mixing benchmark objects not allowed.");	\
+		return NULL;	\
+	}
 
-typedef struct {
-	int exp_ZR, exp_G1, exp_G2, exp_GT;
-	int mul_ZR, mul_G1, mul_G2, mul_GT;
-	int div_ZR, div_G1, div_G2, div_GT;
-	// optional
-	int add_ZR, add_G1, add_G2, add_GT;
-	int sub_ZR, sub_G1, sub_G2, sub_GT;
-} Operations;
+#define IsBenchSet(obj)  obj->dBench != NULL
 
 #define Update_Op(name, op_type, elem_type, bench_obj)	\
 	Op_ ##name(op_type, elem_type, ZR, bench_obj)	\
@@ -187,6 +200,12 @@ typedef struct {
 	    CLEAR_DBENCH(bench_obj, GT);	\
 
 #else
+
+#define IS_SAME_GROUP(a, b) \
+	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
+		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
+		return NULL;	\
+	}
 
 #define UPDATE_BENCH(op_type, elem_type, bench_obj)  /* ... */
 // #define UPDATE_BENCHMARK(op_type, bench_obj)  /* ... */
@@ -203,11 +222,5 @@ typedef struct {
 	if(check) {						     \
 	PyErr_SetString(ElementError, msg);	 \
 	return Py_BuildValue("i", code);	}
-
-#define IS_SAME_GROUP(a, b) \
-	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
-		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
-		return NULL;	\
-	}
 
 #endif

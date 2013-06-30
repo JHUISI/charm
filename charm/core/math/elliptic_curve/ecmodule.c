@@ -210,12 +210,10 @@ void ECGroup_dealloc(ECGroup *self)
 
 #ifdef BENCHMARK_ENABLED
 	if(self->dBench != NULL) {
-		//PrintPyRef("releasing benchmark object", self->dBench);
-//		CLEAR_ALLDBENCH(self->dBench);
-		Operations *c = (Operations *) self->dBench->data_ptr;
-		free(c);
-		Py_DECREF(self->dBench);
-//		PyObject_Del(self->dBench);
+		Py_CLEAR(self->dBench);
+		if(self->gBench != NULL) {
+			Py_CLEAR(self->gBench);
+		}
 	}
 #endif
 	debug("Releasing ECGroup object!\n");
@@ -232,7 +230,9 @@ PyObject *ECGroup_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 		self->order		 = BN_new();
     	self->ctx        = BN_CTX_new();
 #ifdef BENCHMARK_ENABLED
+		memset(self->bench_id, 0, ID_LEN);
 		self->dBench = NULL;
+		self->gBench = NULL;
 #endif
 	}
 
@@ -498,7 +498,7 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 			BN_mod_add(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(ADDITION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(ADDITION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -513,7 +513,7 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 			BN_mod_add(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(ADDITION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(ADDITION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -529,7 +529,7 @@ static PyObject *ECE_add(PyObject *o1, PyObject *o2) {
 			ans = createNewPoint(ZR, lhs->group);
 			BN_mod_add(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(ADDITION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(ADDITION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -564,7 +564,7 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 			BN_mod_sub(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(SUBTRACTION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(SUBTRACTION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -580,7 +580,7 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(SUBTRACTION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(SUBTRACTION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -595,7 +595,7 @@ static PyObject *ECE_sub(PyObject *o1, PyObject *o2) {
 			ans = createNewPoint(ZR, lhs->group);
 			BN_mod_sub(ans->elemZ, lhs->elemZ, rhs->elemZ, ans->group->order, ans->group->ctx);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(SUBTRACTION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(SUBTRACTION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -626,7 +626,7 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 			BN_mod_mul(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(MULTIPLICATION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(MULTIPLICATION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -642,7 +642,7 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 			BN_mod_mul(ans->elemZ, lhs->elemZ, rhs_val, ans->group->order, ans->group->ctx);
 			BN_free(rhs_val);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(MULTIPLICATION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(MULTIPLICATION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -666,7 +666,7 @@ static PyObject *ECE_mul(PyObject *o1, PyObject *o2) {
 			EXIT_IF(TRUE, "elements are not of the same type.");
 		}
 #ifdef BENCHMARK_ENABLED
-		UPDATE_BENCH(MULTIPLICATION, ans->type, ans->group->dBench);
+		UPDATE_BENCH(MULTIPLICATION, ans->type, ans->group);
 #endif
 		return (PyObject *) ans;
 	}
@@ -696,7 +696,7 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 			BN_free(lhs_val);
 			BN_free(rm);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(DIVISION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(DIVISION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -714,7 +714,7 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 			BN_free(rhs_val);
 			BN_free(rm);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(DIVISION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(DIVISION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -744,7 +744,7 @@ static PyObject *ECE_div(PyObject *o1, PyObject *o2) {
 			EXIT_IF(TRUE, "elements not the same type.");
 		}
 #ifdef BENCHMARK_ENABLED
-		UPDATE_BENCH(DIVISION, ans->type, ans->group->dBench);
+		UPDATE_BENCH(DIVISION, ans->type, ans->group);
 #endif
 		return (PyObject *) ans;
 	}
@@ -821,7 +821,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			BN_mod_exp(ans->elemZ, lhs_val, rhs->elemZ, ans->group->order, ans->group->ctx);
 			BN_free(lhs_val);
 #ifdef BENCHMARK_ENABLED
-			UPDATE_BENCH(EXPONENTIATION, ans->type, ans->group->dBench);
+			UPDATE_BENCH(EXPONENTIATION, ans->type, ans->group);
 #endif
 			return (PyObject *) ans;
 		}
@@ -872,7 +872,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			EXIT_IF(TRUE, "element type combination not supported.");
 		}
 #ifdef BENCHMARK_ENABLED
-		UPDATE_BENCH(EXPONENTIATION, ans->type, ans->group->dBench);
+		UPDATE_BENCH(EXPONENTIATION, ans->type, ans->group);
 #endif
 		return (PyObject *) ans;
 	}
@@ -895,7 +895,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 			EXIT_IF(TRUE, "cannot exponentiate two points.");
 		}
 #if BENCHMARK_ENABLED
-		UPDATE_BENCH(EXPONENTIATION, ans->type, ans->group->dBench);
+		UPDATE_BENCH(EXPONENTIATION, ans->type, ans->group);
 #endif
 		return (PyObject *) ans;
 	}
@@ -1509,11 +1509,11 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 #define BENCH_ERROR			PyECErrorObject
 #define GRANULAR
 
-PyObject *PyCreateList(Benchmark *dBench, MeasureType type)
+PyObject *PyCreateList(Operations *gBench, MeasureType type)
 {
 	int countZR = -1, countG = -1;
-	GetField(countZR, type, ZR, dBench);
-	GetField(countG,  type,  G, dBench);
+	GetField(countZR, type, ZR, gBench);
+	GetField(countG,  type,  G, gBench);
 
 	PyObject *objList = Py_BuildValue("[ii]", countZR, countG);
 	return objList;
@@ -1522,12 +1522,6 @@ PyObject *PyCreateList(Benchmark *dBench, MeasureType type)
 #include "benchmark_util.c"
 
 #endif
-//InitBenchmark_CAPI(_init_benchmark, dBench, 2);
-//StartBenchmark_CAPI(_start_benchmark, dBench);
-//EndBenchmark_CAPI(_end_benchmark, dBench);
-//GetBenchmark_CAPI(_get_benchmark, dBench);
-//GetAllBenchmarks_CAPI(_get_all_results, dBench, GetResults);
-//ClearBenchmarks_CAPI(_clear_benchmark, dBench);
 
 PyMemberDef ECElement_members[] = {
 	{"type", T_INT, offsetof(ECElement, type), 0,
@@ -1830,13 +1824,6 @@ static PyMethodDef ec_methods[] = {
 		{"GetBenchmark", (PyCFunction)GetBenchmark, METH_VARARGS, "Returns contents of a benchmark object"},
 		{"GetGeneralBenchmarks", (PyCFunction)GetAllBenchmarks, METH_VARARGS, "Retrieve general benchmark info as a dictionary"},
 		{"GetGranularBenchmarks", (PyCFunction) GranularBenchmark, METH_VARARGS, "Retrieve granular benchmarks as a dictionary"},
-
-//		{"InitBenchmark", (PyCFunction)_init_benchmark, METH_NOARGS, "Initialize a benchmark object"},
-//		{"StartBenchmark", (PyCFunction)_start_benchmark, METH_VARARGS, "Start a new benchmark with some options"},
-//		{"EndBenchmark", (PyCFunction)_end_benchmark, METH_VARARGS, "End a given benchmark"},
-//		{"GetBenchmark", (PyCFunction)_get_benchmark, METH_VARARGS, "Returns contents of a benchmark object"},
-//		{"GetGeneralBenchmarks", (PyCFunction) _get_all_results, METH_VARARGS, "Retrieve general benchmark info as a dictionary."},
-//		{"ClearBenchmark", (PyCFunction)_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 #endif
 		{NULL, NULL}
 };
@@ -1885,6 +1872,8 @@ void initelliptic_curve(void) 		{
         CLEAN_EXIT;
     if(PyType_Ready(&BenchmarkType) < 0)
         CLEAN_EXIT;
+    if(PyType_Ready(&OperationsType) < 0)
+    	CLEAN_EXIT;
 #endif
 
 #if PY_MAJOR_VERSION >= 3

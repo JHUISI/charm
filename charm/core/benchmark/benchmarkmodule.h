@@ -77,7 +77,7 @@ typedef struct {
 
 	struct timeval start_time, stop_time, native_time; // track real time
 	clock_t start_clock, stop_clock; // track cpu time
-	// Operations *op_ptr; // track various operations
+
 	int op_add, op_sub, op_mult, op_div;
 	int op_exp, op_pair;
 	double cpu_time_ms, real_time_ms;
@@ -86,7 +86,7 @@ typedef struct {
 	int cpu_option, real_option, granular_option;
 	int identifier;
 	int bench_initialized, bench_inprogress;
-	void *data_ptr;
+//	void *data_ptr;
 //	void (*gran_init)(void *ptr); // fix this
 } Benchmark;
 
