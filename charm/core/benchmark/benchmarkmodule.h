@@ -74,7 +74,6 @@ typedef enum Measure MeasureType;
 
 typedef struct {
 	PyObject_HEAD
-
 	struct timeval start_time, stop_time, native_time; // track real time
 	clock_t start_clock, stop_clock; // track cpu time
 
@@ -86,8 +85,6 @@ typedef struct {
 	int cpu_option, real_option, granular_option;
 	int identifier;
 	int bench_initialized, bench_inprogress;
-//	void *data_ptr;
-//	void (*gran_init)(void *ptr); // fix this
 } Benchmark;
 
 // PyMethodDef Benchmark_methods[];
@@ -103,12 +100,10 @@ PyObject *Retrieve_result(Benchmark *self, char *option);
 #define PyBenchmark_Start 		  0
 #define PyBenchmark_End 		  1
 #define PyBenchmark_Update		  2
-#define PyBenchmark_StartT		  3
-#define PyBenchmark_StopT	      4
-#define PyBenchmark_Clear		  5
+#define PyBenchmark_Clear		  3
 
 /* total number of C api pointers? */
-#define PyBenchmark_API_pointers 6
+#define PyBenchmark_API_pointers 4
 
 #ifdef BENCHMARK_ENABLED
 #define UPDATE_BENCHMARK(option, bench)   \
@@ -124,8 +119,6 @@ PyObject *Retrieve_result(Benchmark *self, char *option);
 static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize);
 static int PyEndBenchmark(Benchmark *data);
 static int PyUpdateBenchmark(MeasureType option, Benchmark *data);
-static int PyStartTBenchmark(MeasureType option, Benchmark *data);
-static int PyStopTBenchmark(MeasureType option, Benchmark *data);
 static int PyClearBenchmark(Benchmark *data);
 
 #else
@@ -138,8 +131,6 @@ static void **PyBenchmark_API;
 #define PyStartBenchmark (*(int (*)(Benchmark *data, PyObject *opList, int opListSize)) PyBenchmark_API[PyBenchmark_Start])
 #define PyEndBenchmark (*(int (*)(Benchmark *data)) PyBenchmark_API[PyBenchmark_End])
 #define PyUpdateBenchmark (*(int (*)(MeasureType option, Benchmark *data)) PyBenchmark_API[PyBenchmark_Update])
-#define PyStartTBenchmark (*(int (*)(MeasureType option, Benchmark *data)) PyBenchmark_API[PyBenchmark_StartT])
-#define PyStopTBenchmark (*(int (*)(MeasureType option, Benchmark *data)) PyBenchmark_API[PyBenchmark_StopT])
 #define PyClearBenchmark (*(int (*)(Benchmark *data)) PyBenchmark_API[PyBenchmark_Clear])
 
 #define ADD_BENCHMARK_OPTIONS(m)		\

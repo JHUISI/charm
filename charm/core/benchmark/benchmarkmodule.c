@@ -44,53 +44,20 @@ PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 		self->op_div = self->op_exp = self->op_pair = 0;
 		self->cpu_time_ms = self->real_time_ms = 0.0;
 		self->cpu_option = self->real_option = FALSE;
-    	printf("Creating new benchmark object.\n");
+    	debug("Creating new benchmark object.\n");
     }
     return (PyObject *) self;
 }
 
 // benchmark init
-int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds) {
-
-	// initializing object
-	if(self->bench_initialized == FALSE) {
-//		self->bench_inprogress = FALSE;  // false until we StartBenchmark( ... )
-//		self->op_add = self->op_sub = self->op_mult = 0;
-//		self->op_div = self->op_exp = self->op_pair = 0;
-//		self->cpu_time_ms = self->real_time_ms = 0.0;
-//		self->cpu_option = self->real_option = FALSE;
-//		self->identifier = -1;
-//		debug("Initialized benchmark object.\n");
-	}
-
-	printf("Initialized.\n");
+int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds)
+{
 	return 0;
 }
 // benchmark dealloc
 void Benchmark_dealloc(Benchmark *self) {
 	debug("Releasing benchmark object.\n");
 	Py_TYPE(self)->tp_free((PyObject*)self);
-}
-
-static int PyStartTBenchmark(MeasureType option, Benchmark *data)
-{
-//	if(data->native_option) {
-//		if(option == NATIVE_TIME) // last thing we do before returning
-//			return gettimeofday(&data->native_time, NULL);
-//	}
-	return FALSE;
-}
-
-static int PyStopTBenchmark(MeasureType option, Benchmark *data)
-{
-//	struct timeval stop; gettimeofday(&stop, NULL);
-//	if(data->native_option) {
-//		if(option == NATIVE_TIME)
-//			data->native_time_ms += CalcUsecs(&data->native_time,  &stop);
-//			// data->aux_time_ms += ((double)(stop - data->aux_time))/CLOCKS_PER_SEC;
-//		return TRUE;
-//	}
-	return FALSE;
 }
 
 static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
@@ -182,24 +149,17 @@ static int PyEndBenchmark(Benchmark *data)
 	gettimeofday(&data->stop_time, NULL); // stop real time clock
 	data->stop_clock = clock(); // stop cpu time clock
 	int i;
-//	struct timeval stop_t;
-//	gettimeofday(&stop_t, NULL); // stop real time clock
-//	int i, stop_c = clock();
 	if(data != NULL && data->bench_initialized) {
 		debug("Results....\n");
 		for(i = 0; i < data->num_options; i++) {
 			MeasureType option = data->options_selected[i];
 			debug("option => %d\n", option);
 			switch(option) {
-				case CPU_TIME:  // data->stop_clock = stop_c;
-								// compute processor time or clocks per sec
+				case CPU_TIME:  // compute processor time or clocks per sec
 								data->cpu_time_ms = ((double)(data->stop_clock - data->start_clock))/CLOCKS_PER_SEC;
 								debug("CPU Time:\t%f\n", data->cpu_time_ms);
 								break;
-				case REAL_TIME:	// time(&data->stop_time);
-								// data->real_time_ms = difftime(stop_t, data->start_time);
-								debug("realtime option was set!\n");
-//								data->real_time_ms = CalcUsecs(&data->start_time, &stop_t);
+				case REAL_TIME:	debug("realtime option was set!\n");
 								data->real_time_ms = CalcUsecs(&data->start_time, &data->stop_time);
 								debug("Real Time:\t%f\n", data->real_time_ms);
 								break;
@@ -213,7 +173,6 @@ static int PyEndBenchmark(Benchmark *data)
 				default: debug("not a valid option.\n"); break;
 			}
 		}
-		//data->bench_initialized = FALSE;
 		data->bench_inprogress = FALSE;
 		return TRUE;
 	}
@@ -265,68 +224,6 @@ static int PyClearBenchmark(Benchmark *data) {
 	return TRUE;
 }
 
-/*
- * @description: takes as input an identifier, a list of options to measure.
-static PyObject *_startBenchmark(Benchmark *self, PyObject *args) {
-	int errcode = FALSE;
-	PyObject *list;
-
-	if(PyArg_ParseTuple(args, "O", &list)) {
-		// retrieve options
-		int size = PyList_Size(list);
-		if(size > 0) {
-
-#if PY_MAJOR_VERSION < 3
-			int i;
-			for(i = 0; i < size; i++) {
-				PyObject *item = PyList_GetItem(list, i);
-				if(!PyInt_Check(item)) continue;
-				int option = PyInt_AsLong(item);
-				if(option >= CPU_TIME && option < NONE) {
-					debug("Option selected: %d\n", option);
-				}
-			}
-#endif
-			int result = PyStartBenchmark(self, list, size);
-			if(!result) {
-				PyErr_SetString(BenchmarkError, "invalid benchmark object.");
-				return NULL;
-			}
-			errcode = TRUE;
-		}
-		else {
-			errcode = FALSE;
-			PyErr_SetString(BenchmarkError, "no options selected.");
-			return NULL;
-		}
-	}
-	if(errcode) Py_RETURN_TRUE;
-	Py_RETURN_FALSE;
-}
-
-static PyObject *_endBenchmark(Benchmark *self, PyObject *args) {
-	if(self->bench_initialized == TRUE) {
-		PyEndBenchmark(self);
-		Py_RETURN_TRUE;
-	}
-	PyErr_SetString(BenchmarkError, "benchmark object not initialized.");
-	Py_RETURN_FALSE;
-}
-
-static PyObject *_updateBenchmark(Benchmark *self, PyObject *args) {
-	int option, errcode = FALSE;
-
-	if(PyArg_ParseTuple(args, "i", &option)) {
-		if(option >= 0 && option < NONE && self->bench_initialized) {
-			PyUpdateBenchmark(option, self);
-			errcode = TRUE;
-		}
-	}
-
-	return Py_BuildValue("i", errcode);
-}
-*/
-
 PyObject *Benchmark_print(Benchmark *self) {
 	if(self != NULL) {
 		PyObject *cpu = PyFloat_FromDouble(self->cpu_time_ms);
@@ -338,10 +235,6 @@ PyObject *Benchmark_print(Benchmark *self) {
 		return results;
 	}
 	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
-}
-
-PyObject *_benchmark_print(Benchmark *self) {
-	return PyUnicode_FromString("");
 }
 
 PyObject *GetResults(Benchmark *self) {
@@ -402,16 +295,6 @@ PyObject *Retrieve_result(Benchmark *self, char *option) {
 	return result;
 }
 
-// benchmark object methods (object instance scope)
-PyMethodDef Benchmark_methods[] = {
-//	{"InitBenchmark", (PyCFunction)_initBenchmark, METH_NOARGS, "Initialize the benchmark object with an identifier"}
-//	{"StartBenchmark", (PyCFunction)_startBenchmark, METH_VARARGS, "Start a new benchmark with some options"},
-//	{"EndBenchmark", (PyCFunction)_endBenchmark, METH_VARARGS, "End a given benchmark"},
-//	{"GetGeneralBenchmarks", (PyCFunction)GetResults, METH_NOARGS, "Retrieve general benchmark info as a dictionary."},
-//	{"UpdateBenchmark", (PyCFunction)_updateBenchmark, METH_VARARGS, "Update a given option counter for a benchmark object"},
-	{NULL}
-};
-
 PyTypeObject BenchmarkType = {
 	PyVarObject_HEAD_INIT(NULL, 0)
 	"profile.Benchmark",             /*tp_name*/
@@ -422,7 +305,7 @@ PyTypeObject BenchmarkType = {
 	0,                         /*tp_getattr*/
 	0,                         /*tp_setattr*/
 	0,			   				/*tp_reserved*/
-	(reprfunc)_benchmark_print, /*tp_repr*/
+	0, 							/*tp_repr*/
 	0,               		   /*tp_as_number*/
 	0,                         /*tp_as_sequence*/
 	0,                         /*tp_as_mapping*/
@@ -440,7 +323,7 @@ PyTypeObject BenchmarkType = {
 	0,		               /* tp_weaklistoffset */
 	0,		               /* tp_iter */
 	0,		               /* tp_iternext */
-	Benchmark_methods,             /* tp_methods */
+	0,             		   /* tp_methods */
 	0,             			   /* tp_members */
 	0,                         /* tp_getset */
 	0,                         /* tp_base */
@@ -524,8 +407,6 @@ void initbenchmark(void) 		{
 	PyBenchmark_API[PyBenchmark_Start]  = (void *)PyStartBenchmark;
 	PyBenchmark_API[PyBenchmark_End]    = (void *)PyEndBenchmark;
 	PyBenchmark_API[PyBenchmark_Update] = (void *)PyUpdateBenchmark;
-	PyBenchmark_API[PyBenchmark_StartT] = (void *)PyStartTBenchmark;
-	PyBenchmark_API[PyBenchmark_StopT]  = (void *)PyStopTBenchmark;
 	PyBenchmark_API[PyBenchmark_Clear]  = (void *)PyClearBenchmark;
 
 	api_object = (PyObject *) PyCapsule_New((void *) PyBenchmark_API,BENCHMARK_MOD_NAME, NULL);
