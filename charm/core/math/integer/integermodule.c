@@ -802,8 +802,25 @@ static PyObject *Integer_long(PyObject *o1) {
 		return mpzToLongObj(value->e);
 	}
 
-	EXIT_IF(TRUE, "invalid object type.");
+	EXIT_IF(TRUE, "invalid argument.");
 }
+
+static PyObject *Integer_reduce(PyObject *self, PyObject *args) {
+	if (PyInteger_Check(args)) {
+		Integer *in = (Integer *) args;
+		if(in->initialized) {
+			Integer *rop = createNewInteger();
+			mpz_init_set(rop->e, in->e);
+			mpz_init_set(rop->m, in->m);
+			if (mpz_sgn(rop->m) != 0)
+				_reduce(rop);
+			return (PyObject *) rop;
+		}
+	}
+
+	EXIT_IF(TRUE, "invalid argument.");
+}
+
 
 /** a / b mod N ...
  *  only defined when b is invertible modulo N, meaning a*b mod N = c*b mod N iff b has b^-1 s.t.
@@ -1291,18 +1308,18 @@ cleanup:
 
 }
 
-static PyObject *Integer_reduce(Integer *self, PyObject *arg) {
-
-	if (!self->initialized) {
-		PyErr_SetString(IntegerError, "invalid integer object.");
-		Py_INCREF(Py_False);
-		return Py_False;
-	}
-
-	_reduce(self);
-	Py_INCREF(Py_True);
-	return Py_True;
-}
+//static PyObject *Integer_reduce(Integer *self, PyObject *arg) {
+//
+//	if (!self->initialized) {
+//		PyErr_SetString(IntegerError, "invalid integer object.");
+//		Py_INCREF(Py_False);
+//		return Py_False;
+//	}
+//
+//	_reduce(self);
+//	Py_INCREF(Py_True);
+//	return Py_True;
+//}
 
 static PyObject *Integer_remainder(PyObject *o1, PyObject *o2) {
 
@@ -2185,7 +2202,7 @@ PyMethodDef Integer_methods[] = {
 	{ "set", (PyCFunction) Integer_set, METH_VARARGS, "initialize with another integer object." },
 	{ "isCoPrime", (PyCFunction) testCoPrime, METH_O | METH_NOARGS, "determine whether two integers a and b are relatively prime." },
 	{ "isCongruent", (PyCFunction) testCongruency, METH_VARARGS, "determine whether two integers are congruent mod n." },
-	{ "reduce", (PyCFunction) Integer_reduce, METH_NOARGS, "reduce an integer object modulo N." },
+//	{ "reduce", (PyCFunction) Integer_reduce, METH_NOARGS, "reduce an integer object modulo N." },
 	{ NULL }
 };
 
@@ -2357,7 +2374,6 @@ PyTypeObject IntegerType = {
 
 /* global module methods (include isPrime, randomPrime, etc. here). */
 PyMethodDef module_methods[] = {
-//	{ "setBench"
 	{ "randomBits", (PyCFunction) genRandomBits, METH_VARARGS, "generate a random number of bits from 0 to 2^n-1." },
 	{ "random", (PyCFunction) genRandom, METH_VARARGS, "generate a random number in range of 0 to n-1 where n is large number." },
 	{ "randomPrime", (PyCFunction) genRandomPrime, METH_VARARGS, "generate a probabilistic random prime number that is n-bits." },
@@ -2377,11 +2393,11 @@ PyMethodDef module_methods[] = {
 	{ "EndBenchmark", (PyCFunction) EndBenchmark, METH_NOARGS, "End a given benchmark" },
 	{ "GetBenchmark", (PyCFunction) GetBenchmark, METH_VARARGS, "Returns contents of a benchmark object" },
 	{ "GetGeneralBenchmarks", (PyCFunction) GetAllBenchmarks, METH_NOARGS, "Retrieve general benchmark info as a dictionary."},
-//	{ "ClearBenchmark", (PyCFunction) int_clear_benchmark, METH_VARARGS, "Clears content of benchmark object"},
 #endif
 	{ "int2Bytes", (PyCFunction) toBytes, METH_O, "convert an integer object to a bytes object."},
 	{ "toInt", (PyCFunction) toInt, METH_O, "convert modular integer into an integer object."},
 	{ "getMod", (PyCFunction) getMod, METH_O, "get the modulus of a given modular integer object."},
+	{ "reduce", (PyCFunction) Integer_reduce, METH_O, "reduce a modular integer by its modulus. x = mod(y)"},
 	{ NULL, NULL }
 };
 
@@ -2396,9 +2412,8 @@ static int int_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
     Py_XDECREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-	printf("int_clear: Refcnt dBench = '%i'\n", (int) Py_REFCNT(GETSTATE(m)->dBench));
-	Py_XDECREF(GETSTATE(m)->dBench);
-//	Py_XDECREF(GETSTATE(m)->dBench);
+//	debug("int_clear: Refcnt dBench = '%i'\n", (int) Py_REFCNT(GETSTATE(m)->dBench));
+	Py_CLEAR(GETSTATE(m)->dBench);
 #endif
 	return 0;
 }
@@ -2451,21 +2466,10 @@ void initinteger(void) {
 	if (st->error == NULL)
         CLEAN_EXIT;
 	IntegerError = st->error;
-//    Py_INCREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
 	st->dBench = NULL;
 	tmpBench = NULL;
 #endif
-//    st->dBench = PyObject_New(Benchmark, &BenchmarkType);
-//    if(st->dBench == NULL)
-//        CLEAN_EXIT;
-//    Py_INCREF(st->dBench);
-//    tmpBench = st->dBench;
-//    printf("DEBUG: Refcnt dBench = '%i'\n", (int) Py_REFCNT(st->dBench));
-//	Py_INCREF(&BenchmarkType);
-//	PyModule_AddObject(m, "benchmark", (PyObject *) &BenchmarkType);
-//#endif
-
 
 	Py_INCREF(&IntegerType);
 	PyModule_AddObject(m, "integer", (PyObject *) &IntegerType);
