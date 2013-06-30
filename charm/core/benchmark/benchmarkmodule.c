@@ -39,7 +39,12 @@ PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self = (Benchmark *)type->tp_alloc(type, 0);
     if(self != NULL) {
     	self->bench_initialized = FALSE;
-    	debug("Creating new benchmark object.\n");
+		self->bench_inprogress = FALSE;  // false until we StartBenchmark( ... )
+		self->op_add = self->op_sub = self->op_mult = 0;
+		self->op_div = self->op_exp = self->op_pair = 0;
+		self->cpu_time_ms = self->real_time_ms = 0.0;
+		self->cpu_option = self->real_option = FALSE;
+    	printf("Creating new benchmark object.\n");
     }
     return (PyObject *) self;
 }
@@ -49,15 +54,16 @@ int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds) {
 
 	// initializing object
 	if(self->bench_initialized == FALSE) {
-		self->bench_inprogress = FALSE;  // false until we StartBenchmark( ... )
-		self->op_add = self->op_sub = self->op_mult = 0;
-		self->op_div = self->op_exp = self->op_pair = 0;
-		self->cpu_time_ms = self->real_time_ms = 0.0;
-		self->cpu_option = self->real_option = FALSE;
-		self->identifier = -1;
-		debug("Initialized benchmark object.\n");
+//		self->bench_inprogress = FALSE;  // false until we StartBenchmark( ... )
+//		self->op_add = self->op_sub = self->op_mult = 0;
+//		self->op_div = self->op_exp = self->op_pair = 0;
+//		self->cpu_time_ms = self->real_time_ms = 0.0;
+//		self->cpu_option = self->real_option = FALSE;
+//		self->identifier = -1;
+//		debug("Initialized benchmark object.\n");
 	}
 
+	printf("Initialized.\n");
 	return 0;
 }
 // benchmark dealloc

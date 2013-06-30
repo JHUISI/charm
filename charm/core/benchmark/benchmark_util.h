@@ -48,5 +48,14 @@
 	else if(type == SUBTRACTION) count = (((Operations *) bench_obj)->sub_ ##group ); \
 	else if(type == EXPONENTIATION) count = (((Operations *) bench_obj)->exp_ ##group );
 
+#define ClearBenchmark(data) \
+	data->op_add = data->op_sub = data->op_mult = 0; \
+	data->op_div = data->op_exp = data->op_pair = 0; \
+	data->cpu_time_ms = 0.0;	\
+	data->real_time_ms = 0.0;	\
+	data->cpu_option = FALSE;	\
+	data->real_option = FALSE;	\
+	data->granular_option = FALSE;
+
 
 #endif

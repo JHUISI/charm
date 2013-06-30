@@ -67,8 +67,10 @@ PyTypeObject OperationsType = {
 PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 	Benchmark *benchObj = NULL;
 	GROUP_OBJECT *group = NULL;
-	if(!PyArg_ParseTuple(args, "O", &group))
+	if(!PyArg_ParseTuple(args, "O", &group)) {
+		PyErr_SetString(BENCH_ERROR, "InitBenchmark - invalid argument.");
 		return NULL;
+	}
 
 	VERIFY_GROUP(group);
 	if(group->dBench == NULL) {
@@ -79,7 +81,10 @@ PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 			group->gBench = PyObject_New(Operations, &OperationsType);
 			CLEAR_ALLDBENCH(group->gBench);
 		}
-		PyClearBenchmark(benchObj);
+		benchObj->op_add = benchObj->op_sub = benchObj->op_mult = 0;
+		benchObj->op_div = benchObj->op_exp = benchObj->op_pair = 0;
+		benchObj->cpu_time_ms = 0.0;
+		benchObj->real_time_ms = 0.0;
 		benchObj->bench_initialized = TRUE;
 		benchObj->bench_inprogress = FALSE;
 		benchObj->identifier = BenchmarkIdentifier;
@@ -114,71 +119,72 @@ PyObject *StartBenchmark(PyObject *self, PyObject *args)
 {
 	PyObject *list = NULL;
 	GROUP_OBJECT *group = NULL;
-	if(PyArg_ParseTuple(args, "OO", &group, &list))
-	{
-		VERIFY_GROUP(group);
-
-		if(group->dBench == NULL) {
-			PyErr_SetString(BENCH_ERROR, "uninitialized benchmark object.");
-			return NULL;
-		}
-		else if(PyList_Check(list) && group->dBench->bench_initialized == TRUE && group->dBench->bench_inprogress == FALSE
-				&& group->dBench->identifier == BenchmarkIdentifier)
-		{
-			debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
-			size_t size = PyList_Size(list);
-			PyStartBenchmark(group->dBench, list, size);
-			debug("list size => %zd\n", size);
-			debug("benchmark enabled and initialized!\n");
-			Py_RETURN_TRUE;
-		}
-		Py_RETURN_FALSE;
+	if(!PyArg_ParseTuple(args, "OO", &group, &list)) {
+		PyErr_SetString(BENCH_ERROR, "StartBenchmark - invalid argument.");
+		return NULL;
 	}
 
-	PyErr_SetString(BENCH_ERROR, "invalid input.");
-	return NULL;
+	VERIFY_GROUP(group);
+	if(group->dBench == NULL) {
+		PyErr_SetString(BENCH_ERROR, "uninitialized benchmark object.");
+		return NULL;
+	}
+	else if(PyList_Check(list) && group->dBench->bench_initialized == TRUE && group->dBench->bench_inprogress == FALSE
+			&& group->dBench->identifier == BenchmarkIdentifier)
+	{
+		debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
+		size_t size = PyList_Size(list);
+		PyStartBenchmark(group->dBench, list, size);
+		debug("list size => %zd\n", size);
+		debug("benchmark enabled and initialized!\n");
+		Py_RETURN_TRUE;
+	}
+	Py_RETURN_FALSE;
 }
 
 PyObject *EndBenchmark(PyObject *self, PyObject *args)
 {
 	GROUP_OBJECT *group = NULL;
-	if(PyArg_ParseTuple(args, "O", &group)) {
-		VERIFY_GROUP(group);
-		if(group->dBench == NULL) {
-			PyErr_SetString(BENCH_ERROR, "uninitialized benchmark object.");
-			return NULL;
-		}
-		else if(group->dBench->bench_initialized == TRUE && group->dBench->bench_inprogress == TRUE && group->dBench->identifier == BenchmarkIdentifier) {
-			PyEndBenchmark(group->dBench);
-			debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
-			Py_RETURN_TRUE;
-		}
+	if(!PyArg_ParseTuple(args, "O", &group)) {
+		PyErr_SetString(BENCH_ERROR, "EndBenchmark - invalid argument.");
+		return NULL;
 	}
-	debug("Invalid benchmark identifier.\n");
-	PyErr_SetString(BENCH_ERROR, "invalid input.");
+
+	VERIFY_GROUP(group);
+	if(group->dBench == NULL) {
+		PyErr_SetString(BENCH_ERROR, "uninitialized benchmark object.");
+		return NULL;
+	}
+	else if(group->dBench->bench_initialized == TRUE && group->dBench->bench_inprogress == TRUE && group->dBench->identifier == BenchmarkIdentifier) {
+		PyEndBenchmark(group->dBench);
+		debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
+		Py_RETURN_TRUE;
+	}
 	Py_RETURN_FALSE;
 }
 
 PyObject *GetAllBenchmarks(PyObject *self, PyObject *args)
 {
 	GROUP_OBJECT *group = NULL;
-	if(PyArg_ParseTuple(args, "O", &group)) {
-		VERIFY_GROUP(group);
-		if(group->dBench == NULL) {
-			PyErr_SetString(BENCH_ERROR, "uninitialized benchmark object.");
-			return NULL;
-		}
-		else if(group->dBench->bench_inprogress == FALSE && group->dBench->identifier == BenchmarkIdentifier) {
-			debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
-			// return GetResultsWithPair(group->dBench);
-			return GET_RESULTS_FUNC(group->dBench);
-		}
-		else if(group->dBench->bench_inprogress == TRUE) {
-			printf("Benchmark in progress.\n");
-		}
-		else {
-			debug("Invalid benchmark identifier.\n");
-		}
+	if(!PyArg_ParseTuple(args, "O", &group)) {
+		PyErr_SetString(BENCH_ERROR, "GetAllBenchmarks - invalid argument.");
+		return NULL;
+	}
+	VERIFY_GROUP(group);
+	if(group->dBench == NULL) {
+		PyErr_SetString(BENCH_ERROR, "uninitialized benchmark object.");
+		return NULL;
+	}
+	else if(group->dBench->bench_inprogress == FALSE && group->dBench->identifier == BenchmarkIdentifier) {
+		debug("%s: bench id: '%i'\n", __FUNCTION__, group->dBench->identifier);
+		// return GetResultsWithPair(group->dBench);
+		return GET_RESULTS_FUNC(group->dBench);
+	}
+	else if(group->dBench->bench_inprogress == TRUE) {
+		printf("Benchmark in progress.\n");
+	}
+	else {
+		debug("Invalid benchmark identifier.\n");
 	}
 	Py_RETURN_FALSE;
 }
@@ -186,19 +192,22 @@ PyObject *GetAllBenchmarks(PyObject *self, PyObject *args)
 PyObject *GetBenchmark(PyObject *self, PyObject *args) {
 	char *opt = NULL;
 	GROUP_OBJECT *group = NULL;
-	if(PyArg_ParseTuple(args, "Os", &group, &opt))
+	if(!PyArg_ParseTuple(args, "Os", &group, &opt))
 	{
-		VERIFY_GROUP(group);
-		if(group->dBench == NULL) {
-			PyErr_SetString(BENCH_ERROR, "uninitialized benchmark object.");
-			return NULL;
-		}
-		else if(group->dBench->bench_inprogress == FALSE && group->dBench->identifier == BenchmarkIdentifier) {
-			return Retrieve_result(group->dBench, opt);
-		}
-		else if(group->dBench->bench_inprogress == TRUE) {
-			printf("Benchmark in progress.\n");
-		}
+		PyErr_SetString(BENCH_ERROR, "GetBenchmark - invalid argument.");
+		return NULL;
+	}
+
+	VERIFY_GROUP(group);
+	if(group->dBench == NULL) {
+		PyErr_SetString(BENCH_ERROR, "uninitialized benchmark object.");
+		return NULL;
+	}
+	else if(group->dBench->bench_inprogress == FALSE && group->dBench->identifier == BenchmarkIdentifier) {
+		return Retrieve_result(group->dBench, opt);
+	}
+	else if(group->dBench->bench_inprogress == TRUE) {
+		printf("Benchmark in progress.\n");
 	}
 	Py_RETURN_FALSE;
 }
@@ -208,7 +217,7 @@ static PyObject *GranularBenchmark(PyObject *self, PyObject *args)
 	PyObject *dict = NULL;
 	GROUP_OBJECT *group = NULL;
 	if(!PyArg_ParseTuple(args, "O", &group)) {
-		PyErr_SetString(BENCH_ERROR, "invalid benchmark identifier.");
+		PyErr_SetString(BENCH_ERROR, "GranularBenchmark - invalid argument.");
 		return NULL;
 	}
 
