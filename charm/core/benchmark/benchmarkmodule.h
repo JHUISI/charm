@@ -81,7 +81,7 @@ typedef struct {
 	int op_exp, op_pair;
 	double cpu_time_ms, real_time_ms;
 	int num_options; // track num options for a particular benchmark
-	MeasureType options_selected[MAX_MEASURE]; // measurement options selected
+	MeasureType options_selected[MAX_MEASURE+1]; // measurement options selected
 	int cpu_option, real_option, granular_option;
 	int identifier;
 	int bench_initialized, bench_inprogress;

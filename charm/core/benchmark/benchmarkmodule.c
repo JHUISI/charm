@@ -72,6 +72,8 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 	char *s;
 	if(data != NULL) {
 		int cnt = 0;
+		/* initialize */
+		data->cpu_option = data->real_option = data->granular_option = FALSE;
 		for(i = 0; i < opListSize; i++) {
 			PyObject *item = PyList_GetItem(opList, i);
 			if(PyBytes_CharmCheck(item)) {

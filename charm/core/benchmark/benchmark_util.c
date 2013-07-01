@@ -81,6 +81,7 @@ PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 			group->gBench = PyObject_New(Operations, &OperationsType);
 			CLEAR_ALLDBENCH(group->gBench);
 		}
+		benchObj->num_options = 0;
 		benchObj->op_add = benchObj->op_sub = benchObj->op_mult = 0;
 		benchObj->op_div = benchObj->op_exp = benchObj->op_pair = 0;
 		benchObj->cpu_time_ms = 0.0;
