@@ -35,15 +35,15 @@ int runABETest(Charm_t *pGroup)
 
 	Charm_t *pValue4 = CallMethod(pClass, "decrypt", "%O%O%O", pkDict, skDict, ctDict);
 
-	RunCommands(pValue, pRes);
-	RunCommands(pValue1, pRes);
-	RunCommands(pValue2, pRes);
+	PrintObject(pValue);
+	PrintObject(pValue1);
+	PrintObject(pValue2);
 	printf("ct :=> \n");
-	RunCommands(pValue3, pRes);
+	PrintObject(pValue3);
 	printf("msg :=> \n");
-	RunCommands(msg, pRes);
+	PrintObject(msg);
 	printf("rec msg :=> \n");
-	RunCommands(pValue4, pRes);
+	PrintObject(pValue4);
 
 	Free(pValue);
 	Free(pValue1);
@@ -102,16 +102,18 @@ int runHybridABETest(Charm_t *pGroup)
 	Charm_t *rec_msg = CallMethod(pClass, "decrypt", "%O%O%O", pkDict, skDict, ctDict);
     debug("decrypt ok.\n");
 
-	RunCommands(pValue, pRes);
-	RunCommands(pValue1, pRes);
+    printf("g => ");
+	PrintObject(pValue);
+	printf("beta => ");
+	PrintObject(pValue1);
 	printf("sk serialized => \n");
-	RunCommands(pValue2, pRes);
+	PrintObject(pValue2);
 	//	printf("ct :=> \n");
-	//	RunCommands(pValue3, pRes);
+	//	PrintObject(pValue3);
 	printf("original msg :=> '%s'\n", msg);
-	//	RunCommands(msg, pRes);
+	//	PrintObject(msg);
 	printf("rec msg :=> \n");
-	RunCommands(rec_msg, pRes);
+	PrintObject(rec_msg);
 
 	Free(pValue);
 	Free(pValue1);

@@ -103,7 +103,7 @@ void CheckError(char *error_msg)
 result_t getType(PyObject *o)
 {
 	PyTypeObject *t = o->ob_type;
-	debug("Object type: '%s'\n", t->tp_name);
+	//debug("Object type: '%s'\n", t->tp_name);
 
 	if(strcmp(t->tp_name, INTEGER_TYPE) == 0)
 		return INTEGER_T;
