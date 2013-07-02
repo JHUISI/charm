@@ -23,10 +23,7 @@ from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.hash_module import Waters
-import hashlib, math
-import time
-import string
-import random
+import hashlib, math, time, string, random
 
 def randomStringGen(size=30, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))

@@ -815,10 +815,10 @@ echo "INSTALL_PROG=$install -m0755 -p" >> $config_mk
 if test "$darwin" = "yes" ; then
    mac_ver=`sw_vers | grep "ProductVersion:" | cut -d. -f2`
    if test "$mac_ver" = "7"; then 
-      echo "CC=gcc-4.2" >> $config_mk
-      echo "CPP=gcc-4.2 -E" >> $config_mk
-      echo "CXX=gcc-4.2" >> $config_mk 
-      echo "HOST_CC=gcc-4.2" >> $config_mk
+      echo "CC=clang" >> $config_mk
+      echo "CPP=clang++" >> $config_mk
+      echo "CXX=clang++" >> $config_mk 
+      echo "HOST_CC=clang" >> $config_mk
    else
       echo "CC=$cc" >> $config_mk
       echo "HOST_CC=$host_cc" >> $config_mk
