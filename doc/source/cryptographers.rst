@@ -214,11 +214,12 @@ In the integer module we provide additional support for benchmarking without a g
 ::
 	
 	from charm.core.math.integer import *
-	a = integer(12345678)
+	trials = 10	
+	a = integer(1234)
 	
 	assert InitBenchmark(), "failed to initialize benchmark"
 	StartBenchmark(["RealTime", "Exp", "Mul"])
-	for k in range(count):
+	for k in range(trials):
 	    r = randomPrime(512)
 	    s = r * (r ** a)
 	    j = r * (r ** a)	    
