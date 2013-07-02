@@ -31,8 +31,6 @@ Before we begin, please note the current dependencies:
 See ``./configure.sh --help`` for other options.
 
 You can obtain a copy of the latest version of Charm from either of the following links:
-        http://code.google.com/p/charm-crypto/downloads
-
 	https://github.com/JHUISI/charm/downloads
 
 Please let us know at support@charm-crypto.com if you run into any setup or installation problems. We will be happy to offer our assistance.
@@ -135,23 +133,15 @@ Before installing Charm, there are a few prerequisites that need to be installed
                 ``sudo apt-get install python3-setuptools python3-dev`` (for Python 3.x)
         5. libssl-dev (only necessary if you did not install Python 3)
                 ``sudo apt-get install libssl-dev``
+        
+        6. GMP
+        		``sudo apt-get install libgmp-dev``
 
-Next, we will install Charm. Navigate to the Charm directory.
+Next, we will install Charm. Navigate to your Charm directory.
         1. We must first run the configuration script:
                 ``sudo ./configure.sh``
-
-                [If you installed Python 3 and would like to use that, you will need to add ``--python=/path/to/python3``]
-
-        2. Install GMP from source
-        		``./configure``
-        		
-        		``make``
-        		
-        		``sudo make install``
-        		
-        		``sudo ldconfig``
         
-        3. Install PBC from source
+        2. Install PBC from source
         		``./configure LDFLAGS="-lgmp"``
         		
         		``make``
@@ -160,15 +150,15 @@ Next, we will install Charm. Navigate to the Charm directory.
         		
         		``sudo ldconfig``
         
-        4. Now we can build and install Charm:
+        3. Now we can build and install Charm:
                 ``sudo make``
 
                 ``sudo make install``
 
-        5. And finally we must rebuild the search path for libraries
+        4. And finally we must rebuild the search path for libraries
                 ``sudo ldconfig``
         
-        6. Run Pytests
+        5. Run Pytests
         		``sudo make test``
         
 Fedora

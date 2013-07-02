@@ -202,9 +202,9 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 	PyObject *result;
 
 #if PY_MAJOR_VERSION >= 3
-	if (!PyArg_ParseTuple(args, "s#", &str, &len))
-#else
 	if (!PyArg_ParseTuple(args, "y#", &str, &len))
+#else
+	if (!PyArg_ParseTuple(args, "s#", &str, &len))
 #endif
 		return NULL;
 	if (len==0)			/* Handle empty string */
