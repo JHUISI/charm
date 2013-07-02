@@ -38,7 +38,6 @@ class IBE_Chen12_z(IBEnc):
     """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        #IBEnc.setProperty(self, message_space=[GT, 'KEM'], secdef='IND_sID_CPA', assumption='DBDH', secmodel='ROM', other={'id':ZR})
         global group
         group = groupObj
         
