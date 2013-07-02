@@ -8,23 +8,16 @@ Installation
 
 1. Linux
 
-	./configure.sh 
-	
-	cd embed/
-	
-	make
-	
-	./test
-	
+		./configure.sh 
+		cd embed/
+		make
+		./test
 
 2. Mac OS X: this requires MacPorts and the ``gettext`` package (e.g., sudo port install gettext), then execute the following:
 
-	./configure.sh --enable-darwin
-	
-	cd embed/
-	
-	make
-	
-	./test
+		./configure.sh --enable-darwin	
+		cd embed/
+		make
+		./test
 	
 3. Windows (have not tested yet)
