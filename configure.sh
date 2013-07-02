@@ -515,6 +515,10 @@ else
             exit 1
         fi
 fi
+py_config="$python_path-config"
+PY_CFLAGS=`$py_config --cflags`
+PY_LDFLAGS=`$py_config --ldflags`
+
 # check that the C compiler works.
 cat > $TMPC <<EOF
 int main(void) {}
@@ -838,6 +842,9 @@ echo "ARLIBS_BEGIN=$arlibs_begin" >> $config_mk
 echo "ARLIBS_END=$arlibs_end" >> $config_mk
 echo "LIBS+=$LIBS" >> $config_mk
 echo "LIBS_TOOLS+=$libs_tools" >> $config_mk
+
+echo "PY_CFLAGS=$PY_CFLAGS" >> $config_mk
+echo "PY_LDFLAGS=$PY_LDFLAGS" >> $config_mk
 
 # generate list of library paths for linker script
 cflags=""

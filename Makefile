@@ -1,7 +1,7 @@
 
 CONFIG=config.mk
 include ./${CONFIG}
-export CONFIG_FILE=${CONFIG}
+export CONFIG_FILE=${CURDIR}/${CONFIG}
 
 # user config options
 setup1=$(shell mkdir -p /tmp/build-charm)
