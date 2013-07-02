@@ -3,7 +3,7 @@ Embedding Charm via Python/C API
 
 We have only tested with Python 2.7 and 3.3, but should work generally with any Python version supported in Charm.
 
-Installation
+Compiling
 ============
 
 1. Linux
