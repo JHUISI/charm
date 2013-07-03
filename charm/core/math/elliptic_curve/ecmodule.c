@@ -1300,8 +1300,11 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 				memcpy(input, msg, msg_len);
 				int TryNextCTR = TRUE;
 				ECElement *encObj = NULL;
+                y=BN_new();
+                x=BN_new();
 				do {
-
+                    if(encObj !=NULL)
+                        Py_DECREF(encObj);
 					/* 				1-byte    < max_len    ctr
 					 * encoding [   size   |    msg     | \x01 \x00 \x00 \x00]
 					 */
@@ -1318,8 +1321,8 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
 					// check if msg len is big enough to fit into length
 					printf_buffer_as_hex((uint8_t *) input, len);
 					encObj = createNewPoint(G, gobj);
-					x = BN_bin2bn((const uint8_t *) input, len, NULL);
-					y = BN_new();
+					BN_bin2bn((const uint8_t *) input, len, x);
+					BN_init(y);
 					char *xstr = BN_bn2dec(x);
 					debug("gen x => %s\n", xstr);
 					OPENSSL_free(xstr);
