@@ -129,7 +129,8 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 					debug("not a valid option.\n");
 				}
 				cnt++;
-				Py_DECREF(tmpObj);
+                if (tmpObj!=NULL)
+				    Py_DECREF(tmpObj);
 			}
 		}
 		// set size of list
