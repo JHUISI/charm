@@ -23,6 +23,7 @@ Toolbox Classes
    toolbox/IBSig
    toolbox/integergroup
    toolbox/iterate
+   toolbox/matrixops
    toolbox/node
    toolbox/paddingschemes
    toolbox/pairingcurves

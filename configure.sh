@@ -466,6 +466,10 @@ echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
 fi
 
+py_config="$python_path-config"
+PY_CFLAGS=`$py_config --cflags`
+PY_LDFLAGS=`$py_config --ldflags`
+
 # check that the C compiler works.
 cat > $TMPC <<EOF
 int main(void) {}
@@ -774,10 +778,10 @@ echo "INSTALL_PROG=$install -m0755 -p" >> $config_mk
 if test "$darwin" = "yes" ; then
    mac_ver=`sw_vers | grep "ProductVersion:" | cut -d. -f2`
    if test "$mac_ver" = "7"; then 
-      echo "CC=gcc-4.2" >> $config_mk
-      echo "CPP=gcc-4.2 -E" >> $config_mk
-      echo "CXX=gcc-4.2" >> $config_mk 
-      echo "HOST_CC=gcc-4.2" >> $config_mk
+      echo "CC=clang" >> $config_mk
+      echo "CPP=clang++" >> $config_mk
+      echo "CXX=clang++" >> $config_mk 
+      echo "HOST_CC=clang" >> $config_mk
    else
       echo "CC=$cc" >> $config_mk
       echo "HOST_CC=$host_cc" >> $config_mk
@@ -801,6 +805,9 @@ echo "ARLIBS_BEGIN=$arlibs_begin" >> $config_mk
 echo "ARLIBS_END=$arlibs_end" >> $config_mk
 echo "LIBS+=$LIBS" >> $config_mk
 echo "LIBS_TOOLS+=$libs_tools" >> $config_mk
+
+echo "PY_CFLAGS=$PY_CFLAGS" >> $config_mk
+echo "PY_LDFLAGS=$PY_LDFLAGS" >> $config_mk
 
 # generate list of library paths for linker script
 cflags=""

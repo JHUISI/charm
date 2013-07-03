@@ -31,6 +31,7 @@
 #define RELIC_INTERFACE_H
 
 #include <stdlib.h>
+#include <math.h>
 #include "relic.h"
 /* make sure error checking enabled in relic_conf.h, ALLOC should be dynamic */
 

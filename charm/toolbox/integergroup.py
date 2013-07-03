@@ -1,6 +1,6 @@
 try:
-  from charm.core.math.integer import integer,randomBits,random,randomPrime,isPrime,encode,decode,hashInt,bitsize,legendre,gcd,lcm,serialize,deserialize,int2Bytes,toInt
-  #from charm.core.math.integer import InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,ClearBenchmark
+  #from charm.core.math.integer import integer,randomBits,random,randomPrime,isPrime,encode,decode,hashInt,bitsize,legendre,gcd,lcm,serialize,deserialize,int2Bytes,toInt
+  from charm.core.math.integer import * #InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,ClearBenchmark
 except Exception as err:
   print(err)
   exit(-1)
@@ -82,6 +82,28 @@ class IntegerGroup:
             #print "Hashing => '%s'" % args
             return hashInt(args, self.p, self.q, False)
         return None
+
+    def InitBenchmark(self):
+        """initiates the benchmark state"""
+        return InitBenchmark()
+    
+    def StartBenchmark(self, options):
+        """starts the benchmark with any of these options: 
+        RealTime, CpuTime, Mul, Div, Add, Sub, Exp"""
+        return StartBenchmark(options)
+    
+    def EndBenchmark(self):
+        """ends an ongoing benchmark"""
+        return EndBenchmark()
+        
+    def GetGeneralBenchmarks(self):
+        """retrieves benchmark count for all group operations"""
+        return GetGeneralBenchmarks()
+        
+    def GetBenchmark(self, option):
+        """retrieves benchmark results for any of these options: 
+        RealTime, CpuTime, Mul, Div, Add, Sub, Exp"""
+        return GetBenchmark(option)
 
 class IntegerGroupQ:
     def __init__(self, start=0):
@@ -167,6 +189,28 @@ class IntegerGroupQ:
         assert type(bytes_object) == bytes, "cannot deserialize object"
         return deserialize(bytes_object)
 
+    def InitBenchmark(self):
+        """initiates the benchmark state"""
+        return InitBenchmark()
+    
+    def StartBenchmark(self, options):
+        """starts the benchmark with any of these options: 
+        RealTime, CpuTime, Mul, Div, Add, Sub, Exp"""
+        return StartBenchmark(options)
+    
+    def EndBenchmark(self):
+        """ends an ongoing benchmark"""
+        return EndBenchmark()
+        
+    def GetGeneralBenchmarks(self):
+        """retrieves benchmark count for all group operations"""
+        return GetGeneralBenchmarks()
+        
+    def GetBenchmark(self, option):
+        """retrieves benchmark results for any of these options: 
+        RealTime, CpuTime, Mul, Div, Add, Sub, Exp"""
+        return GetBenchmark(option)
+
     
 class RSAGroup:
     def __init__(self):
@@ -228,3 +272,25 @@ class RSAGroup:
 
     def decode(self, value):
         pass
+
+    def InitBenchmark(self):
+        """initiates the benchmark state"""
+        return InitBenchmark()
+    
+    def StartBenchmark(self, options):
+        """starts the benchmark with any of these options: 
+        RealTime, CpuTime, Mul, Div, Add, Sub, Exp"""
+        return StartBenchmark(options)
+    
+    def EndBenchmark(self):
+        """ends an ongoing benchmark"""
+        return EndBenchmark()
+        
+    def GetGeneralBenchmarks(self):
+        """retrieves benchmark count for all group operations"""
+        return GetGeneralBenchmarks()
+        
+    def GetBenchmark(self, option):
+        """retrieves benchmark results for any of these options: 
+        RealTime, CpuTime, Mul, Div, Add, Sub, Exp"""
+        return GetBenchmark(option)

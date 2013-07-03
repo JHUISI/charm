@@ -103,7 +103,7 @@ void CheckError(char *error_msg)
 result_t getType(PyObject *o)
 {
 	PyTypeObject *t = o->ob_type;
-	debug("Object type: '%s'\n", t->tp_name);
+	//debug("Object type: '%s'\n", t->tp_name);
 
 	if(strcmp(t->tp_name, INTEGER_TYPE) == 0)
 		return INTEGER_T;
@@ -133,7 +133,7 @@ result_t getType(PyObject *o)
 
 Charm_t *InitPairingGroup(Charm_t *pModule, const char *param_id)
 {
-	PyObject *pName, *pArgs, *pFunc, *pValue, *tmp;
+	PyObject *pName, *pArgs, *pFunc, *pValue=NULL, *tmp;
 
 	pName = PyUnicode_FromString("charm.toolbox.pairinggroup");
 
@@ -158,11 +158,11 @@ Charm_t *InitPairingGroup(Charm_t *pModule, const char *param_id)
             }
             /* tmp reference stolen here: */
             PyTuple_SetItem(pArgs, 0, tmp);
+        	pValue = PyObject_CallObject(pFunc, pArgs);
+        	Free(pArgs);
         }
         else {}
 
-        pValue = PyObject_CallObject(pFunc, pArgs);
-        Free(pArgs);
         Free(pFunc);
         return (Charm_t *) pValue;
     }
@@ -178,7 +178,7 @@ Charm_t *InitPairingGroup(Charm_t *pModule, const char *param_id)
 
 Charm_t *InitECGroup(Charm_t *pModule, int param_id)
 {
-	PyObject *pName, *pArgs, *pFunc, *pValue;
+	PyObject *pName, *pArgs, *pFunc, *pValue=NULL;
 
 	pName = PyUnicode_FromString("charm.toolbox.ecgroup");
 
@@ -203,11 +203,11 @@ Charm_t *InitECGroup(Charm_t *pModule, int param_id)
             }
             /* pValue reference stolen here: */
             PyTuple_SetItem(pArgs, 0, pValue);
+        	pValue = PyObject_CallObject(pFunc, pArgs);
+        	Free(pArgs);
         }
         else {}
 
-        pValue = PyObject_CallObject(pFunc, pArgs);
-        Free(pArgs);
         Free(pFunc);
         return (Charm_t *) pValue;
     }
@@ -223,7 +223,7 @@ Charm_t *InitECGroup(Charm_t *pModule, int param_id)
 
 Charm_t *InitIntegerGroup(Charm_t *pModule, int param_id)
 {
-	PyObject *pName, *pArgs, *pFunc, *pValue;
+	PyObject *pName, *pArgs, *pFunc, *pValue=NULL;
 
 	pName = PyUnicode_FromString("charm.toolbox.integergroup");
 
@@ -248,11 +248,11 @@ Charm_t *InitIntegerGroup(Charm_t *pModule, int param_id)
             }
             /* pValue reference stolen here: */
             PyTuple_SetItem(pArgs, 0, pValue);
+        	pValue = PyObject_CallObject(pFunc, pArgs);
+        	Free(pArgs);
         }
         else {}
 
-        pValue = PyObject_CallObject(pFunc, pArgs);
-        Free(pArgs);
         Free(pFunc);
         return (Charm_t *) pValue;
     }
@@ -271,7 +271,7 @@ Charm_t *InitIntegerGroup(Charm_t *pModule, int param_id)
 Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pObject)
 {
 	if(pObject == NULL) return NULL;
-	PyObject *pClassName, *pModule, *pFunc, *pArgs, *pValue;
+	PyObject *pClassName, *pModule, *pFunc, *pArgs, *pValue=NULL;
 	pClassName = PyUnicode_FromString(class_file);
 
 	pModule = PyImport_Import(pClassName);
@@ -291,6 +291,7 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
         	// instantiate pValue = ClassName( pObject )
             pValue = PyObject_CallObject(pFunc, pArgs);
             debug("success: \n");
+        	Free(pArgs);
     	}
     	else {
     		// call failed
@@ -298,7 +299,6 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
     			PyErr_Print();
     		fprintf(stderr, "Cannot find function.\n");
     	}
-        Free(pArgs);
         Free(pFunc);
         Free(pModule);
     	return (Charm_t *) pValue;
@@ -316,7 +316,7 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
 Charm_t *InitAdapter(const char *class_file, const char *class_name, Charm_t *pObject1, Charm_t *pObject2)
 {
 	if(pObject1 == NULL || pObject2 == NULL) return NULL;
-	PyObject *pClassFile, *pModule, *pFunc, *pArgs, *pValue;
+	PyObject *pClassFile, *pModule, *pFunc, *pArgs, *pValue=NULL;
 	pClassFile = PyUnicode_FromString(class_file);
 
 	pModule = PyImport_Import(pClassFile);
@@ -336,6 +336,7 @@ Charm_t *InitAdapter(const char *class_file, const char *class_name, Charm_t *pO
         	// instantiate pValue = ClassName( pObject )
             pValue = PyObject_CallObject(pFunc, pArgs);
             debug("success: \n");
+        	Free(pArgs);
     	}
     	else {
     		// call failed
@@ -343,7 +344,6 @@ Charm_t *InitAdapter(const char *class_file, const char *class_name, Charm_t *pO
     			PyErr_Print();
     		fprintf(stderr, "Cannot find function.\n");
     	}
-        Free(pArgs);
         Free(pFunc);
         Free(pModule);
     	return (Charm_t *) pValue;
@@ -461,7 +461,7 @@ Charm_t *GetDict(Charm_t *pObject, char *key)
 
 Charm_t *objectToBytes(Charm_t *object, Charm_t *group)
 {
-	PyObject *pName, *pModule, *pArgs, *pFunc, *pValue;
+	PyObject *pName, *pModule, *pArgs, *pFunc, *pValue=NULL;
 	if(group == NULL || object == NULL) return NULL;
 
 	pName = PyUnicode_FromString("charm.core.engine.util");
@@ -487,12 +487,12 @@ Charm_t *objectToBytes(Charm_t *object, Charm_t *group)
             Py_INCREF(group);
             PyTuple_SetItem(pArgs, 0, object);
             PyTuple_SetItem(pArgs, 1, group);
+        	pValue = PyObject_CallObject(pFunc, pArgs);
+        	Free(pArgs);
         }
         else {}
 
         /* perform serialization */
-        pValue = PyObject_CallObject(pFunc, pArgs);
-        Free(pArgs);
         Free(pFunc);
         return (Charm_t *) pValue;
     }
@@ -507,7 +507,7 @@ Charm_t *objectToBytes(Charm_t *object, Charm_t *group)
 
 Charm_t *bytesToObject(Charm_t *object, Charm_t *group)
 {
-	PyObject *pName, *pModule, *pArgs, *pFunc, *pValue;
+	PyObject *pName, *pModule, *pArgs, *pFunc, *pValue=NULL;
 	if(group == NULL || object == NULL) return NULL;
 
 	pName = PyUnicode_FromString("charm.core.engine.util");
@@ -533,12 +533,12 @@ Charm_t *bytesToObject(Charm_t *object, Charm_t *group)
             Py_INCREF(group);
             PyTuple_SetItem(pArgs, 0, object);
             PyTuple_SetItem(pArgs, 1, group);
+        	pValue = PyObject_CallObject(pFunc, pArgs);
+        	Free(pArgs);
         }
         else {}
 
         /* perform deserialization */
-        pValue = PyObject_CallObject(pFunc, pArgs);
-        Free(pArgs);
         Free(pFunc);
         return (Charm_t *) pValue;
     }

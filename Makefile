@@ -1,7 +1,7 @@
 
 CONFIG=config.mk
 include ./${CONFIG}
-export CONFIG_FILE=${CONFIG}
+export CONFIG_FILE=${CURDIR}/${CONFIG}
 
 # user config options
 setup1=$(shell mkdir -p /tmp/build-charm)
@@ -18,7 +18,9 @@ pbc_url=http://crypto.stanford.edu/pbc/files/${pbc_version}.tar.gz
 pbc_options=CC="${CC}" CPP="${CPP}" LDFLAGS="${LDFLAGS}" CPPFLAGS="${CPPFLAGS}" ${OSFLAGS}
 DESTDIR=${prefix}
 
-all:
+
+
+help:
 	@echo "make deps - Build the charm dependencies."
 	@echo "make build - Build the charm framework and install dependencies."
 	@echo "make source - Create source package."
@@ -81,8 +83,8 @@ build-pbc:
 deps: build-gmp build-pbc
 	@echo "Dependencies build complete."
 
-.PHONY: build
-build: setup build-gmp build-pbc
+.PHONY: all
+all: setup build-gmp build-pbc
 	@echo "Building the Charm Framework"
 	${PYTHON} distribute_setup.py
 	${PYTHON} setup.py build ${PYTHONFLAGS} ${PYTHONBUILDEXT}

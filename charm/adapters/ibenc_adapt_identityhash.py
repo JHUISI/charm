@@ -38,7 +38,7 @@ class HashIDAdapter(IBEnc):
 
     def extract(self, mk, ID):
         assert ibe != None, "IBEnc alg not set"
-        if type(ID) == str:
+        if type(ID) in [str, bytes]:
             ID2 = self.group.hash(ID)
             sk = ibe.extract(mk, ID2); sk['IDstr'] = ID
             return sk
@@ -47,7 +47,7 @@ class HashIDAdapter(IBEnc):
     
     def encrypt(self, pk, ID, msg):
         assert ibe != None, "IBEnc alg not set"        
-        if type(ID) == str:
+        if type(ID) in [str, bytes]:
             ID2 = self.group.hash(ID)
             return ibe.encrypt(pk, ID2, msg)
         else:

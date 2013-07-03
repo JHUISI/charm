@@ -52,28 +52,6 @@ extern "C" {
 //}
 //#endif
 
-#define ID_LEN	4
-
-typedef struct {
-	PyObject_HEAD
-	pbc_param_t p;
-	pairing_t pair_obj;
-	int safe;
-	uint8_t hash_id[ID_LEN+1];
-} Pairing;
-
-typedef struct {
-    PyObject_HEAD
-	char *params;
-	char *param_buf;
-
-	Pairing *pairing;
-	element_t e;
-	int element_type;
-    int elem_initialized;
-	int safe_pairing_clear;
-} PyElement;
-
 #elif defined(BUILD_EC)
 
 #include "openssl/ec.h"
@@ -83,26 +61,9 @@ typedef struct {
 #include "openssl/rand.h"
 #include "openssl/bn.h"
 
-typedef struct {
-	PyObject_HEAD
-	GroupType type;
-	EC_GROUP *group;
-	EC_POINT *P;
-	BIGNUM *elemZ;
-	BN_CTX *ctx;
-	int point_init, group_init, nid;
-} PyECElement;
-
 #elif defined(BUILD_INT)
 
-//#include <gmp.h>
-
-typedef struct {
-	PyObject_HEAD
-	mpz_t m;
-	mpz_t e;
-	int initialized;
-} PyInteger;
+#include <gmp.h>
 
 #endif
 
@@ -166,26 +127,17 @@ Charm_t *bytesToObject(Charm_t *object, Charm_t *group);
 #define Free Py_XDECREF
 
 // for debug purposes
-#define RunCommands(obj, result) 		\
-			{	PyDictObject *dict;		\
-            	PyTupleObject *tupl;	\
-            	PyElement *elem;		\
-            	uint8_t *b;				\
+#define PrintObject(obj) 		\
+			{	uint8_t *b;				\
             	result_t r = getType(obj);	\
             	if(obj == NULL) { printf("NULL object.\n"); r = NONE_T; } \
 				switch (r)						\
 				{								\
 					case PYDICT_T:				\
-						 dict = (PyDictObject *) obj;	\
-						 printf("handle dictionary...\n"); \
-						break;							\
 					case PYTUPLE_T:						\
-						tupl = (PyTupleObject *) obj;	\
-						 printf("handle tuple...\n"); 	\
-						break;							\
 					case PAIRING_T:						\
-						elem = (PyElement *) obj;		\
-						element_printf("element_t :=> '%B'\n", elem->e);	\
+ 						 PyObject_Print(obj, stdout, Py_PRINT_RAW);	\
+ 						 printf("\n");					\
 						break;							\
 					case PYSTR_T:						\
 					case PYBYTES_T:						\

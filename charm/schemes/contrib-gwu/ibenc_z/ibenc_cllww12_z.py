@@ -11,8 +11,11 @@ Shorter IBE and Signatures via Asymmetric Pairings
 
 :Authors:    Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
 :Date:       3/2013
-:Note: The implementation is different from what the paper described. Generally speaking,  instead of storing msk= { \alpha, g_2^{d_1^*}, g_2^{d_2^*} } as the master secret key, we stored \msk= \{ \alpha, d_1^*, d_2^* \}.
-And for the computation of sk_id, we first compute (\alpha + r ID)d_1^* - r \d_2^*$ then apply the exponential operation. This reduce the G2 exponentials from 8 to 4. This is the same trick we used in improving N04(Waters05) scheme.
+:Note: The implementation is different from what the paper described. 
+       Generally speaking,  instead of storing msk= { \alpha, g_2^{d_1^*}, g_2^{d_2^*} } as the master secret key, 
+       we stored \msk= \{ \alpha, d_1^*, d_2^* \}. And for the computation of sk_id, we first compute 
+       (\alpha + r ID)d_1^* - r \d_2^*$ then apply the exponential operation. This reduce the G2 exponentials from 8 to 4. 
+       This is the same trick we used in improving N04(Waters05) scheme.
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.matrixops import *
@@ -35,7 +38,6 @@ class IBE_Chen12_z(IBEnc):
     """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
-        #IBEnc.setProperty(self, message_space=[GT, 'KEM'], secdef='IND_sID_CPA', assumption='DBDH', secmodel='ROM', other={'id':ZR})
         global group
         group = groupObj
         
@@ -44,10 +46,8 @@ class IBE_Chen12_z(IBEnc):
         g2 = group.random(G2)
         alpha = group.random(ZR)
         #generate the 4*4 dual pairing vector spaces.
-        d11, d12, d13, d14 = group.random(ZR),group.random(ZR),group.random(ZR),group.random(ZR)
-        d21, d22, d23, d24 = group.random(ZR),group.random(ZR),group.random(ZR),group.random(ZR)
-        d31, d32, d33, d34 = group.random(ZR),group.random(ZR),group.random(ZR),group.random(ZR)
-        d41, d42, d43, d44 = group.random(ZR),group.random(ZR),group.random(ZR),group.random(ZR)
+        d11, d12, d13, d14, d21, d22, d23, d24 = group.random(ZR, 8)
+        d31, d32, d33, d34, d41, d42, d43, d44 = group.random(ZR, 8)
         D11, D12, D13, D14 = group.init(ZR),group.init(ZR),group.init(ZR),group.init(ZR)
         D21, D22, D23, D24 = group.init(ZR),group.init(ZR),group.init(ZR),group.init(ZR)
         D31, D32, D33, D34 = group.init(ZR),group.init(ZR),group.init(ZR),group.init(ZR)

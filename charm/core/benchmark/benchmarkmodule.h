@@ -32,14 +32,13 @@ extern "C" {
 	/* check for both unicode and bytes objects */
 	#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
 	/* if unicode then add extra conversion step. two possibilities: unicode or bytes */
-	#define PyBytes_ToString(a, obj)	\
-if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AsString(_obj); Py_DECREF(_obj); }	\
-else { a = PyBytes_AsString(obj); }
 	#define PyBytes_ToString2(a, obj, tmp_obj)	\
 if(PyBytes_Check(obj)) { a = PyBytes_AsString(obj); } \
 else if(PyUnicode_Check(obj)) { tmp_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AsString(tmp_obj); }	\
 else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
+
 #else
+	/* python 2.x definitions */
 	#define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
 	#define ConvertToInt(o) PyInt_AsLong(o)
 	#define PyToLongObj(o) PyInt_FromSize_t(o)
@@ -47,7 +46,8 @@ else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
     #define PyUnicode_FromString PyString_FromString
 	/* treat everything as string in 2.x */
 	#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
-	#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
+	#define PyBytes_ToString2(a, obj, tmpObj) a = PyString_AsString(obj);
+
 #endif
 
 #define BENCHMARK_MOD_NAME "charm.core.benchmark._C_API"
@@ -74,20 +74,17 @@ typedef enum Measure MeasureType;
 
 typedef struct {
 	PyObject_HEAD
-
 	struct timeval start_time, stop_time, native_time; // track real time
 	clock_t start_clock, stop_clock; // track cpu time
-	// Operations *op_ptr; // track various operations
+
 	int op_add, op_sub, op_mult, op_div;
 	int op_exp, op_pair;
-	double native_time_ms, cpu_time_ms, real_time_ms;
+	double cpu_time_ms, real_time_ms;
 	int num_options; // track num options for a particular benchmark
-	MeasureType options_selected[MAX_MEASURE]; // measurement options selected
-	int cpu_option, native_option, real_option, granular_option;
+	MeasureType options_selected[MAX_MEASURE+1]; // measurement options selected
+	int cpu_option, real_option, granular_option;
 	int identifier;
-	int bench_initialized;
-	void *data_ptr;
-	void (*gran_init)(void);
+	int bench_initialized, bench_inprogress;
 } Benchmark;
 
 // PyMethodDef Benchmark_methods[];
@@ -103,16 +100,14 @@ PyObject *Retrieve_result(Benchmark *self, char *option);
 #define PyBenchmark_Start 		  0
 #define PyBenchmark_End 		  1
 #define PyBenchmark_Update		  2
-#define PyBenchmark_StartT		  3
-#define PyBenchmark_StopT	      4
-#define PyBenchmark_Clear		  5
+#define PyBenchmark_Clear		  3
 
 /* total number of C api pointers? */
-#define PyBenchmark_API_pointers 6
+#define PyBenchmark_API_pointers 4
 
 #ifdef BENCHMARK_ENABLED
 #define UPDATE_BENCHMARK(option, bench)   \
-	if(bench->bench_initialized) {	   \
+	if(bench != NULL && bench->bench_initialized == TRUE) {	   \
 	PyUpdateBenchmark(option, bench); }
 
 #else
@@ -124,8 +119,6 @@ PyObject *Retrieve_result(Benchmark *self, char *option);
 static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize);
 static int PyEndBenchmark(Benchmark *data);
 static int PyUpdateBenchmark(MeasureType option, Benchmark *data);
-static int PyStartTBenchmark(MeasureType option, Benchmark *data);
-static int PyStopTBenchmark(MeasureType option, Benchmark *data);
 static int PyClearBenchmark(Benchmark *data);
 
 #else
@@ -138,82 +131,7 @@ static void **PyBenchmark_API;
 #define PyStartBenchmark (*(int (*)(Benchmark *data, PyObject *opList, int opListSize)) PyBenchmark_API[PyBenchmark_Start])
 #define PyEndBenchmark (*(int (*)(Benchmark *data)) PyBenchmark_API[PyBenchmark_End])
 #define PyUpdateBenchmark (*(int (*)(MeasureType option, Benchmark *data)) PyBenchmark_API[PyBenchmark_Update])
-#define PyStartTBenchmark (*(int (*)(MeasureType option, Benchmark *data)) PyBenchmark_API[PyBenchmark_StartT])
-#define PyStopTBenchmark (*(int (*)(MeasureType option, Benchmark *data)) PyBenchmark_API[PyBenchmark_StopT])
 #define PyClearBenchmark (*(int (*)(Benchmark *data)) PyBenchmark_API[PyBenchmark_Clear])
-
-/* start - api helper functions */
-#define InitBenchmark_CAPI(func_name, b, id) \
-PyObject *func_name(PyObject *self, PyObject *args) { 	\
-	debug("%s: bench init: '%i'\n", __FUNCTION__, b->bench_initialized); \
-	if(b->bench_initialized == FALSE) {   		\
-		b->bench_initialized = TRUE;		\
-		b->identifier = id;				\
-		debug("%s: bench id set: '%i'\n", __FUNCTION__, b->identifier); 	\
-		debug("Initialized benchmark object.\n");	\
-		PyObject *result = Py_BuildValue("i", id); \
-		return result; }	\
-	debug("Benchmark already initialized.\n");	\
-	Py_RETURN_FALSE;	}
-
-#define StartBenchmark_CAPI(func_name, b) 	\
-PyObject *func_name(PyObject *self, PyObject *args) { \
-	PyObject *list = NULL; int id = -1;			\
-	if(PyArg_ParseTuple(args, "iO", &id, &list)) {		\
-		if(b->bench_initialized == TRUE && id == b->identifier) { \
-			debug("%s: bench id: '%i'\n", __FUNCTION__, b->identifier); 	\
-			size_t size = PyList_Size(list);	\
-			PyStartBenchmark(b, list, size);	\
-		debug("list size => %zd\n", size);		\
-		debug("benchmark enabled and initialized!\n");\
-		Py_RETURN_TRUE;  }				\
-		Py_RETURN_FALSE; 	}			\
-	return NULL;	}
-
-#define EndBenchmark_CAPI(func_name, b)		\
-PyObject *func_name(PyObject *self, PyObject *args) { \
-	int id = -1;					\
-	if(PyArg_ParseTuple(args, "i", &id)) {		\
-		debug("%s: bench init: '%i'\n", __FUNCTION__, b->bench_initialized); \
-		debug("%s: bench id: '%i'\n", __FUNCTION__, b->identifier); \
-		if(b->bench_initialized == TRUE && id == b->identifier) {		\
-			PyEndBenchmark(b);		\
-			b->bench_initialized = FALSE; \
-			b->identifier = id;	\
-			debug("%s: bench id: '%i'\n", __FUNCTION__, b->identifier); 	\
-			Py_RETURN_TRUE;		}	\
-	debug("Invalid benchmark identifier.\n"); } 	\
-	Py_RETURN_FALSE;			}
-
-#define GetBenchmark_CAPI(func_name, b) \
-PyObject *func_name(PyObject *self, PyObject *args) { \
-	int id = -1;					\
-	char *opt = NULL;			\
-	if(PyArg_ParseTuple(args, "i|s", &id, &opt)) { \
-		return Retrieve_result(b, opt); \
-		}		\
-	Py_RETURN_FALSE;	}
-
-#define GetAllBenchmarks_CAPI(func_name, b, getResultFunc)	\
-PyObject *func_name(PyObject *self, PyObject *args) { \
-	int id = -1;					\
-	if(PyArg_ParseTuple(args, "i", &id)) {		\
-		debug("%s: bench id: '%i', id: '%d'\n", __FUNCTION__, b->identifier, id); \
-		if(id == b->identifier)		\
-			return getResultFunc(b);	\
-	debug("Invalid benchmark identifier.\n"); }	\
-	Py_RETURN_FALSE;	}
-
-#define ClearBenchmarks_CAPI(func_name, b) \
-PyObject *func_name(PyObject *self, PyObject *args) { \
-	int id = -1;					\
-	if(PyArg_ParseTuple(args, "i", &id)) {		\
-		if(id == b->identifier)	{	\
-			PyClearBenchmark(b);	\
-			debug("Benchmark object cleared!\n");	\
-			Py_RETURN_TRUE;    } 		\
-	debug("Invalid benchmark idenifier.\n"); }	\
-	Py_RETURN_FALSE;	}
 
 #define ADD_BENCHMARK_OPTIONS(m)		\
 	PyModule_AddStringConstant(m, "CpuTime", "CpuTime");		\

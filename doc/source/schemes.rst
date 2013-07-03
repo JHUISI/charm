@@ -7,6 +7,16 @@ Implemented Schemes
 .. toctree::
    :maxdepth: 1
 
+   charm/schemes/abenc/abenc_bsw07
+   charm/schemes/abenc/abenc_lsw08
+   charm/schemes/abenc/abenc_waters09
+   charm/schemes/abenc/dfa_fe12
+   charm/schemes/abenc/pk_hve08
+   charm/schemes/pkenc/pkenc_cs98
+   charm/schemes/pkenc/pkenc_elgamal85
+   charm/schemes/pkenc/pkenc_paillier99
+   charm/schemes/pkenc/pkenc_rabin
+   charm/schemes/pkenc/pkenc_rsa
    charm/schemes/chamhash_adm05
    charm/schemes/chamhash_rsa_hw09
    charm/schemes/dabe_aw11
@@ -35,16 +45,6 @@ Implemented Schemes
    charm/schemes/pksig/pksig_waters
    charm/schemes/pksig/pksig_waters05
    charm/schemes/pksig/pksig_waters09
-   charm/schemes/abenc/abenc_bsw07
-   charm/schemes/abenc/abenc_lsw08
-   charm/schemes/abenc/abenc_waters09
-   charm/schemes/abenc/dfa_fe12
-   charm/schemes/abenc/pk_hve08
-   charm/schemes/pkenc/pkenc_cs98
-   charm/schemes/pkenc/pkenc_elgamal85
-   charm/schemes/pkenc/pkenc_paillier99
-   charm/schemes/pkenc/pkenc_rabin
-   charm/schemes/pkenc/pkenc_rsa
 
 .. end_auto_scheme_list
 

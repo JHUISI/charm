@@ -46,11 +46,16 @@
 #include "openssl/rand.h"
 #include "openssl/bn.h"
 #include "openssl/sha.h"
+#ifdef BENCHMARK_ENABLED
+#include "benchmark_util.h"
+#endif
+
 
 //#define DEBUG	1
 #define TRUE	1
 #define FALSE	0
 #define BYTE	8
+#define ID_LEN  BYTE
 #define BASE_DEC 10
 #define BASE_HEX 16
 #define MAX_BUF  256
@@ -62,12 +67,9 @@
 #define HASH_LEN						SHA256_DIGEST_LENGTH
 #define RESERVED_ENCODING_BYTES			2
 
-#if BENCHMARK_ENABLED == 1
-static Benchmark *dBench;
-#endif
-
 PyTypeObject ECType;
 PyTypeObject ECGroupType;
+PyTypeObject OperationType;
 static PyObject *PyECErrorObject;
 #define PyEC_Check(obj) PyObject_TypeCheck(obj, &ECType)
 #define PyECGroup_Check(obj) PyObject_TypeCheck(obj, &ECGroupType)
@@ -77,7 +79,19 @@ typedef enum Group GroupType;
 PyMethodDef ECElement_methods[];
 PyNumberMethods ecc_number;
 
-// TODO: consider adding ref_cnt for keeping track of group ptr references.
+#ifdef BENCHMARK_ENABLED
+typedef struct {
+	PyObject_HEAD
+	int op_init;
+	int exp_ZR, exp_G;
+	int mul_ZR, mul_G;
+	int div_ZR, div_G;
+
+	int add_ZR, add_G;
+	int sub_ZR, sub_G;
+} Operations;
+#endif
+
 typedef struct {
 	PyObject_HEAD
 	EC_GROUP *ec_group;
@@ -85,6 +99,11 @@ typedef struct {
 	int nid;
 	BN_CTX *ctx;
 	BIGNUM *order;
+#ifdef BENCHMARK_ENABLED
+    Benchmark *dBench;
+    Operations *gBench;
+	uint8_t bench_id[ID_LEN+1];
+#endif
 } ECGroup;
 
 typedef struct {
@@ -131,7 +150,7 @@ typedef struct {
 	PyErr_SetString(PyECErrorObject, "group object not allocated."); \
 	return NULL;    }
 
-#define Group_Init(obj) \
+#define VERIFY_GROUP(obj) \
 	if(!PyECGroup_Check(obj))  {  \
 		PyErr_SetString(PyECErrorObject, "not an ecc object."); return NULL; } \
 	if(obj->group_init == FALSE || obj->ec_group == NULL) { \
@@ -164,11 +183,44 @@ EC_POINT *element_from_hash(EC_GROUP *group, BIGNUM *order, uint8_t *input, int 
 	PyErr_SetString(PyECErrorObject, msg); \
 	return NULL;	}
 
+
+#ifdef BENCHMARK_ENABLED
+
+#define IS_SAME_GROUP(a, b) \
+	if(a->group->nid != b->group->nid) {	\
+		PyErr_SetString(PyECErrorObject, "mixing group elements from different curves.");	\
+		return NULL;	\
+	} 	\
+	if(strncmp((const char *) a->group->bench_id, (const char *) b->group->bench_id, ID_LEN) != 0) { \
+		PyErr_SetString(PyECErrorObject, "mixing benchmark objects not allowed.");	\
+		return NULL;	\
+	}
+
+#define IsBenchSet(obj)  obj->dBench != NULL
+
+#define Update_Op(name, op_type, elem_type, bench_obj)	\
+	Op_ ##name(op_type, elem_type, ZR, bench_obj)	\
+	Op_ ##name(op_type, elem_type, G, bench_obj)	\
+
+#define CLEAR_ALLDBENCH(bench_obj)  \
+	    CLEAR_DBENCH(bench_obj, ZR);	\
+	    CLEAR_DBENCH(bench_obj, G);
+
+#else
+
 #define IS_SAME_GROUP(a, b) \
 	if(a->group->nid != b->group->nid) {	\
 		PyErr_SetString(PyECErrorObject, "mixing group elements from different curves.");	\
 		return NULL;	\
 	}
+
+#define UPDATE_BENCH(op_type, elem_type, bench_obj)  /* ... */
+// #define UPDATE_BENCHMARK(op_type, bench_obj)  /* ... */
+#define CLEAR_ALLDBENCH(bench_obj) /* ... */
+#define GetField(count, type, group, bench_obj)  /* ... */
+
+#endif
+
 
 
 #endif

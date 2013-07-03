@@ -121,9 +121,9 @@
 
 #endif
 
-#ifdef BENCHMARK_ENABLED
-static Benchmark *dBench;
-#endif
+//#ifdef BENCHMARK_ENABLED
+//static Benchmark *dBench;
+//#endif
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
 #define HASH_FUNCTION_STR_TO_Zr_CRH		0

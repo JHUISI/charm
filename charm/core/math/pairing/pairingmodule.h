@@ -42,16 +42,19 @@
 #include "benchmarkmodule.h"
 #include "base64.h"
 #include "openssl/objects.h"
+#include "openssl/rand.h"
 #include "openssl/sha.h"
+#ifdef BENCHMARK_ENABLED
+#include "benchmark_util.h"
+#endif
 
 //#define DEBUG	1
 //#define TRUE	1
 //#define FALSE	0
-#define BenchmarkIdentifier 1
 #define BYTE		8
 #define MAX_LEN 	2048
 #define HASH_LEN	SHA256_DIGEST_LENGTH
-#define ID_LEN   	4
+#define ID_LEN   	8
 #define MAX_BENCH_OBJECTS	2
 // define element_types
 enum Group {ZR = 0, G1, G2, GT, NONE_G};
@@ -68,9 +71,6 @@ typedef enum Group GroupType;
 #else
 #define debug_e(...)
 #endif
-#ifdef BENCHMARK_ENABLED
-static Benchmark *dBench;
-#endif
 
 #define PrintPyRef(msg, o) printf("%s:" #msg " ref cnt = '%i'\n", __FUNCTION__, (int) Py_REFCNT(o));
 
@@ -86,28 +86,11 @@ PyMethodDef pairing_methods[];
 PyMemberDef Element_members[];
 PyNumberMethods element_number;
 
+#ifdef BENCHMARK_ENABLED
+
 typedef struct {
 	PyObject_HEAD
-	pbc_param_t p;
-	pairing_t pair_obj;
-	int safe;
-	uint8_t hash_id[ID_LEN+1];
-} Pairing;
-
-typedef struct {
-    PyObject_HEAD
-	char *params;
-	char *param_buf;
-
-	Pairing *pairing;
-	element_t e;
-	GroupType element_type;
-    int elem_initialized;
-	int safe_pairing_clear;
-} Element;
-
-#ifdef BENCHMARK_ENABLED
-typedef struct {
+	int op_init;
 	int exp_ZR, exp_G1, exp_G2, exp_GT;
 	int mul_ZR, mul_G1, mul_G2, mul_GT;
 	int div_ZR, div_G1, div_G2, div_GT;
@@ -115,13 +98,31 @@ typedef struct {
 	int add_ZR, add_G1, add_G2, add_GT;
 	int sub_ZR, sub_G1, sub_G2, sub_GT;
 } Operations;
+
 #endif
 
-#define IS_PAIRING_OBJ_NULL(obj) \
-	if(obj->pairing == NULL) {	\
-		PyErr_SetString(ElementError, "pairing structure not initialized.");	\
-		return NULL;	\
-	}
+typedef struct {
+	PyObject_HEAD
+	pbc_param_t p;
+	char *params;
+	char *param_buf;
+	pairing_t pair_obj;
+	int group_init;
+	uint8_t hash_id[ID_LEN+1];
+#ifdef BENCHMARK_ENABLED
+	Operations *gBench;
+    Benchmark *dBench;
+	uint8_t bench_id[ID_LEN+1];
+#endif
+} Pairing;
+
+typedef struct {
+    PyObject_HEAD
+	Pairing *pairing;
+	element_t e;
+	GroupType element_type;
+    int elem_initialized;
+} Element;
 
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)
 #define Check_Types2(o1, o2, lhs_o1, rhs_o2, longLHS_o1, longRHS_o2)  \
@@ -147,11 +148,11 @@ typedef struct {
     else {  element_set_si(obj, (signed int) value); }
 
 #define VERIFY_GROUP(g) \
-	if(PyElement_Check(g) && g->safe_pairing_clear == FALSE) {	\
-		PyErr_SetString(ElementError, "invalid group object specified.");  \
+	if(PyPairing_Check(g) && g->group_init == FALSE) {	\
+		PyErr_SetString(ElementError, "Not a Pairing group object.");  \
 		return NULL;  } 	\
-	if(g->pairing == NULL) {	\
-		PyErr_SetString(ElementError, "pairing object is NULL.");	\
+	if(g->pair_obj == NULL) {	\
+		PyErr_SetString(ElementError, "Pairing object not initialized.");	\
 		return NULL;  }		\
 
 PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -173,29 +174,18 @@ int pair_rule(GroupType lhs, GroupType rhs);
 void print_mpz(mpz_t x, int base);
 
 #ifdef BENCHMARK_ENABLED
-// for multiplicative notation
-void Operations_clear(void);
-#define Op_MUL(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == MULTIPLICATION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->mul_ ##group += 1;
 
-#define Op_DIV(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == DIVISION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->div_ ##group += 1;
+#define IS_SAME_GROUP(a, b) \
+	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
+		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
+		return NULL;	\
+	}			\
+	if(strncmp((const char *) a->pairing->bench_id, (const char *) b->pairing->bench_id, ID_LEN) != 0) { \
+		PyErr_SetString(ElementError, "mixing benchmark objects not allowed.");	\
+		return NULL;	\
+	}
 
-// for additive notation
-#define Op_ADD(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == ADDITION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->add_ ##group += 1;
-
-#define Op_SUB(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == SUBTRACTION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->sub_ ##group += 1;
-
-// exponentiation
-#define Op_EXP(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == EXPONENTIATION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->exp_ ##group += 1;
+#define IsBenchSet(obj)  obj->dBench != NULL
 
 #define Update_Op(name, op_type, elem_type, bench_obj)	\
 	Op_ ##name(op_type, elem_type, ZR, bench_obj)	\
@@ -203,37 +193,19 @@ void Operations_clear(void);
 	Op_ ##name(op_type, elem_type, G2, bench_obj)	\
 	Op_ ##name(op_type, elem_type, GT, bench_obj)	\
 
-#define UPDATE_BENCH(op_type, elem_type, bench_obj) \
-	if(bench_obj->granular_option == TRUE && elem_type >= ZR && elem_type <= GT) {		\
-		Update_Op(MUL, op_type, elem_type, bench_obj) \
-		Update_Op(DIV, op_type, elem_type, bench_obj) \
-		Update_Op(ADD, op_type, elem_type, bench_obj) \
-		Update_Op(SUB, op_type, elem_type, bench_obj) \
-		Update_Op(EXP, op_type, elem_type, bench_obj) \
-	}		\
-	UPDATE_BENCHMARK(op_type, bench_obj);
-
 #define CLEAR_ALLDBENCH(bench_obj)  \
 	    CLEAR_DBENCH(bench_obj, ZR);	\
 	    CLEAR_DBENCH(bench_obj, G1);	\
 	    CLEAR_DBENCH(bench_obj, G2);	\
 	    CLEAR_DBENCH(bench_obj, GT);	\
 
-#define CLEAR_DBENCH(bench_obj, group)   \
-	((Operations *) bench_obj->data_ptr)->mul_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->exp_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->div_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->add_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->sub_ ##group = 0;	\
-
-#define GetField(count, type, group, bench_obj)  \
-	if(type == MULTIPLICATION) count = (((Operations *) bench_obj->data_ptr)->mul_ ##group ); \
-	else if(type == DIVISION) count = (((Operations *) bench_obj->data_ptr)->div_ ##group );	\
-	else if(type == ADDITION) count = (((Operations *) bench_obj->data_ptr)->add_ ##group ); \
-	else if(type == SUBTRACTION) count = (((Operations *) bench_obj->data_ptr)->sub_ ##group ); \
-	else if(type == EXPONENTIATION) count = (((Operations *) bench_obj->data_ptr)->exp_ ##group );
-
 #else
+
+#define IS_SAME_GROUP(a, b) \
+	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
+		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
+		return NULL;	\
+	}
 
 #define UPDATE_BENCH(op_type, elem_type, bench_obj)  /* ... */
 // #define UPDATE_BENCHMARK(op_type, bench_obj)  /* ... */
@@ -250,11 +222,5 @@ void Operations_clear(void);
 	if(check) {						     \
 	PyErr_SetString(ElementError, msg);	 \
 	return Py_BuildValue("i", code);	}
-
-#define IS_SAME_GROUP(a, b) \
-	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
-		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
-		return NULL;	\
-	}
 
 #endif

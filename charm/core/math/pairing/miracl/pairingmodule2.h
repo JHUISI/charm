@@ -46,8 +46,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "sha1.h"
 #include "benchmarkmodule.h"
+#include "openssl/objects.h"
+#include "openssl/sha.h"
 
 /* supported pairing curves */
 #define MNT160  	80
@@ -109,7 +110,7 @@ typedef struct {
 	pairing_t *pair_obj;
 	element_t *order;
 	int curve;
-	int safe;
+	int group_init;
 } Pairing;
 
 typedef struct {
@@ -144,8 +145,8 @@ typedef struct {
 	element_printf(type, e); \
 	printf("\n");
 
-#define element_init_hash(a) _init_hash(a->pairing->pair_obj)
-#define element_add_str_hash(a, b, c) _element_add_str_hash(a->pairing->pair_obj, b, c)
+#define element_init_hash(a) _init_hash(a->pair_obj)
+#define element_add_str_hash(a, b, c) _element_add_str_hash(a->pair_obj, b, c)
 #define element_add_to_hash(a) _element_add_to_hash(a->element_type, a->pairing->pair_obj, a->e)
 #define element_finish_hash(a, t) a->e = finish_hash(t, a->pairing->pair_obj)
 #define element_hash_to_key(a, b, c) _element_hash_key(a->pairing->pair_obj, a->element_type, a->e, b, c)
@@ -159,7 +160,7 @@ typedef struct {
 // TODO: fix for -1 / ZR and similar operations
 #define element_div(c, a, b) _element_div(a->element_type, c->e, a->e, b->e, a->pairing->order)
 #define element_set(a, b) _element_set(a->pairing->curve, a->element_type, a->e, b->e);
-#define element_set_raw(g, t, a, b) _element_set(g->pairing->curve, t, a, b);
+#define element_set_raw(g, t, a, b) _element_set(g->curve, t, a, b);
 #define element_setG1(c, a, b) _element_setG1(c->element_type, c->e, a->e, b->e);
 
 #define element_set_si(a, b) \
@@ -236,10 +237,10 @@ typedef struct {
 		longRHS_o2 = TRUE; }	\
 
 #define VERIFY_GROUP(g) \
-	if(PyElement_Check(g) && g->safe_pairing_clear == FALSE) {	\
+	if(PyPairing_Check(g) && g->group_init == FALSE) {	\
 		PyErr_SetString(ElementError, "invalid group object specified.");  \
 		return NULL;  } 	\
-	if(g->pairing == NULL) {	\
+	if(g->pair_obj == NULL) {	\
 		PyErr_SetString(ElementError, "pairing object is NULL.");	\
 		return NULL;  }		\
 

@@ -26,16 +26,16 @@ Before we begin, please note the current dependencies:
 
 - (optional) MIRACL http://www.shamus.ie/. See :ref:`charm-with-miracl` if interested. 
 
+- (optional) RELIC https://code.google.com/p/relic-toolkit/. See :ref:`charm-with-relic` if interested.
+
 See ``./configure.sh --help`` for other options.
 
 You can obtain a copy of the latest version of Charm from either of the following links:
-        http://code.google.com/p/charm-crypto/downloads
-
 	https://github.com/JHUISI/charm/downloads
 
 Please let us know at support@charm-crypto.com if you run into any setup or installation problems. We will be happy to offer our assistance.
 
-Building In Linux
+Building On Linux
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Note that the entire compilation process is supported by the Charm configure/make scripts.
@@ -49,7 +49,7 @@ The steps for building in linux this way are:
 
 - With wget installed, run the configure.sh script again, and it should set up your Make dependencies for you.
 
-  - ``make build``
+  - ``make``
 
   - ``make install``
 
@@ -64,21 +64,24 @@ Before installing Charm, there are a few prerequisites that need to be installed
         1. Subversion
                 ``sudo apt-get install subversion``
         2. Python 3 (By default, Ubuntu 10.04 LTS comes with 2.6 and does not officially support 2.7. Charm requires 2.7 or 3.x) and header files/static library
-                ``sudo apt-get install python3 python3-dev``
+                ``sudo apt-get install python3 python3-dev python3-setuptools``
         3. m4
                 ``sudo apt-get install m4``
         4. libssl-dev
                 ``sudo apt-get install libssl-dev``
 
-Next, we will install Charm. Navigate to the Charm directory.
+Next, we will install Charm. Navigate to your Charm directory.
         1. We must first run the configuration script:
-                ``sudo ./configure.sh –-python=/path/to/python3``
+                ``sudo ./configure.sh --python=/path/to/python3``
         2. Now we will build and install Charm:
-                ``sudo make build``
+                ``sudo make``
 
                 ``sudo make install``
-        3. And finally we must rebuild the searchpath for libraries
+        3. And finally we must rebuild the search path for libraries
                 ``sudo ldconfig``
+
+        4. Run Pytests
+        		``sudo make test``
 
 Ubuntu 11.04
 ----------------------------------
@@ -93,24 +96,71 @@ Before installing Charm, there are a few prerequisites that need to be installed
         4. Header files/static library
                 ``sudo apt-get install python-dev`` (if you did not install Python 3)
 
-                ``sudo apt-get install python3-dev`` (if you did install Python 3)
+                ``sudo apt-get install python3-setuptools python3-dev`` (for Python 3.x)
         5. libssl-dev (only necessary if you did not install Python 3)
                 ``sudo apt-get install libssl-dev``
 
-Next, we will install Charm. Navigate to the Charm directory.
+Next, we will install Charm. Navigate to your Charm directory.
         1. We must first run the configuration script:
                 ``sudo ./configure.sh``
 
-                [If you installed Python 3 and would like to use that, you will need to add ``-–python=/path/to/python3``]
+                [If you installed Python 3 and would like to use that, you will need to add ``--python=/path/to/python3``]
 
         2. Now we will build and install Charm:
-                ``sudo make build``
+                ``sudo make``
 
                 ``sudo make install``
 
-        3. And finally we must rebuild the searchpath for libraries
+        3. And finally we must rebuild the search path for libraries
                 ``sudo ldconfig``
 
+        4. Run Pytests
+        		``sudo make test``
+
+Ubuntu 13.04
+----------------------------------
+
+Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+        1. Subversion
+                ``sudo apt-get install subversion``
+        2. m4
+                ``sudo apt-get install m4``
+        3. Python 3 (this is an optional, though recommended, step)
+                ``sudo apt-get install python3``
+        4. Header files/static library
+                ``sudo apt-get install python-dev`` (if you did NOT install Python 3)
+
+                ``sudo apt-get install python3-setuptools python3-dev`` (for Python 3.x)
+        5. libssl-dev (only necessary if you did not install Python 3)
+                ``sudo apt-get install libssl-dev``
+        
+        6. GMP
+        		``sudo apt-get install libgmp-dev``
+
+Next, we will install Charm. Navigate to your Charm directory.
+        1. We must first run the configuration script:
+                ``sudo ./configure.sh``
+        
+        2. Install PBC from source
+        		``./configure LDFLAGS="-lgmp"``
+        		
+        		``make``
+        		
+        		``sudo make install``
+        		
+        		``sudo ldconfig``
+        
+        3. Now we can build and install Charm:
+                ``sudo make``
+
+                ``sudo make install``
+
+        4. And finally we must rebuild the search path for libraries
+                ``sudo ldconfig``
+        
+        5. Run Pytests
+        		``sudo make test``
+        
 Fedora
 ------------------------------------
 
@@ -180,7 +230,7 @@ Next, we will install Charm. Navigate to the Charm directory.
                 [If you installed Python 3 and would like to use that, you will need to add ``-–python=/path/to/python3``]
 
         2. Now we will build and install Charm:
-                ``su -c "make build"``
+                ``su -c "make"``
 
                 ``su -c "make install"``
 
@@ -214,7 +264,7 @@ Next, we will install Charm. Navigate to the Charm directory.
                 [If you installed Python 3 and would like to use that, you will need to add ``-–python=/path/to/python3``]
 
         2. Now we will build and install Charm:
-                ``sudo make build``
+                ``sudo make``
 
                 ``sudo make install``
         3. And finally we must rebuild the searchpath for libraries
@@ -287,7 +337,7 @@ Note that the entire compilation process is supported by the Charm configure/mak
     3. Using your package manager of choice (e.g., ``sudo port install wget``), install wget.
     4. With wget installed, run the ``configure.sh`` script again, and it should set up your make dependencies for you.
     5. The next steps may require super user privileges so prepend a ``sudo`` to each command:
-		``make build`` 
+		``make`` 
 
        		``make install``
 
@@ -295,7 +345,7 @@ Note that the entire compilation process is supported by the Charm configure/mak
 	Another way to install dependencies is to use ``macports`` or ``fink``.
 
 
-Lion v10.7
+Lion v10.7 and Mountain Lion v10.8
 ------------------------------------
 
 In Lion, Apple has made the decision to deprecate the openssl library in favor of their Common-Crypto library implementation. As a result, you'll have to make some modifications to the library in order to use it with Charm. Please follow the steps below then proceed to install Charm:
@@ -313,7 +363,6 @@ In Lion, Apple has made the decision to deprecate the openssl library in favor o
 		``./configure.sh --enable-darwin``
     
     4. The next steps may require super user privileges so prepend a ``sudo`` to each command:
-      		``make build`` 
+      		``make`` 
 
        		``make install``
-

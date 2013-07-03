@@ -11,7 +11,7 @@ Identity-Based Proxy Re-Encryption
 :Authors:    N. Fotiou
 :Date:       11/2012
 '''
-from charm.toolbox.pairinggroup import ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import pc_element,ZR,G1,G2,GT,pair
 from charm.core.math.integer import integer,bitsize, int2Bytes, randomBits
 from charm.toolbox.hash_module import Hash
 from charm.core.engine.util import objectToBytes
@@ -19,7 +19,7 @@ from charm.core.engine.util import objectToBytes
 debug = False
 class PreGA:
     """
-    >>> from charm.toolbox.pairinggroup import PairingGroup  
+    >>> from charm.toolbox.pairinggroup import PairingGroup,pc_element  
     >>> ID = "nikos fotiou"
     >>> ID2 = "test user"
     >>> msg = "hello world!!!!!"
