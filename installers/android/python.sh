@@ -14,4 +14,4 @@ export PATH="$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin/
 
 cd python-build
 chmod +x *.sh
-bash bootstrap.sh && ./build.sh && ./package.sh
+bash ./bootstrap.sh && ./build.sh && ./package.sh

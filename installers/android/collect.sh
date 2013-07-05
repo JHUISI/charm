@@ -5,10 +5,10 @@ export BD="$BD"
 
 rm -r $BD/out
 
-mkdir -p $BD/out/python/bin
-cp $BD/android-python27/python-build/build/bin/python $BD/out/python/bin/python
+mkdir -p $BD/out
+cp -r $BD/android-python27/python-build/output/python/ $BD/out/
+    cp -r $BD/android-python27/python-build/output/extras/python/* $BD/out/python/lib/python2.7/
 
-cp -r $BD/android-python27/python-build/build/lib $BD/out/python/lib/
 cp $BD/obj/lib/*    $BD/out/python/lib
 
 cp $BD/charm/dist/Charm_Crypto-*-py2.7-linux-armv.egg $BD/out/python/lib/python2.7/site-packages/

@@ -130,7 +130,6 @@ libdir="\${prefix}/lib"
 sysconfdir="\${prefix}/etc"
 confsuffix="/charm"
 profiler="no"
-python_path="$(which python)"
 wget="$(which wget)"
  
 # set -x
@@ -228,7 +227,7 @@ else
 fi
 
 case "$cpu" in
-  alpha|cris|ia64|lm32|m68k|microblaze|ppc|ppc64|sparc64|unicore32)
+  alpha|cris|ia64|lm32|m68k|microblaze|ppc|ppc64|sparc64|unicore32|armv4b)
     cpu="$cpu"
   ;;
   i386|i486|i586|i686|i86pc|BePC)
@@ -466,6 +465,56 @@ echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
 fi
 
+# Python version handling logic. We prefer the argument path given by --python 
+# If not specified, we check if python is python 3. 
+#Baring that, we try python3,python3.2.python3.1,etc 
+
+python3_found="no"
+is_python_version(){
+cat > $TMPC << EOF
+import sys
+
+if float(sys.version[:3]) >= 3.0:
+    exit(0)
+else:
+   exit(-1)
+EOF
+
+if  [ -n "${1}"  ]; then
+    $1 $TMPC
+    result=$?
+    if [ "$result" -eq "0" ] ; then 
+        return  
+    fi
+fi
+return 1
+}
+
+if [ -n "$python_path" ]; then 
+        if (is_python_version $python_path); then
+            python3_found="yes"
+        else
+            echo "$python_path is not python 3.x. This version of charm requires"
+            echo "python 3.x. Please specify a valid python3 location with"
+            echo "--python=/path/to/python3, leave off the command to have this script"
+            echo "try finding it on its own, or install charm for python2.7"
+            exit 1
+        fi 
+else
+        for pyversion in python python3 python3.2 python3.1 
+        do 
+            if (is_python_version `which $pyversion`); then
+                python3_found="yes"
+                python_path=`which $pyversion`
+                break
+            fi
+        done
+        if test "$python3_found" = "no"; then 
+            echo "No python 3 version found. This version of Charm requires python version 3.x. Specify python3 location with --python=/path/to/python3"
+            echo "Otherwise, use the python 2.7+ version"
+            exit 1
+        fi
+fi
 py_config="$python_path-config"
 PY_CFLAGS=`$py_config --cflags`
 PY_LDFLAGS=`$py_config --ldflags`
@@ -575,18 +624,6 @@ fi
 #  echo warning: proceeding without "$pkg_config" >&2
 #  pkg_config=/bin/false
 #fi
-
-##########################################
-# python probe
-cat > $TMPC << EOF
-import sys
-
-if sys.hexversion >= int(0x2070000) && sys.hexversion < int(0x3000000):
-   exit(0)
-else:
-   print("Need Python 2.7. Specify --python=/path/to/python")
-   exit(-1)
-EOF
 
 ##########################################
 # check if the compiler defines offsetof

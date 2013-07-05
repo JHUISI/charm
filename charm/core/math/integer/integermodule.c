@@ -624,7 +624,8 @@ static PyObject *Integer_add(PyObject *o1, PyObject *o2) {
 //	if(mpz_sgn(rop->e) < 0 || mpz_cmp(rop->e, rop->m) > 0) {
 //		_reduce(rop);
 //	}
-
+    mpz_clear(lhs_mpz);
+    mpz_clear(rhs_mpz);
 #ifdef BENCHMARK_ENABLED
 	UPDATE_BENCHMARK(ADDITION, tmpBench);
 #endif
@@ -1479,10 +1480,10 @@ static PyObject *genRandomPrime(PyObject *self, PyObject *args) {
 			 * iff (p-1)/2 is also prime.
 			 */
 			if(safe == TRUE) // safe is non-zero
-				BN_generate_prime(bn, bits, safe, NULL, NULL, NULL, NULL);
+				BN_generate_prime_ex(bn, bits, safe, NULL, NULL, NULL);
 			else
 				/* generate strong primes only */
-				BN_generate_prime(bn, bits, FALSE, NULL, NULL, NULL, NULL);
+				BN_generate_prime_ex(bn, bits, FALSE, NULL, NULL, NULL);
 
 			debug("Safe prime => ");
 			print_bn_dec(bn);
