@@ -18,7 +18,7 @@ Before we begin, please note the current dependencies:
 
 - Pyparsing http://pyparsing.wikispaces.com/
 
-- GMP http://gmplib.org/ 
+- GMP 5.x http://gmplib.org/ 
 
 - PBC http://crypto.stanford.edu/pbc/news.html
 

@@ -1,10 +1,9 @@
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.ecgroup import ECGroup,ZR,G
-from charm.toolbox.eccurve import prime192v1
-from charm.core.math.elliptic_curve import *
-from charm.core.math.integer import *
+from charm.toolbox.eccurve import prime192v2
+from charm.core.math.integer import * 
 
-import unittest
+import unittest, sys
 
 debug = False
 
@@ -18,8 +17,8 @@ def isSaneBenchmark(dct):
             isSane&=val>=0
     return isSane
 
-class BenchmarkTest(unittest.TestCase):
-
+@unittest.skipIf(sys.platform == 'darwin', "expected issues on Mac OS X.")
+class BenchmarkTest1(unittest.TestCase):
     def testPairing(self):    
         trials = 10
         trials2 = trials * 3 
@@ -50,17 +49,20 @@ class BenchmarkTest(unittest.TestCase):
         group.EndBenchmark()
         
         msmtDict = group.GetGeneralBenchmarks()
+        del group
         self.assertTrue(isSaneBenchmark(msmtDict))        
 
+@unittest.skipIf(sys.platform == 'darwin', "expected issues on Mac OS X.")
+class BenchmarkTest2(unittest.TestCase):
     def testECGroup(self):
         trials = 10
-        group = ECGroup(prime192v1)
+        group = ECGroup(prime192v2)
         g = group.random(G)
         h = group.random(G)
         i = group.random(G)
         
         self.assertTrue(group.InitBenchmark())
-        group.StartBenchmark([RealTime, Mul, Div, Exp, Granular])
+        group.StartBenchmark(["RealTime", "Mul", "Div", "Exp", "Granular"])
         for a in range(trials):
             j = g * h 
             k = h ** group.random(ZR)
@@ -74,7 +76,7 @@ class BenchmarkTest(unittest.TestCase):
         self.assertTrue(isSaneBenchmark(granDict))        
         
         self.assertTrue(group.InitBenchmark())
-        group.StartBenchmark([RealTime, Mul, Div, Exp, Granular])
+        group.StartBenchmark(["RealTime", "Mul", "Div", "Exp", "Granular"])
         for a in range(trials*2):
             j = g * h 
             k = h ** group.random(ZR)
@@ -83,41 +85,17 @@ class BenchmarkTest(unittest.TestCase):
         
         msmtDict = group.GetGeneralBenchmarks()
         granDict = group.GetGranularBenchmarks()
+        del group
         self.assertTrue(isSaneBenchmark(msmtDict))        
-        self.assertTrue(isSaneBenchmark(granDict))        
-    
-    def testInteger(self):
-        count = 15
-        time_in_ms = 1000
-        
-        a = integer(10)
-        
-        self.assertTrue(InitBenchmark())
-        StartBenchmark([RealTime, Exp, Mul])
-        for k in range(count):
-            r = randomPrime(512)
-            s = r * (r ** a)
-            j = r * (r ** a)
-        EndBenchmark()
-        msmtDict = GetGeneralBenchmarks()
-        self.assertTrue(isSaneBenchmark(msmtDict))        
-        
-        self.assertTrue(InitBenchmark())
-        StartBenchmark([RealTime, Exp, Mul, Add, Sub])
-        for k in range(count):
-            r = randomPrime(512)
-            s = r * (r ** a)
-            j = r * (r ** a)
-            u = s + j - j 
-        EndBenchmark()
-        msmtDict = GetGeneralBenchmarks()
-        self.assertTrue(isSaneBenchmark(msmtDict))        
+        self.assertTrue(isSaneBenchmark(granDict))
 
+@unittest.skipIf(sys.platform == 'darwin', "expected issues on Mac OS X.")
+class BenchmarkTest3(unittest.TestCase):
     def testInterleave(self):
         trials = 10
         trials2 = trials * 3 
-        group1 = PairingGroup("SS512")
-        group2 = PairingGroup("SS512")
+        group1 = PairingGroup("MNT224")
+        group2 = PairingGroup("MNT224")
         
         g = group1.random(G1)
         h = group1.random(G1)
@@ -133,7 +111,38 @@ class BenchmarkTest(unittest.TestCase):
             n = pair(h, i)
         group1.EndBenchmark()
         msmtDict = group1.GetGeneralBenchmarks()
+        del group1, group2
+        self.assertTrue(isSaneBenchmark(msmtDict))
+
+@unittest.skipIf(sys.platform == 'darwin', "expected issues on Mac OS X.")
+class BenchmarkTest4(unittest.TestCase):
+    def testInteger(self):
+        count = 5
+        time_in_ms = 1000
+        
+        a = integer(10)
+        
+        self.assertTrue(InitBenchmark())
+        StartBenchmark(["RealTime", "Exp", "Mul"])
+        for k in range(count):
+            r = randomPrime(256)
+            s = r * (r ** a)
+            j = r * (r ** a)
+        EndBenchmark()
+        msmtDict = GetGeneralBenchmarks()
         self.assertTrue(isSaneBenchmark(msmtDict))        
+        
+        self.assertTrue(InitBenchmark())
+        StartBenchmark(["RealTime", "Exp", "Mul", "Add", "Sub"])
+        for k in range(count):
+            r = randomPrime(256)
+            s = r * (r ** a)
+            j = r * (r ** a)
+            u = s + j - j 
+        EndBenchmark()
+        msmtDict = GetGeneralBenchmarks()
+        self.assertTrue(isSaneBenchmark(msmtDict)) 
+
 
 if __name__ == "__main__":
     unittest.main()

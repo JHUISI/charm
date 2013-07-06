@@ -75,9 +75,13 @@ PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 	VERIFY_GROUP(group);
 	if(group->dBench == NULL) {
 		benchObj = PyObject_New(Benchmark, &BenchmarkType);
+		if (benchObj == NULL) {
+			PyErr_SetString(BENCH_ERROR, "out of memory.");
+			return NULL;
+		}
+
 		/* setup granular options */
 		if(group->gBench == NULL) {
-			debug("Creating operations object.\n");
 			group->gBench = PyObject_New(Operations, &OperationsType);
 			CLEAR_ALLDBENCH(group->gBench);
 		}
