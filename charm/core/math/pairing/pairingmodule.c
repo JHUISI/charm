@@ -1927,9 +1927,6 @@ PyTypeObject ElementType = {
 
 struct module_state {
 	PyObject *error;
-//#ifdef BENCHMARK_ENABLED
-//	Benchmark *dBench;
-//#endif
 };
 
 #if PY_MAJOR_VERSION >= 3
