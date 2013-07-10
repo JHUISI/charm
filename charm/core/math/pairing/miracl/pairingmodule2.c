@@ -247,6 +247,7 @@ static Element *createNewElement(Group_t element_type, Pairing *pairing) {
 	}
 	
 	retObject->elem_initialized = TRUE;
+	retObject->elem_initPP = FALSE;
 	retObject->pairing = pairing;
 	Py_INCREF(retObject->pairing);
 	return retObject;	
@@ -581,6 +582,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
     element_random(retObject->element_type, group->pair_obj, retObject->e);
 
 	retObject->elem_initialized = TRUE;
+	retObject->elem_initPP = FALSE;
 	retObject->pairing = group;
 	Py_INCREF(retObject->pairing);
 	return (PyObject *) retObject;	
@@ -992,6 +994,22 @@ static PyObject *Element_setxy(Element *self, PyObject *args)
 
 	Py_RETURN_TRUE;
 }
+
+static PyObject  *Element_initPP(Element *self, PyObject *args)
+{
+    EXITCODE_IF(self->elem_initPP == TRUE, "initialized the pre-processing function already", FALSE);
+    EXITCODE_IF(self->elem_initialized == FALSE, "must initialize element to a field (G1,G2, or GT)", FALSE);
+
+    /* initialize and store preprocessing information in e_pp */
+    if(self->element_type >= pyG1_t && self->element_type <= pyGT_t) {
+    	element_pp_init(self);
+		self->elem_initPP = TRUE;
+		Py_RETURN_TRUE;
+    }
+
+    Py_RETURN_FALSE;
+}
+
 
 /* Takes a list of two objects in G1 & G2 respectively and computes the multi-pairing */
 PyObject *multi_pairing_asymmetric(Pairing *groupObj, PyObject *listG1, PyObject *listG2)
@@ -1882,7 +1900,7 @@ PyMemberDef Element_members[] = {
 };
 
 PyMethodDef Element_methods[] = {
-	// benchmark methods
+	{"initPP", (PyCFunction)Element_initPP, METH_NOARGS, "Initialize the pre-processing field of element."},
 	{"set", (PyCFunction)Element_set, METH_VARARGS, "Set an element to a fixed value."},
 	{"setPoint", (PyCFunction)Element_setxy, METH_VARARGS, "Set x and y coordinates of a G1 element object."},
     {NULL}  /* Sentinel */
@@ -1999,6 +2017,7 @@ void initpairing(void) 		{
 	PyModule_AddIntConstant(m, "MNT160", MNT160);
 	PyModule_AddIntConstant(m, "BN256", BN256);
 	PyModule_AddIntConstant(m, "SS512", SS512);
+	PyModule_AddIntConstant(m, "SS1536", SS1536);
 
 LEAVE:
     if (PyErr_Occurred()) {

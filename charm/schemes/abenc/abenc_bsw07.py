@@ -50,7 +50,9 @@ class CPabe_BSW07(ABEnc):
     def setup(self):
         g, gp = group.random(G1), group.random(G2)
         alpha, beta = group.random(ZR), group.random(ZR)
-
+        # initialize pre-processing for generators
+        g.initPP(); gp.initPP()
+        
         h = g ** beta; f = g ** ~beta
         e_gg_alpha = pair(g, gp ** alpha)
         

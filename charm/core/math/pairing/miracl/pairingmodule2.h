@@ -58,6 +58,7 @@
 #define MNT160  	80
 #define BN256	  	128
 #define SS512		80
+#define SS1536		128
 
 /* buf sizes */
 #define BenchmarkIdentifier 1
@@ -122,7 +123,7 @@ typedef struct {
 	element_t *e;
 	Group_t element_type;
     int elem_initialized;
-	int safe_pairing_clear;
+	int elem_initPP;
 } Element;
 
 #define IS_PAIRING_OBJ_NULL(obj) \
@@ -176,6 +177,9 @@ typedef struct {
 #define element_pow_int(c, a, b) \
 	c->e = _element_pow_zr_zr(pyZR_t, a->pairing->pair_obj, a->e, b, a->pairing->order);	\
 	c->element_type = pyZR_t;
+
+#define element_pp_init(a) \
+		_element_pp_init(a->pairing->pair_obj, a->element_type, a->e)
 
 #define pairing_apply(c, a, b) \
 	if(a->pairing->curve == MNT || a->pairing->curve == BN || a->pairing->curve == SS) { \
