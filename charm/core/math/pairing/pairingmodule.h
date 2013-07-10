@@ -120,9 +120,10 @@ typedef struct {
     PyObject_HEAD
 	Pairing *pairing;
 	element_t e;
-	element_pp_t e_pp;
 	GroupType element_type;
-    int elem_initialized, elem_initPP;
+    int elem_initialized;
+	element_pp_t e_pp;
+    int elem_initPP;
 } Element;
 
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)

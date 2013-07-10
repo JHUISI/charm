@@ -237,6 +237,7 @@ static Element *createNewElement(GroupType element_type, Pairing *pairing) {
 	}
 	
 	retObject->elem_initialized = TRUE;
+	retObject->elem_initPP = FALSE;
 	retObject->pairing = pairing;
 	Py_INCREF(retObject->pairing);
 	return retObject;	
@@ -293,11 +294,8 @@ void	Element_dealloc(Element* self)
 		debug_e("Clear element_t => '%B'\n", self->e);
 		if(self->elem_initPP == TRUE) {
 			element_pp_clear(self->e_pp);
-			element_clear(self->e);
 		}
-		else {
-			element_clear(self->e);
-		}
+		element_clear(self->e);
 		Py_DECREF(self->pairing);
 	}
 
@@ -768,6 +766,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	/* create new Element object */
 	element_random(retObject->e);
 	retObject->elem_initialized = TRUE;
+	retObject->elem_initPP = FALSE;
 	retObject->element_type = e_type;
 	/* set the group object for element operations */
 	retObject->pairing = group;
@@ -1057,9 +1056,13 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation");
 		if(rhs_o2->element_type == ZR) {
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
+			//printf("Calling pp func: '%d'\n", lhs_o1->elem_initPP);
 			if(lhs_o1->elem_initPP == TRUE) {
 				// n = g ^ e where g has been pre-processed
-				element_pp_pow_zn(newObject->e, rhs_o2->e, lhs_o1->e_pp);
+				mpz_init(n);
+				element_to_mpz(n, rhs_o2->e);
+				element_pp_pow(newObject->e, n, lhs_o1->e_pp);
+				mpz_clear(n);
 			}
 			else {
 				element_pow_zn(newObject->e, lhs_o1->e, rhs_o2->e);
