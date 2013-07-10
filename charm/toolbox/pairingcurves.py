@@ -65,12 +65,12 @@ nqr 142721363302176037340346936780070353538541593770301992936740616924
 
 # Notes: pbc library parameters : SS means super singular curve with the following digits 
 # represents the size of the base field in bits. MNT curves were created by 
-# Miyaji, Nakabayashi and Takano.
+# Miyaji, Nakabayashi and Takano. BN curve was created by Barreto and Naehrig
 params = None
 if pairing_lib == libs.pbc:
    params = {'SS512':a, 'SS1024':a1, 'MNT159':d159, 'MNT201':d201, 'MNT224':d224 }
 elif pairing_lib == libs.miracl:
-   params = {'MNT160':80, 'BN256':128, 'SS512':80}
+   params = {'MNT160':80, 'BN256':128, 'SS512':80, 'SS1536':128}
 elif pairing_lib == libs.relic:
    params = {'BN158':0, 'BN254':1, 'BN256':2}
 

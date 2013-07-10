@@ -972,16 +972,9 @@ static PyObject *Element_setxy(Element *self, PyObject *args)
 
     if(self->elem_initialized == FALSE) {
     	PyErr_SetString(ElementError, "must initialize element to a field (G1_t,G2,GT, or Zr)");
-    	errcode = FALSE;
-    	return Py_BuildValue("i", errcode);
+    	return NULL;
     }
 
-//    if(check_type(self->element_type) == FALSE) {
-//    	PyErr_SetString(ElementError, "must initialize element to a field (G1_t,G2,GT, or Zr)");
-//    	errcode = FALSE;
-//    	return Py_BuildValue("i", errcode);
-//    }
-//
     debug("Creating a new element\n");
     if(PyArg_ParseTuple(args, "|OO", &object1, &object2)) {
             // convert into an int using PyArg_Parse(...)
@@ -992,13 +985,12 @@ static PyObject *Element_setxy(Element *self, PyObject *args)
     		}
     		else {
     	    	PyErr_SetString(ElementError, "types are not the same!");
-    	    	errcode = FALSE;
-    	    	return Py_BuildValue("i", errcode);
+    			return NULL;
     		}
         }
     }
 
-    return Py_BuildValue("i", errcode);
+	Py_RETURN_TRUE;
 }
 
 /* Takes a list of two objects in G1 & G2 respectively and computes the multi-pairing */
@@ -1093,7 +1085,6 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			}
 			//
 #ifdef BENCHMARK_ENABLED
-//			UPDATE_BENCH(PAIRINGS, newObject->element_type, newObject->pairing);
 			UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
 #endif
 			return (PyObject *) newObject;
@@ -1102,41 +1093,6 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 
 	PyErr_SetString(ElementError, "pairings only apply to elements of G1 x G2 --> GT");
 	return NULL;
-}
-
-PyObject *sha1_hash(Element *self, PyObject *args) {
-	Element *object;
-	PyObject *str;
-	char *hash_hex = NULL;
-	int label = 0;
-
-	debug("Hashing the element...\n");
-	if(!PyArg_ParseTuple(args, "O|i", &object, &label)) {
-		PyErr_SetString(ElementError, "missing element object");
-		return NULL;
-	}
-
-	if(!object->elem_initialized) {
-		PyErr_SetString(ElementError, "null element object");
-		return NULL;
-	}
-
-	int hash_size = HASH_LEN;
-	uint8_t hash_buf[hash_size + 1];
-	if(!hash_element_to_bytes(object, hash_size, hash_buf, label)) {
-		PyErr_SetString(ElementError, "failed to hash element");
-		return NULL;
-	}
-
-	hash_hex = convert_buffer_to_hex(hash_buf, hash_size);
-	printf_buffer_as_hex(hash_buf, hash_size);
-	
-
-
-	str = PyBytes_FromString((const char *) hash_hex);
-	free(hash_hex);
-
-	return str;
 }
 
 PyObject *sha1_hash2(Element *self, PyObject *args) {
@@ -1379,15 +1335,15 @@ cleanup:
 
 	if(opid == Py_EQ) {
 		if(result == TRUE) {
-			Py_INCREF(Py_True); return Py_True;
+			Py_RETURN_TRUE;
 		}
-		Py_INCREF(Py_False); return Py_False;
+		Py_RETURN_FALSE;
 	}
 	else { /* Py_NE */
 		if(result == FALSE) {
-			Py_INCREF(Py_True); return Py_True;
+			Py_RETURN_TRUE;
 		}
-		Py_INCREF(Py_False); return Py_False;
+		Py_RETURN_FALSE;
 	}
 }
 
