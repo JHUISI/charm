@@ -170,7 +170,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             sources = [math_path + 'pairing/relic/pairingmodule3.c',
                                         math_path + 'pairing/relic/relic_interface.c',
                                         utils_path + 'base64.c'],
-                            libraries=['relic', 'gmp'], define_macros=_macros, undef_macros=_undef_macro)
+                            libraries=['relic', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
                             #extra_objects=[relic_lib], extra_compile_args=None)
 
     elif opt.get('USE_MIRACL') == 'yes':

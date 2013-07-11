@@ -36,6 +36,7 @@
 /* make sure error checking enabled in relic_conf.h, ALLOC should be dynamic */
 
 //#define DISABLE_CHECK  1
+//#define pp_map_oatep pp_map_k2
 #define TRUE	1
 #define FALSE	0
 #define BASE	16
@@ -51,9 +52,10 @@ typedef enum _status_t { ELEMENT_OK = 2,
 	   ELEMENT_PAIRING_INIT_FAILED,
 	   ELEMENT_UNINITIALIZED,
 	   ELEMENT_DIV_ZERO,
+	   ELEMENT_INITIALIZED_ALRDY,
 } status_t;
 
-enum Group {ZR, G1, G2, GT, NIL};
+enum Group {ZR, G1, G2, GT, NONE_G};
 typedef enum Group GroupType;
 
 #define FP_STR FP_BYTES * 2 + 1
@@ -71,14 +73,15 @@ struct element {
 	gt_t gt;
 };
 
-struct group {
+struct object {
 	int isInitialized;
-	void *ptr;
+	g1_t *t1;
+	g2_t *t2;
 };
 
 typedef struct element element_t[1];
 typedef struct element *element_ptr;
-typedef struct group group_t;
+typedef struct object element_pp_t[1];
 typedef bn_t integer_t;
 int bn_is_one(bn_t a);
 
@@ -101,7 +104,9 @@ status_t element_to_str(char *data, int len, element_t e);
 /* free mem. associated with a */
 status_t element_clear(element_t e);
 
-// <=== TODO ===>
+status_t element_pp_init(element_pp_t e_pp, element_t e);
+status_t element_pp_pow(element_t o, element_pp_t e_pp, GroupType type, element_t e);
+status_t element_pp_clear(element_pp_t e_pp, GroupType type);
 
 /* arithmetic operators over elements */
 // c = a + b

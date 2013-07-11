@@ -40,11 +40,14 @@
 #include "benchmarkmodule.h"
 #include "base64.h"
 #include "relic_interface.h"
+#ifdef BENCHMARK_ENABLED
+#define RAND_pseudo_bytes(a, b) /* redefine */
+#include "benchmark_util.h"
+#endif
 
 //#define DEBUG	1
 //#define TRUE	1
 //#define FALSE	0
-#define BenchmarkIdentifier 4
 #define MAX_LEN 2048
 #define HASH_LEN 20
 #define ID_LEN   4
@@ -68,9 +71,6 @@
 PyTypeObject ElementType;
 PyTypeObject PairingType;
 static PyObject *ElementError;
-#ifdef BENCHMARK_ENABLED
-static Benchmark *dBench;
-#endif
 #define PyElement_Check(obj) PyObject_TypeCheck(obj, &ElementType)
 #define PyPairing_Check(obj) PyObject_TypeCheck(obj, &PairingType)
 
@@ -79,28 +79,11 @@ PyMethodDef pairing_methods[];
 PyMemberDef Element_members[];
 PyNumberMethods element_number;
 
+#ifdef BENCHMARK_ENABLED
+
 typedef struct {
 	PyObject_HEAD
-//	pbc_param_t p;
-//	pairing_t pair_obj;
-	int group_init;
-	uint8_t hash_id[ID_LEN+1];
-} Pairing;
-
-typedef struct {
-    PyObject_HEAD
-//	char *params;
-//	char *param_buf;
-
-	Pairing *pairing;
-	element_t e;
-//	element_ptr e;
-	GroupType element_type;
-    int elem_initialized;
-	int safe_pairing_clear;
-} Element;
-
-typedef struct {
+	int op_init;
 	int exp_ZR, exp_G1, exp_G2, exp_GT;
 	int mul_ZR, mul_G1, mul_G2, mul_GT;
 	int div_ZR, div_G1, div_G2, div_GT;
@@ -108,6 +91,30 @@ typedef struct {
 	int add_ZR, add_G1, add_G2, add_GT;
 	int sub_ZR, sub_G1, sub_G2, sub_GT;
 } Operations;
+
+#endif
+
+
+typedef struct {
+	PyObject_HEAD
+	int group_init;
+	uint8_t hash_id[ID_LEN+1];
+#ifdef BENCHMARK_ENABLED
+	Operations *gBench;
+    Benchmark *dBench;
+	uint8_t bench_id[ID_LEN+1];
+#endif
+} Pairing;
+
+typedef struct {
+    PyObject_HEAD
+	Pairing *pairing;
+	element_t e;
+	GroupType element_type;
+    int elem_initialized;
+	element_pp_t e_pp;
+	int elem_initPP;
+} Element;
 
 #define IS_PAIRING_OBJ_NULL(obj)   /* do nothing */
 //	if(obj->pairing == NULL) {
@@ -163,28 +170,8 @@ int pair_rule(GroupType lhs, GroupType rhs);
 //void print_int(integer_t x, int base);
 
 #ifdef BENCHMARK_ENABLED
-// for multiplicative notation
-#define Op_MUL(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == MULTIPLICATION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->mul_ ##group += 1;
 
-#define Op_DIV(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == DIVISION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->div_ ##group += 1;
-
-// for additive notation
-#define Op_ADD(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == ADDITION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->add_ ##group += 1;
-
-#define Op_SUB(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == SUBTRACTION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->sub_ ##group += 1;
-
-// exponentiation
-#define Op_EXP(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == EXPONENTIATION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->exp_ ##group += 1;
+#define IsBenchSet(obj)  obj->dBench != NULL
 
 #define Update_Op(name, op_type, elem_type, bench_obj)	\
 	Op_ ##name(op_type, elem_type, ZR, bench_obj)	\
@@ -192,35 +179,11 @@ int pair_rule(GroupType lhs, GroupType rhs);
 	Op_ ##name(op_type, elem_type, G2, bench_obj)	\
 	Op_ ##name(op_type, elem_type, GT, bench_obj)	\
 
-#define UPDATE_BENCH(op_type, elem_type, bench_obj) \
-	if(bench_obj->granular_option == TRUE && elem_type >= ZR && elem_type <= GT) {		\
-		Update_Op(MUL, op_type, elem_type, bench_obj) \
-		Update_Op(DIV, op_type, elem_type, bench_obj) \
-		Update_Op(ADD, op_type, elem_type, bench_obj) \
-		Update_Op(SUB, op_type, elem_type, bench_obj) \
-		Update_Op(EXP, op_type, elem_type, bench_obj) \
-	}		\
-	UPDATE_BENCHMARK(op_type, bench_obj);
-
 #define CLEAR_ALLDBENCH(bench_obj)  \
 	    CLEAR_DBENCH(bench_obj, ZR);	\
 	    CLEAR_DBENCH(bench_obj, G1);	\
 	    CLEAR_DBENCH(bench_obj, G2);	\
 	    CLEAR_DBENCH(bench_obj, GT);	\
-
-#define CLEAR_DBENCH(bench_obj, group)   \
-	((Operations *) bench_obj->data_ptr)->mul_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->exp_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->div_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->add_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->sub_ ##group = 0;	\
-
-#define GetField(count, type, group, bench_obj)  \
-	if(type == MULTIPLICATION) count = (((Operations *) bench_obj->data_ptr)->mul_ ##group ); \
-	else if(type == DIVISION) count = (((Operations *) bench_obj->data_ptr)->div_ ##group );	\
-	else if(type == ADDITION) count = (((Operations *) bench_obj->data_ptr)->add_ ##group ); \
-	else if(type == SUBTRACTION) count = (((Operations *) bench_obj->data_ptr)->sub_ ##group ); \
-	else if(type == EXPONENTIATION) count = (((Operations *) bench_obj->data_ptr)->exp_ ##group );
 
 #else
 

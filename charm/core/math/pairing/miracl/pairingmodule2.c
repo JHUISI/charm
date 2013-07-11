@@ -413,6 +413,11 @@ PyObject *Pairing_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 	if(self != NULL) {
 		self->group_init = FALSE;
 		self->curve      = -1;
+#ifdef BENCHMARK_ENABLED
+		memset(self->bench_id, 0, ID_LEN);
+		self->dBench = NULL;
+		self->gBench = NULL;
+#endif
 	}
 
 	return (PyObject *) self;
@@ -1101,7 +1106,6 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 			else if(lhs->element_type == pyG2_t) {
 				pairing_apply(newObject, rhs, lhs);
 			}
-			//
 #ifdef BENCHMARK_ENABLED
 			UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
 #endif

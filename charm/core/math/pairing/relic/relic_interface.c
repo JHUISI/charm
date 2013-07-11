@@ -167,6 +167,70 @@ status_t element_init_GT(element_t e)
     return ELEMENT_OK;
 }
 
+status_t element_pp_init(element_pp_t e_pp, element_t e)
+{
+	int i;
+	if(e_pp->isInitialized == TRUE) return ELEMENT_INITIALIZED_ALRDY;
+	if(e->isInitialized == FALSE) return ELEMENT_UNINITIALIZED;
+	if(e->type == G1) {
+		e_pp->t1 = malloc(sizeof(g1_t) * G1_TABLE);
+		for (i = 0; i < G1_TABLE; i++) {
+			g1_inits(e_pp->t1[i]);
+		}
+		/* compute the pre-computation table */
+		g1_mul_pre(e_pp->t1, e->g1);
+	}
+	else if(e->type == G2) {
+		e_pp->t2 = malloc(sizeof(g2_t) * G2_TABLE);
+		for (i = 0; i < G2_TABLE; i++) {
+			g2_inits(e_pp->t2[i]);
+		}
+		/* compute the pre-computation table */
+		g2_mul_pre(e_pp->t2, e->g2);
+	}
+	e_pp->isInitialized = TRUE;
+	return ELEMENT_OK;
+}
+
+status_t element_pp_clear(element_pp_t e_pp, GroupType type)
+{
+	if(e_pp->isInitialized == FALSE) return ELEMENT_UNINITIALIZED;
+	if(type == G1) {
+		for (int i = 0; i < G1_TABLE; i++) {
+//			printf("%d: ", i);
+//    		g1_print(e_pp->t1[i]);
+			g1_free(e_pp->t1[i]);
+		}
+	}
+	else if(type == G2) {
+		for (int i = 0; i < G2_TABLE; i++) {
+			g2_free(e_pp->t2[i]);
+		}
+	}
+	e_pp->isInitialized = FALSE;
+	return ELEMENT_OK;
+}
+
+status_t element_pp_pow(element_t o, element_pp_t e_pp, GroupType type, element_t e)
+{
+	if(e_pp->isInitialized == FALSE) return ELEMENT_UNINITIALIZED;
+	if(e->isInitialized == FALSE) return ELEMENT_UNINITIALIZED;
+
+	if(o->type == type) {
+		if(type == G1 && e->type == ZR) {
+//			printf("pp pow call...\n");
+			g1_mul_fix(o->g1, e_pp->t1, e->bn);
+//			g1_print(o->g1);
+		}
+		else if(type == G2 && e->type == ZR) {
+			g2_mul_fix(o->g2, e_pp->t2, e->bn);
+		}
+		return ELEMENT_OK;
+	}
+
+	return ELEMENT_INVALID_ARG;
+}
+
 status_t element_random(element_t e)
 {
 	if(e->isInitialized == TRUE) {
@@ -284,7 +348,7 @@ status_t element_clear(element_t e)
 		bn_free(e->order);
 		bn_null(e->order);
     	e->isInitialized = FALSE;
-    	e->type = NIL;
+    	e->type = NONE_G;
     }
     return ELEMENT_OK;
 }
@@ -1183,8 +1247,9 @@ status_t pairing_apply(element_t et, element_t e1, element_t e2)
 	LEAVE_IF(e1->isInitialized != TRUE || e2->isInitialized != TRUE || et->isInitialized != TRUE, "uninitialized arguments.");
 	if(e1->type == G1 && e2->type == G2 && et->type == GT) {
 		/* compute optimal ate pairing */
-		pp_map_oatep(et->gt, e1->g1, e2->g2);
-		//pp_map_k2(et->gt, e1->g1, e2->g2);
+		pc_map(et->gt, e1->g1, e2->g2);
+		//pp_map_oatep(et->gt, e1->g1, e2->g2);
+		//pp_map_k12(et->gt, e1->g1, e2->g2);
 		return ELEMENT_OK;
 	}
 	return ELEMENT_INVALID_ARG;
