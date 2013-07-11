@@ -11,6 +11,9 @@ Brent Waters (Pairing-based)
 
 :Authors:    J Ayo Akinyele
 :Date:       2/2012
+
+:Improved by: Fan Zhang, 3/2013
+:Notes: Only minor changes has been made. Deleted the alpha from msk and added g2^-alpha into it.
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import IBEnc
@@ -56,7 +59,7 @@ class IBEWaters09(IBEnc):
               'tau1^b':tau1 ** b, 'tau2^b':tau2 ** b, 'u':u1, 'u2':u2,'w1':w1, 'h1':h1, 'w2':w2, 'h2':h2,
               'egg_alpha': pair(g1, g2) ** (alpha * a1 * b) }
         sk = {'g^alph_a1':g2 ** (alpha * a1),
-              'g2^b':g2 ** b,'v':v_2, 'v1':v1_2, 'v2':v2_2, 'alpha':alpha }
+              'g2^b':g2 ** b,'v':v_2, 'v1':v1_2, 'v2':v2_2, 'g2^-alpha':g2 ** -alpha }
         return (pk, sk)
     
     def sign(self, mpk, msk, m):
@@ -66,7 +69,7 @@ class IBEWaters09(IBEnc):
 
         S = {}
         S[1] = msk['g^alph_a1'] * (msk['v'] ** r)
-        S[2] = (mpk['g2'] ** -msk['alpha']) * (msk['v1'] ** r) * (mpk['g2'] ** z1)
+        S[2] = msk['g2^-alpha'] * (msk['v1'] ** r) * (mpk['g2'] ** z1)
         S[3] = msk['g2^b'] ** -z1
         S[4] = (msk['v2'] ** r) * (mpk['g2'] ** z2)
         S[5] = msk['g2^b'] ** -z2

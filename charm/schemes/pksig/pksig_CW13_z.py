@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
 '''
-Name of the Paper
-  
-| From: | From:  J.Chen and H. Wee, Dual System Groups and its
-Applications — Compact HIBE and More, Manuscript.
+| From:  J.Chen and H. Wee, Dual System Groups and its Applications — Compact HIBE and More, Manuscript.
 | Published in: Manuscript
 | Available from: Manuscript
 | Notes: 
@@ -14,7 +10,7 @@ Applications — Compact HIBE and More, Manuscript.
 :Authors:    Fan Zhang(zfwise@gwu.edu) and Hoeteck Wee, supported by GWU computer science department
 :Date:       5/2013
 :Note:  The paper is not published yet. One has to notice that the implementation is different with the
-paper. The code is designed to optimize the performance by reduce Exponentional operation and Multiplication
+paper. The code is designed to optimize the performance by reducing Exponentional operation and Multiplication
 operation as much as possible.
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

@@ -10,7 +10,7 @@ Shorter IBE and Signatures via Asymmetric Pairings
 * setting:        bilinear groups (asymmetric)
 
 :Improved by: Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
-:Date: 3/2013
+:Date: 	      3/2013
 :Notes:
 1. We swapped g1 and g2 to make signature faster.
 2. Change all the pair($params_1$, $params_2$) to pair($params_2$, $params_1$) is required.
