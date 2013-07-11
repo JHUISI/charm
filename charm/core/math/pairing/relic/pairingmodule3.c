@@ -865,7 +865,12 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			bn_inits(n);
 			longObjToInt(n, (PyLongObject *) o2);
-			element_pow_int(newObject->e, lhs_o1->e, n);
+			if(lhs_o1->elem_initPP == TRUE) {
+				element_pp_pow_int(newObject->e, lhs_o1->e_pp, lhs_o1->element_type, n);
+			}
+			else {
+				element_pow_int(newObject->e, lhs_o1->e, n);
+			}
 			bn_free(n);
 		}
 		else if(rhs == -1) {

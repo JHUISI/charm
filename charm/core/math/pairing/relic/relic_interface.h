@@ -106,6 +106,7 @@ status_t element_clear(element_t e);
 
 status_t element_pp_init(element_pp_t e_pp, element_t e);
 status_t element_pp_pow(element_t o, element_pp_t e_pp, GroupType type, element_t e);
+status_t element_pp_pow_int(element_t o, element_pp_t e_pp, GroupType type, integer_t bn);
 status_t element_pp_clear(element_pp_t e_pp, GroupType type);
 
 /* arithmetic operators over elements */

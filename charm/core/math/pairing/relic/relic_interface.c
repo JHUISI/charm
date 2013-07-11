@@ -218,9 +218,7 @@ status_t element_pp_pow(element_t o, element_pp_t e_pp, GroupType type, element_
 
 	if(o->type == type) {
 		if(type == G1 && e->type == ZR) {
-//			printf("pp pow call...\n");
 			g1_mul_fix(o->g1, e_pp->t1, e->bn);
-//			g1_print(o->g1);
 		}
 		else if(type == G2 && e->type == ZR) {
 			g2_mul_fix(o->g2, e_pp->t2, e->bn);
@@ -230,6 +228,25 @@ status_t element_pp_pow(element_t o, element_pp_t e_pp, GroupType type, element_
 
 	return ELEMENT_INVALID_ARG;
 }
+
+status_t element_pp_pow_int(element_t o, element_pp_t e_pp, GroupType type, integer_t bn)
+{
+	if(e_pp->isInitialized == FALSE) return ELEMENT_UNINITIALIZED;
+	LEAVE_IF(bn == NULL, "uninitialized integer.");
+
+	if(o->type == type) {
+		if(type == G1) {
+			g1_mul_fix(o->g1, e_pp->t1, bn);
+		}
+		else if(type == G2) {
+			g2_mul_fix(o->g2, e_pp->t2, bn);
+		}
+		return ELEMENT_OK;
+	}
+
+	return ELEMENT_INVALID_ARG;
+}
+
 
 status_t element_random(element_t e)
 {
