@@ -260,9 +260,12 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 	mpz_t x;
 	mpz_init(x);
 #if PY_MAJOR_VERSION < 3
-	longObj = PyNumber_Long(longObj);
-#endif
+	PyObject *longObj2 = PyNumber_Long(longObj);
+	longObjToMPZ(x, (PyLongObject *) longObj2);
+	Py_DECREF(longObj2);
+#else
 	longObjToMPZ(x, (PyLongObject *) longObj);
+#endif
 	element_set_mpz(new, x);
 	mpz_clear(x);
 	return new;
@@ -507,10 +510,16 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 		return NULL;
 	}
 
-	if(long_obj != NULL && PyLong_Check(long_obj)) {
+	if(long_obj != NULL && _PyLong_Check(long_obj)) {
 		mpz_t m;
 		mpz_init(m);
+#if PY_MAJOR_VERSION < 3
+		PyObject *longObj2 = PyNumber_Long(long_obj);
+		longObjToMPZ(m, (PyLongObject *) longObj2);
+		Py_DECREF(longObj2);
+#else
 		longObjToMPZ(m, (PyLongObject *) long_obj);
+#endif
 		element_set_mpz(retObject, m);
 		mpz_clear(m);
 	}
@@ -877,7 +886,13 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			rhs_o2 = createNewElement(pyZR_t, lhs_o1->pairing);
 			if(newObject->element_type != pyZR_t) {
 				mpz_init(n);
+#if PY_MAJOR_VERSION < 3
+				PyObject *longObj2 = PyNumber_Long(o2);
+				longObjToMPZ(n, (PyLongObject *) longObj2);
+				Py_DECREF(longObj2);
+#else
 				longObjToMPZ(n, (PyLongObject *) o2);
+#endif
 				element_set_mpz(rhs_o2, n);
 				element_pow_zr(newObject, lhs_o1, rhs_o2);
 				mpz_clear(n);
@@ -888,7 +903,13 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			}
 			else { // anything larger: convert to an MPZ type then raise to EXP value
 				mpz_init(n);
+#if PY_MAJOR_VERSION < 3
+				PyObject *longObj2 = PyNumber_Long(o2);
+				longObjToMPZ(n, (PyLongObject *) longObj2);
+				Py_DECREF(longObj2);
+#else
 				longObjToMPZ(n, (PyLongObject *) o2);
+#endif
 				element_set_mpz(rhs_o2, n);
 				element_pow_zr(newObject, lhs_o1, rhs_o2);
 				mpz_clear(n);
@@ -1117,7 +1138,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 	return NULL;
 }
 
-PyObject *sha1_hash2(Element *self, PyObject *args) {
+PyObject *sha2_hash(Element *self, PyObject *args) {
 	Element *object;
 	PyObject *str;
 	char *hash_hex = NULL;
@@ -1920,7 +1941,7 @@ PyMethodDef pairing_methods[] = {
 	{"order", (PyCFunction) Get_Order, METH_VARARGS, "Get the group order for a particular field."},
 
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1_t and G2 and returns an element mapped to GT"},
-	{"hashPair", (PyCFunction)sha1_hash2, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"hashPair", (PyCFunction)sha2_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
 //	{"SymEnc", (PyCFunction) AES_Encrypt, METH_VARARGS, "AES encryption args: key (bytes or str), message (str)"},
 //	{"SymDec", (PyCFunction) AES_Decrypt, METH_VARARGS, "AES decryption args: key (bytes or str), ciphertext (str)"},
 #ifdef BENCHMARK_ENABLED

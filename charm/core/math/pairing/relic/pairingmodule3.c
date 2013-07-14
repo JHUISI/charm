@@ -283,10 +283,7 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 
 	integer_t x;
 	bn_inits(x);
-#if PY_MAJOR_VERSION < 3
-	longObj = PyNumber_Long(longObj);
-#endif
-	longObjToInt(x, (PyLongObject *) longObj);
+	ConvertToInt2(x, longObj);
 	element_set_int(new->e, x);
 	bn_free(x);
 	return new;
@@ -486,10 +483,10 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 		EXIT_IF(TRUE, "unrecognized group type.");
 	}
 
-	if(long_obj != NULL && PyLong_Check(long_obj)) {
+	if(long_obj != NULL && _PyLong_Check(long_obj)) {
 		integer_t m;
 		bn_inits(m);
-		longObjToInt(m, (PyLongObject *) long_obj);
+		ConvertToInt2(m, long_obj);
 		element_set_int(retObject->e, m);
 		bn_free(m);
 	}
@@ -639,18 +636,18 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	if(PyElement_Check(lhs)) {
 		self = (Element *) lhs;
 	}
-	else if(PyLong_Check(lhs)) {
+	else if(_PyLong_Check(lhs)) {
 		bn_inits(z);
-		longObjToInt(z, (PyLongObject *) lhs);
+		ConvertToInt2(z, lhs);
 		found_int = TRUE;
 	}
 
 	if(PyElement_Check(rhs)) {
 		other = (Element *) rhs;
 	}
-	else if(PyLong_Check(rhs)) {
+	else if(_PyLong_Check(rhs)) {
 		bn_inits(z);
-		longObjToInt(z, (PyLongObject *) rhs);
+		ConvertToInt2(z, rhs);
 		found_int = TRUE;
 	}
 
@@ -679,24 +676,17 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 		EXIT_IF(mul_rule(self->element_type, other->element_type) == FALSE, "invalid mul operation.");
 
 		if(self->element_type != ZR && other->element_type == ZR) {
-
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul_zr(newObject->e, self->e, other->e);
 
 		}
 		else if(other->element_type != ZR && self->element_type == ZR) {
-			// START_CLOCK
-
 			newObject = createNewElement(other->element_type, self->pairing);
 			element_mul_zr(newObject->e, other->e, self->e);
-
 		}
 		else { // all other cases
-			// START_CLOCK
-
 			newObject = createNewElement(self->element_type, self->pairing);
 			element_mul(newObject->e, self->e, other->e);
-
 		}
 	}
 	else {
@@ -720,7 +710,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyLong_Check(lhs)) {
 		bn_inits(z);
-		longObjToInt(z, (PyLongObject *) lhs);
+		ConvertToInt2(z, lhs);
 		found_int = TRUE;
 	}
 
@@ -729,7 +719,7 @@ static PyObject *Element_div(PyObject *lhs, PyObject *rhs)
 	}
 	else if(PyLong_Check(rhs)) {
 		bn_inits(z);
-		longObjToInt(z, (PyLongObject *) rhs);
+		ConvertToInt2(z, rhs);
 		found_int = TRUE;
 	}
 
@@ -841,7 +831,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 //			printf("%s: testing longFoundLHS\n", __FUNCTION__);
 
 			bn_inits(n);
-			longObjToInt(n, (PyLongObject *) o1);
+			ConvertToInt2(n, o1);
 			newObject = createNewElement(rhs_o2->element_type, rhs_o2->pairing);
 			element_set_int(newObject->e, n);
 			element_pow_zr(newObject->e, newObject->e, rhs_o2->e);
@@ -864,7 +854,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			PyErr_Clear();
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			bn_inits(n);
-			longObjToInt(n, (PyLongObject *) o2);
+			ConvertToInt2(n, o2);
 			if(lhs_o1->elem_initPP == TRUE) {
 				element_pp_pow_int(newObject->e, lhs_o1->e_pp, lhs_o1->element_type, n);
 			}
@@ -1079,7 +1069,7 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 	EXIT_IF(TRUE, "pairings only apply to elements of G1 x G2 --> GT");
 }
 
-PyObject *sha1_hash(Element *self, PyObject *args) {
+PyObject *sha2_hash(Element *self, PyObject *args) {
 	Element *object;
 	PyObject *str = NULL;
 	uint8_t *hash_hex = NULL;
@@ -1748,7 +1738,7 @@ PyMethodDef Element_methods[] = {
 PyMethodDef pairing_methods[] = {
 	{"init", (PyCFunction)Element_elem, METH_VARARGS, "Create an element in group ZR and optionally set value."},
 	{"pair", (PyCFunction)Apply_pairing, METH_VARARGS, "Apply pairing between an element of G1 and G2 and returns an element mapped to GT"},
-	{"hashPair", (PyCFunction)sha1_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
+	{"hashPair", (PyCFunction)sha2_hash, METH_VARARGS, "Compute a sha1 hash of an element type"},
 	{"H", (PyCFunction)Element_hash, METH_VARARGS, "Hash an element type to a specific field: Zr, G1, or G2"},
 	{"random", (PyCFunction)Element_random, METH_VARARGS, "Return a random element in a specific group: G1, G2, Zr"},
 	{"serialize", (PyCFunction)Serialize_cmp, METH_VARARGS, "Serialize an element type into bytes."},

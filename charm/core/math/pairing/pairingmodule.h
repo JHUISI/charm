@@ -165,7 +165,7 @@ void	Element_dealloc(Element* self);
 Element *convertToZR(PyObject *LongObj, PyObject *elemObj);
 
 PyObject *Apply_pairing(Element *self, PyObject *args);
-PyObject *sha1_hash(Element *self, PyObject *args);
+PyObject *sha2_hash(Element *self, PyObject *args);
 
 int exp_rule(GroupType lhs, GroupType rhs);
 int mul_rule(GroupType lhs, GroupType rhs);
