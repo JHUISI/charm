@@ -27,8 +27,6 @@
  *
  ************************************************************************/
 
-// TODO: fix 1 / a (ZR) ==> 0 instead of inverse of a!
-
 #include "pairingmodule3.h"
 
 int exp_rule(GroupType lhs, GroupType rhs)
@@ -257,7 +255,6 @@ static Element *createNewElement(GroupType element_type, Pairing *pairing) {
 		retObject->element_type = ZR;
 	}
 	else if(element_type == G1) {
-
 		element_init_G1(retObject->e); // , pairing->pair_obj);
 		retObject->element_type = G1;
 	}
@@ -537,8 +534,6 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	VERIFY_GROUP(group);
 	retObject = PyObject_New(Element, &ElementType);
 	debug("init random element in '%d'\n", arg1);
-// mem alloc alternatives
-//		retObject->e = (element_ptr) malloc(sizeof(element_t));
 	if(arg1 == ZR) {
 		element_init_Zr(retObject->e, 0);
 		e_type = ZR;
@@ -562,10 +557,9 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	element_random(retObject->e);
 
 	retObject->elem_initialized = TRUE;
+	retObject->elem_initPP = FALSE;
 	retObject->pairing = group;
 	Py_INCREF(retObject->pairing);
-//	retObject->safe_pairing_clear = FALSE;
-//	retObject->param_buf = NULL;
 	retObject->element_type = e_type;
 	return (PyObject *) retObject;
 }
@@ -897,7 +891,6 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		EXIT_IF(!PyElement_Check(o2), ERROR_TYPE(right, int, bytes, str));
 	}
 
-	// STOP_CLOCK
 #ifdef BENCHMARK_ENABLED
 	UPDATE_BENCH(EXPONENTIATION, newObject->element_type, newObject->pairing);
 #endif

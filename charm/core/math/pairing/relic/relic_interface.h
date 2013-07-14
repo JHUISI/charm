@@ -36,14 +36,12 @@
 /* make sure error checking enabled in relic_conf.h, ALLOC should be dynamic */
 
 //#define DISABLE_CHECK  1
-//#define pp_map_oatep pp_map_k2
 #define TRUE	1
 #define FALSE	0
-#define BASE	16
+#define DBASE	16
 #define MAX_BUF	1024
 #define SHA_LEN  	32
 #define SHA_FUNC	md_map_sh256
-/* move to the appropriate place */
 typedef enum _status_t { ELEMENT_OK = 2,
 	   ELEMENT_INVALID_ARG,
 	   ELEMENT_INVALID_ARG_LEN,
