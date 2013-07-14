@@ -52,9 +52,6 @@
 #define HASH_LEN 20
 #define ID_LEN   4
 #define MAX_BENCH_OBJECTS	2
-// define element_types
-//enum Group {ZR, G1, G2, GT, NONE_G};
-//typedef enum Group GroupType;
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
 #define HASH_FUNCTION_ELEMENTS			0
@@ -158,8 +155,7 @@ void	Element_dealloc(Element* self);
 Element *convertToZR(PyObject *LongObj, PyObject *elemObj);
 
 PyObject *Apply_pairing(Element *self, PyObject *args);
-PyObject *sha1_hash(Element *self, PyObject *args);
-void Operations_clear(void);
+PyObject *sha2_hash(Element *self, PyObject *args);
 
 int exp_rule(GroupType lhs, GroupType rhs);
 int mul_rule(GroupType lhs, GroupType rhs);
@@ -168,6 +164,16 @@ int sub_rule(GroupType lhs, GroupType rhs);
 int div_rule(GroupType lhs, GroupType rhs);
 int pair_rule(GroupType lhs, GroupType rhs);
 //void print_int(integer_t x, int base);
+
+#if PY_MAJOR_VERSION < 3
+#define ConvertToInt2(x, obj) \
+	PyObject *_longObj = PyNumber_Long(obj);	\
+	longObjToInt(x, (PyLongObject *) _longObj);		\
+	Py_DECREF(_longObj);
+#else
+#define ConvertToInt2(x, obj) \
+	longObjToInt(x, (PyLongObject *) obj);
+#endif
 
 #ifdef BENCHMARK_ENABLED
 

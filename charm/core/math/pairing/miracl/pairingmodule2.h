@@ -222,14 +222,14 @@ typedef struct {
 		lhs_o1 = (Element *) o1; \
 		debug("found a lhs element.\n"); \
     } \
-	else if(PyLong_Check(o1)) { \
+	else if(_PyLong_Check(o1)) { \
 		longLHS_o1 = TRUE;  } \
 							  \
 	if(PyElement_Check(o2)) {  \
 		rhs_o2 = (Element *) o2; \
 		debug("found a rhs element.\n"); \
     } \
-	else if(PyLong_Check(o2)) {  \
+	else if(_PyLong_Check(o2)) {  \
 		longRHS_o2 = TRUE; }	\
 
 #define VERIFY_GROUP(g) \
@@ -248,7 +248,7 @@ void	Element_dealloc(Element* self);
 Element *convertToZR(PyObject *LongObj, PyObject *elemObj);
 
 PyObject *Apply_pairing(Element *self, PyObject *args);
-PyObject *sha1_hash(Element *self, PyObject *args);
+PyObject *sha2_hash(Element *self, PyObject *args);
 
 int exp_rule(Group_t lhs, Group_t rhs);
 int mul_rule(Group_t lhs, Group_t rhs);
