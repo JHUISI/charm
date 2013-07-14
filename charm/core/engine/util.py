@@ -2,7 +2,7 @@ from __future__ import print_function
 import io, pickle
 import json, zlib
 from base64 import *
-import types
+from charm.toolbox.bitstring import *
 
 def serializeDict(Object, group):
     bytes_object = {}
@@ -249,7 +249,7 @@ def from_json(json_object):
 def objectToBytes(object, group):
     object_ser = serializeObject(object, group)
     #result = pickleObject(object_ser)
-    result = bytes(json.dumps(object_ser, default=to_json), 'utf-8')
+    result = getBytes(json.dumps(object_ser, default=to_json))
     return b64encode(zlib.compress(result))
     
 def bytesToObject(byteobject, group):
@@ -279,16 +279,5 @@ def bytesToObjectWithPickle(byteobject, group):
     
     dataRec   = bytesToObject(dataBytes, group)
 
-    assert data == dataRec, 'Error during deserialization.'    
+    assert data == dataRec, 'Error during deserialization.'
 """
-
-if __name__ == "__main__":
-    data = { 'a':b"hello", 'b':"world", 'c':[1, 2, 3], 'd':unicode('this is a test')}
-  
-    #packer = getPackerObject(data)    
-    #print("packed => ", packer.pack())
-    result = pickleObject(data)
-
-    data2 = unpickleObject(result)
-    
-    print("data2 => ", data2)
