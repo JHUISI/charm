@@ -237,6 +237,7 @@ static Element *createNewElement(GroupType element_type, Pairing *pairing) {
 	}
 	
 	retObject->elem_initialized = TRUE;
+	retObject->elem_initPP = FALSE;
 	retObject->pairing = pairing;
 	Py_INCREF(retObject->pairing);
 	return retObject;	
@@ -291,6 +292,9 @@ void	Element_dealloc(Element* self)
 {
 	if(self->elem_initialized == TRUE && self->e != NULL) {
 		debug_e("Clear element_t => '%B'\n", self->e);
+		if(self->elem_initPP == TRUE) {
+			element_pp_clear(self->e_pp);
+		}
 		element_clear(self->e);
 		Py_DECREF(self->pairing);
 	}
@@ -517,6 +521,7 @@ PyObject *Element_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self = (Element *)type->tp_alloc(type, 0);
     if (self != NULL) {
         self->elem_initialized = FALSE;
+        self->elem_initPP = FALSE;
 		self->pairing = NULL;
 		self->element_type = NONE_G;
     }
@@ -761,6 +766,7 @@ static PyObject *Element_random(Element* self, PyObject* args)
 	/* create new Element object */
 	element_random(retObject->e);
 	retObject->elem_initialized = TRUE;
+	retObject->elem_initPP = FALSE;
 	retObject->element_type = e_type;
 	/* set the group object for element operations */
 	retObject->pairing = group;
@@ -1004,10 +1010,10 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 
 			lhs_o1 = convertToZR(o1, o2);
 			newObject = createNewElement(rhs_o2->element_type, rhs_o2->pairing);
+			// both must be ZR, no need for pp check
 			element_pow_mpz(newObject->e, lhs_o1->e, n);
 			mpz_clear(n);
 			Py_DECREF(lhs_o1);
-			//PyObject_Del(lhs_o1);
 		}
 		else {
 			EXIT_IF(TRUE, "undefined exponentiation operation.");
@@ -1023,7 +1029,13 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			mpz_init(n);
 			longObjToMPZ(n, (PyLongObject *) o2);
-			element_pow_mpz(newObject->e, lhs_o1->e, n);
+			if(lhs_o1->elem_initPP == TRUE) {
+				// n = g ^ e where g has been pre-processed
+				element_pp_pow(newObject->e, n, lhs_o1->e_pp);
+			}
+			else {
+				element_pow_mpz(newObject->e, lhs_o1->e, n);
+			}
 			mpz_clear(n);
 		}
 		else if(rhs == -1) {
@@ -1044,11 +1056,17 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 		EXIT_IF(exp_rule(lhs_o1->element_type, rhs_o2->element_type) == FALSE, "invalid exp operation");
 		if(rhs_o2->element_type == ZR) {
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
-			element_pow_zn(newObject->e, lhs_o1->e, rhs_o2->e);
-//			mpz_init(n);
-//			element_to_mpz(n, rhs_o2->e);
-//			element_pow_mpz(newObject->e, lhs_o1->e, n);
-//			mpz_clear(n);
+			//printf("Calling pp func: '%d'\n", lhs_o1->elem_initPP);
+			if(lhs_o1->elem_initPP == TRUE) {
+				// n = g ^ e where g has been pre-processed
+				mpz_init(n);
+				element_to_mpz(n, rhs_o2->e);
+				element_pp_pow(newObject->e, n, lhs_o1->e_pp);
+				mpz_clear(n);
+			}
+			else {
+				element_pow_zn(newObject->e, lhs_o1->e, rhs_o2->e);
+			}
 		}
 		else {
 			// we have a problem
@@ -1098,6 +1116,21 @@ static PyObject *Element_set(Element *self, PyObject *args)
     }
 
     return Py_BuildValue("i", errcode);
+}
+
+static PyObject  *Element_initPP(Element *self, PyObject *args)
+{
+    EXITCODE_IF(self->elem_initPP == TRUE, "initialized the pre-processing function already", FALSE);
+    EXITCODE_IF(self->elem_initialized == FALSE, "must initialize element to a field (G1,G2, or GT)", FALSE);
+
+    /* initialize and store preprocessing information in e_pp */
+    if(self->element_type >= G1 && self->element_type <= GT) {
+		element_pp_init(self->e_pp, self->e);
+		self->elem_initPP = TRUE;
+		Py_RETURN_TRUE;
+    }
+
+    Py_RETURN_FALSE;
 }
 
 /* Takes a list of two objects in G1 & G2 respectively and computes the multi-pairing */
@@ -1927,9 +1960,6 @@ PyTypeObject ElementType = {
 
 struct module_state {
 	PyObject *error;
-//#ifdef BENCHMARK_ENABLED
-//	Benchmark *dBench;
-//#endif
 };
 
 #if PY_MAJOR_VERSION >= 3
@@ -1949,6 +1979,7 @@ PyMemberDef Element_members[] = {
 };
 
 PyMethodDef Element_methods[] = {
+	{"initPP", (PyCFunction)Element_initPP, METH_NOARGS, "Initialize the pre-processing field of element."},
 	{"set", (PyCFunction)Element_set, METH_VARARGS, "Set an element to a fixed value."},
     {NULL}  /* Sentinel */
 };

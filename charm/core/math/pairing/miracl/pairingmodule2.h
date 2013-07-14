@@ -48,17 +48,23 @@
 #include <fcntl.h>
 #include "benchmarkmodule.h"
 #include "openssl/objects.h"
+#include "openssl/rand.h"
 #include "openssl/sha.h"
+#ifdef BENCHMARK_ENABLED
+#include "benchmark_util.h"
+#endif
 
 /* supported pairing curves */
 #define MNT160  	80
 #define BN256	  	128
 #define SS512		80
+#define SS1536		128
 
 /* buf sizes */
 #define BenchmarkIdentifier 1
 #define BUF_MAX_LEN 512
 #define HASH_LEN 	20
+#define ID_LEN		8
 
 /* Index numbers for different hash functions.  These are all implemented as SHA1(index || message).	*/
 #define HASH_FUNCTION_STR_TO_Zr_CRH		0
@@ -76,54 +82,19 @@ int pairing_init_finished;
 PyTypeObject ElementType;
 PyTypeObject PairingType;
 static PyObject *ElementError;
-#ifdef BENCHMARK_ENABLED
-static Benchmark *dBench;
-#endif
 
 #define PyElement_Check(obj) PyObject_TypeCheck(obj, &ElementType)
 #define PyPairing_Check(obj) PyObject_TypeCheck(obj, &PairingType)
-//#if PY_MAJOR_VERSION >= 3
-///* check for both unicode and bytes objects */
-//#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
-//#else
-///* check for just unicode stuff */
-//#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
-//#endif
-
-//#if PY_MAJOR_VERSION >= 3
-///* if unicode then add extra conversion step. two possibilities: unicode or bytes */
-//#define PyBytes_ToString(a, obj) \
-//	if(PyUnicode_Check(obj)) { PyObject *_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AS_STRING(_obj); Py_DECREF(_obj); }	\
-//	else { a = PyBytes_AS_STRING(obj); }
-//#else
-///* treat everything as string in 2.x */
-//#define PyBytes_ToString(a, obj) a = PyString_AsString(obj);
-//#endif
 
 PyMethodDef Element_methods[];
 PyMethodDef pairing_methods[];
 PyMemberDef Element_members[];
 PyNumberMethods element_number;
 
-typedef struct {
-	PyObject_HEAD
-	pairing_t *pair_obj;
-	element_t *order;
-	int curve;
-	int group_init;
-} Pairing;
-
-typedef struct {
-    PyObject_HEAD
-	Pairing *pairing;
-	element_t *e;
-	Group_t element_type;
-    int elem_initialized;
-	int safe_pairing_clear;
-} Element;
-
 #ifdef BENCHMARK_ENABLED
 typedef struct {
+	PyObject_HEAD
+	int op_init;
 	int exp_pyZR_t, exp_pyG1_t, exp_pyG2_t, exp_pyGT_t;
 	int mul_pyZR_t, mul_pyG1_t, mul_pyG2_t, mul_pyGT_t;
 	int div_pyZR_t, div_pyG1_t, div_pyG2_t, div_pyGT_t;
@@ -132,6 +103,28 @@ typedef struct {
 	int sub_pyZR_t, sub_pyG1_t, sub_pyG2_t, sub_pyGT_t;
 } Operations;
 #endif
+
+typedef struct {
+	PyObject_HEAD
+	pairing_t *pair_obj;
+	element_t *order;
+	int curve;
+	int group_init;
+#ifdef BENCHMARK_ENABLED
+	Operations *gBench;
+    Benchmark *dBench;
+	uint8_t bench_id[ID_LEN+1];
+#endif
+} Pairing;
+
+typedef struct {
+    PyObject_HEAD
+	Pairing *pairing;
+	element_t *e;
+	Group_t element_type;
+    int elem_initialized;
+	int elem_initPP;
+} Element;
 
 #define IS_PAIRING_OBJ_NULL(obj) \
 	if(obj->pairing == NULL) {	\
@@ -184,6 +177,9 @@ typedef struct {
 #define element_pow_int(c, a, b) \
 	c->e = _element_pow_zr_zr(pyZR_t, a->pairing->pair_obj, a->e, b, a->pairing->order);	\
 	c->element_type = pyZR_t;
+
+#define element_pp_init(a) \
+		_element_pp_init(a->pairing->pair_obj, a->element_type, a->e)
 
 #define pairing_apply(c, a, b) \
 	if(a->pairing->curve == MNT || a->pairing->curve == BN || a->pairing->curve == SS) { \
@@ -262,30 +258,6 @@ int div_rule(Group_t lhs, Group_t rhs);
 int pair_rule(Group_t lhs, Group_t rhs);
 
 #ifdef BENCHMARK_ENABLED
-void Operations_clear(void);
-
-// for multiplicative notation
-#define Op_MUL(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == MULTIPLICATION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->mul_ ##group += 1;
-
-#define Op_DIV(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == DIVISION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->div_ ##group += 1;
-
-// for additive notation
-#define Op_ADD(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == ADDITION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->add_ ##group += 1;
-
-#define Op_SUB(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == SUBTRACTION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->sub_ ##group += 1;
-
-// exponentiation
-#define Op_EXP(op_var_type, op_group_type, group, bench_obj)  \
-	if(op_var_type == EXPONENTIATION && op_group_type == group)      \
-		((Operations *) bench_obj->data_ptr)->exp_ ##group += 1;
 
 #define Update_Op(name, op_type, elem_type, bench_obj)	\
 	Op_ ##name(op_type, elem_type, pyZR_t, bench_obj)	\
@@ -293,35 +265,11 @@ void Operations_clear(void);
 	Op_ ##name(op_type, elem_type, pyG2_t, bench_obj)	\
 	Op_ ##name(op_type, elem_type, pyGT_t, bench_obj)	\
 
-#define UPDATE_BENCH(op_type, elem_type, bench_obj) \
-	if(bench_obj->granular_option == TRUE && elem_type >= pyZR_t && elem_type <= pyGT_t) {		\
-		Update_Op(MUL, op_type, elem_type, bench_obj) \
-		Update_Op(DIV, op_type, elem_type, bench_obj) \
-		Update_Op(ADD, op_type, elem_type, bench_obj) \
-		Update_Op(SUB, op_type, elem_type, bench_obj) \
-		Update_Op(EXP, op_type, elem_type, bench_obj) \
-	}		\
-	UPDATE_BENCHMARK(op_type, bench_obj);
-
 #define CLEAR_ALLDBENCH(bench_obj)  \
 	    CLEAR_DBENCH(bench_obj, pyZR_t);	\
 	    CLEAR_DBENCH(bench_obj, pyG1_t);	\
 	    CLEAR_DBENCH(bench_obj, pyG2_t);	\
 	    CLEAR_DBENCH(bench_obj, pyGT_t);	\
-
-#define CLEAR_DBENCH(bench_obj, group)   \
-	((Operations *) bench_obj->data_ptr)->mul_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->exp_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->div_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->add_ ##group = 0;	\
-	((Operations *) bench_obj->data_ptr)->sub_ ##group = 0;	\
-
-#define GetField(count, type, group, bench_obj)  \
-	if(type == MULTIPLICATION) count = (((Operations *) bench_obj->data_ptr)->mul_ ##group ); \
-	else if(type == DIVISION) count = (((Operations *) bench_obj->data_ptr)->div_ ##group );	\
-	else if(type == ADDITION) count = (((Operations *) bench_obj->data_ptr)->add_ ##group ); \
-	else if(type == SUBTRACTION) count = (((Operations *) bench_obj->data_ptr)->sub_ ##group ); \
-	else if(type == EXPONENTIATION) count = (((Operations *) bench_obj->data_ptr)->exp_ ##group );
 
 #else
 

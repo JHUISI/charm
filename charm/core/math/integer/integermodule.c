@@ -2085,6 +2085,10 @@ PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 	Benchmark *b = GETSTATE(self)->dBench;
 	if(b == NULL) {
 		GETSTATE(self)->dBench = PyObject_New(Benchmark, &BenchmarkType);
+		if(GETSTATE(self)->dBench == NULL) {
+			PyErr_SetString(IntegerError, "InitBenchmark - out of memory.");
+			return NULL;
+		}
 	    Py_INCREF(GETSTATE(self)->dBench);
 	    tmpBench = GETSTATE(self)->dBench;
 		Benchmark *dBench = GETSTATE(self)->dBench;
@@ -2403,7 +2407,7 @@ static int int_clear(PyObject *m) {
 	Py_CLEAR(GETSTATE(m)->error);
     Py_XDECREF(IntegerError);
 #ifdef BENCHMARK_ENABLED
-//	debug("int_clear: Refcnt dBench = '%i'\n", (int) Py_REFCNT(GETSTATE(m)->dBench));
+	//printf("int_clear: Refcnt dBench = '%i'\n", (int) Py_REFCNT(GETSTATE(m)->dBench));
 	Py_CLEAR(GETSTATE(m)->dBench);
 #endif
 	return 0;

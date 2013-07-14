@@ -129,7 +129,7 @@ static int PyStartBenchmark(Benchmark *data, PyObject *opList, int opListSize)
 					debug("not a valid option.\n");
 				}
 				cnt++;
-                if(tmpObj != NULL)
+                if (tmpObj!=NULL)
 				    Py_DECREF(tmpObj);
 			}
 		}

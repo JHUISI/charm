@@ -122,6 +122,8 @@ typedef struct {
 	element_t e;
 	GroupType element_type;
     int elem_initialized;
+	element_pp_t e_pp;
+    int elem_initPP;
 } Element;
 
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)

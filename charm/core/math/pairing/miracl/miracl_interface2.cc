@@ -192,6 +192,27 @@ int element_is_member(Curve_t ctype, Group_t type, const pairing_t *pairing, ele
 	return -1;
 }
 
+int _element_pp_init(const pairing_t *pairing, Group_t type, element_t *e)
+{
+	PFC *pfc = (PFC *) pairing;
+	if(type == pyG1_t) {
+		G1 *g = (G1 *) e;
+		pfc->precomp_for_mult(*g);
+	}
+	else if(type == pyG2_t) {
+		G2 *g = (G2 *) e;
+		pfc->precomp_for_mult(*g);
+	}
+	else if(type == pyGT_t) {
+		GT *g = (GT *) e;
+		pfc->precomp_for_power(*g);
+	}
+	else {
+		return FALSE;
+	}
+
+	return TRUE;
+}
 
 void element_random(Group_t type, const pairing_t *pairing, element_t *e) {
 	PFC *pfc = (PFC *) pairing;

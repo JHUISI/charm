@@ -231,13 +231,41 @@ def unpickleObject(Object):
         return pickle.loads(decoded)
     return None
 
+# JSON does not support 'bytes' objects, so these from/to_json 
+# functions handle protecting the 
+def to_json(object):
+    if isinstance(object, bytes):
+        return {'__class__': 'bytes', '__value__': list(object) }
+    return TypeError(repr(python_ob) + " is not JSON serializable")
+
+def from_json(json_object):
+    if '__class__' in json_object:
+        if json_object['__class__'] == 'bytes':
+            return bytes(json_object['__value__'])
+    return json_object
+
 # Two new API calls to simplify serializing to a blob of bytes
 # objectToBytes() and bytesToObject()
-def objectToBytes(Object, group):
+def objectToBytes(object, group):
+    object_ser = serializeObject(object, group)
+    #result = pickleObject(object_ser)
+    result = bytes(json.dumps(object_ser, default=to_json), 'utf-8')
+    return b64encode(zlib.compress(result))
+    
+def bytesToObject(byteobject, group):
+    #unwrap_object = unpickleObject(byteobject)
+    decoded = bytes.decode(zlib.decompress(b64decode(byteobject)))
+    unwrap_object = json.loads(decoded, object_hook=from_json)
+    return deserializeObject(unwrap_object, group)
+
+# Note: included for backwards compatibility with older versions. 
+# Will be removed completely in future versions.
+def objectToBytesWithPickle(Object, group):
     object_ser = serializeObject(Object, group)
     return pickleObject(object_ser)
     
-def bytesToObject(byteobject, group):
+def bytesToObjectWithPickle(byteobject, group):
+    print("SecurityWarning: do not unpickle data received from an untrusted source. Bad things WILL happen!")
     unwrap_object = unpickleObject(byteobject)
     return deserializeObject(unwrap_object, group)
     

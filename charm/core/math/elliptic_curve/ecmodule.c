@@ -1303,7 +1303,8 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
                 y=BN_new();
                 x=BN_new();
 				do {
-                    if(encObj !=NULL)
+                    
+                    if(encObj!=NULL)
                         Py_DECREF(encObj);
 					/* 				1-byte    < max_len    ctr
 					 * encoding [   size   |    msg     | \x01 \x00 \x00 \x00]

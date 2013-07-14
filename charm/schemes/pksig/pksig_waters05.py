@@ -7,10 +7,20 @@
 * setting:		bilinear groups (asymmetric)
 
 :Authors:	Gary Belvin
-:Date:			06/2011
+:Date:		06/2011
+
+:Improved by: Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
+:Date: 3/2013
+:Notes:
+1. e(g1,g2) is pre-calculated as part of public parameters.
+2. g1 and g2 have been swapped. In the original scheme, signature happens in G2
+but now, it happens in G1.
+3. I stored U_z and u as part of mk. This will speed up the sign() a lot.
+The trick is that, instead of doing exponential operation and then multiply
+all together, I compute the exponent first and then do one exponential operation
 ''' 
 
-from charm.toolbox.pairinggroup import * #PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.enum import Enum
 from charm.toolbox.hash_module import Waters
@@ -24,6 +34,7 @@ class IBE_N04_Sig(PKSig):
     >>> waters = Waters(group)
     >>> ibe = IBE_N04_Sig(group)
     >>> (public_key, secret_key) = ibe.keygen()
+    >>> ID = "bob@mail.com"
     >>> msg = waters.hash("This is a test.")    
     >>> signature = ibe.sign(public_key, secret_key, msg)
     >>> ibe.verify(public_key, msg, signature)
@@ -43,25 +54,24 @@ class IBE_N04_Sig(PKSig):
         with l = 32, and the hash function at 160 bits = n * l with n = 5'''
         global waters
         sha1_func, sha1_len = 'sha1', 20
-        g = group.random(G1)      # generator for group G of prime order p
+        g = group.random(G2)      # generator for group G of prime order p
         
         hLen = sha1_len * 8
         n = int(math.floor(hLen / l))
         waters = Waters(group, n, l, sha1_func)
         
         alpha = group.random(ZR)  #from Zp
-        g1    = g ** alpha      # G1
-        g2    = group.random(G2)    #G2
-        uprime = group.random(G2)
-        U = [group.random(G2) for x in range(n)]
+        g2    = g ** alpha      
+        g1    = group.random(G1)   
+        u = group.random(ZR)
+        uprime = g ** u
+        U_z = [group.random(ZR) for x in range(n)]
+        U = [g ** x  for x in U_z]
         
-        pk = {'g':g, 'g1':g1, 'g2': g2, 'uPrime':uprime, 'U': U, 
-              'n':n, 'l':l, 'egg': pair(g, g2) ** alpha }
+        pk = {'g':g, 'g1':g1, 'g2': g2, 'uPrime':uprime, 'U': U,
+              'n':n, 'l':l, 'egg': pair(g1, g2) }
         
-        # mk = pk.copy()
-        mk = {'g':g, 'g1':g1, 'g2': g2, 'uPrime':uprime, 'U': U, 
-              'n':n, 'l':l, 'egg': pair(g, g2) ** alpha }
-        mk['g2^alpha'] = g2 ** alpha #master secret
+        mk = {'g1^alpha':g1 ** alpha, 'U_z':U_z, 'u':u} #master secret
         if debug: 
             print(mk)
         
@@ -70,13 +80,12 @@ class IBE_N04_Sig(PKSig):
     def sign(self, pk, sk, m):
         '''v = (v1, .., vn) is an identity'''
         r = group.random(ZR)
-        
-        d1 = sk['uPrime']
-        for i in range(sk['n']):
-            d1 *= (sk['U'][i] ** m[i])
+        u = sk['u']
+        for i in range(pk['n']):
+            u += sk['U_z'][i] * m[i]
             
-        d1 = sk['g2^alpha'] * (d1 ** r)
-        d2 = sk['g'] ** r
+        d1 = sk['g1^alpha'] * (pk['g1'] ** (u * r))
+        d2 = pk['g1'] ** r
         return {'d1': d1, 'd2':d2}
 
     def verify(self, pk, msg, sig):
@@ -84,9 +93,7 @@ class IBE_N04_Sig(PKSig):
         for i in range(pk['n']):
             c3 *= pk['U'][i] ** msg[i]
         
-        num = pair(pk['g'], sig['d1'])
-        dem = pair(sig['d2'], c3)
-        return pk['egg'] == num / dem
+        return pk['egg'] == (pair(sig['d1'], pk['g']) / pair(sig['d2'], c3))
 
 
 def main():
@@ -96,9 +103,11 @@ def main():
     (pk, sk) = ibe.keygen()
 
     # represents public identity
-    msg = waters.hash("This is a test!")    
+    M = "bob@mail.com"
+    msg = waters.hash("This is a test.")    
     sig = ibe.sign(pk, sk, msg)
     if debug:
+        print("original msg => '%s'" % M)
         print("msg => '%s'" % msg)
         print("sig => '%s'" % sig)
 
