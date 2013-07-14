@@ -1,6 +1,7 @@
 import io, pickle
 import json, zlib
 from base64 import *
+from charm.toolbox.bitstring import *
 
 def serializeDict(Object, group):
     bytes_object = {}
@@ -207,7 +208,7 @@ def from_json(json_object):
 def objectToBytes(object, group):
     object_ser = serializeObject(object, group)
     #result = pickleObject(object_ser)
-    result = bytes(json.dumps(object_ser, default=to_json), 'utf-8')
+    result = getBytes(json.dumps(object_ser, default=to_json))
     return b64encode(zlib.compress(result))
     
 def bytesToObject(byteobject, group):
