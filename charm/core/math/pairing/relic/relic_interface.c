@@ -708,7 +708,10 @@ status_t element_pow_zr(element_t c, element_t a, element_t b)
 		g2_mul(c->g2, a->g2, b->bn);
 	}
 	else if(type == GT) {
-		gt_exp(c->gt, a->gt, b->bn);
+		if(bn_is_zero(b->bn))
+			gt_set_unity(c->gt); // GT ^ 0 => identity element (not handled by gt_exp)
+		else
+			gt_exp(c->gt, a->gt, b->bn);
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
