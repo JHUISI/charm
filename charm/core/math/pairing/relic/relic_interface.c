@@ -307,7 +307,7 @@ status_t element_to_str(char *data, int len, element_t e)
 		memset(tmp1, 0, str_len);
 
     	if(e->type == ZR) {
-    		bn_write_str(data, str_len, e->bn, BASE);
+    		bn_write_str(data, str_len, e->bn, DBASE);
     	}
     	else if(e->type == G1) {
 			g1_write_str(e->g1, tmp1, str_len);
@@ -738,7 +738,8 @@ status_t element_pow_int(element_t c, element_t a, integer_t b)
 				 break;
 		case G2: g2_mul(c->g2, a->g2, b);
 				 break;
-		case GT: gt_exp(c->gt, a->gt, b);
+		case GT: if(bn_is_zero(b)) gt_set_unity(c->gt);
+				 else gt_exp(c->gt, a->gt, b);
 				 break;
 		default:
 				 result = ELEMENT_INVALID_TYPES;
@@ -921,8 +922,8 @@ status_t g1_write_str(g1_t g, uint8_t *data, int data_len)
 
 	int len = FP_BYTES*2+1;
 
-	fp_write(d, len, g->x, BASE);
-	fp_write(&(d[len]), len, g->y, BASE);
+	fp_write(d, len, g->x, DBASE);
+	fp_write(&(d[len]), len, g->y, DBASE);
 
 	return ELEMENT_OK;
 }
@@ -989,13 +990,13 @@ status_t g2_write_str(g2_t g, uint8_t *data, int data_len)
 	char *d = (char *) data;
 
 	int len = FP_BYTES*2 + 1;
-	fp_write(d, len, g->x[0], BASE);
+	fp_write(d, len, g->x[0], DBASE);
 	d += len;
-	fp_write(d, len, g->x[1], BASE);
+	fp_write(d, len, g->x[1], DBASE);
 	d += len;
-	fp_write(d, len, g->y[0], BASE);
+	fp_write(d, len, g->y[0], DBASE);
 	d += len;
-	fp_write(d, len, g->y[1], BASE);
+	fp_write(d, len, g->y[1], DBASE);
 
 	return ELEMENT_OK;
 }
@@ -1098,29 +1099,29 @@ status_t gt_write_str(gt_t g, uint8_t *data, int data_len)
 	char *d1 = (char *) data;
 
 	// write the x-coordinate
-	fp_write(d1, len, g[0][0][0], BASE);
+	fp_write(d1, len, g[0][0][0], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[0][0][1], BASE);
+	fp_write(d1, len, g[0][0][1], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[0][1][0], BASE);
+	fp_write(d1, len, g[0][1][0], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[0][1][1], BASE);
+	fp_write(d1, len, g[0][1][1], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[0][2][0], BASE);
+	fp_write(d1, len, g[0][2][0], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[0][2][1], BASE);
+	fp_write(d1, len, g[0][2][1], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[1][0][0], BASE);
+	fp_write(d1, len, g[1][0][0], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[1][0][1], BASE);
+	fp_write(d1, len, g[1][0][1], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[1][1][0], BASE);
+	fp_write(d1, len, g[1][1][0], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[1][1][1], BASE);
+	fp_write(d1, len, g[1][1][1], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[1][2][0], BASE);
+	fp_write(d1, len, g[1][2][0], DBASE);
 	d1 += len;
-	fp_write(d1, len, g[1][2][1], BASE);
+	fp_write(d1, len, g[1][2][1], DBASE);
 
 	return ELEMENT_OK;
 }
