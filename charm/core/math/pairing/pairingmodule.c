@@ -687,7 +687,13 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 	if(long_obj != NULL && _PyLong_Check(long_obj)) {
 		mpz_t m;
 		mpz_init(m);
+#if PY_MAJOR_VERSION < 3
+		PyObject *longObj2 = PyNumber_Long(long_obj);
+		longObjToMPZ(m, (PyLongObject *) longObj2);
+		Py_DECREF(longObj2);
+#else
 		longObjToMPZ(m, (PyLongObject *) long_obj);
+#endif
 		element_set_mpz(retObject->e, m);
 		mpz_clear(m);
 	}
