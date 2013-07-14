@@ -1,5 +1,5 @@
 '''
-| From:  J.Chen and H. Wee, Dual System Groups and its Applications — Compact HIBE and More, Manuscript.
+| From:  J.Chen and H. Wee, Dual System Groups and its Applications - Compact HIBE and More, Manuscript.
 | Published in: Manuscript
 | Available from: Manuscript
 | Notes: 
