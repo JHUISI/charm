@@ -395,7 +395,6 @@ int hash2_buffer_to_bytes(uint8_t *input_str, int input_len, uint8_t *last_hash,
 
 	result = hash_buffer_to_bytes(temp_buf, (input_len + hash_size), output_buf, hash_size, HASH_FUNCTION_STRINGS+1);
 
-	//PyObject_Del(last);
 	Py_XDECREF(last);
 	return result;
 }
@@ -830,8 +829,7 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			element_set_int(newObject->e, n);
 			element_pow_zr(newObject->e, newObject->e, rhs_o2->e);
 			bn_free(n);
-			PyObject_Del(lhs_o1);
-
+			Py_DECREF(lhs_o1);
 		}
 		else {
 			EXIT_IF(TRUE, "undefined exponentiation operation.");
@@ -1127,7 +1125,6 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 				tmp = "could not hash to bytes.";
 				goto cleanup;
 			}
-
 		}
 		else if(type == G1 || type == G2) {
 		    // element to G1
@@ -1148,7 +1145,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 			tmp = "cannot hash a string to that field. Only Zr or G1.";
 			goto cleanup;
 		}
-		Py_DECREF(tmp_obj);
+		if(tmp_obj != NULL) Py_DECREF(tmp_obj);
 	}
 	// element type to ZR or G1. Can also contain multiple elements
 	// second case: is a tuple of elements of which could be a string or group elements
@@ -1239,7 +1236,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 	return (PyObject *) newObject;
 
 cleanup:
-	if(newObject != NULL) PyObject_Del(newObject);
+	if(newObject != NULL) Py_XDECREF(newObject);
 	EXIT_IF(TRUE, tmp);
 }
 
@@ -1308,7 +1305,6 @@ static long Element_index(Element *o1) {
 		PyObject *temp = intToLongObj(o); // fix this
 		result = PyObject_Hash(temp);
 		bn_free(o);
-//		PyObject_Del(temp);
 		Py_XDECREF(temp);
 	}
 	return result;
