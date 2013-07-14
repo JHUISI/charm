@@ -37,13 +37,15 @@ if(PyBytes_Check(obj)) { a = PyBytes_AsString(obj); } \
 else if(PyUnicode_Check(obj)) { tmp_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AsString(tmp_obj); }	\
 else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
 
+	#define _PyUnicode_FromFormat PyUnicode_FromFormat
+	#define _PyUnicode_FromString PyUnicode_FromString
 #else
 	/* python 2.x definitions */
 	#define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
 	#define ConvertToInt(o) PyInt_AsLong(o)
 	#define PyToLongObj(o) PyInt_FromSize_t(o)
-	#define PyUnicode_FromFormat PyString_FromFormat
-    #define PyUnicode_FromString PyString_FromString
+	#define _PyUnicode_FromFormat PyString_FromFormat
+    #define _PyUnicode_FromString PyString_FromString
 	/* treat everything as string in 2.x */
 	#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
 	#define PyBytes_ToString2(a, obj, tmpObj) a = PyString_AsString(obj);
