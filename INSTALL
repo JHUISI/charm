@@ -12,14 +12,17 @@ installation blocks highlighting each respective implementation.
 
 Before we begin, please note the current dependencies:
     
-	Python3
-	Pyparsing http://pyparsing.wikispaces.com/
-	GMP http://gmplib.org/ 
-	PBC http://crypto.stanford.edu/pbc/news.html 
-    	OPENSSL http://www.openssl.org/
+- Python2.7 or Python3
 
-	---
-	See ./configure.sh --help for other options.
+- Pyparsing http://pyparsing.wikispaces.com/
+
+- GMP 5.x http://gmplib.org/ 
+
+- PBC 0.5.14 http://crypto.stanford.edu/pbc/news.html
+
+- OPENSSL http://www.openssl.org/
+
+See ./configure.sh --help for other options.
 	
 	
 BUILDING IN LINUX
@@ -28,8 +31,8 @@ BUILDING IN LINUX
 Note that the entire compilation process is supported by the Charm configure/make scripts.
 The steps for building in linux this way are:
 	1. In a terminal, run configure.sh
-    2. sudo Make build
-    3. sudo Make install
+    2. sudo make
+    3. sudo make install
 	
 [Ubuntu 10.04 LTS]
 
@@ -50,7 +53,7 @@ The steps for building in linux this way are:
 	1. We must first run the configuration script:
 		sudo ./configure.sh
 	2. Now we will build and install Charm:
-		sudo make build
+		sudo make
 		sudo make install
 	3. And finally we must rebuild the searchpath for libraries
 		sudo ldconfig
@@ -74,7 +77,7 @@ The steps for building in linux this way are:
 	1. We must first run the configuration script:
 		sudo ./configure.sh
 	2. Now we will build and install Charm:
-		sudo make build
+		sudo make
 		sudo make install
 	3. And finally we must rebuild the searchpath for libraries
 		sudo ldconfig
@@ -183,7 +186,7 @@ The steps for building in linux this way are:
 			6. Rebuild the searchpath for libraries
 				su -c ldconfig
 	2. Now we will build and install Charm:
-		su -c "make build"
+		su -c "make"
 		su -c "make install"
 	3. And finally we must rebuild the searchpath for libraries
 		su -c ldconfig
@@ -211,7 +214,7 @@ The steps for building in linux this way are:
         1. We must first run the configuration script:
                 sudo bash ./configure.sh                * Bash to avoid unexpected operator error.
         2. Now we will build and install Charm:
-                sudo make build
+                sudo make
                 sudo make install
         3. And finally we must rebuild the searchpath for libraries
                 sudo ldconfig
@@ -328,18 +331,14 @@ The steps for building in os x this way are:
 	3. Using your package manager of choice (e.g., sudo port install wget), install wget.
     4. With wget installed, run the configure.sh script again, and it should set up your
        Make dependencies for you.  
-    5. Make build.
-    6. Make install.	
-    *. Another way to install dependencies is to use macports or fink.
+    5. make
+    6. make install
+    *. Another way to install dependencies is to use macports, homebrew or fink.
 	
 [Snow Leopard]
 
 
-[Lion]
+[Lion/Mountain Lion]
 
 For Lion, run ./configure.sh --enable-darwin in step 1 and follow the steps above for OS X.
 
-# *** NOTE *** A direct install of xcode 4.2 on a clean Lion machine will
-# no longer include the gcc-4.2 compiler. This will create some hardache
-# for pbc as llvm-gcc-4.2 doesn't support nested functions, and thus will
-# fail during build.  
