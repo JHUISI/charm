@@ -11,7 +11,7 @@ class SerializeTest(unittest.TestCase):
     def testIntegerGroup(self):    
         groupObj = IntegerGroup()
         p = integer(148829018183496626261556856344710600327516732500226144177322012998064772051982752493460332138204351040296264880017943408846937646702376203733370973197019636813306480144595809796154634625021213611577190781215296823124523899584781302512549499802030946698512327294159881907114777803654670044046376468983244647367)
-        data={'p':p,'String':"foo",'list':[p,{}]}
+        data={'p':p,'String':"foo",'list':[p,{},1,1.7]}
 
         x=objectToBytes(data,groupObj)
         data2=bytesToObject(x,groupObj)
@@ -20,7 +20,7 @@ class SerializeTest(unittest.TestCase):
     def testPairingGroup(self):    
         groupobj = PairingGroup('SS512')
         p=groupobj.random()
-        data={'p':p,'String':"foo",'list':[p,{}]}
+        data={'p':p,'String':"foo",'list':[p,{},1,1.7]}
 
         x=objectToBytes(data,groupobj)
         data2=bytesToObject(x,groupobj)
@@ -29,7 +29,7 @@ class SerializeTest(unittest.TestCase):
     def testECGroup(self):    
         groupObj = ECGroup(prime192v1)
         p=groupObj.random()
-        data={'p':p,'String':"foo",'list':[p,{}]}
+        data={'p':p,'String':"foo",'list':[p,{},1,1.7]}
 
         x=objectToBytes(data,groupObj)
         data2=bytesToObject(x,groupObj)
