@@ -1486,17 +1486,19 @@ static PyObject *Deserialize(ECElement *self, PyObject *args)
 				EC_POINT_oct2point(gobj->ec_group, newObj->P, (const uint8_t *) buf, len, gobj->ctx);
 
 				if(EC_POINT_is_on_curve(gobj->ec_group, newObj->P, gobj->ctx)) {
-					return (PyObject *) newObj;
+					obj=(PyObject *) newObj;
 				}
 			}
 			else if(type == ZR) {
 				ECElement *newObj = createNewPoint(type, gobj);
 				BN_bin2bn((const uint8_t *) buf, len, newObj->elemZ);
-				return (PyObject *) newObj;
-			}
-
-			Py_INCREF(Py_False);
-			return Py_False;
+                obj = (PyObject *) newObj;
+			}else{
+                Py_INCREF(Py_False);
+                obj = Py_False;
+            }
+            free(buf);
+			return obj;
 		}
 		else {
 			EXIT_IF(TRUE, "invalid object type");

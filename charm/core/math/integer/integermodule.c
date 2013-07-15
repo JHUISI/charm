@@ -1954,7 +1954,7 @@ static PyObject *deserialize(PyObject *self, PyObject *args) {
 	uint8_t *serial_buf2 = (uint8_t *) PyBytes_AsString(bytesObj);
 	int serial_buf2_len = strlen((char *) serial_buf2);
 	uint8_t serial_buf[serial_buf2_len + 1];
-	memset(serial_buf, 0, serial_buf2_len);
+	memset(serial_buf, 0, serial_buf2_len + 1);
 	memcpy(serial_buf, serial_buf2, serial_buf2_len);
 	/* get integer value */
 	char delim[] = ":";
@@ -2438,7 +2438,7 @@ PyInit_integer(void) {
 #define INITERROR return
 void initinteger(void) {
 #endif
-	PyObject *m;
+	PyObject *m=NULL;
 	if (PyType_Ready(&IntegerType) < 0)
 		CLEAN_EXIT;
 #ifdef BENCHMARK_ENABLED
@@ -2488,7 +2488,9 @@ LEAVE:
 	if (PyErr_Occurred()) {
 		printf("ERROR: module load failed!\n");
 		PyErr_Clear();
-		Py_XDECREF(m);
+        if(m!=NULL){
+		    Py_XDECREF(m);
+        }
 		INITERROR;
    }
 
