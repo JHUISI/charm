@@ -14,10 +14,12 @@ Features of Charm include:
 
 Documentation
 =============
-For complete install docs see http://jhuisi.github.com/charm/install_source.html. 
+For complete install, see our [documentation](http://jhuisi.github.com/charm/install_source.html). 
 
 Schemes
 =======
-We have provided several cryptographic scheme examples to get you going.  See http://jhuisi.github.com/charm/schemes.html
+We have provided several cryptographic scheme [examples](http://jhuisi.github.com/charm/schemes.html) to get you going. If this doesn't help, then feel free to reach us for questions and/or comments at support@charm-crypto.com.
 
-For questions and/or comments, email us at support@charm-crypto.com.
+If you're using Charm to implement schemes, we want to know what your experience is with our framework. Your feedback is very valuable to us! 
+
+
