@@ -16,14 +16,14 @@ class EncapBCHK():
         H = hashlib.sha1()
 
     def setup(self):
-        pub = hashlib.md5()
+        pub = hashlib.sha256()
         return pub
 
     def S(self, pub):
         x = randomBits(448)
         x = str(x).zfill(135) 
 
-        r = hashlib.md5(x.encode('utf-8')).digest()
+        r = hashlib.sha256(x.encode('utf-8')).digest()
 
         com = hashlib.sha1(x.encode('utf-8')).digest()[:128]
 
@@ -35,7 +35,7 @@ class EncapBCHK():
         x = hashlib.sha1(str(dec).encode('utf-8')).digest()[:128]
         
         if(x == com):
-            m = hashlib.md5(str(dec).encode('utf-8')).digest()
+            m = hashlib.sha256(str(dec).encode('utf-8')).digest()
             return m
         else:
             return b'FALSE'
