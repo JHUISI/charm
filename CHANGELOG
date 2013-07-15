@@ -1,3 +1,16 @@
+
+v0.43 beta release (infrastructure changes) 
+-------------------------------------------
+- simplified benchmarking interface -- breaks compatibility and see docs
+- added new schemes (some external contributions from Nikos Fotiou, Fan Zhang, Hoeteck Wee)
+- added pre-computation optimization for group exponentiation in pairing-based modules -- see docs 
+- fixed several memory leaks and segmentation faults
+- switched from SHA1 to SHA2 for hashing operations
+- improved serialization -- now using JSON instead of Pickle (security vulnerability)
+- significant improvements to all base modules -- several fixes to integer and ecmodule functions
+- more robust Android build for Charm
+- significant fixes to 2.7 version of Charm
+
 v0.42 beta release (infrastructure changes)
 -------------------------------------------
 - Several bug fixes to base modules (mem leaks, interface issues): pairing (PBC & Miracl), ecc, and integer
