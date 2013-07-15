@@ -12,9 +12,6 @@ debug = False
 # Adapter class for Hybrid Encryption Schemes
 class HybridEnc(PKEnc):
     """
-#    >>> from charm.toolbox.eccurve import prime192v1
-#    >>> from charm.toolbox.ecgroup import ECGroup
-#    >>> from charm.schemes.pkenc.pkenc_cs98 import CS98
     >>> groupObj = ECGroup(prime192v1)
     >>> pkenc = CS98(groupObj)
     >>> hyenc = HybridEnc(pkenc)
@@ -43,7 +40,7 @@ class HybridEnc(PKEnc):
     
     def encrypt(self, pk, M):
         # generate a short session key, K and encrypt using pkenc
-        key = OpenSSLRand().getRandomBytes(self.key_len) # urandom(self.key_len)
+        key = OpenSSLRand().getRandomBytes(self.key_len) 
         # encrypt session key using PKEnc
         c1 = self.pkenc.encrypt(pk, key)
         # use symmetric key encryption to enc actual message
