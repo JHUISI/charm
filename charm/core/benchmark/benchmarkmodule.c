@@ -231,13 +231,13 @@ PyObject *Benchmark_print(Benchmark *self) {
 	if(self != NULL) {
 		PyObject *cpu = PyFloat_FromDouble(self->cpu_time_ms);
 		PyObject *real = PyFloat_FromDouble(self->real_time_ms);
-		PyObject *results = PyUnicode_FromFormat("<--- Results --->\nCPU Time:  %Sms\nReal Time: %Ss\nAdd:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
+		PyObject *results = _PyUnicode_FromFormat("<--- Results --->\nCPU Time:  %Sms\nReal Time: %Ss\nAdd:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
 								cpu, real, self->op_add, self->op_sub, self->op_mult, self->op_div, self->op_exp, self->op_pair);
 
 		PyClearBenchmark(self);
 		return results;
 	}
-	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
+	return _PyUnicode_FromString("Benchmark object has not been initialized properly.");
 }
 
 PyObject *GetResults(Benchmark *self) {
@@ -248,7 +248,7 @@ PyObject *GetResults(Benchmark *self) {
 						"Div", self->op_div, "Exp", self->op_exp);
 	}
 
-	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
+	return _PyUnicode_FromString("Benchmark object has not been initialized properly.");
 }
 
 PyObject *GetResultsWithPair(Benchmark *self) {
@@ -259,7 +259,7 @@ PyObject *GetResultsWithPair(Benchmark *self) {
 						"Div", self->op_div, "Exp", self->op_exp, "Pair", self->op_pair);
 	}
 
-	return PyUnicode_FromString("Benchmark object has not been initialized properly.");
+	return _PyUnicode_FromString("Benchmark object has not been initialized properly.");
 }
 
 

@@ -6,7 +6,7 @@ import string
 import sys
 
 py3 = False
-if sys.hexversion >= int(0x03000000):
+if float(sys.version[:3]) >= 3.0:
     py3 = True
 
 
@@ -40,4 +40,10 @@ class Bytes(bytes):
         return Bytes(bits)
         
 
+if py3:
+   def getBytes(arg1, arg2='utf-8'):
+       return Bytes(arg1, arg2)
+else:
+   def getBytes(arg1, arg2=None):
+       return bytes(arg1)
 # TODO: add left and right bit shifting

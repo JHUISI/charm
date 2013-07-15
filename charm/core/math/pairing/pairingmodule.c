@@ -603,7 +603,7 @@ int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 		if(short_val == Py_True) {
 			// type f curve
 			if(!PyLong_Check(n)) {
-				PyErr_SetString(ElementError, "n is expected to be short and an int or long type.");
+				PyErr_SetString(ElementError, "n is expected to be short and a long type.");
 				return -1;
 			}
 			long bits = PyLong_AsLong(n);
@@ -684,10 +684,16 @@ static PyObject *Element_elem(Element* self, PyObject* args)
 		EXIT_IF(TRUE, "unrecognized group type.");
 	}
 
-	if(long_obj != NULL && PyLong_Check(long_obj)) {
+	if(long_obj != NULL && _PyLong_Check(long_obj)) {
 		mpz_t m;
 		mpz_init(m);
+#if PY_MAJOR_VERSION < 3
+		PyObject *longObj2 = PyNumber_Long(long_obj);
+		longObjToMPZ(m, (PyLongObject *) longObj2);
+		Py_DECREF(longObj2);
+#else
 		longObjToMPZ(m, (PyLongObject *) long_obj);
+#endif
 		element_set_mpz(retObject->e, m);
 		mpz_clear(m);
 	}
@@ -1028,7 +1034,13 @@ static PyObject *Element_pow(PyObject *o1, PyObject *o2, PyObject *o3)
 			PyErr_Clear();
 			newObject = createNewElement(lhs_o1->element_type, lhs_o1->pairing);
 			mpz_init(n);
+#if PY_MAJOR_VERSION < 3
+			PyObject *longObj2 = PyNumber_Long(o2);
+			longObjToMPZ(n, (PyLongObject *) longObj2);
+			Py_DECREF(longObj2);
+#else
 			longObjToMPZ(n, (PyLongObject *) o2);
+#endif
 			if(lhs_o1->elem_initPP == TRUE) {
 				// n = g ^ e where g has been pre-processed
 				element_pp_pow(newObject->e, n, lhs_o1->e_pp);
