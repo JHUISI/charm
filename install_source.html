@@ -54,19 +54,15 @@
             
   <div class="section" id="platform-install-manual">
 <span id="id1"></span><h1>Platform Install Manual<a class="headerlink" href="#platform-install-manual" title="Permalink to this headline">¶</a></h1>
-<p>Charm has automated the installation process such that the end-user
-does not have to directly handle dependencies, linking, compiler flag setting.
-However, there is always the corner case in which an end-user is using a currently
-unsupported platform, and thus may need to build and install using a manual process.</p>
-<p>We would like to support you in this case, and have written this documentation to get
-you started on your path using Charm.  This installation file will contain some
-installation blocks highlighting each respective implementation.</p>
+<p>Charm has automated the installation process such that you
+do not have to directly handle dependencies, linking, and compiler flag settings. Note that these automated installers are available at our repository.
+However, in the event you are interested in building and installing from source, we have provided installation steps for a number of widely used platforms. If we missed your favorite OS, feel free to write up the instructions and email us at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a>.</p>
 <p>Before we begin, please note the current dependencies:</p>
 <ul class="simple">
 <li>Python2.7 or Python3</li>
 <li>Pyparsing <a class="reference external" href="http://pyparsing.wikispaces.com/">http://pyparsing.wikispaces.com/</a></li>
 <li>GMP 5.x <a class="reference external" href="http://gmplib.org/">http://gmplib.org/</a></li>
-<li>PBC <a class="reference external" href="http://crypto.stanford.edu/pbc/news.html">http://crypto.stanford.edu/pbc/news.html</a></li>
+<li>PBC (latest) <a class="reference external" href="http://crypto.stanford.edu/pbc/news.html">http://crypto.stanford.edu/pbc/news.html</a></li>
 <li>OPENSSL <a class="reference external" href="http://www.openssl.org/">http://www.openssl.org/</a></li>
 <li>(optional) MIRACL <a class="reference external" href="http://www.certivox.com/miracl/">http://www.certivox.com/miracl/</a>. See <a class="reference internal" href="miracl.html#charm-with-miracl"><em>Building MIRACL for Charm</em></a> if interested.</li>
 <li>(optional) RELIC <a class="reference external" href="https://code.google.com/p/relic-toolkit/">https://code.google.com/p/relic-toolkit/</a>. See <a class="reference internal" href="relic.html#charm-with-relic"><em>Building RELIC for Charm</em></a> if interested.</li>
@@ -83,9 +79,7 @@ installation blocks highlighting each respective implementation.</p>
 The steps for building in linux this way are:</p>
 <ul class="simple">
 <li>In a terminal, run <tt class="docutils literal"><span class="pre">configure.sh</span></tt></li>
-<li>The process will fail out at wget, and will ask you to install.</li>
-<li>Using your package manager of choice (e.g., <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">wget</span></tt>), install wget.</li>
-<li>With wget installed, run the configure.sh script again, and it should set up your Make dependencies for you.<ul>
+<li>Confirm that you have installed the dependencies above. Then, proceed as follows:<ul>
 <li><tt class="docutils literal"><span class="pre">make</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">make</span> <span class="pre">test</span></tt></li>
@@ -534,14 +528,10 @@ The steps for building in linux this way are:</p>
 </li>
 <li><p class="first">Run configure.sh as shown below.</p>
 </li>
-<li><p class="first">The process will fail out at wget, and open Internet Explorer to the wget download page.</p>
-</li>
-<li><p class="first">Install wget, and set it&#8217;s bin directory on your PATH.  To do this, right-click My Computer, Select Properties, Select Advanced System Settings, Select Advanced, Select Environment Variables, and than PATH.  Scroll to the end, and enter a ; followed by the absolute path to the bin directory (e.g., <tt class="docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files\etc</span></tt>).</p>
-</li>
 <li><dl class="first docutils">
-<dt>With wget installed, run the configure.sh script again, and it should set up your make dependencies for you.</dt>
-<dd><p class="first"><tt class="docutils literal"><span class="pre">Make</span> <span class="pre">build</span></tt></p>
-<p class="last"><tt class="docutils literal"><span class="pre">Make</span> <span class="pre">install</span></tt></p>
+<dt>Confirm that you have installed the dependencies above. Then, proceed as follows:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">make</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></p>
 </dd>
 </dl>
 </li>
@@ -584,11 +574,7 @@ make install</pre>
 <dd><ol class="first last arabic">
 <li><p class="first">In a terminal, run <tt class="docutils literal"><span class="pre">configure.sh</span></tt></p>
 </li>
-<li><p class="first">Make sure you have <tt class="docutils literal"><span class="pre">wget</span></tt> installed otherwise this process may fail at the <tt class="docutils literal"><span class="pre">wget</span></tt> check, and will ask you to install.</p>
-</li>
-<li><p class="first">Using your package manager of choice (e.g., <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">port</span> <span class="pre">install</span> <span class="pre">wget</span></tt>), install wget.</p>
-</li>
-<li><p class="first">With wget installed, run the <tt class="docutils literal"><span class="pre">configure.sh</span></tt> script again, and it should set up your make dependencies for you.</p>
+<li><p class="first">Confirm that you have installed the dependencies above.</p>
 </li>
 <li><dl class="first docutils">
 <dt>The next steps may require super user privileges so prepend a <tt class="docutils literal"><span class="pre">sudo</span></tt> to each command:</dt>
