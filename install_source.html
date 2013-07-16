@@ -82,12 +82,13 @@ installation blocks highlighting each respective implementation.</p>
 <p>Note that the entire compilation process is supported by the Charm configure/make scripts.
 The steps for building in linux this way are:</p>
 <ul class="simple">
-<li>In a terminal, run configure.sh</li>
+<li>In a terminal, run <tt class="docutils literal"><span class="pre">configure.sh</span></tt></li>
 <li>The process will fail out at wget, and will ask you to install.</li>
 <li>Using your package manager of choice (e.g., <tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">wget</span></tt>), install wget.</li>
 <li>With wget installed, run the configure.sh script again, and it should set up your Make dependencies for you.<ul>
 <li><tt class="docutils literal"><span class="pre">make</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">make</span> <span class="pre">test</span></tt></li>
 </ul>
 </li>
 </ul>
@@ -592,7 +593,8 @@ make install</pre>
 <li><dl class="first docutils">
 <dt>The next steps may require super user privileges so prepend a <tt class="docutils literal"><span class="pre">sudo</span></tt> to each command:</dt>
 <dd><p class="first"><tt class="docutils literal"><span class="pre">make</span></tt></p>
-<p class="last"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">test</span></tt></p>
 </dd>
 </dl>
 </li>
@@ -630,7 +632,8 @@ make install</pre>
 <li><dl class="first docutils">
 <dt>The next steps may require super user privileges so prepend a <tt class="docutils literal"><span class="pre">sudo</span></tt> to each command:</dt>
 <dd><p class="first"><tt class="docutils literal"><span class="pre">make</span></tt></p>
-<p class="last"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt></p>
+<p class="last"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">test</span></tt></p>
 </dd>
 </dl>
 </li>

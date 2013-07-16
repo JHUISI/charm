@@ -41,7 +41,7 @@ Building On Linux
 Note that the entire compilation process is supported by the Charm configure/make scripts.
 The steps for building in linux this way are:
 
-- In a terminal, run configure.sh
+- In a terminal, run ``configure.sh``
 
 - The process will fail out at wget, and will ask you to install.
 
@@ -52,6 +52,8 @@ The steps for building in linux this way are:
   - ``make``
 
   - ``make install``
+
+  - ``make test``
 
 .. note::
 	Another way to install dependencies is to use your package manager of choice.
@@ -341,6 +343,7 @@ Note that the entire compilation process is supported by the Charm configure/mak
 
        		``make install``
 
+		``make test``
 .. note::
 	Another way to install dependencies is to use ``macports`` or ``fink``.
 
@@ -366,3 +369,5 @@ In Lion, Apple has made the decision to deprecate the openssl library in favor o
       		``make`` 
 
        		``make install``
+
+		``make test``
