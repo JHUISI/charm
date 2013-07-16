@@ -1,15 +1,15 @@
 For Cryptographers
 =======================
 
-Interested in implementing your cryptographic scheme in Charm? Here's a guide to navigate our framework to implement your cryptosystem. The following describes several aspects of developing cryptographic algorithms in Charm.
+Interested in implementing your cryptographic scheme in Charm? Here's a guide to navigate our framework to implement your cryptosystem: 
 
 Group Abstractions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We begin with the first stage of new scheme development which is selecting the appropriate group to instantiate a scheme. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking: 
+The first stage of new scheme development is selecting the appropriate group to instantiate a scheme. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking: 
 
-At the moment, there are three cryptographic settings covered by Charm: ``integergroups``, ``ecgroups``, and ``pairinggroups``. 
-To initialize a group in the elliptic curve (EC) setting, refer to the ``toolbox.eccurve`` for the full set of identifiers and supported NIST approved curves (e.g., ``prime192v1``). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric type of curves. For example, the ``'SS512'`` represents a symmetric curve with a 512-bit base field and ``'MNT159'`` represents an asymmetric curve with 159-bit base field.
+At the moment, there are three cryptographic settings covered by Charm (will be expanded in the future): ``integergroups``, ``ecgroups``, and ``pairinggroups``. 
+To initialize a group in the elliptic curve (EC) setting, refer to the ``toolbox.eccurve`` for the full set of identifiers and supported NIST approved curves (e.g., ``prime192v1``). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric type of curves. For example, the ``'SS512'`` represents a symmetric curve with a 512-bit base field and ``'MNT159'`` represents an asymmetric curve with 159-bit base field. Note that these curves are of prime order.
 Finally, for integer groups, typically defining large primes ``p`` and ``q`` is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., ``p = 2q + 1``). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):
 
 ::
@@ -46,19 +46,19 @@ Typical implementations follow an object-oriented model such that an implementat
 	     	 global group
 	     	 group = ECGroup(curve)
 	        		
-Before we get started, it is important to understand that in our toolbox each cryptographic setting has a corresponding group abstraction such as elliptic curve group or ``ECGroup``, pairing group or ``PairingGroup``, and integer groups or ``IntegerGroup``. This abstraction provides a simple interface for selecting group parameters, performing group operations, and etc. See the :ref:`toolbox` documentation for more details.
+Before we get started, it is important to understand that in our toolbox each cryptographic setting has a corresponding group abstraction such as elliptic curve group or ``ECGroup``, pairing group or ``PairingGroup``, and integer groups or ``IntegerGroup``. These abstractions provide a convenient and simple interface for selecting group parameters, performing group operations, and even benchmarking. See the :ref:`toolbox` documentation for more details.
 
 Thus, at the beginning of the scheme, you must import the corresponding group setting in which the cryptographic scheme will be implemented
 ::
 	
 	from charm.toolbox.ecgroup import ECGroup
 
-Next, let's explain what goes on during class initialization. During ``__init__``, you define the basic security properties of the ``PKEnc`` scheme and in this case accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as ``self.group = ECGroup(curve)``.
+Next, let's explain what goes on during class initialization. During ``__init__``, we define the basic security properties of the ``PKEnc`` scheme and in this case, accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, define group as ``self.group = ECGroup(curve)``.
 
 .. note::
-	Also, the ``init`` routine arguments can vary depending on the scheme and group setting. What is shown above is only an example and see other schemes we have implemented for other possibilities.
+	Also, the ``init`` routine arguments can vary depending on the scheme and group setting. What is shown above is only an example and see other schemes we have implemented for full list of possibilities.
 
-We describe the first algorithm in the paper, ``keygen``. Keygen only accepts a security parameter and generates the public and private keys and returns to the user. The paper description is as follows:
+Let's take a look at the first algorithm in the paper, ``keygen``. Keygen only accepts a security parameter, generates the public and private keys and returns them the user. The paper description is as follows:
 
 .. math:: g_1, g_2 \in G
    :label: keygen1
@@ -75,7 +75,7 @@ We describe the first algorithm in the paper, ``keygen``. Keygen only accepts a 
 .. math:: sk = (x_1, x_2, y_1, y_2, z)
    :label: sk
 
-Random elements :eq:`keygen1` are chosen and random elements :eq:`keygen2` are also chosen. Next, the group elements :eq:`keygen3` are computed. Select a hash function H from the family of universal one-way hash functions. The public key is defined by :eq:`pk` and the private key is defined by :eq:`sk`. Below is the Charm ``keygen`` function defined in the ``CS98`` class:
+Group elements :eq:`keygen1` and :eq:`keygen2` are selected at random. Next, the group elements :eq:`keygen3` are computed. Then, select a hash function H from the family of universal one-way hash functions. The public key is defined by :eq:`pk` and the private key is defined by :eq:`sk`. Below is the Charm ``keygen`` function defined in the ``CS98`` class:
 
 ::
 
@@ -99,7 +99,7 @@ Random elements :eq:`keygen1` are chosen and random elements :eq:`keygen2` are a
 .. math:: (u_1, u_2, e, v)
    :label: ciphertext
 
-We now describe the encrypt routine as described by the paper. Given a message in G, the encryption algorithm first selects a random integer r :eq:`prelim`, then computes :eq:`encrypt` and returns the ciphertext as :eq:`ciphertext`. The ``encrypt`` algorithm defined in Charm:
+Let's take a look at the encrypt routine as described in the paper. Given a message in G, the encryption algorithm first selects a random integer r :eq:`prelim`, then computes :eq:`encrypt` and returns the ciphertext as :eq:`ciphertext`. The ``encrypt`` algorithm defined in Charm:
 
 ::
 
@@ -122,7 +122,7 @@ We now describe the encrypt routine as described by the paper. Given a message i
 .. math:: m = e / {u_1}^z
    :label: decrypt3
 
-Finally, the decryption routine as described by the paper. Given a ciphertext, the decryption algorithm runs as follows and first computes :eq:`decrypt1`, and tests if :eq:`decrypt2` condition holds, and if so outputs :eq:`decrypt3` otherwise "reject". The ``decrypt`` algorithm defined in Charm:
+Finally, the decryption routine as described in the paper. Given a ciphertext, the decryption algorithm runs as follows and first computes :eq:`decrypt1`, and tests if :eq:`decrypt2` condition holds, and if so outputs :eq:`decrypt3` otherwise "reject". The ``decrypt`` algorithm defined in Charm:
 ::
 
 	def decrypt(self, pk, sk, c):
@@ -134,19 +134,20 @@ Finally, the decryption routine as described by the paper. Given a ciphertext, t
 	    return group.decode(c['e'] / (c['u1'] ** sk['z'])) 
 
 .. note::
-   Since the scheme defines messages as a group element, it is important to use the encode/decode methods to convert the message string into a member of the group, ``G``. This encoding function makes cryptographic schemes practical for handling real messages. However, the pairing group does not currently implement the routines for encoding/decoding messages as group elements. Other techniques are used for pairings to provide the ability to convert from/to different message spaces.
+   Since the scheme defines messages as a group element, it is important to use the encode/decode methods to convert the message string into a member of the group, ``G``. This encoding function makes cryptographic schemes practical for handling real messages. However, the pairing group does not currently implement such routines for encoding/decoding messages as group elements. This is on purpose given the difficulty and risks associated with implementing such encoding algorithms in pairing groups. Other techniques are used for pairings to provide the ability to convert from/to different message spaces.
 
 For more examples, see the ``schemes`` package that is included in each Charm release.
+
 
 Reusable Tools 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Perhaps you are developing a new scheme that relies on existing building blocks such as block ciphers, hash functions, secret sharing and etc, do not reinvent the wheel! Charm was designed with reusability in mind and to aid cryptographers in easily composing their schemes based on existing constructions. Charm has a growing toolbox of reusable components that might simplify your scheme development. If the component you are looking for does not exist in Charm, then once you implement it consider contributing it back to the project for others to leverage. The end goal is to come up with a comprehensive toolbox that all can reuse. See the :ref:`toolbox` section for a detailed list. 
+Perhaps, you are developing a new scheme that relies on existing building blocks such as block ciphers, hash functions, secret sharing and etc -- do not reinvent the wheel! Charm was designed with reusability in mind and to aid cryptographers in easily composing schemes based on existing constructions. Charm has a growing toolbox of reusable components that might simplify your scheme development. If the component you are looking for does not exist in Charm, then once you implement it consider contributing it back to the project for others to leverage. The end goal is to come up with a comprehensive toolbox that all can reuse. See the :ref:`toolbox` section for a detailed list. 
 
 Testing & Benchmarking
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Once you have implemented your scheme, the next step is to test and benchmark. There are two possible approaches: either define a test routine that executes the algorithms in your scheme via test vectors if they exist and/or embedding the test routine as a docstring in your scheme's class definition. See examples in the ``schemes`` package.
+Once you have implemented your scheme, you might be interested in testing correctness and measuring its efficiency. There are two possible approaches: either define a test routine that executes the algorithms in your scheme via test vectors if they exist and/or embedding the test routine as a docstring in your scheme's class definition. Docstrings are tests that can be executed directly as follows: ``python -m doctest myScheme.py``. See examples in the ``schemes`` package.
 
 There are several benchmark flags you should be aware of such as: ``RealTime``, ``CpuTime``, ``Add``, ``Sub``, ``Mul``, ``Div``, and ``Exp``. Here is an example to demonstrate use of the Charm benchmark interface for the EC setting:
 
@@ -209,7 +210,7 @@ Note that thesame benchmark function calls work for the other group settings as 
 	print("G1 mul   := ", granDict["Mul"][G1])	
 	print("G2 exp   := ", granDict["Exp"][G2])
 
-In the integer module we provide additional support for benchmarking without a group object:
+In the integer module, we provide additional support for benchmarking without a group object:
 
 ::
 	
@@ -230,4 +231,37 @@ In the integer module we provide additional support for benchmarking without a g
 
 
 
+Optimizations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the pairing base module, we now support pre-computation tables for group exponentiation. Note that this speeds up exponentiation signifcantly. To take advantage of this, simply call the ``initPP()`` method on a given pairing object in ``G1``, ``G2``, or ``GT``. ``initPP()`` stores the pre-computed values for the given generator and any use of that variable in an exponentiation operation will automatically utilize the table. See how long it takes to compute 10 exponentiations with & without pre-computation:
+
+::
+
+	from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+
+	count = 10	
+	group = PairingGroup("MNT224")	
+	g = group.random(GT)
+	assert g.initPP(), "failed to init pre-computation table"
+	h = group.random(GT)
+	a, b = group.random(ZR, 2)
+	
+	assert group.InitBenchmark(), "failed to initialize benchmark"
+	group.StartBenchmark(["RealTime"])
+	for i in range(count):
+	    A = g ** a
+	group.EndBenchmark()
+	print("With PP: ", group.GetBenchmark("RealTime"))
+
+	assert group.InitBenchmark(), "failed to initialize benchmark"
+	group.StartBenchmark(["RealTime"])
+	for i in range(count):
+	    B = h ** b
+	group.EndBenchmark()
+	print("Without: ", group.GetBenchmark("RealTime"))
+	
+
+
 Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com.
+

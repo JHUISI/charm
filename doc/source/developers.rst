@@ -1,5 +1,6 @@
 For App Developers
 ====================================
+
 Installation and dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 See :ref:`platform-install-manual` for installation instructions.
@@ -22,7 +23,7 @@ To use any of our existing schemes in your application, each scheme includes a `
 	M = b'Hello World!'	
 	ciphertext = pkenc.encrypt(pk, M)    
 
-    	message = pkenc.decrypt(pk, sk, ciphertext)
+	message = pkenc.decrypt(pk, sk, ciphertext)
 
 For a full list of schemes that are available to you, see the :ref:`schemes` section.
 
@@ -87,7 +88,7 @@ To make Charm easy to use conveniently with C/C++ applications, we have provided
 	InitializeCharm();	
 
 	/* initialize a group object */
-	group = InitPairingGroup("SS512");
+	group = InitPairingGroup("SS1024");
 
 	/* initialize a scheme */
 	class = InitClass("abenc_bsw07", "CPabe_BSW07", group);
@@ -123,6 +124,6 @@ To make Charm easy to use conveniently with C/C++ applications, we have provided
 	CleanupCharm();
 	....
 
-The rest of the example can be found in ``test.c`` in the ``embed`` dir of Charm repository on github. 
+The rest of the example can be found in ``test.c`` in the ``embed`` dir of Charm source.
 	
 Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com.

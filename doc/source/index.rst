@@ -1,18 +1,16 @@
-.. Charm-Crypto documentation master file, created by
-   sphinx-quickstart on Wed Jul 20 14:42:25 2011.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. Charm-Crypto documentation master file
 
-Charm-Crypto docs
+Charm-Crypto Docs!
 ========================================
-.. sectionauthor:: My Name
+.. sectionauthor:: J. Ayo Akinyele
+Welcome! This is the documenation for the Charm-Crypto framework. Please contact us at support@charm-crypto.com, if you have any questions and/or comments.
 
 Users:
 
 .. toctree::
    :maxdepth: 1
    
-   quick_start
+   updates
    install_source 
    mobile
 
@@ -40,7 +38,7 @@ Our Toolbox
    toolbox
    test_toolbox
 
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`

@@ -24,7 +24,7 @@ Before we begin, please note the current dependencies:
 
 - OPENSSL http://www.openssl.org/
 
-- (optional) MIRACL http://www.shamus.ie/. See :ref:`charm-with-miracl` if interested. 
+- (optional) MIRACL http://www.certivox.com/miracl/. See :ref:`charm-with-miracl` if interested. 
 
 - (optional) RELIC https://code.google.com/p/relic-toolkit/. See :ref:`charm-with-relic` if interested.
 
