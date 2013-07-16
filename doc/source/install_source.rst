@@ -3,14 +3,9 @@
 Platform Install Manual 
 ===========================================
 
-Charm has automated the installation process such that the end-user
-does not have to directly handle dependencies, linking, compiler flag setting.
-However, there is always the corner case in which an end-user is using a currently
-unsupported platform, and thus may need to build and install using a manual process.
-
-We would like to support you in this case, and have written this documentation to get
-you started on your path using Charm.  This installation file will contain some
-installation blocks highlighting each respective implementation.
+Charm has automated the installation process such that you
+do not have to directly handle dependencies, linking, and compiler flag settings. Note that these automated installers are available at our repository. 
+However, in the event you are interested in building and installing from source, we have provided installation steps for a number of widely used platforms. If we missed your favorite OS, feel free to write up the instructions and email us at support@charm-crypto.com. 
 
 Before we begin, please note the current dependencies:
 
@@ -20,7 +15,7 @@ Before we begin, please note the current dependencies:
 
 - GMP 5.x http://gmplib.org/ 
 
-- PBC http://crypto.stanford.edu/pbc/news.html
+- PBC (latest) http://crypto.stanford.edu/pbc/news.html
 
 - OPENSSL http://www.openssl.org/
 
@@ -41,17 +36,15 @@ Building On Linux
 Note that the entire compilation process is supported by the Charm configure/make scripts.
 The steps for building in linux this way are:
 
-- In a terminal, run configure.sh
+- In a terminal, run ``configure.sh``
 
-- The process will fail out at wget, and will ask you to install.
-
-- Using your package manager of choice (e.g., ``sudo apt-get install wget``), install wget.
-
-- With wget installed, run the configure.sh script again, and it should set up your Make dependencies for you.
+- Confirm that you have installed the dependencies above. Then, proceed as follows:
 
   - ``make``
 
   - ``make install``
+
+  - ``make test``
 
 .. note::
 	Another way to install dependencies is to use your package manager of choice.
@@ -282,12 +275,10 @@ Note that the entire compilation process is now supported by the Charm configure
     	3. Extract openssl, configure and install as shown below.
 	4. Extract Charm, and navigate to the top directory.
         5. Run configure.sh as shown below.
-        6. The process will fail out at wget, and open Internet Explorer to the wget download page.
-        7. Install wget, and set it's bin directory on your PATH.  To do this, right-click My Computer, Select Properties, Select Advanced System Settings, Select Advanced, Select Environment Variables, and than PATH.  Scroll to the end, and enter a ; followed by the absolute path to the bin directory (e.g., ``C:\Program Files\etc``).
-        8. With wget installed, run the configure.sh script again, and it should set up your make dependencies for you.
-    	    ``Make build``
+	6. Confirm that you have installed the dependencies above. Then, proceed as follows:
+    	    ``make``
 
-            ``Make install``
+            ``make install``
 
 .. note::
 	Another way to install dependencies is to follow the Windows blocks below.
@@ -333,14 +324,13 @@ Leopard v10.6
 -------------------------------------
 Note that the entire compilation process is supported by the Charm configure/make scripts. The steps for building in os x this way are:
     1. In a terminal, run ``configure.sh``
-    2. Make sure you have ``wget`` installed otherwise this process may fail at the ``wget`` check, and will ask you to install.
-    3. Using your package manager of choice (e.g., ``sudo port install wget``), install wget.
-    4. With wget installed, run the ``configure.sh`` script again, and it should set up your make dependencies for you.
-    5. The next steps may require super user privileges so prepend a ``sudo`` to each command:
+    2. Confirm that you have installed the dependencies above. 
+    3. The next steps may require super user privileges so prepend a ``sudo`` to each command:
 		``make`` 
 
        		``make install``
 
+		``make test``
 .. note::
 	Another way to install dependencies is to use ``macports`` or ``fink``.
 
@@ -366,3 +356,5 @@ In Lion, Apple has made the decision to deprecate the openssl library in favor o
       		``make`` 
 
        		``make install``
+
+		``make test``
