@@ -24,12 +24,18 @@ If you're using Charm to implement schemes, we want to know what your experience
 
 Quick Install & Test
 ====================
-Installing Charm is straightforward. First, verify that you have installed the GMP 5.x, PBC and Openssl. After that, you may proceed to install a basic configuration of Charm as follows:
-* `./configure.sh` (include --enable-darwin if on a Mac)
+Installing Charm from source is straightforward. First, verify that you have installed the following dependencies:
+* [GMP 5.x](http://gmplib.org/)
+* [PBC](http://crypto.stanford.edu/pbc/download.html) 
+* [OPENSSL](http://www.openssl.org/source/)
+
+After that, you may proceed to install a basic configuration of Charm as follows:
+
+* `./configure.sh` (include `--enable-darwin` if running Mac OS X)
 * `make install` (may require super-user privileges)
 * `make test` (may also require super-user privileges)
 
-If most (or all) Python tests pass, then Charm has been successfully installed.
+If most (or all) Python tests pass, then the Charm installation was successful. Enjoy!
 
  
 
