@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>IBSig &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="integergroup" href="integergroup.html" />
+    <link rel="prev" title="IBEnc" href="IBEnc.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="integergroup.html" title="integergroup"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="IBEnc.html" title="IBEnc"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-IBSig">
+<span id="ibsig"></span><h1>IBSig<a class="headerlink" href="#module-IBSig" title="Permalink to this headline">¶</a></h1>
+<p>Base class for identity-based signatures</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Notes: This class implements an interface for a standard identity-based signatures scheme.</dt>
+<dd>Identity-based signatures consists of four algorithms: (setup, keygen, sign and verify).</dd>
+</dl>
+</div></blockquote>
+<dl class="class">
+<dt id="IBSig.IBSig">
+<em class="property">class </em><tt class="descclassname">IBSig.</tt><tt class="descname">IBSig</tt><a class="reference internal" href="../_modules/IBSig.html#IBSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.schemebase.SchemeBase</span></tt></p>
+<dl class="method">
+<dt id="IBSig.IBSig.checkProperty">
+<tt class="descname">checkProperty</tt><big>(</big><em>schemeObj</em>, <em>_reqProps</em><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.checkProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.checkProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="IBSig.IBSig.getProperty">
+<tt class="descname">getProperty</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.getProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.getProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="IBSig.IBSig.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>msk</em>, <em>ID</em><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="IBSig.IBSig.printProperties">
+<tt class="descname">printProperties</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.printProperties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.printProperties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="IBSig.IBSig.setProperty">
+<tt class="descname">setProperty</tt><big>(</big><em>secDef=None</em>, <em>assumption=None</em>, <em>messageSpace=None</em>, <em>secModel=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.setProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.setProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="IBSig.IBSig.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="IBSig.IBSig.sign">
+<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>M</em><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="IBSig.IBSig.updateProperty">
+<tt class="descname">updateProperty</tt><big>(</big><em>scheme</em>, <em>secDef=None</em>, <em>assumption=None</em>, <em>messageSpace=None</em>, <em>secModel=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.updateProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.updateProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="IBSig.IBSig.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>M</em>, <em>sig</em><big>)</big><a class="reference internal" href="../_modules/IBSig.html#IBSig.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#IBSig.IBSig.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="IBEnc.html"
+                        title="previous chapter">IBEnc</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="integergroup.html"
+                        title="next chapter">integergroup</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/IBSig.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="integergroup.html" title="integergroup"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="IBEnc.html" title="IBEnc"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

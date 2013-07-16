@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>chamhash_rsa_hw09 &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>chamhash_rsa_hw09 &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -71,7 +69,7 @@
 <span class="kn">from</span> <span class="nn">charm.toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
 
 <span class="n">debug</span><span class="o">=</span><span class="bp">False</span>
-<div class="viewcode-block" id="ChamHash_HW09"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09">[docs]</a><span class="k">class</span> <span class="nc">ChamHash_HW09</span><span class="p">(</span><span class="n">ChamHash</span><span class="p">):</span>
+<div class="viewcode-block" id="ChamHash_HW09"><a class="viewcode-back" href="../charm/schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09">[docs]</a><span class="k">class</span> <span class="nc">ChamHash_HW09</span><span class="p">(</span><span class="n">ChamHash</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; from charm.core.math.integer import integer</span>
 <span class="sd">    &gt;&gt;&gt; p = integer(164960892556379843852747960442703555069442262500242170785496141408191025653791149960117681934982863436763270287998062485836533436731979391762052869620652382502450810563192532079839617163226459506619269739544815249458016088505187490329968102214003929285843634017082702266003694786919671197914296386150563930299)</span>
@@ -88,7 +86,7 @@
         <span class="k">global</span> <span class="n">group</span>
         <span class="n">group</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     
-<div class="viewcode-block" id="ChamHash_HW09.paramgen"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="ChamHash_HW09.paramgen"><a class="viewcode-back" href="../charm/schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="c"># If we&#39;re given p, q, compute N = p*q.  Otherwise select random p, q</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">N</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
@@ -108,7 +106,7 @@
         <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;p&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span> <span class="p">}</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
           </div>
-<div class="viewcode-block" id="ChamHash_HW09.hash"><a class="viewcode-back" href="../schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09.hash">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="ChamHash_HW09.hash"><a class="viewcode-back" href="../charm/schemes/chamhash_rsa_hw09.html#chamhash_rsa_hw09.ChamHash_HW09.hash">[docs]</a>    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="n">N</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;J&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
            <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
@@ -148,14 +146,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

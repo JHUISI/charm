@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pk_hve08 &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
+    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
+    <link rel="next" title="pksig_bls04" href="../pksig/pksig_bls04.html" />
+    <link rel="prev" title="dfa_fe12" href="dfa_fe12.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_bls04.html" title="pksig_bls04"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dfa_fe12.html" title="dfa_fe12"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pk_hve08">
+<span id="pk-hve08"></span><h1>pk_hve08<a class="headerlink" href="#module-pk_hve08" title="Permalink to this headline">¶</a></h1>
+<p>Vincenzo Iovino, Giuseppe Persiano (Pairing-based)</p>
+<div class="line-block">
+<div class="line">From: &#8220;Hidden-Vector Encryption with Groups of Prime Order&#8221;</div>
+<div class="line">Published in: Pairing 2008</div>
+<div class="line">Available from: <a class="reference external" href="http://dl.acm.org/citation.cfm?id=1431889">http://dl.acm.org/citation.cfm?id=1431889</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:        predicate encryption (public key)</li>
+<li>setting:     Pairing</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Matthew W. Pagano</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">12/2012</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pk_hve08.HVE08">
+<em class="property">class </em><tt class="descclassname">pk_hve08.</tt><tt class="descname">HVE08</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../../_modules/pk_hve08.html#HVE08"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_hve08.HVE08" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="pk_hve08.HVE08.decrypt">
+<tt class="descname">decrypt</tt><big>(</big><em>CT</em>, <em>sk</em><big>)</big><a class="reference internal" href="../../../_modules/pk_hve08.html#HVE08.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_hve08.HVE08.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pk_hve08.HVE08.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>M</em>, <em>xVector</em>, <em>pk</em><big>)</big><a class="reference internal" href="../../../_modules/pk_hve08.html#HVE08.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_hve08.HVE08.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pk_hve08.HVE08.keygen">
+<tt class="descname">keygen</tt><big>(</big><em>pk</em>, <em>msk</em>, <em>yVector</em><big>)</big><a class="reference internal" href="../../../_modules/pk_hve08.html#HVE08.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_hve08.HVE08.keygen" title="Permalink to this definition">¶</a></dt>
+<dd><p>yVector: expects binary attributes of 0 or 1 and &#8220;dont care&#8221; attriute is represented by the value 2.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pk_hve08.HVE08.setup">
+<tt class="descname">setup</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="../../../_modules/pk_hve08.html#HVE08.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_hve08.HVE08.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pk_hve08.main">
+<tt class="descclassname">pk_hve08.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pk_hve08.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_hve08.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="dfa_fe12.html"
+                        title="previous chapter">dfa_fe12</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../pksig/pksig_bls04.html"
+                        title="next chapter">pksig_bls04</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/charm/schemes/abenc/pk_hve08.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../pksig/pksig_bls04.html" title="pksig_bls04"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dfa_fe12.html" title="dfa_fe12"
+             >previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ecgroup &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>ecgroup &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
     <link rel="next" title="enum" href="enum.html" />
     <link rel="prev" title="eccurve" href="eccurve.html" /> 
@@ -46,7 +44,7 @@
         <li class="right" >
           <a href="eccurve.html" title="eccurve"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -63,14 +61,54 @@
 <em class="property">class </em><tt class="descclassname">ecgroup.</tt><tt class="descname">ECGroup</tt><big>(</big><em>builtin_cv</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <dl class="method">
+<dt id="ecgroup.ECGroup.EndBenchmark">
+<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>ends an ongoing benchmark</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.GetBenchmark">
+<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark results for any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.GetGeneralBenchmarks">
+<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark count for all group operations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.GetGranularBenchmarks">
+<tt class="descname">GetGranularBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetGranularBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetGranularBenchmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves group operation count per type: ZR and G</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.InitBenchmark">
+<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>initiates the benchmark state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ecgroup.ECGroup.StartBenchmark">
+<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>starts the benchmark with any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="ecgroup.ECGroup.bitsize">
 <tt class="descname">bitsize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.bitsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.bitsize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>returns the bitsize for encoding messages in the group</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.coordinates">
 <tt class="descname">coordinates</tt><big>(</big><em>point</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.coordinates" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get the X and Y coordinates of an EC point</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.debug">
@@ -80,17 +118,20 @@
 <dl class="method">
 <dt id="ecgroup.ECGroup.decode">
 <tt class="descname">decode</tt><big>(</big><em>msg_bytes</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.decode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>decode a group element into a string</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.deserialize">
 <tt class="descname">deserialize</tt><big>(</big><em>bytes_object</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.deserialize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>deserializes into a pairing object</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.encode">
 <tt class="descname">encode</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.encode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>encode arbitrary string as a group element. Max size is dependent on the EC group order</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.groupSetting">
@@ -104,18 +145,21 @@
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.hash">
-<tt class="descname">hash</tt><big>(</big><em>args</em>, <em>_type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.hash" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">hash</tt><big>(</big><em>args</em>, <em>target_type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>hashes objects into ZR or G</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.init">
 <tt class="descname">init</tt><big>(</big><em>_type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>initializes an object with a specified type and value</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.order">
 <tt class="descname">order</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.order" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>returns the order of the group</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.paramgen">
@@ -125,17 +169,20 @@
 <dl class="method">
 <dt id="ecgroup.ECGroup.random">
 <tt class="descname">random</tt><big>(</big><em>_type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.random" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>selects a random element in ZR or G</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.serialize">
 <tt class="descname">serialize</tt><big>(</big><em>object</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.serialize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>serializes a pairing object into bytes</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.zr">
 <tt class="descname">zr</tt><big>(</big><em>point</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.zr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.zr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>get the X coordinate only</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -190,14 +237,14 @@
         <li class="right" >
           <a href="eccurve.html" title="eccurve"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Jul 04, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

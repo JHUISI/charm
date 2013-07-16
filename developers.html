@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>For App Developers &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>For App Developers &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '0.42b',
+        URL_ROOT:    './',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,8 +23,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="index.html" />
-    <link rel="next" title="Charm for Android" href="mobile.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" />
+    <link rel="next" title="Implemented Schemes" href="schemes.html" />
     <link rel="prev" title="For Cryptographers" href="cryptographers.html" /> 
   </head>
   <body>
@@ -40,12 +38,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="mobile.html" title="Charm for Android"
+          <a href="schemes.html" title="Implemented Schemes"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="cryptographers.html" title="For Cryptographers"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -78,7 +76,7 @@
 <span class="n">message</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>For a full list of schemes that are available to you, see the <a class="reference internal" href="schemes.html#schemes"><em>Demonstration Schemes</em></a> section.</p>
+<p>For a full list of schemes that are available to you, see the <a class="reference internal" href="schemes.html#schemes"><em>Implemented Schemes</em></a> section.</p>
 </div>
 <div class="section" id="using-serialization-api">
 <h2>Using serialization API<a class="headerlink" href="#using-serialization-api" title="Permalink to this headline">¶</a></h2>
@@ -129,7 +127,7 @@ Charm_t *module, *group, *class;
 InitializeCharm();
 
 /* initialize a group object */
-group = InitPairingGroup(&quot;SS512&quot;);
+group = InitPairingGroup(&quot;SS1024&quot;);
 
 /* initialize a scheme */
 class = InitClass(&quot;abenc_bsw07&quot;, &quot;CPabe_BSW07&quot;, group);
@@ -165,7 +163,7 @@ Free(msg2);
 CleanupCharm();
 ....</pre>
 </div>
-<p>The rest of the example can be found in <tt class="docutils literal"><span class="pre">test.c</span></tt> in the <tt class="docutils literal"><span class="pre">embed</span></tt> dir of Charm repository on github.</p>
+<p>The rest of the example can be found in <tt class="docutils literal"><span class="pre">test.c</span></tt> in the <tt class="docutils literal"><span class="pre">embed</span></tt> dir of Charm source.</p>
 <p>Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a>.</p>
 </div>
 </div>
@@ -191,8 +189,8 @@ CleanupCharm();
   <p class="topless"><a href="cryptographers.html"
                         title="previous chapter">For Cryptographers</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="mobile.html"
-                        title="next chapter">Charm for Android</a></p>
+  <p class="topless"><a href="schemes.html"
+                        title="next chapter">Implemented Schemes</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/developers.txt"
@@ -225,18 +223,18 @@ CleanupCharm();
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="mobile.html" title="Charm for Android"
+          <a href="schemes.html" title="Implemented Schemes"
              >next</a> |</li>
         <li class="right" >
           <a href="cryptographers.html" title="For Cryptographers"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

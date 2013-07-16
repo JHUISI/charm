@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_boyen &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>pksig_boyen &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +23,10 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../../../index.html" />
-    <link rel="up" title="Demonstration Schemes" href="../../../schemes.html" />
-    <link rel="next" title="pksig_chch" href="../pksig/pksig_chch.html" />
-    <link rel="prev" title="pksig_bls04" href="../pksig/pksig_bls04.html" /> 
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
+    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
+    <link rel="next" title="pksig_boyen_mod" href="pksig_boyen_mod.html" />
+    <link rel="prev" title="pksig_bls04" href="pksig_bls04.html" /> 
   </head>
   <body>
     <div class="related">
@@ -41,13 +39,13 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../pksig/pksig_chch.html" title="pksig_chch"
+          <a href="pksig_boyen_mod.html" title="pksig_boyen_mod"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../pksig/pksig_bls04.html" title="pksig_bls04"
+          <a href="pksig_bls04.html" title="pksig_bls04"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" accesskey="U">Demonstration Schemes</a> &raquo;</li> 
+        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -100,7 +98,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">secret_keys</span><span class="p">[</span><span class="n">signer</span><span class="p">]</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;please sign this new message!&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">boyen</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">public_keys</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">boyen</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">signer</span><span class="p">,</span> <span class="n">master_public_key</span><span class="p">,</span> <span class="n">public_keys</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">boyen</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">public_keys</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span> 
 <span class="go">True</span>
 </pre></div>
@@ -122,7 +120,7 @@
 
 <dl class="method">
 <dt id="pksig_boyen.Boyen.sign">
-<tt class="descname">sign</tt><big>(</big><em>mpk</em>, <em>pk</em>, <em>sk</em>, <em>M</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_boyen.html#Boyen.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.Boyen.sign" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">sign</tt><big>(</big><em>index</em>, <em>mpk</em>, <em>pk</em>, <em>sk</em>, <em>M</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_boyen.html#Boyen.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_boyen.Boyen.sign" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -146,11 +144,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../pksig/pksig_bls04.html"
+  <p class="topless"><a href="pksig_bls04.html"
                         title="previous chapter">pksig_bls04</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../pksig/pksig_chch.html"
-                        title="next chapter">pksig_chch</a></p>
+  <p class="topless"><a href="pksig_boyen_mod.html"
+                        title="next chapter">pksig_boyen_mod</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../../../_sources/charm/schemes/pksig/pksig_boyen.txt"
@@ -183,19 +181,19 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../pksig/pksig_chch.html" title="pksig_chch"
+          <a href="pksig_boyen_mod.html" title="pksig_boyen_mod"
              >next</a> |</li>
         <li class="right" >
-          <a href="../pksig/pksig_bls04.html" title="pksig_bls04"
+          <a href="pksig_bls04.html" title="pksig_bls04"
              >previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" >Demonstration Schemes</a> &raquo;</li> 
+        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 04, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

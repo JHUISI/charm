@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>PKEnc &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>PKEnc &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -57,13 +55,53 @@
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">from</span> <span class="nn">charm.toolbox.schemebase</span> <span class="kn">import</span> <span class="o">*</span>
 
+<span class="n">encBaseSecDefs</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;OW_CPA&#39;</span><span class="p">,</span><span class="s">&#39;OW_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;OW_CCA&#39;</span><span class="p">,</span><span class="s">&#39;IND_CPA&#39;</span><span class="p">,</span><span class="s">&#39;IND_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;IND_CCA&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;NM_CPA&#39;</span><span class="p">,</span><span class="s">&#39;NM_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;NM_CCA&#39;</span><span class="p">,</span><span class="s">&#39;KA_CPA&#39;</span><span class="p">,</span><span class="s">&#39;KA_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;KA_CCA&#39;</span><span class="p">)</span>
+
+<span class="n">OW_CPA</span><span class="p">,</span><span class="n">OW_CCA1</span><span class="p">,</span><span class="n">OW_CCA</span><span class="o">=</span><span class="s">&quot;OW_CPA&quot;</span><span class="p">,</span><span class="s">&quot;OW_CCA1&quot;</span><span class="p">,</span><span class="s">&quot;OW_CCA&quot;</span>
+<span class="n">IND_CPA</span><span class="p">,</span><span class="n">IND_CCA1</span><span class="p">,</span><span class="n">IND_CCA</span><span class="o">=</span><span class="s">&quot;IND_CPA&quot;</span><span class="p">,</span><span class="s">&quot;IND_CCA1&quot;</span><span class="p">,</span><span class="s">&quot;IND_CCA&quot;</span>
+<span class="n">NM_CPA</span><span class="p">,</span><span class="n">NM_CCA1</span><span class="p">,</span><span class="n">NM_CCA</span><span class="o">=</span><span class="s">&quot;NM_CPA&quot;</span><span class="p">,</span><span class="s">&quot;NM_CCA1&quot;</span><span class="p">,</span><span class="s">&quot;NM_CCA&quot;</span>
+<span class="n">KA_CPA</span><span class="p">,</span><span class="n">KA_CCA1</span><span class="p">,</span><span class="n">KA_CCA</span><span class="o">=</span><span class="s">&#39;KA_CPA&#39;</span><span class="p">,</span><span class="s">&#39;KA_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;KA_CCA&#39;</span>
+
+<span class="n">pkencSchemeType</span><span class="o">=</span><span class="s">&quot;pkeScheme&quot;</span>
+
 <div class="viewcode-block" id="PKEnc"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc">[docs]</a><span class="k">class</span> <span class="nc">PKEnc</span><span class="p">(</span><span class="n">SchemeBase</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">SchemeBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&quot;PKEnc&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;OW_CPA&#39;</span><span class="p">,</span><span class="s">&#39;OW_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;OW_CCA&#39;</span><span class="p">,</span><span class="s">&#39;IND_CPA&#39;</span><span class="p">,</span><span class="s">&#39;IND_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;IND_CCA&#39;</span><span class="p">,</span>
-                                <span class="s">&#39;NM_CPA&#39;</span><span class="p">,</span><span class="s">&#39;NM_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;NM_CCA&#39;</span><span class="p">,</span><span class="s">&#39;KA_CPA&#39;</span><span class="p">,</span><span class="s">&#39;KA_CCA1&#39;</span><span class="p">,</span><span class="s">&#39;KA_CCA&#39;</span><span class="p">)</span>
-          
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&#39;PKEnc&#39;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="PKEnc.setProperty"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.setProperty">[docs]</a>    <span class="k">def</span> <span class="nf">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secDef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">messageSpace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secModel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">secDef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">secDef</span> <span class="ow">in</span> <span class="n">encBaseSecDefs</span><span class="o">.</span><span class="n">getList</span><span class="p">(),</span> <span class="s">&quot;not a valid security definition for this scheme type.&quot;</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">encBaseSecDefs</span><span class="p">[</span><span class="n">secDef</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">assumption</span><span class="p">),</span> <span class="n">messageSpace</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">secModel</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="PKEnc.getProperty"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.getProperty">[docs]</a>    <span class="k">def</span> <span class="nf">getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">baseProp</span> <span class="o">=</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">baseProp</span>
+    </div>
+<div class="viewcode-block" id="PKEnc.checkProperty"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.checkProperty">[docs]</a>    <span class="k">def</span> <span class="nf">checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemeObj</span><span class="p">,</span> <span class="n">_reqProps</span><span class="p">):</span>
+        <span class="n">reqProps</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">_reqProps</span> <span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemeObj</span><span class="p">,</span> <span class="n">reqProps</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+</div>
+<div class="viewcode-block" id="PKEnc.updateProperty"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.updateProperty">[docs]</a>    <span class="k">def</span> <span class="nf">updateProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">secDef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">messageSpace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secModel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c"># 1. inherit the scheme&#39;s properties</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="s">&#39;properties&#39;</span><span class="p">),</span> <span class="s">&quot;schemeObj does not have getProperty() method.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">scheme</span><span class="o">.</span><span class="n">getProperty</span><span class="p">())</span>
+        <span class="c"># 2. make sure things are consistent, then update to new properties</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">schemeType</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="s">&quot;scheme type wasn&#39;t specified on initialization&quot;</span>
+        <span class="k">assert</span> <span class="n">secDef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">secDef</span> <span class="ow">in</span> <span class="n">encBaseSecDefs</span><span class="o">.</span><span class="n">getList</span><span class="p">(),</span> <span class="s">&quot;not a valid security definition for this scheme type.&quot;</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">encBaseSecDefs</span><span class="p">[</span><span class="n">secDef</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">assumption</span><span class="p">),</span> <span class="n">messageSpace</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">secModel</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span>
+</div>
+<div class="viewcode-block" id="PKEnc.printProperties"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.printProperties">[docs]</a>    <span class="k">def</span> <span class="nf">printProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;&#39;&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&lt;=== </span><span class="si">%s</span><span class="s"> Properties ===&gt;&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s">&quot;:&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&lt;=== </span><span class="si">%s</span><span class="s"> Properties ===&gt;&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>            
+        <span class="k">return</span>
+    </div>
 <div class="viewcode-block" id="PKEnc.paramgen"><a class="viewcode-back" href="../toolbox/PKEnc.html#PKEnc.PKEnc.paramgen">[docs]</a>    <span class="k">def</span> <span class="nf">paramgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">NotImplemented</span>
 </div>
@@ -108,14 +146,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

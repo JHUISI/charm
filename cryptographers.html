@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>For Cryptographers &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>For Cryptographers &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '0.42b',
+        URL_ROOT:    './',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" />
     <link rel="next" title="For App Developers" href="developers.html" />
-    <link rel="prev" title="Platform Install Manual" href="install_source.html" /> 
+    <link rel="prev" title="Android Build" href="mobile.html" /> 
   </head>
   <body>
     <div class="related">
@@ -43,9 +41,9 @@
           <a href="developers.html" title="For App Developers"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="install_source.html" title="Platform Install Manual"
+          <a href="mobile.html" title="Android Build"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,12 +54,12 @@
             
   <div class="section" id="for-cryptographers">
 <h1>For Cryptographers<a class="headerlink" href="#for-cryptographers" title="Permalink to this headline">¶</a></h1>
-<p>Interested in implementing your cryptographic scheme in Charm? Here&#8217;s a guide to navigate our framework to implement your cryptosystem. The following describes several aspects of developing cryptographic algorithms in Charm.</p>
+<p>Interested in implementing your cryptographic scheme in Charm? Here&#8217;s a guide to navigate our framework to implement your cryptosystem:</p>
 <div class="section" id="group-abstractions">
 <h2>Group Abstractions<a class="headerlink" href="#group-abstractions" title="Permalink to this headline">¶</a></h2>
-<p>We begin with the first stage of new scheme development which is selecting the appropriate group to instantiate a scheme. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking:</p>
-<p>At the moment, there are three cryptographic settings covered by Charm: <tt class="docutils literal"><span class="pre">integergroups</span></tt>, <tt class="docutils literal"><span class="pre">ecgroups</span></tt>, and <tt class="docutils literal"><span class="pre">pairinggroups</span></tt>.
-To initialize a group in the elliptic curve (EC) settiing, refer to the <tt class="docutils literal"><span class="pre">toolbox.eccurve</span></tt> for all the full set of identifiers for supported NIST approved curves (e.g., <tt class="docutils literal"><span class="pre">prime192v1</span></tt>). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric type of curves. For example, the <tt class="docutils literal"><span class="pre">'SS512'</span></tt> represents a symmetric curve with a 512-bit base field and <tt class="docutils literal"><span class="pre">'MNT159'</span></tt> represents an asymmetric curve with 159-bit base field.
+<p>The first stage of new scheme development is selecting the appropriate group to instantiate a scheme. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking:</p>
+<p>At the moment, there are three cryptographic settings covered by Charm (will be expanded in the future): <tt class="docutils literal"><span class="pre">integergroups</span></tt>, <tt class="docutils literal"><span class="pre">ecgroups</span></tt>, and <tt class="docutils literal"><span class="pre">pairinggroups</span></tt>.
+To initialize a group in the elliptic curve (EC) setting, refer to the <tt class="docutils literal"><span class="pre">toolbox.eccurve</span></tt> for the full set of identifiers and supported NIST approved curves (e.g., <tt class="docutils literal"><span class="pre">prime192v1</span></tt>). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric type of curves. For example, the <tt class="docutils literal"><span class="pre">'SS512'</span></tt> represents a symmetric curve with a 512-bit base field and <tt class="docutils literal"><span class="pre">'MNT159'</span></tt> represents an asymmetric curve with 159-bit base field. Note that these curves are of prime order.
 Finally, for integer groups, typically defining large primes <tt class="docutils literal"><span class="pre">p</span></tt> and <tt class="docutils literal"><span class="pre">q</span></tt> is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., <tt class="docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">2q</span> <span class="pre">+</span> <span class="pre">1</span></tt>). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">IntegerGroup</span>
 
@@ -93,17 +91,17 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
          <span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">curve</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Before we get started, it is important to understand that in our toolbox each cryptographic setting has a corresponding group abstraction such as elliptic curve group or <tt class="docutils literal"><span class="pre">ECGroup</span></tt>, pairing group or <tt class="docutils literal"><span class="pre">PairingGroup</span></tt>, and integer groups or <tt class="docutils literal"><span class="pre">IntegerGroup</span></tt>. This abstraction provides a simple interface for selecting group parameters, performing group operations, and etc. See the <a class="reference internal" href="toolbox.html#toolbox"><em>Toolbox Classes</em></a> documentation for more details.</p>
+<p>Before we get started, it is important to understand that in our toolbox each cryptographic setting has a corresponding group abstraction such as elliptic curve group or <tt class="docutils literal"><span class="pre">ECGroup</span></tt>, pairing group or <tt class="docutils literal"><span class="pre">PairingGroup</span></tt>, and integer groups or <tt class="docutils literal"><span class="pre">IntegerGroup</span></tt>. These abstractions provide a convenient and simple interface for selecting group parameters, performing group operations, and even benchmarking. See the <a class="reference internal" href="toolbox.html#toolbox"><em>Toolbox Classes</em></a> documentation for more details.</p>
 <p>Thus, at the beginning of the scheme, you must import the corresponding group setting in which the cryptographic scheme will be implemented</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
 </pre></div>
 </div>
-<p>Next, let&#8217;s explain what goes on during class initialization. During <tt class="docutils literal"><span class="pre">__init__</span></tt>, you define the basic security properties of the <tt class="docutils literal"><span class="pre">PKEnc</span></tt> scheme and in this case accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as <tt class="docutils literal"><span class="pre">self.group</span> <span class="pre">=</span> <span class="pre">ECGroup(curve)</span></tt>.</p>
+<p>Next, let&#8217;s explain what goes on during class initialization. During <tt class="docutils literal"><span class="pre">__init__</span></tt>, we define the basic security properties of the <tt class="docutils literal"><span class="pre">PKEnc</span></tt> scheme and in this case, accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, define group as <tt class="docutils literal"><span class="pre">self.group</span> <span class="pre">=</span> <span class="pre">ECGroup(curve)</span></tt>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Also, the <tt class="docutils literal"><span class="pre">init</span></tt> routine arguments can vary depending on the scheme and group setting. What is shown above is only an example and see other schemes we have implemented for other possibilities.</p>
+<p class="last">Also, the <tt class="docutils literal"><span class="pre">init</span></tt> routine arguments can vary depending on the scheme and group setting. What is shown above is only an example and see other schemes we have implemented for full list of possibilities.</p>
 </div>
-<p>We describe the first algorithm in the paper, <tt class="docutils literal"><span class="pre">keygen</span></tt>. Keygen only accepts a security parameter and generates the public and private keys and returns to the user. The paper description is as follows:</p>
+<p>Let&#8217;s take a look at the first algorithm in the paper, <tt class="docutils literal"><span class="pre">keygen</span></tt>. Keygen only accepts a security parameter, generates the public and private keys and returns them the user. The paper description is as follows:</p>
 <div class="math" id="equation-keygen1">
 <p><span class="eqno">(1)</span><img src="_images/math/babfd8689f532a9a2531927e2a0222e1663535ed.png" alt="g_1, g_2 \in G"/></p>
 </div><div class="math" id="equation-keygen2">
@@ -114,7 +112,7 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 <p><span class="eqno">(4)</span><img src="_images/math/59711f4e0462a5b6ab884ed4e19d7e1892c1a541.png" alt="pk = (g_1, g_2, c, d, h, H)"/></p>
 </div><div class="math" id="equation-sk">
 <p><span class="eqno">(5)</span><img src="_images/math/9f601bd3bc30a1fbeb40505bf46c3c61d38b7497.png" alt="sk = (x_1, x_2, y_1, y_2, z)"/></p>
-</div><p>Random elements <a href="#equation-keygen1">(1)</a> are chosen and random elements <a href="#equation-keygen2">(2)</a> are also chosen. Next, the group elements <a href="#equation-keygen3">(3)</a> are computed. Select a hash function H from the family of universal one-way hash functions. The public key is defined by <a href="#equation-pk">(4)</a> and the private key is defined by <a href="#equation-sk">(5)</a>. Below is the Charm <tt class="docutils literal"><span class="pre">keygen</span></tt> function defined in the <tt class="docutils literal"><span class="pre">CS98</span></tt> class:</p>
+</div><p>Group elements <a href="#equation-keygen1">(1)</a> and <a href="#equation-keygen2">(2)</a> are selected at random. Next, the group elements <a href="#equation-keygen3">(3)</a> are computed. Then, select a hash function H from the family of universal one-way hash functions. The public key is defined by <a href="#equation-pk">(4)</a> and the private key is defined by <a href="#equation-sk">(5)</a>. Below is the Charm <tt class="docutils literal"><span class="pre">keygen</span></tt> function defined in the <tt class="docutils literal"><span class="pre">CS98</span></tt> class:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
     <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
     <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
@@ -133,7 +131,7 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 <p><span class="eqno">(7)</span><img src="_images/math/2d17612f9a0a0b76f35acc7acd3a52dbc2483454.png" alt="u_1 = {g_1}^r, u_2 = {g_2}^r, e = h^r\cdot m, \alpha = H(u_1, u_2, e), v = c^r\cdot d^{r\alpha}"/></p>
 </div><div class="math" id="equation-ciphertext">
 <p><span class="eqno">(8)</span><img src="_images/math/ce422a7be60e2095d1997ff9f803453171760274.png" alt="(u_1, u_2, e, v)"/></p>
-</div><p>We now describe the encrypt routine as described by the paper. Given a message in G, the encryption algorithm first selects a random integer r <a href="#equation-prelim">(6)</a>, then computes <a href="#equation-encrypt">(7)</a> and returns the ciphertext as <a href="#equation-ciphertext">(8)</a>. The <tt class="docutils literal"><span class="pre">encrypt</span></tt> algorithm defined in Charm:</p>
+</div><p>Let&#8217;s take a look at the encrypt routine as described in the paper. Given a message in G, the encryption algorithm first selects a random integer r <a href="#equation-prelim">(6)</a>, then computes <a href="#equation-encrypt">(7)</a> and returns the ciphertext as <a href="#equation-ciphertext">(8)</a>. The <tt class="docutils literal"><span class="pre">encrypt</span></tt> algorithm defined in Charm:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
     <span class="n">r</span>   <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
     <span class="n">u1</span>  <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
@@ -151,7 +149,7 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 <p><span class="eqno">(10)</span><img src="_images/math/4c8c6ab5ce5f4c7eb58bb0927e2f398e82e6dcf5.png" alt="{u_1}^{x_1 + y_1\alpha} {u_2}^{x_2 + y_2\alpha} = v"/></p>
 </div><div class="math" id="equation-decrypt3">
 <p><span class="eqno">(11)</span><img src="_images/math/373ff473647f7fff090a56d6f58c039f0aaeba10.png" alt="m = e / {u_1}^z"/></p>
-</div><p>Finally, the decryption routine as described by the paper. Given a ciphertext, the decryption algorithm runs as follows and first computes <a href="#equation-decrypt1">(9)</a>, and tests if <a href="#equation-decrypt2">(10)</a> condition holds, and if so outputs <a href="#equation-decrypt3">(11)</a> otherwise &#8220;reject&#8221;. The <tt class="docutils literal"><span class="pre">decrypt</span></tt> algorithm defined in Charm:</p>
+</div><p>Finally, the decryption routine as described in the paper. Given a ciphertext, the decryption algorithm runs as follows and first computes <a href="#equation-decrypt1">(9)</a>, and tests if <a href="#equation-decrypt2">(10)</a> condition holds, and if so outputs <a href="#equation-decrypt3">(11)</a> otherwise &#8220;reject&#8221;. The <tt class="docutils literal"><span class="pre">decrypt</span></tt> algorithm defined in Charm:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">](</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span>
 
@@ -163,21 +161,20 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Since the scheme defines messages as a group element, it is important to use the encode/decode methods to convert the message string into a member of the group, <tt class="docutils literal"><span class="pre">G</span></tt>. This encoding function makes cryptographic schemes practical for handling real messages. However, the pairing group does not currently implement the routines for encoding/decoding messages as group elements. Other techniques are used for pairings to provide the ability to convert from/to different message spaces.</p>
+<p class="last">Since the scheme defines messages as a group element, it is important to use the encode/decode methods to convert the message string into a member of the group, <tt class="docutils literal"><span class="pre">G</span></tt>. This encoding function makes cryptographic schemes practical for handling real messages. However, the pairing group does not currently implement such routines for encoding/decoding messages as group elements. This is on purpose given the difficulty and risks associated with implementing such encoding algorithms in pairing groups. Other techniques are used for pairings to provide the ability to convert from/to different message spaces.</p>
 </div>
 <p>For more examples, see the <tt class="docutils literal"><span class="pre">schemes</span></tt> package that is included in each Charm release.</p>
 </div>
 <div class="section" id="reusable-tools">
 <h2>Reusable Tools<a class="headerlink" href="#reusable-tools" title="Permalink to this headline">¶</a></h2>
-<p>Perhaps you are developing a new scheme that relies on existing building blocks such as block ciphers, hash functions, secret sharing and etc, do not reinvent the wheel! Charm was designed with reusability in mind and to aid cryptographers in easily composing their schemes based on existing constructions. Charm has a growing toolbox of resuable components that might simplify your scheme development. If the component you are looking for does not exist in Charm, then once you implement it consider contributing it back to the project for others to leverage. The end goal is to come up with a comprehensive toolbox that all can reuse. See the <a class="reference internal" href="toolbox.html#toolbox"><em>Toolbox Classes</em></a> section for a detailed list.</p>
+<p>Perhaps, you are developing a new scheme that relies on existing building blocks such as block ciphers, hash functions, secret sharing and etc &#8211; do not reinvent the wheel! Charm was designed with reusability in mind and to aid cryptographers in easily composing schemes based on existing constructions. Charm has a growing toolbox of reusable components that might simplify your scheme development. If the component you are looking for does not exist in Charm, then once you implement it consider contributing it back to the project for others to leverage. The end goal is to come up with a comprehensive toolbox that all can reuse. See the <a class="reference internal" href="toolbox.html#toolbox"><em>Toolbox Classes</em></a> section for a detailed list.</p>
 </div>
 <div class="section" id="testing-benchmarking">
 <h2>Testing &amp; Benchmarking<a class="headerlink" href="#testing-benchmarking" title="Permalink to this headline">¶</a></h2>
-<p>Once you have implemented your scheme, the next step is to test and benchmark. There are two possibile approaches: either define a test routine that executes the algorithms in your scheme via test vectors if they exist and/or embedding the test routine as a docstring in your scheme&#8217;s class definition. See examples in the <tt class="docutils literal"><span class="pre">schemes</span></tt> package.</p>
+<p>Once you have implemented your scheme, you might be interested in testing correctness and measuring its efficiency. There are two possible approaches: either define a test routine that executes the algorithms in your scheme via test vectors if they exist and/or embedding the test routine as a docstring in your scheme&#8217;s class definition. Docstrings are tests that can be executed directly as follows: <tt class="docutils literal"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">doctest</span> <span class="pre">myScheme.py</span></tt>. See examples in the <tt class="docutils literal"><span class="pre">schemes</span></tt> package.</p>
 <p>There are several benchmark flags you should be aware of such as: <tt class="docutils literal"><span class="pre">RealTime</span></tt>, <tt class="docutils literal"><span class="pre">CpuTime</span></tt>, <tt class="docutils literal"><span class="pre">Add</span></tt>, <tt class="docutils literal"><span class="pre">Sub</span></tt>, <tt class="docutils literal"><span class="pre">Mul</span></tt>, <tt class="docutils literal"><span class="pre">Div</span></tt>, and <tt class="docutils literal"><span class="pre">Exp</span></tt>. Here is an example to demonstrate use of the Charm benchmark interface for the EC setting:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G</span>
 <span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v1</span>
-<span class="kn">from</span> <span class="nn">charm.core.math.elliptic_curve</span> <span class="kn">import</span> <span class="n">InitBenchmark</span><span class="p">,</span><span class="n">StartBenchmark</span><span class="p">,</span><span class="n">EndBenchmark</span><span class="p">,</span><span class="n">GetBenchmark</span><span class="p">,</span><span class="n">GetGeneralBenchmarks</span><span class="p">,</span><span class="n">ClearBenchmark</span><span class="p">,</span><span class="n">Mul</span><span class="p">,</span><span class="n">Div</span><span class="p">,</span><span class="n">Exp</span>
 
 <span class="n">trials</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v1</span><span class="p">)</span>
@@ -185,49 +182,95 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 <span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
 <span class="n">i</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
 
-<span class="n">ID</span> <span class="o">=</span> <span class="n">InitBenchmark</span><span class="p">()</span>
-<span class="n">StartBenchmark</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="p">[</span><span class="n">Mul</span><span class="p">,</span> <span class="n">Div</span><span class="p">,</span> <span class="n">Exp</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">group</span><span class="o">.</span><span class="n">InitBenchmark</span><span class="p">(),</span> <span class="s">&quot;failed to initialize benchmark&quot;</span>
+<span class="n">group</span><span class="o">.</span><span class="n">StartBenchmark</span><span class="p">([</span><span class="s">&quot;Mul&quot;</span><span class="p">,</span> <span class="s">&quot;Div&quot;</span><span class="p">,</span> <span class="s">&quot;Exp&quot;</span><span class="p">,</span> <span class="s">&quot;Granular&quot;</span><span class="p">])</span>
 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
     <span class="n">j</span> <span class="o">=</span> <span class="n">g</span> <span class="o">*</span> <span class="n">h</span>
     <span class="n">k</span> <span class="o">=</span> <span class="n">h</span> <span class="o">**</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">**</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">))</span> <span class="o">/</span> <span class="n">k</span>
-<span class="n">EndBenchmark</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+<span class="n">group</span><span class="o">.</span><span class="n">EndBenchmark</span><span class="p">()</span>
 
-<span class="n">msmtDict</span> <span class="o">=</span> <span class="n">GetGeneralBenchmarks</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+<span class="n">msmtDict</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">GetGeneralBenchmarks</span><span class="p">()</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;&lt;=== General Benchmarks ===&gt;&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;Mul := &quot;</span><span class="p">,</span> <span class="n">msmtDict</span><span class="p">[</span><span class="n">Mul</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;Div := &quot;</span><span class="p">,</span> <span class="n">msmtDict</span><span class="p">[</span><span class="n">Div</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;Exp := &quot;</span><span class="p">,</span> <span class="n">msmtDict</span><span class="p">[</span><span class="n">Exp</span><span class="p">])</span>
-<span class="n">ClearBenchmark</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Mul := &quot;</span><span class="p">,</span> <span class="n">msmtDict</span><span class="p">[</span><span class="s">&quot;Mul&quot;</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Div := &quot;</span><span class="p">,</span> <span class="n">msmtDict</span><span class="p">[</span><span class="s">&quot;Div&quot;</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Exp := &quot;</span><span class="p">,</span> <span class="n">msmtDict</span><span class="p">[</span><span class="s">&quot;Exp&quot;</span><span class="p">])</span>
+<span class="n">granDict</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">GetGranularBenchmarks</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;&lt;=== Granular Benchmarks ===&gt;&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;G mul   := &quot;</span><span class="p">,</span> <span class="n">granDict</span><span class="p">[</span><span class="s">&quot;Mul&quot;</span><span class="p">][</span><span class="n">G</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;G exp   := &quot;</span><span class="p">,</span> <span class="n">granDict</span><span class="p">[</span><span class="s">&quot;Exp&quot;</span><span class="p">][</span><span class="n">G</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Note that thesame benchmark function calls work for the other group settings as well. In particular, the pairing base module also supports the ability to perform benchmarks at a granular level (operation count per group). For this feature, import <tt class="docutils literal"><span class="pre">GetGranularBenchmarks</span></tt> in addition to <tt class="docutils literal"><span class="pre">GetGeneralBenchmarks</span></tt> in the <tt class="docutils literal"><span class="pre">pairing</span></tt> base module. Also, you are required to supply the <tt class="docutils literal"><span class="pre">Granular</span></tt> benchmark flag when calling <tt class="docutils literal"><span class="pre">StartBenchmark</span></tt>. Here is an illustrative example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
-<span class="kn">from</span> <span class="nn">charm.core.math.pairing</span> <span class="kn">import</span> <span class="n">InitBenchmark</span><span class="p">,</span><span class="n">StartBenchmark</span><span class="p">,</span><span class="n">EndBenchmark</span><span class="p">,</span><span class="n">GetBenchmark</span><span class="p">,</span><span class="n">GetGeneralBenchmarks</span><span class="p">,</span><span class="n">GetGranularBenchmarks</span><span class="p">,</span><span class="n">ClearBenchmark</span><span class="p">,</span><span class="n">RealTime</span><span class="p">,</span><span class="n">Mul</span><span class="p">,</span><span class="n">Div</span><span class="p">,</span><span class="n">Exp</span><span class="p">,</span><span class="n">Pair</span><span class="p">,</span><span class="n">Granular</span>
 
 <span class="n">trials</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&quot;SS512&quot;</span><span class="p">)</span>
+<span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&quot;SS1024&quot;</span><span class="p">)</span>
 <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
 <span class="n">i</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
 
-<span class="n">ID</span> <span class="o">=</span> <span class="n">InitBenchmark</span><span class="p">()</span>
-<span class="n">StartBenchmark</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="p">[</span><span class="n">Mul</span><span class="p">,</span> <span class="n">Exp</span><span class="p">,</span> <span class="n">Pair</span><span class="p">,</span> <span class="n">Granular</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">group</span><span class="o">.</span><span class="n">InitBenchmark</span><span class="p">(),</span> <span class="s">&quot;failed to initialize benchmark&quot;</span>
+<span class="n">group</span><span class="o">.</span><span class="n">StartBenchmark</span><span class="p">([</span><span class="s">&quot;Mul&quot;</span><span class="p">,</span> <span class="s">&quot;Exp&quot;</span><span class="p">,</span> <span class="s">&quot;Pair&quot;</span><span class="p">,</span> <span class="s">&quot;Granular&quot;</span><span class="p">])</span>
 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
     <span class="n">j</span> <span class="o">=</span> <span class="n">g</span> <span class="o">*</span> <span class="n">h</span>
     <span class="n">k</span> <span class="o">=</span> <span class="n">i</span> <span class="o">**</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">**</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">))</span> <span class="o">/</span> <span class="n">h</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-<span class="n">EndBenchmark</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+<span class="n">group</span><span class="o">.</span><span class="n">EndBenchmark</span><span class="p">()</span>
 
-<span class="n">msmtDict</span> <span class="o">=</span> <span class="n">GetGeneralBenchmarks</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
-<span class="n">granDict</span> <span class="o">=</span> <span class="n">GetGranularBenchmarks</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+<span class="n">msmtDict</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">GetGeneralBenchmarks</span><span class="p">()</span>
+<span class="n">granDict</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">GetGranularBenchmarks</span><span class="p">()</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;&lt;=== General Benchmarks ===&gt;&quot;</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;Results  := &quot;</span><span class="p">,</span> <span class="n">msmtDict</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;&lt;=== Granular Benchmarks ===&gt;&quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;G1 mul   := &quot;</span><span class="p">,</span> <span class="n">granDict</span><span class="p">[</span><span class="n">Mul</span><span class="p">][</span><span class="n">G1</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;G2 exp   := &quot;</span><span class="p">,</span> <span class="n">granDict</span><span class="p">[</span><span class="n">Exp</span><span class="p">][</span><span class="n">G2</span><span class="p">])</span>
-<span class="n">ClearBenchmark</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;G1 mul   := &quot;</span><span class="p">,</span> <span class="n">granDict</span><span class="p">[</span><span class="s">&quot;Mul&quot;</span><span class="p">][</span><span class="n">G1</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;G2 exp   := &quot;</span><span class="p">,</span> <span class="n">granDict</span><span class="p">[</span><span class="s">&quot;Exp&quot;</span><span class="p">][</span><span class="n">G2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>In the integer module, we provide additional support for benchmarking without a group object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">trials</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">InitBenchmark</span><span class="p">(),</span> <span class="s">&quot;failed to initialize benchmark&quot;</span>
+<span class="n">StartBenchmark</span><span class="p">([</span><span class="s">&quot;RealTime&quot;</span><span class="p">,</span> <span class="s">&quot;Exp&quot;</span><span class="p">,</span> <span class="s">&quot;Mul&quot;</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">**</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">**</span> <span class="n">a</span><span class="p">)</span>
+<span class="n">EndBenchmark</span><span class="p">()</span>
+
+<span class="n">msmtDict1</span> <span class="o">=</span> <span class="n">GetGeneralBenchmarks</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;General Benchmarks: &quot;</span><span class="p">,</span> <span class="n">msmtDict1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="optimizations">
+<h2>Optimizations<a class="headerlink" href="#optimizations" title="Permalink to this headline">¶</a></h2>
+<p>For the pairing base module, we now support pre-computation tables for group exponentiation. Note that this speeds up exponentiation signifcantly. To take advantage of this, simply call the <tt class="docutils literal"><span class="pre">initPP()</span></tt> method on a given pairing object in <tt class="docutils literal"><span class="pre">G1</span></tt>, <tt class="docutils literal"><span class="pre">G2</span></tt>, or <tt class="docutils literal"><span class="pre">GT</span></tt>. <tt class="docutils literal"><span class="pre">initPP()</span></tt> stores the pre-computed values for the given generator and any use of that variable in an exponentiation operation will automatically utilize the table. See how long it takes to compute 10 exponentiations with &amp; without pre-computation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+
+<span class="n">count</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&quot;MNT224&quot;</span><span class="p">)</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">g</span><span class="o">.</span><span class="n">initPP</span><span class="p">(),</span> <span class="s">&quot;failed to init pre-computation table&quot;</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">group</span><span class="o">.</span><span class="n">InitBenchmark</span><span class="p">(),</span> <span class="s">&quot;failed to initialize benchmark&quot;</span>
+<span class="n">group</span><span class="o">.</span><span class="n">StartBenchmark</span><span class="p">([</span><span class="s">&quot;RealTime&quot;</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">a</span>
+<span class="n">group</span><span class="o">.</span><span class="n">EndBenchmark</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;With PP: &quot;</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">GetBenchmark</span><span class="p">(</span><span class="s">&quot;RealTime&quot;</span><span class="p">))</span>
+
+<span class="k">assert</span> <span class="n">group</span><span class="o">.</span><span class="n">InitBenchmark</span><span class="p">(),</span> <span class="s">&quot;failed to initialize benchmark&quot;</span>
+<span class="n">group</span><span class="o">.</span><span class="n">StartBenchmark</span><span class="p">([</span><span class="s">&quot;RealTime&quot;</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">h</span> <span class="o">**</span> <span class="n">b</span>
+<span class="n">group</span><span class="o">.</span><span class="n">EndBenchmark</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Without: &quot;</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">GetBenchmark</span><span class="p">(</span><span class="s">&quot;RealTime&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a>.</p>
@@ -247,13 +290,14 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 <li><a class="reference internal" href="#implement-a-scheme">Implement a Scheme</a></li>
 <li><a class="reference internal" href="#reusable-tools">Reusable Tools</a></li>
 <li><a class="reference internal" href="#testing-benchmarking">Testing &amp; Benchmarking</a></li>
+<li><a class="reference internal" href="#optimizations">Optimizations</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="install_source.html"
-                        title="previous chapter">Platform Install Manual</a></p>
+  <p class="topless"><a href="mobile.html"
+                        title="previous chapter">Android Build</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="developers.html"
                         title="next chapter">For App Developers</a></p>
@@ -292,15 +336,15 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
           <a href="developers.html" title="For App Developers"
              >next</a> |</li>
         <li class="right" >
-          <a href="install_source.html" title="Platform Install Manual"
+          <a href="mobile.html" title="Android Build"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

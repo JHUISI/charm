@@ -1,0 +1,7 @@
+
+commit_test
+=========================================
+.. automodule:: commit_test
+    :show-inheritance:
+    :members:
+    :undoc-members:

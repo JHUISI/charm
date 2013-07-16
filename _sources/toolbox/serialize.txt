@@ -1,0 +1,7 @@
+
+serialize
+=========================================
+.. automodule:: serialize
+    :show-inheritance:
+    :members:
+    :undoc-members:

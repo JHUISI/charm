@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Building MIRACL for Charm &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>Building MIRACL for Charm &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '0.42b',
+        URL_ROOT:    './',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="index.html" /> 
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +35,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -48,40 +46,36 @@
             
   <div class="section" id="building-miracl-for-charm">
 <span id="charm-with-miracl"></span><h1>Building MIRACL for Charm<a class="headerlink" href="#building-miracl-for-charm" title="Permalink to this headline">¶</a></h1>
-<p>The first step is to obtain the MIRACL library source from <a class="reference external" href="http://www.shamus.ie/">http://www.shamus.ie/</a>. Currently, our pairing base module works with version 5.5.4 (released on 02/08/11). If you&#8217;re interested in using it for academic purposes, then you are not required to purchase a license. Otherwise, you will have to purchase a MIRACL license since it is not under an open source license. With that said, we provide instructions for how to compile MIRACL and the charm pairing module.</p>
+<p>The first step is to obtain the MIRACL library source from <a class="reference external" href="http://www.certivox.com/miracl/">http://www.certivox.com/miracl/</a>. Currently, our pairing base module works with version 5.5.4 (released on 02/08/11). If you&#8217;re interested in using it for academic purposes, then you are not required to purchase a license. Otherwise, you will have to purchase a MIRACL license since it is not under an open source license. With that said, we provide instructions for how to compile MIRACL and the charm pairing module.</p>
 <blockquote>
 <div><ol class="arabic">
 <li><dl class="first docutils">
-<dt>Unzip the miracl.zip into <tt class="docutils literal"><span class="pre">charm/charm-src/pairingmath/miracl/</span></tt></dt>
-<dd><p class="first last"><tt class="docutils literal"><span class="pre">unzip</span> <span class="pre">-j</span> <span class="pre">-aa</span> <span class="pre">-L</span> <span class="pre">miracl.zip</span></tt></p>
+<dt>Unzip the MIRACL-master.zip in the <tt class="docutils literal"><span class="pre">charm/charm/core/math/pairing/miracl/</span></tt></dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">unzip</span> <span class="pre">-j</span> <span class="pre">-aa</span> <span class="pre">-L</span> <span class="pre">MIRACL-master.zip</span></tt></p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>Change directories into the <tt class="docutils literal"><span class="pre">miracl</span></tt> dir and build the library using the provided compile script.</dt>
-<dd><p class="first last"><tt class="docutils literal"><span class="pre">sh</span> <span class="pre">compile_miracl.sh</span></tt></p>
+<dt>Change directories into the <tt class="docutils literal"><span class="pre">miracl</span></tt> dir and build the library using the provided compile script. Note that this script can build specific curves supported in the MIRACL library. These include <tt class="docutils literal"><span class="pre">ss</span></tt> for supersingular curves, <tt class="docutils literal"><span class="pre">mnt</span></tt> for MNT curves and <tt class="docutils literal"><span class="pre">bn</span></tt> for Barreto-Naehrig curves. This command may require super-user privileges to install on your system.</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">sh</span> <span class="pre">compile_miracl.sh</span> <span class="pre">bn</span></tt></p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>If there are no errors during MIRACL compile, a <tt class="docutils literal"><span class="pre">miracl.a</span></tt> static library file should appear and you may run configure at the top-level source dir and enable use of MIRACL.</dt>
-<dd><p class="first last"><tt class="docutils literal"><span class="pre">./configure.sh</span> <span class="pre">--enable-pairing-miracl</span></tt></p>
+<dt>If there are no errors during MIRACL compile/install, you may run configure at the top-level source dir and enable use of MIRACL with a specific curve. Unfortunately, we can only support one curve at run-time which is a mild inconvenience and requires re-running configure to switch to another curve.</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">./configure.sh</span> <span class="pre">--enable-pairing-miracl=bn</span></tt></p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>You may build and install Charm as usual. These commands may or may not require super-user privileges depending on your environment.</dt>
-<dd><p class="first"><tt class="docutils literal"><span class="pre">make</span> <span class="pre">build</span></tt></p>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">make</span></tt></p>
 <p class="last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">install</span></tt></p>
 </dd>
 </dl>
 </li>
 </ol>
 </div></blockquote>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">At the moment, our support for the MIRACL library is rather limited. Primarily, the MIRACL based pairing module only supports the MNT curve parameters shipped with version 5.5.4. We plan to improve the interface significantly in the next few releases and possibly expand to other base modules (standard elliptic curve and integer module). Thank you!</p>
-</div>
 </div>
 
 
@@ -121,13 +115,13 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

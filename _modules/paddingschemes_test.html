@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>paddingschemes_test &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for paddingschemes_test</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">:Date: Jun 17, 2011</span>
+<span class="sd">:Authors: Gary Belvin</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span>  <span class="nn">charm.toolbox.paddingschemes</span> <span class="kn">import</span> <span class="n">OAEPEncryptionPadding</span><span class="p">,</span> <span class="n">MGF1</span><span class="p">,</span> <span class="n">hashFunc</span><span class="p">,</span> <span class="n">PSSPadding</span><span class="p">,</span> <span class="n">PKCS7Padding</span>
+<span class="kn">from</span> <span class="nn">binascii</span> <span class="kn">import</span> <span class="n">a2b_hex</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="PaddingSchemesTest"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest">[docs]</a><span class="k">class</span> <span class="nc">PaddingSchemesTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PaddingSchemesTest.testOEAPVector1"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest.testOEAPVector1">[docs]</a>    <span class="k">def</span> <span class="nf">testOEAPVector1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># OAEP Test vector taken from Appendix C </span>
+        <span class="c">#ftp://ftp.rsa.com/pub/rsalabs/rsa_algorithm/rsa-oaep_spec.pdf</span>
+        
+        <span class="c"># --------------------------------------------------------------------------------</span>
+        <span class="c"># Message:</span>
+        <span class="n">m</span>     <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;d4 36 e9 95 69 fd 32 a7 c8 a0 5b bc 90 d3 2c 49&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">lhash</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;da 39 a3 ee 5e 6b 4b 0d 32 55 bf ef 95 60 18 90 af d8 07 09&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">DB</span>    <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;da 39 a3 ee 5e 6b 4b 0d 32 55 bf ef 95 60 18 90 af d8 07 09 00 00 00 00</span><span class="se">\</span>
+<span class="s">                         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><span class="se">\</span>
+<span class="s">                         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><span class="se">\</span>
+<span class="s">                         00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 d4 36 e9 95 69</span><span class="se">\</span>
+<span class="s">                         fd 32 a7 c8 a0 5b bc 90 d3 2c 49&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+ 
+        <span class="n">seed</span>  <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;aa fd 12 f6 59 ca e6 34 89 b4 79 e5 07 6d de c2 f0 6c b5 8f&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span> <span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="c">#dbmask = dbMask = MGF (seed , 107):</span>
+        <span class="n">dbmask</span><span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;06 e1 de b2 36 9a a5 a5 c7 07 d8 2c 8e 4e 93 24 8a c7 83 de e0 b2 c0 46</span><span class="se">\</span>
+<span class="s">                         26 f5 af f9 3e dc fb 25 c9 c2 b3 ff 8a e1 0e 83 9a 2d db 4c dc fe 4f f4</span><span class="se">\</span>
+<span class="s">                         77 28 b4 a1 b7 c1 36 2b aa d2 9a b4 8d 28 69 d5 02 41 21 43 58 11 59 1b</span><span class="se">\</span>
+<span class="s">                         e3 92 f9 82 fb 3e 87 d0 95 ae b4 04 48 db 97 2f 3a c1 4e af f4 9c 8c 3b</span><span class="se">\</span>
+<span class="s">                         7c fc 95 1a 51 ec d1 dd e6 12 64&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="c">#maskedDB</span>
+        <span class="c">#seedMask = M GF (maskedDB, 20):</span>
+        <span class="n">seedMask</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;41 87 0b 5a b0 29 e6 57 d9 57 50 b5 4c 28 3c 08 72 5d be a9&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">maskedSeed</span><span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;eb 7a 19 ac e9 e3 00 63 50 e3 29 50 4b 45 e2 ca 82 31 0b 26&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+
+        <span class="c">#EM = maskedSeed maskedDB</span>
+        <span class="n">EM</span>       <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;00 eb 7a 19 ac e9 e3 00 63 50 e3 29 50 4b 45 e2 ca 82 31 0b 26 dc d8 7d 5c</span><span class="se">\</span>
+<span class="s">                            68 f1 ee a8 f5 52 67 c3 1b 2e 8b b4 25 1f 84 d7 e0 b2 c0 46 26 f5 af f9</span><span class="se">\</span>
+<span class="s">                            3e dc fb 25 c9 c2 b3 ff 8a e1 0e 83 9a 2d db 4c dc fe 4f f4 77 28 b4 a1</span><span class="se">\</span>
+<span class="s">                            b7 c1 36 2b aa d2 9a b4 8d 28 69 d5 02 41 21 43 58 11 59 1b e3 92 f9 82</span><span class="se">\</span>
+<span class="s">                            fb 3e 87 d0 95 ae b4 04 48 db 97 2f 3a c1 4f 7b c2 75 19 52 81 ce 32 d2</span><span class="se">\</span>
+<span class="s">                            f1 b7 6d 4d 35 3e 2d&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span> 
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Test Vector 1:&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;mesg  =&gt;&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;label =&gt;&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;lhash =&gt;&quot;</span><span class="p">,</span> <span class="n">lhash</span><span class="p">)</span>    <span class="c">#Correct</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;DB    =&gt;&quot;</span><span class="p">,</span> <span class="n">DB</span><span class="p">)</span>       <span class="c">#Correct</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;DBMask=&gt;&quot;</span><span class="p">,</span> <span class="n">dbmask</span><span class="p">)</span>   <span class="c">#Correct</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;seedMask=&gt;&quot;</span><span class="p">,</span> <span class="n">seedMask</span><span class="p">)</span>   <span class="c">#Correct</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;maskedseed=&gt;&quot;</span><span class="p">,</span> <span class="n">maskedSeed</span><span class="p">)</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">OAEPEncryptionPadding</span><span class="p">()</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">EM</span><span class="p">,</span> <span class="n">E</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="PaddingSchemesTest.testOAEPRoundTripEquiv"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest.testOAEPRoundTripEquiv">[docs]</a>    <span class="k">def</span> <span class="nf">testOAEPRoundTripEquiv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">oaep</span> <span class="o">=</span> <span class="n">OAEPEncryptionPadding</span><span class="p">()</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test message&#39;</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">oaep</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+        <span class="n">pt</span> <span class="o">=</span> <span class="n">oaep</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">pt</span><span class="p">,</span> <span class="s">&#39;Decoded message is not equal to encoded message</span><span class="se">\n</span><span class="s">&#39;</span>\
+                         <span class="s">&#39;ct: </span><span class="si">%s</span><span class="se">\n</span><span class="s">m:  </span><span class="si">%s</span><span class="se">\n</span><span class="s">pt: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">pt</span><span class="p">))</span>
+    </div>
+    <span class="nd">@unittest.skip</span><span class="p">(</span><span class="s">&quot;Unnecessary length test&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="PaddingSchemesTest.testMFGLength"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest.testMFGLength">[docs]</a>    <span class="k">def</span> <span class="nf">testMFGLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">hashFn</span> <span class="o">=</span> <span class="n">OAEPEncryptionPadding</span><span class="p">()</span><span class="o">.</span><span class="n">hashFn</span>
+        <span class="n">hLen</span> <span class="o">=</span>  <span class="n">OAEPEncryptionPadding</span><span class="p">()</span><span class="o">.</span><span class="n">hashFnOutputBytes</span>
+        
+        <span class="k">for</span> <span class="n">mbytes</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">MGF1</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">mbytes</span><span class="p">,</span> <span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">mbytes</span><span class="p">,</span> <span class="s">&#39;MFG output wrong size&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PaddingSchemesTest.testMFGvector"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest.testMFGvector">[docs]</a>    <span class="k">def</span> <span class="nf">testMFGvector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">hashFn</span> <span class="o">=</span> <span class="n">OAEPEncryptionPadding</span><span class="p">()</span><span class="o">.</span><span class="n">hashFn</span>
+        <span class="n">hLen</span> <span class="o">=</span>  <span class="n">OAEPEncryptionPadding</span><span class="p">()</span><span class="o">.</span><span class="n">hashFnOutputBytes</span>
+        <span class="n">seed</span>  <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;aa fd 12 f6 59 ca e6 34 89 b4 79 e5 07 6d de c2 f0 6c b5 8f&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span> <span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="c">#dbmask = dbMask = MGF (seed , 107):</span>
+        <span class="n">dbmask</span><span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;06 e1 de b2 36 9a a5 a5 c7 07 d8 2c 8e 4e 93 24 8a c7 83 de e0 b2 c0 46</span><span class="se">\</span>
+<span class="s">                         26 f5 af f9 3e dc fb 25 c9 c2 b3 ff 8a e1 0e 83 9a 2d db 4c dc fe 4f f4</span><span class="se">\</span>
+<span class="s">                         77 28 b4 a1 b7 c1 36 2b aa d2 9a b4 8d 28 69 d5 02 41 21 43 58 11 59 1b</span><span class="se">\</span>
+<span class="s">                         e3 92 f9 82 fb 3e 87 d0 95 ae b4 04 48 db 97 2f 3a c1 4e af f4 9c 8c 3b</span><span class="se">\</span>
+<span class="s">                         7c fc 95 1a 51 ec d1 dd e6 12 64&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">MGF1</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="mi">107</span><span class="p">,</span> <span class="n">hashFn</span><span class="p">,</span> <span class="n">hLen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">dbmask</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="PaddingSchemesTest.testSHA1Vector"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest.testSHA1Vector">[docs]</a>    <span class="k">def</span> <span class="nf">testSHA1Vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">hashFn</span> <span class="o">=</span> <span class="n">hashFunc</span><span class="p">(</span><span class="s">&#39;sha1&#39;</span><span class="p">)</span>
+        <span class="n">V0</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;da39a3ee5e6b4b0d3255bfef95601890afd80709&quot;</span><span class="p">,</span><span class="s">&#39;utf-8&#39;</span><span class="p">)))</span>
+        <span class="n">V1</span> <span class="o">=</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;The quick brown fox jumps over the lazy dog&quot;</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;2fd4e1c67a2d28fced849ee1bb76e7391b93eb12&quot;</span><span class="p">,</span><span class="s">&#39;utf-8&#39;</span><span class="p">)))</span> <span class="c">#ASCII encoding</span>
+        <span class="n">V2</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="s">&#39;The quick brown fox jumps over the lazy dog&#39;</span><span class="p">,</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&quot;2fd4e1c67a2d28fced849ee1bb76e7391b93eb12&quot;</span><span class="p">,</span><span class="s">&#39;utf-8&#39;</span><span class="p">)))</span> <span class="c">#binary data</span>
+        <span class="c">#print(&quot;str =&gt; &quot;, V2[0])</span>
+        <span class="c">#print(&quot;H(s)=&gt; &quot;, hashFn(V2[0]))</span>
+        <span class="c">#print(&quot;stnd=&gt; &quot;, V2[1])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">hashFn</span><span class="p">(</span><span class="n">V0</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">V0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;empty string&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">hashFn</span><span class="p">(</span><span class="n">V1</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">V1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;quick fox&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">hashFn</span><span class="p">(</span><span class="n">V2</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">V2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    
+    </div>
+<div class="viewcode-block" id="PaddingSchemesTest.testPSSRountTripEquiv"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest.testPSSRountTripEquiv">[docs]</a>    <span class="k">def</span> <span class="nf">testPSSRountTripEquiv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">pss</span> <span class="o">=</span> <span class="n">PSSPadding</span><span class="p">()</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test message&#39;</span>
+        <span class="n">em</span> <span class="o">=</span> <span class="n">pss</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">pss</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">em</span><span class="p">))</span>
+    </div>
+<div class="viewcode-block" id="PaddingSchemesTest.testPSSTestVector"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest.testPSSTestVector">[docs]</a>    <span class="k">def</span> <span class="nf">testPSSTestVector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Test vector taken from http://www.rsa.com/rsalabs/node.asp?id=2125</span>
+        <span class="c"># ---------------------------------</span>
+        <span class="c"># Step-by-step RSASSA-PSS Signature</span>
+        <span class="c"># ---------------------------------</span>
+        
+        <span class="c"># Message M to be signed:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;85 9e ef 2f d7 8a ca 00 30 8b dc 47 11 93 bf 55</span><span class="se">\</span>
+<span class="s">        bf 9d 78 db 8f 8a 67 2b 48 46 34 f3 c9 c2 6e 64</span><span class="se">\</span>
+<span class="s">        78 ae 10 26 0f e0 dd 8c 08 2e 53 a5 29 3a f2 17</span><span class="se">\</span>
+<span class="s">        3c d5 0c 6d 5d 35 4f eb f7 8b 26 02 1c 25 c0 27</span><span class="se">\</span>
+<span class="s">        12 e7 8c d4 69 4c 9f 46 97 77 e4 51 e7 f8 e9 e0</span><span class="se">\</span>
+<span class="s">        4c d3 73 9c 6b bf ed ae 48 7f b5 56 44 e9 ca 74</span><span class="se">\</span>
+<span class="s">        ff 77 a5 3c b7 29 80 2f 6e d4 a5 ff a8 ba 15 98</span><span class="se">\</span>
+<span class="s">        90 fc&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+
+        <span class="c"># mHash    = Hash(M)</span>
+        <span class="c"># salt     = random string of octets</span>
+        <span class="c"># M&#39;       = Padding || mHash || salt</span>
+        <span class="c"># H        = Hash(M&#39;)</span>
+        <span class="c"># DB       = Padding || salt </span>
+        <span class="c"># dbMask   = MGF(H, length(DB))</span>
+        <span class="c"># maskedDB = DB xor dbMask (leftmost bit set to</span>
+        <span class="c">#            zero)</span>
+        <span class="c"># EM       = maskedDB || H || 0xbc</span>
+        
+        <span class="c"># mHash:</span>
+        <span class="n">mHash</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;37 b6 6a e0 44 58 43 35 3d 47 ec b0 b4 fd 14 c1</span><span class="se">\</span>
+<span class="s">        10 e6 2d 6a&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># salt:</span>
+        <span class="n">salt</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;e3 b5 d5 d0 02 c1 bc e5 0c 2b 65 ef 88 a1 88 d8</span><span class="se">\</span>
+<span class="s">        3b ce 7e 61&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># M&#39;:</span>
+        <span class="n">mPrime</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;00 00 00 00 00 00 00 00 37 b6 6a e0 44 58 43 35</span><span class="se">\</span>
+<span class="s">        3d 47 ec b0 b4 fd 14 c1 10 e6 2d 6a e3 b5 d5 d0</span><span class="se">\</span>
+<span class="s">        02 c1 bc e5 0c 2b 65 ef 88 a1 88 d8 3b ce 7e 61&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># H:</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;df 1a 89 6f 9d 8b c8 16 d9 7c d7 a2 c4 3b ad 54</span><span class="se">\</span>
+<span class="s">        6f be 8c fe&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># DB:</span>
+        <span class="n">DB</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 01 e3 b5 d5 d0 02 c1 bc e5 0c</span><span class="se">\</span>
+<span class="s">        2b 65 ef 88 a1 88 d8 3b ce 7e 61&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># dbMask:</span>
+        <span class="n">dbMask</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67</span><span class="se">\</span>
+<span class="s">        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af</span><span class="se">\</span>
+<span class="s">        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4</span><span class="se">\</span>
+<span class="s">        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1</span><span class="se">\</span>
+<span class="s">        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec</span><span class="se">\</span>
+<span class="s">        d3 18 3a 31 1f c8 97 39 a9 66 43 13 6e 8b 0f 46</span><span class="se">\</span>
+<span class="s">        5e 87 a4 53 5c d4 c5 9b 10 02 8d&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># maskedDB:</span>
+        <span class="n">maskedDB</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67</span><span class="se">\</span>
+<span class="s">        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af</span><span class="se">\</span>
+<span class="s">        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4</span><span class="se">\</span>
+<span class="s">        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1</span><span class="se">\</span>
+<span class="s">        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec</span><span class="se">\</span>
+<span class="s">        d3 18 3a 31 1f c8 96 da 1c b3 93 11 af 37 ea 4a</span><span class="se">\</span>
+<span class="s">        75 e2 4b db fd 5c 1d a0 de 7c ec&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># Encoded message EM:</span>
+        <span class="n">EM</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67</span><span class="se">\</span>
+<span class="s">        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af</span><span class="se">\</span>
+<span class="s">        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4</span><span class="se">\</span>
+<span class="s">        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1</span><span class="se">\</span>
+<span class="s">        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec</span><span class="se">\</span>
+<span class="s">        d3 18 3a 31 1f c8 96 da 1c b3 93 11 af 37 ea 4a</span><span class="se">\</span>
+<span class="s">        75 e2 4b db fd 5c 1d a0 de 7c ec df 1a 89 6f 9d</span><span class="se">\</span>
+<span class="s">        8b c8 16 d9 7c d7 a2 c4 3b ad 54 6f be 8c fe bc&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;PSS Test Vector:&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;M     =&gt;&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Mlen  =&gt;&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;mHash =&gt;&quot;</span><span class="p">,</span> <span class="n">mHash</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;salt  =&gt;&quot;</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;M&#39;    =&gt;&quot;</span><span class="p">,</span> <span class="n">mPrime</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;H     =&gt;&quot;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;DB    =&gt;&quot;</span><span class="p">,</span> <span class="n">DB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;dbmask=&gt;&quot;</span><span class="p">,</span> <span class="n">dbMask</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;masked=&gt;&quot;</span><span class="p">,</span> <span class="n">maskedDB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;EM    =&gt;&quot;</span><span class="p">,</span> <span class="n">EM</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;EMLen =&gt;&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">EM</span><span class="p">))</span>
+        
+        <span class="n">pss</span> <span class="o">=</span> <span class="n">PSSPadding</span><span class="p">()</span>
+        <span class="n">realEM</span> <span class="o">=</span> <span class="n">pss</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">EM</span><span class="p">)</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span><span class="n">salt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">EM</span><span class="p">,</span> <span class="n">realEM</span><span class="p">)</span>
+
+    </div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="PaddingSchemesTest.suite"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.PaddingSchemesTest.suite">[docs]</a>    <span class="k">def</span> <span class="nf">suite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">suite</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span><span class="o">.</span><span class="n">loadTestsFromTestCase</span><span class="p">(</span><span class="n">Test</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">suite</span>
+</div></div>
+<div class="viewcode-block" id="Pkcs7PaddingTest"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.Pkcs7PaddingTest">[docs]</a><span class="k">class</span> <span class="nc">Pkcs7PaddingTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="Pkcs7PaddingTest.setUp"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.Pkcs7PaddingTest.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">padder</span> <span class="o">=</span> <span class="n">PKCS7Padding</span><span class="p">()</span></div>
+<div class="viewcode-block" id="Pkcs7PaddingTest.encodecode"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.Pkcs7PaddingTest.encodecode">[docs]</a>    <span class="k">def</span> <span class="nf">encodecode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">text</span><span class="p">):</span>
+        <span class="n">_bytes</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">padded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">padder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">_bytes</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">_bytes</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">padder</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">padded</span><span class="p">),</span> <span class="s">&#39;o: =&gt;</span><span class="si">%s</span><span class="se">\n</span><span class="s">m: =&gt;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_bytes</span><span class="p">,</span><span class="n">padded</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">padded</span><span class="p">)</span> <span class="o">%</span> <span class="mi">16</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">,</span> <span class="s">&#39;invalid padding length: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">padded</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">padded</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;invalid padding length: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">padded</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">padded</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">_bytes</span><span class="p">),</span> <span class="s">&#39;message must allways have padding&#39;</span>
+        </div>
+<div class="viewcode-block" id="Pkcs7PaddingTest.testBasic"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.Pkcs7PaddingTest.testBasic">[docs]</a>    <span class="k">def</span> <span class="nf">testBasic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodecode</span><span class="p">(</span><span class="s">&quot;asd&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Pkcs7PaddingTest.testEmpty"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.Pkcs7PaddingTest.testEmpty">[docs]</a>    <span class="k">def</span> <span class="nf">testEmpty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodecode</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Pkcs7PaddingTest.testFull"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.Pkcs7PaddingTest.testFull">[docs]</a>    <span class="k">def</span> <span class="nf">testFull</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodecode</span><span class="p">(</span><span class="s">&quot;sixteen byte msg&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Pkcs7PaddingTest.testLarge"><a class="viewcode-back" href="../test/paddingschemes_test.html#paddingschemes_test.Pkcs7PaddingTest.testLarge">[docs]</a>    <span class="k">def</span> <span class="nf">testLarge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encodecode</span><span class="p">(</span><span class="s">&quot;sixteen byte msg +3&quot;</span><span class="p">)</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c">#import sys;sys.argv = [&#39;&#39;, &#39;Test.testName&#39;]</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

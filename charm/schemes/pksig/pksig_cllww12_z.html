@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_cllww12_z &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
+    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
+    <link rel="next" title="pksig_CW13_z" href="pksig_CW13_z.html" />
+    <link rel="prev" title="pksig_cl04" href="pksig_cl04.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pksig_CW13_z.html" title="pksig_CW13_z"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pksig_cl04.html" title="pksig_cl04"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pksig_cllww12_z">
+<span id="pksig-cllww12-z"></span><h1>pksig_cllww12_z<a class="headerlink" href="#module-pksig_cllww12_z" title="Permalink to this headline">¶</a></h1>
+<p>Shorter IBE and Signatures via Asymmetric Pairings</p>
+<div class="line-block">
+<div class="line">From: &#8220;J. Chen, H. Lim, S. Ling, H. Wang, H. Wee Shorter IBE and Signatures via Asymmetric Pairings&#8221;, Section 5.</div>
+<div class="line">Published in: Pairing 2012</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2012/224">http://eprint.iacr.org/2012/224</a></div>
+<div class="line">Notes: This is a shorter IBE construction based on SXDH construction.</div>
+</div>
+<ul class="simple">
+<li>type:           signature (identity-based)</li>
+<li>setting:        bilinear groups (asymmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Improved by:</th><td class="field-body">Fan Zhang(<a class="reference external" href="mailto:zfwise&#37;&#52;&#48;gwu&#46;edu">zfwise<span>&#64;</span>gwu<span>&#46;</span>edu</a>), supported by GWU computer science department</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">3/2013</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Notes:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple">
+<li>We swapped g1 and g2 to make signature faster.</li>
+</ol>
+<p>2. Change all the pair($params_1$, $params_2$) to pair($params_2$, $params_1$) is required.
+3.The code is similar with the encryption scheme, especially in setup() function.
+4. Same trick in the encryption scheme applied here.</p>
+<dl class="class">
+<dt id="pksig_cllww12_z.Sign_Chen12_z">
+<em class="property">class </em><tt class="descclassname">pksig_cllww12_z.</tt><tt class="descname">Sign_Chen12_z</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cllww12_z.html#Sign_Chen12_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cllww12_z.Sign_Chen12_z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="s">&quot;plese sign this message!!!!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cllww</span> <span class="o">=</span> <span class="n">Sign_Chen12_z</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cllww</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">cllww</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cllww</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> 
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pksig_cllww12_z.Sign_Chen12_z.keygen">
+<tt class="descname">keygen</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_cllww12_z.html#Sign_Chen12_z.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cllww12_z.Sign_Chen12_z.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_cllww12_z.Sign_Chen12_z.sign">
+<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>m</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cllww12_z.html#Sign_Chen12_z.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cllww12_z.Sign_Chen12_z.sign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pksig_cllww12_z.Sign_Chen12_z.verify">
+<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>sig</em>, <em>m</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_cllww12_z.html#Sign_Chen12_z.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cllww12_z.Sign_Chen12_z.verify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pksig_cllww12_z.main">
+<tt class="descclassname">pksig_cllww12_z.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_cllww12_z.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_cllww12_z.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pksig_cl04.html"
+                        title="previous chapter">pksig_cl04</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pksig_CW13_z.html"
+                        title="next chapter">pksig_CW13_z</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../../_sources/charm/schemes/pksig/pksig_cllww12_z.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pksig_CW13_z.html" title="pksig_CW13_z"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pksig_cl04.html" title="pksig_cl04"
+             >previous</a> |</li>
+        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

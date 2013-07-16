@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>protocol_cns07 &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>protocol_cns07 &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -67,15 +65,15 @@
 <span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
-<span class="kn">from</span> <span class="nn">schemes.sigma1</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">schemes.sigma2</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">schemes.sigma3</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.sigma1</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.sigma2</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.sigma3</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="n">SENDER</span><span class="p">,</span><span class="n">RECEIVER</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span>
 <span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="mi">8083</span>
 
-<div class="viewcode-block" id="ObliviousTransfer"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer">[docs]</a><span class="k">class</span> <span class="nc">ObliviousTransfer</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer">[docs]</a><span class="k">class</span> <span class="nc">ObliviousTransfer</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">groupObj</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">common_input</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>        
         <span class="n">Protocol</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>        
         <span class="n">receiver_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_init2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer6</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver_transfer8</span> <span class="p">}</span>
@@ -109,7 +107,7 @@
 <span class="c">#                self.sig.append(messages[i])</span>
         <span class="c"># dict to hold variables from interaction        </span>
 
-<div class="viewcode-block" id="ObliviousTransfer.get_common"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.get_common">[docs]</a>    <span class="k">def</span> <span class="nf">get_common</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.get_common"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.get_common">[docs]</a>    <span class="k">def</span> <span class="nf">get_common</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_setup</span><span class="p">:</span>
             <span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
             <span class="n">H</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
@@ -119,7 +117,7 @@
             <span class="k">return</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">])</span>
     
     <span class="c"># msgs =&gt; dict of M -&gt; H(M)</span></div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_init1"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_init1">[docs]</a>    <span class="k">def</span> <span class="nf">sender_init1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.sender_init1"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_init1">[docs]</a>    <span class="k">def</span> <span class="nf">sender_init1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 1: &quot;</span><span class="p">)</span>
         <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_common</span><span class="p">()</span>  
@@ -143,7 +141,7 @@
         <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">C</span> <span class="p">,</span> <span class="s">&#39;PoK&#39;</span><span class="p">:</span><span class="s">&#39;SigmaProtocol1&#39;</span> <span class="p">}</span>
     </div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_init3"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_init3">[docs]</a>    <span class="k">def</span> <span class="nf">sender_init3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.sender_init3"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_init3">[docs]</a>    <span class="k">def</span> <span class="nf">sender_init3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 3: &quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;FAIL&#39;</span>
         <span class="n">pk</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">,</span> <span class="s">&#39;H&#39;</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
@@ -162,7 +160,7 @@
         <span class="c"># need store and get functions for db        </span>
         <span class="k">return</span> <span class="p">{</span><span class="s">&#39;PoK&#39;</span><span class="p">:</span> <span class="n">result</span> <span class="p">}</span>
     </div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_transfer5"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer5">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer5"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer5">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;SENDER 5: query =&gt;&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PoK&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="c"># continue</span>
@@ -171,7 +169,7 @@
         <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
     </div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_transfer7"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer7">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer7"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer7">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
 <span class="c">#        print(&quot;SENDER 7: input =&gt;&quot;, input)</span>
         <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PoK2&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> 
 <span class="c">#            pk = Protocol.get(self, [&#39;g&#39;,&#39;g2&#39;,&#39;y&#39;], dict)           </span>
@@ -193,7 +191,7 @@
         <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
     </div>
-<div class="viewcode-block" id="ObliviousTransfer.sender_transfer9"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer9">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer9</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.sender_transfer9"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer9">[docs]</a>    <span class="k">def</span> <span class="nf">sender_transfer9</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
 <span class="c">#        print(&quot;SENDER 9: PoM init =&gt;&quot;, input)           </span>
         
         <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="s">&#39;GO&#39;</span><span class="p">:</span>    
@@ -210,7 +208,7 @@
 <span class="c"># END of SENDER state functions #</span>
 <span class="c">#################################    </span>
     </div>
-<div class="viewcode-block" id="ObliviousTransfer.receiver_init2"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_init2">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_init2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_init2"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_init2">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_init2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;RECEIVER 2: &quot;</span><span class="p">)</span>
         <span class="n">pk</span> <span class="o">=</span> <span class="n">Sigma</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;PoK&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;SigmaProtocol1&#39;</span><span class="p">:</span>
@@ -226,7 +224,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="s">&#39;PoK&#39;</span><span class="p">:</span> <span class="n">result</span> <span class="p">}</span> <span class="c"># result should be R0 (state info) for Receiver</span>
         <span class="c"># let sender know to expect a PoK2 interaction next</span>
 </div>
-<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer4"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer4">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span> <span class="c"># rec_tran4 -&gt; sender_tran5</span>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer4"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer4">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span> <span class="c"># rec_tran4 -&gt; sender_tran5</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;RECEIVER 4: Get query from end user.&quot;</span><span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># maps to position 0 in array (+1 indexed)</span>
         <span class="n">C</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
@@ -236,7 +234,7 @@
         <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="n">v</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="n">V</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;query&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;V&#39;</span><span class="p">:</span><span class="n">V</span><span class="p">,</span> <span class="s">&#39;PoK2&#39;</span><span class="p">:</span><span class="s">&#39;SigmaProtocol2&#39;</span> <span class="p">}</span>
     </div>
-<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer6"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer6">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer6"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer6">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;RECEIVER 6: input =&gt;&quot;</span><span class="p">,</span><span class="nb">input</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">input</span> <span class="o">==</span> <span class="s">&#39;GO&#39;</span><span class="p">:</span>
             <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="s">&#39;v&#39;</span><span class="p">,</span><span class="s">&#39;query&#39;</span><span class="p">])</span>
@@ -253,7 +251,7 @@
         <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>            
         <span class="k">return</span> <span class="bp">None</span>
 </div>
-<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer8"><a class="viewcode-back" href="../schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer8">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+<div class="viewcode-block" id="ObliviousTransfer.receiver_transfer8"><a class="viewcode-back" href="../charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer8">[docs]</a>    <span class="k">def</span> <span class="nf">receiver_transfer8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="k">print</span><span class="p">(</span><span class="s">&quot;RECEIVER 8:&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s">&#39;PoK2&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;OK&#39;</span><span class="p">:</span>
             <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -349,14 +347,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

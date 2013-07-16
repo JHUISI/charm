@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Changes in v0.43 &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" />
+    <link rel="next" title="Platform Install Manual" href="install_source.html" />
+    <link rel="prev" title="Charm-Crypto Docs!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="install_source.html" title="Platform Install Manual"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Charm-Crypto Docs!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="changes-in-v0-43">
+<h1>Changes in v0.43<a class="headerlink" href="#changes-in-v0-43" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="integer-module">
+<h2>Integer Module<a class="headerlink" href="#integer-module" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">reduce()</span></tt> method no longer a field of integer object, but rather a class method.</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;a = &quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;b = &quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Note that certain mixing of integer objects and Python <tt class="docutils literal"><span class="pre">int</span></tt> no longer supported. For example, <tt class="docutils literal"><span class="pre">integer(10,</span> <span class="pre">17)</span> <span class="pre">*</span> <span class="pre">-1</span></tt> will generate a runtime exception:</li>
+</ul>
+</div>
+<div class="section" id="benchmarking">
+<h2>Benchmarking<a class="headerlink" href="#benchmarking" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Benchmark API now part of group abstraction class which eliminates need for importing the benchmark methods.</li>
+<li>Removed the <tt class="docutils literal"><span class="pre">ID</span></tt> handle returned by <tt class="docutils literal"><span class="pre">InitBenchmark</span></tt>.</li>
+<li>No longer necessary to call <tt class="docutils literal"><span class="pre">ClearBenchmark()</span></tt> to clear benchmarking state.</li>
+<li>Benchmarking options are strings instead of int values. That is, <tt class="docutils literal"><span class="pre">&quot;RealTime&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;CpuTime&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;Add&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;Sub&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;Mul&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;Div&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;Exp&quot;</span></tt>, <tt class="docutils literal"><span class="pre">&quot;Pair&quot;</span></tt>, and <tt class="docutils literal"><span class="pre">&quot;Granular&quot;</span></tt>.</li>
+<li>Both pairing and elliptic curve modules now support collection of granular benchmarks.</li>
+</ul>
+</div>
+<div class="section" id="serialization">
+<h2>Serialization<a class="headerlink" href="#serialization" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>We have deprecated the use of Pickle as a primary serilization method. Pickle contains a serious vulnerability that could lead to arbitrary code execution. It has been replaced by a safer implementation based on JSON module.</li>
+<li>For backwards compatibility, the Pickle methods are still available, but we output a warning that it is vulnerable. The Pickle methods are now <tt class="docutils literal"><span class="pre">objectToBytesWithPickle</span></tt> and <tt class="docutils literal"><span class="pre">bytesToObjectWithPickle</span></tt>.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Changes in v0.43</a><ul>
+<li><a class="reference internal" href="#integer-module">Integer Module</a></li>
+<li><a class="reference internal" href="#benchmarking">Benchmarking</a></li>
+<li><a class="reference internal" href="#serialization">Serialization</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Charm-Crypto Docs!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="install_source.html"
+                        title="next chapter">Platform Install Manual</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/updates.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="install_source.html" title="Platform Install Manual"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Charm-Crypto Docs!"
+             >previous</a> |</li>
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pre_mg07 &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../index.html" />
+    <link rel="up" title="Implemented Schemes" href="../../schemes.html" />
+    <link rel="next" title="protocol_cns07" href="protocol_cns07.html" />
+    <link rel="prev" title="pk_vrf" href="pk_vrf.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="protocol_cns07.html" title="protocol_cns07"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pk_vrf.html" title="pk_vrf"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pre_mg07">
+<span id="pre-mg07"></span><h1>pre_mg07<a class="headerlink" href="#module-pre_mg07" title="Permalink to this headline">¶</a></h1>
+<p>Identity-Based Proxy Re-Encryption</p>
+<div class="line-block">
+<div class="line">From: &#8220;M. Green, G. Ateniese Identity-Based Proxy Re-Encryption&#8221;, Section 4.3.</div>
+<div class="line">Published in: Applied Cryptography and Network Security. Springer Berlin/Heidelberg, 2007</div>
+<div class="line">Available from: <a class="reference external" href="http://link.springer.com/chapter/10.1007%2F978-3-540-72738-5_19">http://link.springer.com/chapter/10.1007%2F978-3-540-72738-5_19</a></div>
+</div>
+<ul class="simple">
+<li>type:           proxy encryption (identity-based)</li>
+<li>setting:        bilinear groups (symmetric)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body"><ol class="first upperalpha simple" start="14">
+<li>Fotiou</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body"><p class="first last">11/2012</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="pre_mg07.PreGA">
+<em class="property">class </em><tt class="descclassname">pre_mg07.</tt><tt class="descname">PreGA</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_mg07.PreGA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">pc_element</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ID</span> <span class="o">=</span> <span class="s">&quot;nikos fotiou&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ID2</span> <span class="o">=</span> <span class="s">&quot;test user&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;hello world!!!!!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pre</span> <span class="o">=</span> <span class="n">PreGA</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">id_secret_key</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">keyGen</span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">id2_secret_key</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">keyGen</span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">ID2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pre</span><span class="o">.</span><span class="n">decryptFirstLevel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="n">id_secret_key</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
+<span class="go">b&#39;hello world!!!!!&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">re_encryption_key</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">rkGen</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="n">id_secret_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">ID2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext2</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">reEncrypt</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">re_encryption_key</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pre</span><span class="o">.</span><span class="n">decryptSecondLevel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="n">id2_secret_key</span><span class="p">,</span><span class="n">ID</span><span class="p">,</span> <span class="n">ID2</span><span class="p">,</span> <span class="n">ciphertext2</span><span class="p">)</span>
+<span class="go">b&#39;hello world!!!!!&#39;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="pre_mg07.PreGA.decryptFirstLevel">
+<tt class="descname">decryptFirstLevel</tt><big>(</big><em>params</em>, <em>skid</em>, <em>cid</em>, <em>ID</em><big>)</big><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.decryptFirstLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_mg07.PreGA.decryptFirstLevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pre_mg07.PreGA.decryptSecondLevel">
+<tt class="descname">decryptSecondLevel</tt><big>(</big><em>params</em>, <em>skid</em>, <em>IDsrc</em>, <em>ID</em>, <em>cid</em><big>)</big><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.decryptSecondLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_mg07.PreGA.decryptSecondLevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pre_mg07.PreGA.encrypt">
+<tt class="descname">encrypt</tt><big>(</big><em>params</em>, <em>ID</em>, <em>M</em><big>)</big><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_mg07.PreGA.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pre_mg07.PreGA.keyGen">
+<tt class="descname">keyGen</tt><big>(</big><em>msk</em>, <em>ID</em><big>)</big><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.keyGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_mg07.PreGA.keyGen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pre_mg07.PreGA.reEncrypt">
+<tt class="descname">reEncrypt</tt><big>(</big><em>params</em>, <em>IDsrc</em>, <em>rk</em>, <em>cid</em><big>)</big><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.reEncrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_mg07.PreGA.reEncrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pre_mg07.PreGA.rkGen">
+<tt class="descname">rkGen</tt><big>(</big><em>params</em>, <em>skid</em>, <em>IDsrc</em>, <em>IDdest</em><big>)</big><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.rkGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_mg07.PreGA.rkGen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pre_mg07.PreGA.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_mg07.PreGA.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pk_vrf.html"
+                        title="previous chapter">pk_vrf</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="protocol_cns07.html"
+                        title="next chapter">protocol_cns07</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/charm/schemes/pre_mg07.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="protocol_cns07.html" title="protocol_cns07"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pk_vrf.html" title="pk_vrf"
+             >previous</a> |</li>
+        <li><a href="../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

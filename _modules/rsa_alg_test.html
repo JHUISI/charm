@@ -1,0 +1,433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rsa_alg_test &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rsa_alg_test</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">:Date: Jul 1, 2011</span>
+<span class="sd">:authors: Gary Belvin</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">binascii</span> <span class="kn">import</span> <span class="n">a2b_hex</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_rsa</span> <span class="kn">import</span> <span class="n">RSA_Enc</span><span class="p">,</span> <span class="n">RSA_Sig</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.securerandom</span> <span class="kn">import</span> <span class="n">WeakRandom</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">Random</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="Test"><a class="viewcode-back" href="../test/rsa_alg_test.html#rsa_alg_test.Test">[docs]</a><span class="k">class</span> <span class="nc">Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+    
+<div class="viewcode-block" id="Test.testRSAEnc"><a class="viewcode-back" href="../test/rsa_alg_test.html#rsa_alg_test.Test.testRSAEnc">[docs]</a>    <span class="k">def</span> <span class="nf">testRSAEnc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Enc</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        
+        <span class="c">#m = integer(34567890981234556498) % pk[&#39;N&#39;]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test&#39;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        
+        <span class="n">orig_m</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">orig_m</span><span class="p">,</span> <span class="s">&#39;o: =&gt;</span><span class="si">%s</span><span class="se">\n</span><span class="s">m: =&gt;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">orig_m</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+            </div>
+<div class="viewcode-block" id="Test.testRSAVector"><a class="viewcode-back" href="../test/rsa_alg_test.html#rsa_alg_test.Test.testRSAVector">[docs]</a>    <span class="k">def</span> <span class="nf">testRSAVector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># ==================================</span>
+        <span class="c"># Example 1: A 1024-bit RSA Key Pair</span>
+        <span class="c"># ==================================</span>
+        
+        <span class="c"># ------------------------------</span>
+        <span class="c"># Components of the RSA Key Pair</span>
+        <span class="c"># ------------------------------</span>
+        
+        <span class="c"># RSA modulus n:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        bb f8 2f 09 06 82 ce 9c 23 38 ac 2b 9d a8 71 f7 </span><span class="se">\</span>
+<span class="s">        36 8d 07 ee d4 10 43 a4 40 d6 b6 f0 74 54 f5 1f </span><span class="se">\</span>
+<span class="s">        b8 df ba af 03 5c 02 ab 61 ea 48 ce eb 6f cd 48 </span><span class="se">\</span>
+<span class="s">        76 ed 52 0d 60 e1 ec 46 19 71 9d 8a 5b 8b 80 7f </span><span class="se">\</span>
+<span class="s">        af b8 e0 a3 df c7 37 72 3e e6 b4 b7 d9 3a 25 84 </span><span class="se">\</span>
+<span class="s">        ee 6a 64 9d 06 09 53 74 88 34 b2 45 45 98 39 4e </span><span class="se">\</span>
+<span class="s">        e0 aa b1 2d 7b 61 a5 1f 52 7a 9a 41 f6 c1 68 7f </span><span class="se">\</span>
+<span class="s">        e2 53 72 98 ca 2a 8f 59 46 f8 e5 fd 09 1d bd cb &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        
+        <span class="c"># RSA public exponent e:</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;11&#39;</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        
+        <span class="c"># Prime p: </span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        ee cf ae 81 b1 b9 b3 c9 08 81 0b 10 a1 b5 60 01 </span><span class="se">\</span>
+<span class="s">        99 eb 9f 44 ae f4 fd a4 93 b8 1a 9e 3d 84 f6 32 </span><span class="se">\</span>
+<span class="s">        12 4e f0 23 6e 5d 1e 3b 7e 28 fa e7 aa 04 0a 2d </span><span class="se">\</span>
+<span class="s">        5b 25 21 76 45 9d 1f 39 75 41 ba 2a 58 fb 65 99 &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        
+        <span class="c"># Prime q: </span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        c9 7f b1 f0 27 f4 53 f6 34 12 33 ea aa d1 d9 35 </span><span class="se">\</span>
+<span class="s">        3f 6c 42 d0 88 66 b1 d0 5a 0f 20 35 02 8b 9d 86 </span><span class="se">\</span>
+<span class="s">        98 40 b4 16 66 b4 2e 92 ea 0d a3 b4 32 04 b5 cf </span><span class="se">\</span>
+<span class="s">        ce 33 52 52 4d 04 16 a5 a4 41 e7 00 af 46 15 03&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        
+        <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">e</span> <span class="o">%</span> <span class="n">phi_N</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">e</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+        
+        <span class="c"># ----------------------------------</span>
+        <span class="c"># Step-by-step RSAES-OAEP Encryption</span>
+        <span class="c"># ----------------------------------</span>
+        
+        <span class="c"># Message to be encrypted:</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        d4 36 e9 95 69 fd 32 a7 c8 a0 5b bc 90 d3 2c 49&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="n">lhash</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        da 39 a3 ee 5e 6b 4b 0d 32 55 bf ef 95 60 18 90 </span><span class="se">\</span>
+<span class="s">        af d8 07 09&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># DB:</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        da 39 a3 ee 5e 6b 4b 0d 32 55 bf ef 95 60 18 90 </span><span class="se">\</span>
+<span class="s">        af d8 07 09 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 01 d4 36 e9 95 69 </span><span class="se">\</span>
+<span class="s">        fd 32 a7 c8 a0 5b bc 90 d3 2c 49&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span> 
+        
+        <span class="c"># Seed:</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        aa fd 12 f6 59 ca e6 34 89 b4 79 e5 07 6d de c2 </span><span class="se">\</span>
+<span class="s">        f0 6c b5 8f &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># dbMask:</span>
+        <span class="n">dbmask</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        06 e1 de b2 36 9a a5 a5 c7 07 d8 2c 8e 4e 93 24 </span><span class="se">\</span>
+<span class="s">        8a c7 83 de e0 b2 c0 46 26 f5 af f9 3e dc fb 25 </span><span class="se">\</span>
+<span class="s">        c9 c2 b3 ff 8a e1 0e 83 9a 2d db 4c dc fe 4f f4 </span><span class="se">\</span>
+<span class="s">        77 28 b4 a1 b7 c1 36 2b aa d2 9a b4 8d 28 69 d5 </span><span class="se">\</span>
+<span class="s">        02 41 21 43 58 11 59 1b e3 92 f9 82 fb 3e 87 d0 </span><span class="se">\</span>
+<span class="s">        95 ae b4 04 48 db 97 2f 3a c1 4e af f4 9c 8c 3b </span><span class="se">\</span>
+<span class="s">        7c fc 95 1a 51 ec d1 dd e6 12 64&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span> 
+        
+        <span class="c"># maskedDB:</span>
+        <span class="n">maskeddb</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        dc d8 7d 5c 68 f1 ee a8 f5 52 67 c3 1b 2e 8b b4 </span><span class="se">\</span>
+<span class="s">        25 1f 84 d7 e0 b2 c0 46 26 f5 af f9 3e dc fb 25 </span><span class="se">\</span>
+<span class="s">        c9 c2 b3 ff 8a e1 0e 83 9a 2d db 4c dc fe 4f f4 </span><span class="se">\</span>
+<span class="s">        77 28 b4 a1 b7 c1 36 2b aa d2 9a b4 8d 28 69 d5 </span><span class="se">\</span>
+<span class="s">        02 41 21 43 58 11 59 1b e3 92 f9 82 fb 3e 87 d0 </span><span class="se">\</span>
+<span class="s">        95 ae b4 04 48 db 97 2f 3a c1 4f 7b c2 75 19 52 </span><span class="se">\</span>
+<span class="s">        81 ce 32 d2 f1 b7 6d 4d 35 3e 2d &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># seedMask:</span>
+        <span class="n">seedmask</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        41 87 0b 5a b0 29 e6 57 d9 57 50 b5 4c 28 3c 08 </span><span class="se">\</span>
+<span class="s">        72 5d be a9 &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># maskedSeed:</span>
+        <span class="n">maskedseed</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        eb 7a 19 ac e9 e3 00 63 50 e3 29 50 4b 45 e2 ca </span><span class="se">\</span>
+<span class="s">        82 31 0b 26 &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># EM = 00 || maskedSeed || maskedDB:</span>
+        <span class="n">em</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        00 eb 7a 19 ac e9 e3 00 63 50 e3 29 50 4b 45 e2 </span><span class="se">\</span>
+<span class="s">        ca 82 31 0b 26 dc d8 7d 5c 68 f1 ee a8 f5 52 67 </span><span class="se">\</span>
+<span class="s">        c3 1b 2e 8b b4 25 1f 84 d7 e0 b2 c0 46 26 f5 af </span><span class="se">\</span>
+<span class="s">        f9 3e dc fb 25 c9 c2 b3 ff 8a e1 0e 83 9a 2d db </span><span class="se">\</span>
+<span class="s">        4c dc fe 4f f4 77 28 b4 a1 b7 c1 36 2b aa d2 9a </span><span class="se">\</span>
+<span class="s">        b4 8d 28 69 d5 02 41 21 43 58 11 59 1b e3 92 f9 </span><span class="se">\</span>
+<span class="s">        82 fb 3e 87 d0 95 ae b4 04 48 db 97 2f 3a c1 4f </span><span class="se">\</span>
+<span class="s">        7b c2 75 19 52 81 ce 32 d2 f1 b7 6d 4d 35 3e 2d &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+            
+        <span class="c"># Encryption:</span>
+        <span class="n">enc</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        12 53 e0 4d c0 a5 39 7b b4 4a 7a b8 7e 9b f2 a0 </span><span class="se">\</span>
+<span class="s">        39 a3 3d 1e 99 6f c8 2a 94 cc d3 00 74 c9 5d f7 </span><span class="se">\</span>
+<span class="s">        63 72 20 17 06 9e 52 68 da 5d 1c 0b 4f 87 2c f6 </span><span class="se">\</span>
+<span class="s">        53 c1 1d f8 23 14 a6 79 68 df ea e2 8d ef 04 bb </span><span class="se">\</span>
+<span class="s">        6d 84 b1 c3 1d 65 4a 19 70 e5 78 3b d6 eb 96 a0 </span><span class="se">\</span>
+<span class="s">        24 c2 ca 2f 4a 90 fe 9f 2e f5 c9 c1 40 e5 bb 48 </span><span class="se">\</span>
+<span class="s">        da 95 36 ad 87 00 c8 4f c9 13 0a de a7 4e 55 8d </span><span class="se">\</span>
+<span class="s">        51 a7 4d df 85 d8 b5 0d e9 68 38 d6 06 3e 09 55 &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Enc</span><span class="p">()</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span> <span class="p">}</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;phi_N&#39;</span><span class="p">:</span><span class="n">phi_N</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">:</span><span class="n">d</span> <span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">}</span>
+        
+        <span class="n">c</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> 
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;RSA OEAP step by step&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Label L  = empty string&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;lHash      = &quot;</span><span class="p">,</span> <span class="n">lhash</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;DB         = &quot;</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;seed       = &quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;dbMask     = &quot;</span><span class="p">,</span> <span class="n">dbmask</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;maskedDB   = &quot;</span><span class="p">,</span> <span class="n">maskeddb</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;seedMask   = &quot;</span><span class="p">,</span> <span class="n">seedmask</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;maskedSeed = &quot;</span><span class="p">,</span> <span class="n">maskedseed</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;EM         = &quot;</span><span class="p">,</span> <span class="n">em</span><span class="p">)</span>
+        
+        <span class="k">assert</span> <span class="n">C</span> <span class="o">==</span> <span class="n">enc</span>
+      
+    </div>
+<div class="viewcode-block" id="Test.testRSASig"><a class="viewcode-back" href="../test/rsa_alg_test.html#rsa_alg_test.Test.testRSASig">[docs]</a>    <span class="k">def</span> <span class="nf">testRSASig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">Random</span><span class="p">()</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="mi">128</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">WeakRandom</span><span class="p">()</span><span class="o">.</span><span class="n">myrandom</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Sig</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">rsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+    
+    </div>
+<div class="viewcode-block" id="Test.testPSSVector"><a class="viewcode-back" href="../test/rsa_alg_test.html#rsa_alg_test.Test.testPSSVector">[docs]</a>    <span class="k">def</span> <span class="nf">testPSSVector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># ==================================</span>
+        <span class="c"># Example 1: A 1024-bit RSA Key Pair</span>
+        <span class="c"># ==================================</span>
+        
+        <span class="c"># ------------------------------</span>
+        <span class="c"># Components of the RSA Key Pair</span>
+        <span class="c"># ------------------------------</span>
+        
+        <span class="c"># RSA modulus n: </span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        a2 ba 40 ee 07 e3 b2 bd 2f 02 ce 22 7f 36 a1 95 </span><span class="se">\</span>
+<span class="s">        02 44 86 e4 9c 19 cb 41 bb bd fb ba 98 b2 2b 0e </span><span class="se">\</span>
+<span class="s">        57 7c 2e ea ff a2 0d 88 3a 76 e6 5e 39 4c 69 d4 </span><span class="se">\</span>
+<span class="s">        b3 c0 5a 1e 8f ad da 27 ed b2 a4 2b c0 00 fe 88 </span><span class="se">\</span>
+<span class="s">        8b 9b 32 c2 2d 15 ad d0 cd 76 b3 e7 93 6e 19 95 </span><span class="se">\</span>
+<span class="s">        5b 22 0d d1 7d 4e a9 04 b1 ec 10 2b 2e 4d e7 75 </span><span class="se">\</span>
+<span class="s">        12 22 aa 99 15 10 24 c7 cb 41 cc 5e a2 1d 00 ee </span><span class="se">\</span>
+<span class="s">        b4 1f 7c 80 08 34 d2 c6 e0 6b ce 3b ce 7e a9 a5 &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        
+        <span class="c"># RSA public exponent e: </span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;01 00 01&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        
+        
+        <span class="c"># Prime p: </span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        d1 7f 65 5b f2 7c 8b 16 d3 54 62 c9 05 cc 04 a2 </span><span class="se">\</span>
+<span class="s">        6f 37 e2 a6 7f a9 c0 ce 0d ce d4 72 39 4a 0d f7 </span><span class="se">\</span>
+<span class="s">        43 fe 7f 92 9e 37 8e fd b3 68 ed df f4 53 cf 00 </span><span class="se">\</span>
+<span class="s">        7a f6 d9 48 e0 ad e7 57 37 1f 8a 71 1e 27 8f 6b &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        
+        <span class="c"># Prime q: </span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        c6 d9 2b 6f ee 74 14 d1 35 8c e1 54 6f b6 29 87 </span><span class="se">\</span>
+<span class="s">        53 0b 90 bd 15 e0 f1 49 63 a5 e2 63 5a db 69 34 </span><span class="se">\</span>
+<span class="s">        7e c0 c0 1b 2a b1 76 3f d8 ac 1a 59 2f b2 27 57 </span><span class="se">\</span>
+<span class="s">        46 3a 98 24 25 bb 97 a3 a4 37 c5 bf 86 d0 3f 2f&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">OS2IP</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        
+        <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">e</span> <span class="o">%</span> <span class="n">phi_N</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">e</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+        
+        <span class="c"># ---------------------------------</span>
+        <span class="c"># Step-by-step RSASSA-PSS Signature</span>
+        <span class="c"># ---------------------------------</span>
+        
+        <span class="c"># Message to be signed:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        85 9e ef 2f d7 8a ca 00 30 8b dc 47 11 93 bf 55 </span><span class="se">\</span>
+<span class="s">        bf 9d 78 db 8f 8a 67 2b 48 46 34 f3 c9 c2 6e 64 </span><span class="se">\</span>
+<span class="s">        78 ae 10 26 0f e0 dd 8c 08 2e 53 a5 29 3a f2 17 </span><span class="se">\</span>
+<span class="s">        3c d5 0c 6d 5d 35 4f eb f7 8b 26 02 1c 25 c0 27 </span><span class="se">\</span>
+<span class="s">        12 e7 8c d4 69 4c 9f 46 97 77 e4 51 e7 f8 e9 e0 </span><span class="se">\</span>
+<span class="s">        4c d3 73 9c 6b bf ed ae 48 7f b5 56 44 e9 ca 74 </span><span class="se">\</span>
+<span class="s">        ff 77 a5 3c b7 29 80 2f 6e d4 a5 ff a8 ba 15 98 </span><span class="se">\</span>
+<span class="s">        90 fc &#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>        
+        
+        <span class="c"># mHash:</span>
+        <span class="n">mHash</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        37 b6 6a e0 44 58 43 35 3d 47 ec b0 b4 fd 14 c1 </span><span class="se">\</span>
+<span class="s">        10 e6 2d 6a&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># salt:</span>
+        <span class="n">salt</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        e3 b5 d5 d0 02 c1 bc e5 0c 2b 65 ef 88 a1 88 d8 </span><span class="se">\</span>
+<span class="s">        3b ce 7e 61&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># M&#39;:</span>
+        <span class="n">mPrime</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 37 b6 6a e0 44 58 43 35 </span><span class="se">\</span>
+<span class="s">        3d 47 ec b0 b4 fd 14 c1 10 e6 2d 6a e3 b5 d5 d0 </span><span class="se">\</span>
+<span class="s">        02 c1 bc e5 0c 2b 65 ef 88 a1 88 d8 3b ce 7e 61&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># H:</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        df 1a 89 6f 9d 8b c8 16 d9 7c d7 a2 c4 3b ad 54 </span><span class="se">\</span>
+<span class="s">        6f be 8c fe&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># DB:</span>
+        <span class="n">DB</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </span><span class="se">\</span>
+<span class="s">        00 00 00 00 00 00 01 e3 b5 d5 d0 02 c1 bc e5 0c </span><span class="se">\</span>
+<span class="s">        2b 65 ef 88 a1 88 d8 3b ce 7e 61&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># dbMask:</span>
+        <span class="n">dbMask</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67 </span><span class="se">\</span>
+<span class="s">        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af </span><span class="se">\</span>
+<span class="s">        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4 </span><span class="se">\</span>
+<span class="s">        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1 </span><span class="se">\</span>
+<span class="s">        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec </span><span class="se">\</span>
+<span class="s">        d3 18 3a 31 1f c8 97 39 a9 66 43 13 6e 8b 0f 46 </span><span class="se">\</span>
+<span class="s">        5e 87 a4 53 5c d4 c5 9b 10 02 8d&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># maskedDB:</span>
+        <span class="n">maskedDB</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67 </span><span class="se">\</span>
+<span class="s">        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af </span><span class="se">\</span>
+<span class="s">        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4 </span><span class="se">\</span>
+<span class="s">        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1 </span><span class="se">\</span>
+<span class="s">        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec </span><span class="se">\</span>
+<span class="s">        d3 18 3a 31 1f c8 96 da 1c b3 93 11 af 37 ea 4a </span><span class="se">\</span>
+<span class="s">        75 e2 4b db fd 5c 1d a0 de 7c ec&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># Encoded message EM:</span>
+        <span class="n">EM</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        66 e4 67 2e 83 6a d1 21 ba 24 4b ed 65 76 b8 67 </span><span class="se">\</span>
+<span class="s">        d9 a4 47 c2 8a 6e 66 a5 b8 7d ee 7f bc 7e 65 af </span><span class="se">\</span>
+<span class="s">        50 57 f8 6f ae 89 84 d9 ba 7f 96 9a d6 fe 02 a4 </span><span class="se">\</span>
+<span class="s">        d7 5f 74 45 fe fd d8 5b 6d 3a 47 7c 28 d2 4b a1 </span><span class="se">\</span>
+<span class="s">        e3 75 6f 79 2d d1 dc e8 ca 94 44 0e cb 52 79 ec </span><span class="se">\</span>
+<span class="s">        d3 18 3a 31 1f c8 96 da 1c b3 93 11 af 37 ea 4a </span><span class="se">\</span>
+<span class="s">        75 e2 4b db fd 5c 1d a0 de 7c ec df 1a 89 6f 9d </span><span class="se">\</span>
+<span class="s">        8b c8 16 d9 7c d7 a2 c4 3b ad 54 6f be 8c fe bc&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        <span class="c"># Signature S, the RSA decryption of EM:</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">a2b_hex</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\</span>
+<span class="s">        8d aa 62 7d 3d e7 59 5d 63 05 6c 7e c6 59 e5 44 </span><span class="se">\</span>
+<span class="s">        06 f1 06 10 12 8b aa e8 21 c8 b2 a0 f3 93 6d 54 </span><span class="se">\</span>
+<span class="s">        dc 3b dc e4 66 89 f6 b7 95 1b b1 8e 84 05 42 76 </span><span class="se">\</span>
+<span class="s">        97 18 d5 71 5d 21 0d 85 ef bb 59 61 92 03 2c 42 </span><span class="se">\</span>
+<span class="s">        be 4c 29 97 2c 85 62 75 eb 6d 5a 45 f0 5f 51 87 </span><span class="se">\</span>
+<span class="s">        6f c6 74 3d ed dd 28 ca ec 9b b3 0e a9 9e 02 c3 </span><span class="se">\</span>
+<span class="s">        48 82 69 60 4f e4 97 f7 4c cd 7c 7f ca 16 71 89 </span><span class="se">\</span>
+<span class="s">        71 23 cb d3 0d ef 5d 54 a2 b5 53 6a d9 0a 74 7e&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span><span class="s">&#39;utf-8&#39;</span><span class="p">))</span>
+        
+        
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> 
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;PSS Test Step by Step&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;mHash    = Hash(M)&quot;</span><span class="p">,</span> <span class="n">mHash</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;salt     = random &quot;</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;M&#39;       = Padding || mHash || salt&quot;</span><span class="p">,</span> <span class="n">mPrime</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;H        = Hash(M&#39;)&quot;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;DB       = Padding || salt&quot;</span><span class="p">,</span> <span class="n">DB</span><span class="p">)</span> 
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;dbMask   = MGF(H, length(DB))&quot;</span><span class="p">,</span> <span class="n">dbMask</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;maskedDB = DB xor dbMask&quot;</span><span class="p">,</span> <span class="n">maskedDB</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;EM       = maskedDB || H || 0xbc&quot;</span><span class="p">,</span> <span class="n">EM</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;S        = RSA decryption of EM&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+        
+        <span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Sig</span><span class="p">()</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;phi_N&#39;</span><span class="p">:</span><span class="n">phi_N</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">:</span><span class="n">d</span> <span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">}</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">salt</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">S</span> <span class="o">==</span> <span class="n">sig</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c">#import sys;sys.argv = [&#39;&#39;, &#39;Test.testName&#39;]</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

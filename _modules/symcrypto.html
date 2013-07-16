@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>symcrypto &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>symcrypto &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -111,13 +109,12 @@
 <span class="sd">    Ideally provide an INDCCA2 secure symmetric container for arbitrary data.</span>
 <span class="sd">    Currently only supports primitives that JSON can encode and decode.</span>
 <span class="sd">  </span>
-<span class="sd">     A large number of the schemes can only encrypt group elements </span>
+<span class="sd">    A large number of the schemes can only encrypt group elements </span>
 <span class="sd">    and do not provide an efficient mechanism for encoding byte in</span>
 <span class="sd">    those elements. As such we don&#39;t pick a symmetric key and encrypt </span>
 <span class="sd">    it asymmetrically. Rather, we hash a random group element to get the</span>
 <span class="sd">    symmetric key.</span>
 
-<span class="sd">    usage:</span>
 <span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup,GT</span>
 <span class="sd">    &gt;&gt;&gt; groupObj = PairingGroup(&#39;SS512&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; from charm.core.math.pairing import hashPair as extractor</span>
@@ -229,14 +226,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

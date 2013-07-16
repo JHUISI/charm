@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>schemebase &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>schemebase &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,46 +49,69 @@
   <h1>Source code for schemebase</h1><div class="highlight"><pre>
 <span class="kn">from</span> <span class="nn">charm.toolbox.enum</span> <span class="kn">import</span> <span class="o">*</span>
 
+<span class="c"># user-map</span>
+<span class="n">EU_CMA</span><span class="p">,</span><span class="n">SU_CMA</span><span class="o">=</span><span class="s">&quot;EU_CMA&quot;</span><span class="p">,</span><span class="s">&quot;SU_CMA&quot;</span>
+<span class="n">SM</span><span class="p">,</span><span class="n">ROM</span><span class="p">,</span><span class="n">CRS</span> <span class="o">=</span> <span class="s">&quot;SM&quot;</span><span class="p">,</span><span class="s">&quot;ROM&quot;</span><span class="p">,</span><span class="s">&quot;CRS&quot;</span>
+<span class="n">OW</span><span class="p">,</span><span class="n">RSA</span><span class="p">,</span><span class="n">StrongRSA</span><span class="p">,</span><span class="n">DL</span><span class="p">,</span><span class="n">DH</span><span class="p">,</span><span class="n">CDH</span><span class="p">,</span><span class="n">DDH</span><span class="p">,</span><span class="n">DBDH</span><span class="p">,</span><span class="n">q_SDH</span><span class="p">,</span><span class="n">LRSW</span> <span class="o">=</span> <span class="s">&quot;OW&quot;</span><span class="p">,</span><span class="s">&quot;RSA&quot;</span><span class="p">,</span><span class="s">&quot;StrongRSA&quot;</span><span class="p">,</span><span class="s">&quot;DL&quot;</span><span class="p">,</span><span class="s">&quot;DH&quot;</span><span class="p">,</span><span class="s">&quot;CDH&quot;</span><span class="p">,</span><span class="s">&quot;DDH&quot;</span><span class="p">,</span><span class="s">&quot;DBDH&quot;</span><span class="p">,</span><span class="s">&quot;q_SDH&quot;</span><span class="p">,</span><span class="s">&quot;LRSW&quot;</span>
+
+<span class="c"># security models: standard, random oracle and common reference string</span>
+<span class="n">baseSecModels</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;SM&#39;</span><span class="p">,</span> <span class="s">&#39;ROM&#39;</span><span class="p">,</span> <span class="s">&#39;CRS&#39;</span><span class="p">)</span>
+<span class="c"># scheme types</span>
+<span class="n">SchemeType</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;PKEnc&#39;</span><span class="p">,</span> <span class="s">&#39;PKSig&#39;</span><span class="p">,</span> <span class="s">&#39;IBEnc&#39;</span><span class="p">,</span> <span class="s">&#39;IBSig&#39;</span><span class="p">,</span> <span class="s">&#39;RingSig&#39;</span><span class="p">,</span> <span class="s">&#39;GroupSig&#39;</span><span class="p">,</span> <span class="s">&#39;ABEnc&#39;</span><span class="p">,</span> <span class="s">&#39;DABEnc&#39;</span><span class="p">,</span><span class="s">&#39;Commitment&#39;</span><span class="p">,</span> <span class="s">&#39;Hash&#39;</span><span class="p">,</span> <span class="s">&#39;ChamHash&#39;</span><span class="p">,</span> <span class="s">&#39;Protocol&#39;</span><span class="p">)</span>
+<span class="c"># security hardness assumptions</span>
+<span class="n">secAssump</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;OW&#39;</span><span class="p">,</span><span class="s">&#39;RSA&#39;</span><span class="p">,</span><span class="s">&#39;StrongRSA&#39;</span><span class="p">,</span><span class="s">&#39;DL&#39;</span><span class="p">,</span><span class="s">&#39;DH&#39;</span><span class="p">,</span><span class="s">&#39;CDH&#39;</span><span class="p">,</span><span class="s">&#39;DDH&#39;</span><span class="p">,</span><span class="s">&#39;DBDH&#39;</span><span class="p">,</span><span class="s">&#39;q_SDH&#39;</span><span class="p">,</span><span class="s">&#39;LRSW&#39;</span><span class="p">)</span> <span class="c"># need to expand this since it captures implications</span>
+
+<span class="n">schemeType</span> <span class="o">=</span> <span class="s">&quot;scheme&quot;</span>
+<span class="n">assumptionType</span> <span class="o">=</span> <span class="s">&quot;assumption&quot;</span>
+<span class="n">messageSpaceType</span> <span class="o">=</span> <span class="s">&quot;messageSpace&quot;</span>
+<span class="n">secModelType</span> <span class="o">=</span> <span class="s">&quot;secModel&quot;</span>
+<span class="n">secDefType</span>   <span class="o">=</span> <span class="s">&quot;secDef&quot;</span>
+
 <div class="viewcode-block" id="SchemeBase"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase">[docs]</a><span class="k">class</span> <span class="nc">SchemeBase</span><span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39;Base class for all crypto, which defines certain attributes&#39;&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;Base class for all crypto, which defines security properties of cryptosystem&#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseSchemeTypes</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;PKEnc&#39;</span><span class="p">,</span> <span class="s">&#39;PKSig&#39;</span><span class="p">,</span> <span class="s">&#39;IBEnc&#39;</span><span class="p">,</span> <span class="s">&#39;IBSig&#39;</span><span class="p">,</span> <span class="s">&#39;ABEnc&#39;</span><span class="p">,</span> <span class="s">&#39;Commitment&#39;</span><span class="p">,</span> <span class="s">&#39;Hash&#39;</span><span class="p">,</span> <span class="s">&#39;Protocol&#39;</span><span class="p">)</span>
-	    <span class="c"># self.baseSecDefs defined by derived scheme types</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseAssumptions</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;RSA&#39;</span><span class="p">,</span><span class="s">&#39;StrongRSA&#39;</span><span class="p">,</span><span class="s">&#39;DL&#39;</span><span class="p">,</span><span class="s">&#39;DH&#39;</span><span class="p">,</span><span class="s">&#39;CDH&#39;</span><span class="p">,</span><span class="s">&#39;DDH&#39;</span><span class="p">,</span><span class="s">&#39;DBDH&#39;</span><span class="p">,</span><span class="s">&#39;q_SDH&#39;</span><span class="p">,</span><span class="s">&#39;LRSW&#39;</span><span class="p">)</span> 
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecModels</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;SM&#39;</span><span class="p">,</span> <span class="s">&#39;ROM&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="p">{}</span>
         
-<div class="viewcode-block" id="SchemeBase.setProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.setProperty">[docs]</a>    <span class="k">def</span> <span class="nf">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secdef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">message_space</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secmodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">scheme</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">schemeType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSchemeTypes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">secdef</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">secdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span><span class="p">[</span><span class="n">secdef</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">assumption</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">assumption</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseAssumptions</span><span class="p">[</span><span class="n">assumption</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secDef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">messageSpace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secModel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">scheme</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">scheme</span> <span class="ow">in</span> <span class="n">SchemeType</span><span class="o">.</span><span class="n">getList</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span> <span class="n">schemeType</span> <span class="p">]</span> <span class="o">=</span> <span class="n">SchemeType</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">assumption</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">assumption</span> <span class="ow">in</span> <span class="n">secAssump</span><span class="o">.</span><span class="n">getList</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span> <span class="n">assumptionType</span> <span class="p">]</span> <span class="o">=</span> <span class="n">secAssump</span><span class="p">[</span><span class="n">assumption</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">messageSpace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">messageSpace</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span> <span class="n">messageSpaceType</span> <span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">messageSpace</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">messageSpace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span> <span class="n">messageSpaceType</span> <span class="p">]</span> <span class="o">=</span> <span class="n">messageSpace</span> <span class="c"># TODO: better error handling here</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">message_space</span> <span class="o">=</span> <span class="n">message_space</span>
-        <span class="k">if</span> <span class="n">secmodel</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">secmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseSecModels</span><span class="p">[</span><span class="n">secmodel</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">secModel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">secModel</span> <span class="ow">in</span> <span class="n">baseSecModels</span><span class="o">.</span><span class="n">getList</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span> <span class="n">secModelType</span> <span class="p">]</span> <span class="o">=</span> <span class="n">baseSecModels</span><span class="p">[</span><span class="n">secModel</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">secDef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span> <span class="n">secDefType</span> <span class="p">]</span> <span class="o">=</span> <span class="n">secDef</span> <span class="c"># defined by subclass</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span> <span class="n">key</span> <span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">True</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">other</span> <span class="o">=</span> <span class="n">other</span>
-        <span class="k">return</span> <span class="bp">None</span>
-</div>
-<div class="viewcode-block" id="SchemeBase.getProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.getProperty">[docs]</a>    <span class="k">def</span> <span class="nf">getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">props</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;schemeType&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schemeType</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;secdef&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secdef</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;assumption&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assumption</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;message_space&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message_space</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;secmodel&#39;</span><span class="p">):</span> <span class="n">props</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secmodel</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span> <span class="n">props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">other</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="SchemeBase.checkProperty"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.checkProperty">[docs]</a>    <span class="k">def</span> <span class="nf">checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
-           <span class="n">values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>           
-           <span class="c">#print(&quot;values =&gt;&quot;, values)</span>
-           <span class="n">check</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">getProperty</span><span class="p">()</span>
-           <span class="c">#print(&quot;check list =&gt;&quot;, check)</span>
-           <span class="k">if</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">check</span><span class="p">)):</span>
-               <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">False</span>
-    </div>
+    <span class="k">def</span> <span class="nf">_getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+        <span class="c"># verify scheme is a subclass of SchemeBase</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="s">&#39;getProperty&#39;</span><span class="p">):</span> 
+            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;ERROR: Scheme class not derived from any of the Charm scheme types.&quot;</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+           <span class="n">criteria</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+           <span class="c">#print(&quot;criteria: &quot;, criteria)</span>
+           <span class="n">targetProps</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">getProperty</span><span class="p">()</span>
+           <span class="c">#print(&quot;check list =&gt;&quot;, targetProps)</span>
+           <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">criteria</span><span class="p">:</span>
+               <span class="c">#print(k, &quot;:&quot;, v)</span>
+               <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">targetProps</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                   <span class="c"># found a match</span>
+                   <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">targetProps</span><span class="p">[</span><span class="n">k</span><span class="p">])):</span>
+                       <span class="k">continue</span>
+                   <span class="c"># criteria value is less than target value</span>
+                   <span class="k">elif</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">baseSecModels</span><span class="o">.</span><span class="n">getList</span><span class="p">()</span> <span class="ow">and</span> <span class="n">baseSecModels</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">targetProps</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                       <span class="k">continue</span>
+               <span class="k">else</span><span class="p">:</span>
+                   <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;ERROR: required property not in scheme dictionary or not satisfied: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">k</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="SchemeBase.verifyTypeStruct"><a class="viewcode-back" href="../toolbox/schemebase.html#schemebase.SchemeBase.verifyTypeStruct">[docs]</a>    <span class="k">def</span> <span class="nf">verifyTypeStruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">_types</span><span class="o">=</span><span class="nb">dict</span><span class="p">):</span>
         <span class="c"># make sure src and targ the same type otherwise raise error</span>
@@ -246,14 +267,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

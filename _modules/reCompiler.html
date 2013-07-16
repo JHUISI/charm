@@ -1,0 +1,439 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>reCompiler &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for reCompiler</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; Module re_compile -- compile a regular expression into an FSA</span>
+
+<span class="sd">To Do</span>
+<span class="sd">-----</span>
+<span class="sd">New features:</span>
+<span class="sd">    - add \-, \~</span>
+<span class="sd">    - add remaining metachars</span>
+<span class="sd">    - char set with ^ as first char will print wrong</span>
+<span class="sd">    - figure out when to print spaces between operators</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span>  <span class="o">=</span> <span class="s">&quot;Oliver Steele &lt;steele@osteele.com&gt;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="nb">reduce</span>
+<span class="kn">import</span> <span class="nn">charm.toolbox.FSA</span> <span class="kn">as</span> <span class="nn">FSA</span>
+
+<div class="viewcode-block" id="compileSymbolRE"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.compileSymbolRE">[docs]</a><span class="k">def</span> <span class="nf">compileSymbolRE</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">SymbolRECompiler</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">toFSA</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="dummy_func"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.dummy_func">[docs]</a><span class="k">def</span> <span class="nf">dummy_func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> 
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler">[docs]</a><span class="k">class</span> <span class="nc">SymbolRECompiler</span><span class="p">:</span>
+    <span class="n">EOF</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">recordSourcePositions</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str</span> <span class="o">=</span> <span class="nb">str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recordSourcePositions</span> <span class="o">=</span> <span class="n">recordSourcePositions</span>
+    
+<div class="viewcode-block" id="SymbolRECompiler.toFSA"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.toFSA">[docs]</a>    <span class="k">def</span> <span class="nf">toFSA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nextToken</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">fsa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compileExpr</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;extra &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="s">&#39;)&#39;</span><span class="p">))</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">fsa</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">str</span>
+        <span class="k">if</span> <span class="n">minimize</span><span class="p">:</span>
+            <span class="n">fsa</span> <span class="o">=</span> <span class="n">fsa</span><span class="o">.</span><span class="n">minimized</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fsa</span>
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler.readChar"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.readChar">[docs]</a>    <span class="k">def</span> <span class="nf">readChar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="p">):</span>
+            <span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">c</span>
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler.peekChar"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.peekChar">[docs]</a>    <span class="k">def</span> <span class="nf">peekChar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler.readToken"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.readToken">[docs]</a>    <span class="k">def</span> <span class="nf">readToken</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nextToken</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readNextToken</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nextToken</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="n">token</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">EOF</span> <span class="ow">and</span> <span class="n">token</span>
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler.peekToken"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.peekToken">[docs]</a>    <span class="k">def</span> <span class="nf">peekToken</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nextToken</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nextToken</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_readNextToken</span><span class="p">()</span>
+        <span class="c">#print &#39;peekToken&#39;, token</span>
+        <span class="k">return</span> <span class="n">token</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">EOF</span> <span class="ow">and</span> <span class="n">token</span>
+    </div>
+    <span class="k">def</span> <span class="nf">_readNextToken</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readChar</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">EOF</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;()|&amp;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">c</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;.&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ANY</span>
+        <span class="k">return</span> <span class="n">c</span>
+    
+<div class="viewcode-block" id="SymbolRECompiler.skipTokens"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.skipTokens">[docs]</a>    <span class="k">def</span> <span class="nf">skipTokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bag</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekToken</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekToken</span><span class="p">()</span> <span class="ow">in</span> <span class="n">bag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">readToken</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler.compileExpr"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.compileExpr">[docs]</a>    <span class="k">def</span> <span class="nf">compileExpr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">NULL_FSA</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekToken</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekToken</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;)&#39;</span><span class="p">:</span>
+            <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">fsa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compileConjunction</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">skipTokens</span><span class="p">([</span><span class="s">&#39;|&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">fsa</span>
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler.compileConjunction"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.compileConjunction">[docs]</a>    <span class="k">def</span> <span class="nf">compileConjunction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fsa</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekToken</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekToken</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;)&#39;</span><span class="p">,</span> <span class="s">&#39;|&#39;</span><span class="p">):</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compileSequence</span><span class="p">()</span>
+            <span class="n">fsa</span> <span class="o">=</span> <span class="n">fsa</span> <span class="ow">and</span> <span class="n">FSA</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">fsa</span><span class="p">,</span> <span class="n">sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="n">sequence</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">skipTokens</span><span class="p">([</span><span class="s">&#39;&amp;&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">fsa</span>
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler.compileSequence"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.compileSequence">[docs]</a>    <span class="k">def</span> <span class="nf">compileSequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">EMPTY_STRING_FSA</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekToken</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekToken</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;)&#39;</span><span class="p">,</span> <span class="s">&#39;|&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;&#39;</span><span class="p">):</span>
+            <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">concatenation</span><span class="p">(</span><span class="n">fsa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compileItem</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">fsa</span>
+    </div>
+<div class="viewcode-block" id="SymbolRECompiler.compileItem"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.SymbolRECompiler.compileItem">[docs]</a>    <span class="k">def</span> <span class="nf">compileItem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">startPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readToken</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;(&#39;</span><span class="p">:</span>
+            <span class="n">fsa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compileExpr</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">readToken</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;)&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;missing &#39;)&#39;&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;~&#39;</span><span class="p">:</span>
+            <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">complement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compileItem</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">singleton</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">arcMetadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">recordSourcePositions</span> <span class="ow">and</span> <span class="p">[</span><span class="n">startPosition</span><span class="p">])</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekChar</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekChar</span><span class="p">()</span> <span class="ow">in</span> <span class="s">&#39;?*+&#39;</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readChar</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;*&#39;</span><span class="p">:</span>
+                <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">closure</span><span class="p">(</span><span class="n">fsa</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;?&#39;</span><span class="p">:</span>
+                <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">fsa</span><span class="p">,</span> <span class="n">FSA</span><span class="o">.</span><span class="n">EMPTY_STRING_FSA</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;+&#39;</span><span class="p">:</span>
+                <span class="n">fsa</span> <span class="o">=</span> <span class="n">FSA</span><span class="o">.</span><span class="n">iteration</span><span class="p">(</span><span class="n">fsa</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;program error&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fsa</span>
+
+
+<span class="c">#</span>
+<span class="c"># Character REs</span>
+<span class="c">#</span>
+</div></div>
+<div class="viewcode-block" id="CharacterSet"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.CharacterSet">[docs]</a><span class="k">class</span> <span class="nc">CharacterSet</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ranges</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">ranges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convertString</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span>
+        <span class="n">accum</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c"># copy, so sort doesn&#39;t destroy the arg</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">accum</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">item</span><span class="p">,</span> <span class="n">item</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">accum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;invalid argument to CharacterSet&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+                    <span class="n">accum</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;invalid argument to CharacterSet&quot;</span><span class="p">)</span>
+        <span class="n">ranges</span> <span class="o">=</span> <span class="n">accum</span>
+        <span class="n">ranges</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="p">[(</span><span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">),</span> <span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">)]</span> <span class="o">=</span> <span class="n">ranges</span><span class="p">[</span><span class="n">index</span><span class="p">:</span><span class="n">index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">c1</span> <span class="o">&gt;=</span> <span class="n">c2</span><span class="p">:</span>
+                <span class="n">ranges</span><span class="p">[</span><span class="n">index</span><span class="p">:</span><span class="n">index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">c0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c3</span><span class="p">))]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">=</span> <span class="n">ranges</span>
+    
+    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">cmp</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">cmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">cmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">ranges</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span><span class="n">a</span> <span class="o">^</span> <span class="n">b</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">))</span>
+    
+<div class="viewcode-block" id="CharacterSet.convertString"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.CharacterSet.convertString">[docs]</a>    <span class="k">def</span> <span class="nf">convertString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_str</span><span class="p">):</span>
+        <span class="n">ranges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">_str</span><span class="p">):</span>
+            <span class="n">c0</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">=</span> <span class="n">_str</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">_str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_str</span><span class="p">[</span><span class="n">index</span> <span class="p">]</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">c1</span> <span class="o">=</span> <span class="n">_str</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">2</span>
+            <span class="n">ranges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">ranges</span>
+    </div>
+<div class="viewcode-block" id="CharacterSet.matches"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.CharacterSet.matches">[docs]</a>    <span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">c0</span><span class="p">,</span> <span class="n">c1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c0</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="ow">and</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="n">c1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    </div>
+<div class="viewcode-block" id="CharacterSet.complement"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.CharacterSet.complement">[docs]</a>    <span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">c0</span><span class="p">),</span> <span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">dummy_func</span><span class="p">,</span> <span class="p">[(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">+</span> <span class="p">[(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)]):</span>
+            <span class="n">i0</span> <span class="o">=</span> <span class="n">c0</span> <span class="ow">and</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">or</span> <span class="mi">0</span>
+            <span class="n">i1</span> <span class="o">=</span> <span class="n">c1</span> <span class="ow">and</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="mi">255</span>
+            <span class="k">if</span> <span class="n">i0</span> <span class="o">&lt;=</span> <span class="n">i1</span><span class="p">:</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">chr</span><span class="p">(</span><span class="n">i0</span><span class="p">),</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i1</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CharacterSet</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="CharacterSet.union"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.CharacterSet.union">[docs]</a>    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">complement</span><span class="p">()</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">complement</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">b</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">c</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">complement</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ANY</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">a</span> <span class="ow">or</span> <span class="n">b</span>
+</div>
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="CharacterSet.intersection"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.CharacterSet.intersection">[docs]</a>    <span class="k">def</span> <span class="nf">intersection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">ranges</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">ranges</span><span class="p">:</span>
+                <span class="n">c0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">b0</span><span class="p">)</span>
+                <span class="n">c1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">c0</span> <span class="o">&lt;=</span> <span class="n">c1</span><span class="p">:</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">))</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CharacterSet</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    </div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ### print(CharacterSet([(&#39;a&#39;, &#39;a&#39;)]))</span>
+<span class="sd">        a</span>
+<span class="sd">        ### print(CharacterSet([(&#39;a&#39;, &#39;b&#39;)]))</span>
+<span class="sd">        [ab]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ANY</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;.&#39;</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;[^.]&#39;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">METACHARS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">key</span>
+        <span class="n">ranges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranges</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ranges</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">255</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">complement</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;[&#39;</span> <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;]&#39;</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="s">&#39;[^&#39;</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&#39;]&#39;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">c0</span><span class="p">,</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">ranges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c0</span> <span class="o">==</span> <span class="n">c1</span> <span class="ow">and</span> <span class="n">c0</span> <span class="o">!=</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">crep</span><span class="p">(</span><span class="n">c0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">c0</span> <span class="o">!=</span> <span class="s">&#39;-&#39;</span> <span class="ow">and</span> <span class="n">c1</span> <span class="o">!=</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&quot;</span><span class="si">%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crep</span><span class="p">(</span><span class="n">c0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">crep</span><span class="p">(</span><span class="n">c1</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crep</span><span class="p">(</span><span class="n">c0</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">crep</span><span class="p">(</span><span class="n">c1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s">&#39;[&#39;</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&#39;]&#39;</span>
+    
+<div class="viewcode-block" id="CharacterSet.crep"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.CharacterSet.crep">[docs]</a>    <span class="k">def</span> <span class="nf">crep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">t&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">n&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\r</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">r&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\f</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">f&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\v</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">v&#39;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    </div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&gt;&#39;</span>
+</div>
+<span class="n">METACHARS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;d&#39;</span><span class="p">:</span> <span class="n">CharacterSet</span><span class="p">(</span><span class="s">&#39;0-9&#39;</span><span class="p">),</span>
+        <span class="s">&#39;s&#39;</span><span class="p">:</span> <span class="n">CharacterSet</span><span class="p">(</span><span class="s">&#39; </span><span class="se">\t\n\r\f\v</span><span class="s">&#39;</span><span class="p">),</span>
+        <span class="s">&#39;w&#39;</span><span class="p">:</span> <span class="n">CharacterSet</span><span class="p">(</span><span class="s">&#39;a-zA-Z0-9&#39;</span><span class="p">)}</span>
+<span class="n">METACHARS</span><span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">METACHARS</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">complement</span><span class="p">()</span>
+<span class="n">METACHARS</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">METACHARS</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">complement</span><span class="p">()</span>
+<span class="n">METACHARS</span><span class="p">[</span><span class="s">&#39;W&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">METACHARS</span><span class="p">[</span><span class="s">&#39;w&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">complement</span><span class="p">()</span>
+
+<span class="n">CharacterSet</span><span class="o">.</span><span class="n">ANY</span> <span class="o">=</span> <span class="n">CharacterSet</span><span class="p">([(</span><span class="nb">chr</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">255</span><span class="p">))])</span>
+
+
+<div class="viewcode-block" id="RECompiler"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.RECompiler">[docs]</a><span class="k">class</span> <span class="nc">RECompiler</span><span class="p">(</span><span class="n">SymbolRECompiler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_readNextToken</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readChar</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">EOF</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;()|&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">c</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;.&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CharacterSet</span><span class="o">.</span><span class="n">ANY</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;[&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekChar</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;~&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">readChar</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">readCSetInnards</span><span class="p">()</span><span class="o">.</span><span class="n">complement</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">readCSetInnards</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readChar</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">METACHARS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">METACHARS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;&amp;&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">c</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">CharacterSet</span><span class="p">([(</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">CharacterSet</span><span class="p">([(</span><span class="n">c</span><span class="p">,</span><span class="n">c</span><span class="p">)])</span>
+    
+<div class="viewcode-block" id="RECompiler.readCSetInnards"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.RECompiler.readCSetInnards">[docs]</a>    <span class="k">def</span> <span class="nf">readCSetInnards</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cset</span> <span class="o">=</span> <span class="n">CharacterSet</span><span class="p">([])</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readChar</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;]&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">cset</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peekChar</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">readChar</span><span class="p">()</span>
+                <span class="n">cset</span> <span class="o">=</span> <span class="n">cset</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">CharacterSet</span><span class="p">([(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">readChar</span><span class="p">())]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cset</span> <span class="o">=</span> <span class="n">cset</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">CharacterSet</span><span class="p">([(</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="p">)]))</span>
+</div></div>
+<div class="viewcode-block" id="compileRE"><a class="viewcode-back" href="../toolbox/reCompiler.html#reCompiler.compileRE">[docs]</a><span class="k">def</span> <span class="nf">compileRE</span><span class="p">(</span><span class="n">_str</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">recordSourcePositions</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">RECompiler</span><span class="p">(</span><span class="n">_str</span><span class="p">,</span> <span class="n">recordSourcePositions</span><span class="o">=</span><span class="n">recordSourcePositions</span><span class="p">)</span><span class="o">.</span><span class="n">toFSA</span><span class="p">(</span><span class="n">minimize</span><span class="o">=</span><span class="n">minimize</span><span class="p">)</span>
+
+<span class="c">#</span>
+<span class="c"># testing</span>
+<span class="c">#</span></div>
+<span class="k">def</span> <span class="nf">_printCompiledREs</span><span class="p">():</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a|b&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;abc&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab*c&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab?c&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab+c&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab|c&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a(b|c)&#39;</span><span class="p">))</span>
+    <span class="c">#print compileRE(&#39;a\&amp;a&#39;)</span>
+    <span class="c">#print compileRE(&#39;ab+\&amp;a+b&#39;)</span>
+    <span class="c">#print compileRE(&#39;ab*\&amp;a*b&#39;)</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab|c?&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab|bc?&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a?&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;abc|acb|bac|bca|cab|cba&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;abc|acb|bac|bca|cab|cba&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">determinized</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;abc|acb|bac|bca|cab|cba&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">determinized</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;abc|acb|bac|bca|cab|cba&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimized</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;abc|acb|bac|bca|cab&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">determinized</span><span class="p">())</span>
+
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">determinized</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">determinized</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimized</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimized</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a|b&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">determinized</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a|b&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimized</span><span class="p">()</span><span class="o">.</span><span class="n">getArcMetadata</span><span class="p">())</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">compileRE</span><span class="p">(</span><span class="s">&#39;a|b&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">minimized</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">_test</span><span class="p">(</span><span class="n">reset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">compileRE</span>
+    <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+        <span class="n">doctest</span><span class="o">.</span><span class="n">master</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># This keeps doctest from complaining after a reload.</span>
+    <span class="k">return</span> <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">compileRE</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

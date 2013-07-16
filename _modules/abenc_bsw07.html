@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>abenc_bsw07 &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>abenc_bsw07 &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -75,7 +73,7 @@
 <span class="n">ct_t</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;C_tilde&#39;</span><span class="p">:</span><span class="n">GT</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">G1</span><span class="p">,</span> <span class="s">&#39;Cy&#39;</span><span class="p">:</span><span class="n">G1</span><span class="p">,</span> <span class="s">&#39;Cyp&#39;</span><span class="p">:</span><span class="n">G2</span> <span class="p">}</span>
 
 <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
-<div class="viewcode-block" id="CPabe_BSW07"><a class="viewcode-back" href="../schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07">[docs]</a><span class="k">class</span> <span class="nc">CPabe_BSW07</span><span class="p">(</span><span class="n">ABEnc</span><span class="p">):</span>
+<div class="viewcode-block" id="CPabe_BSW07"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07">[docs]</a><span class="k">class</span> <span class="nc">CPabe_BSW07</span><span class="p">(</span><span class="n">ABEnc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair</span>
 <span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;SS512&#39;)</span>
@@ -98,10 +96,12 @@
         <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
 
     <span class="nd">@Output</span><span class="p">(</span><span class="n">pk_t</span><span class="p">,</span> <span class="n">mk_t</span><span class="p">)</span>    
-<div class="viewcode-block" id="CPabe_BSW07.setup"><a class="viewcode-back" href="../schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CPabe_BSW07.setup"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">g</span><span class="p">,</span> <span class="n">gp</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
         <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-
+        <span class="c"># initialize pre-processing for generators</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">initPP</span><span class="p">();</span> <span class="n">gp</span><span class="o">.</span><span class="n">initPP</span><span class="p">()</span>
+        
         <span class="n">h</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">beta</span><span class="p">;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="o">~</span><span class="n">beta</span>
         <span class="n">e_gg_alpha</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">gp</span> <span class="o">**</span> <span class="n">alpha</span><span class="p">)</span>
         
@@ -111,7 +111,7 @@
     </div>
     <span class="nd">@Input</span><span class="p">(</span><span class="n">pk_t</span><span class="p">,</span> <span class="n">mk_t</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">])</span>
     <span class="nd">@Output</span><span class="p">(</span><span class="n">sk_t</span><span class="p">)</span>
-<div class="viewcode-block" id="CPabe_BSW07.keygen"><a class="viewcode-back" href="../schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<div class="viewcode-block" id="CPabe_BSW07.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> 
         <span class="n">g_r</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>    
         <span class="n">D</span> <span class="o">=</span> <span class="p">(</span><span class="n">mk</span><span class="p">[</span><span class="s">&#39;g2_alpha&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">g_r</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;beta&#39;</span><span class="p">])</span>        
@@ -124,7 +124,7 @@
     </div>
     <span class="nd">@Input</span><span class="p">(</span><span class="n">pk_t</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
     <span class="nd">@Output</span><span class="p">(</span><span class="n">ct_t</span><span class="p">)</span>
-<div class="viewcode-block" id="CPabe_BSW07.encrypt"><a class="viewcode-back" href="../schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">):</span> 
+<div class="viewcode-block" id="CPabe_BSW07.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">):</span> 
         <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">policy_str</span><span class="p">)</span>
         <span class="n">a_list</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
@@ -142,7 +142,7 @@
     </div>
     <span class="nd">@Input</span><span class="p">(</span><span class="n">pk_t</span><span class="p">,</span> <span class="n">sk_t</span><span class="p">,</span> <span class="n">ct_t</span><span class="p">)</span>
     <span class="nd">@Output</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
-<div class="viewcode-block" id="CPabe_BSW07.decrypt"><a class="viewcode-back" href="../schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
+<div class="viewcode-block" id="CPabe_BSW07.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_bsw07.html#abenc_bsw07.CPabe_BSW07.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s">&#39;policy&#39;</span><span class="p">])</span>
         <span class="n">pruned_list</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">pruned_list</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
@@ -155,7 +155,38 @@
         
         <span class="k">return</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;C_tilde&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">],</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">A</span><span class="p">)</span>
 
-   </div></div>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_bsw07.html#abenc_bsw07.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>   
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+
+    <span class="n">cpabe</span> <span class="o">=</span> <span class="n">CPabe_BSW07</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ONE&#39;</span><span class="p">,</span> <span class="s">&#39;TWO&#39;</span><span class="p">,</span> <span class="s">&#39;THREE&#39;</span><span class="p">]</span>
+    <span class="n">access_policy</span> <span class="o">=</span> <span class="s">&#39;((four or three) and (three or one))&#39;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Attributes =&gt;&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="p">);</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Policy =&gt;&quot;</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+    <span class="n">sk</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk :=&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+
+    <span class="n">rand_msg</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;msg =&gt;&quot;</span><span class="p">,</span> <span class="n">rand_msg</span><span class="p">)</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">rand_msg</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">Ciphertext...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">groupObj</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+
+    <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">Decrypt...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Rec msg =&gt;&quot;</span><span class="p">,</span> <span class="n">rec_msg</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">rand_msg</span> <span class="o">==</span> <span class="n">rec_msg</span><span class="p">,</span> <span class="s">&quot;FAILED Decryption: message is incorrect&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!!&quot;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+   
 </pre></div>
 
           </div>
@@ -189,14 +220,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

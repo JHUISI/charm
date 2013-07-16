@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>symcrypto_test &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for symcrypto_test</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">unittest</span> 
+<span class="kn">from</span> <span class="nn">charm.toolbox.symcrypto</span> <span class="kn">import</span> <span class="n">SymmetricCryptoAbstraction</span><span class="p">,</span><span class="n">AuthenticatedCryptoAbstraction</span><span class="p">,</span> <span class="n">MessageAuthenticator</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.pairing</span> <span class="kn">import</span> <span class="n">hashPair</span> <span class="k">as</span> <span class="n">sha1</span>
+<div class="viewcode-block" id="SymmetricCryptoAbstractionTest"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.SymmetricCryptoAbstractionTest">[docs]</a><span class="k">class</span> <span class="nc">SymmetricCryptoAbstractionTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="SymmetricCryptoAbstractionTest.testAESCBC"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.SymmetricCryptoAbstractionTest.testAESCBC">[docs]</a>    <span class="k">def</span> <span class="nf">testAESCBC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MsgtestAESCBC</span><span class="p">(</span><span class="n">b</span><span class="s">&quot;hello world&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SymmetricCryptoAbstractionTest.testAESCBCLong"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.SymmetricCryptoAbstractionTest.testAESCBCLong">[docs]</a>    <span class="k">def</span> <span class="nf">testAESCBCLong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MsgtestAESCBC</span><span class="p">(</span><span class="n">b</span><span class="s">&quot;Lots of people working in cryptography have no deep </span><span class="se">\</span>
+<span class="s">       concern with real application issues. They are trying to discover things </span><span class="se">\</span>
+<span class="s">        clever enough to write papers about -- Whitfield Diffie.&quot;</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="SymmetricCryptoAbstractionTest.testAESCBC_Seperate"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.SymmetricCryptoAbstractionTest.testAESCBC_Seperate">[docs]</a>    <span class="k">def</span> <span class="nf">testAESCBC_Seperate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MsgTestAESCBCSeperate</span><span class="p">(</span><span class="n">b</span><span class="s">&quot;Lots of people working in cryptography have no deep </span><span class="se">\</span>
+<span class="s">        concern with real application issues. They are trying to discover things </span><span class="se">\</span>
+<span class="s">        clever enough to write papers about -- Whitfield Diffie.&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SymmetricCryptoAbstractionTest.MsgtestAESCBC"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.SymmetricCryptoAbstractionTest.MsgtestAESCBC">[docs]</a>    <span class="k">def</span> <span class="nf">MsgtestAESCBC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span>  <span class="n">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)))</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">dmsg</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">);</span>
+        <span class="k">assert</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">dmsg</span> <span class="p">,</span> <span class="s">&#39;o: =&gt;</span><span class="si">%s</span><span class="se">\n</span><span class="s">m: =&gt;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">dmsg</span><span class="p">)</span>
+   </div>
+<div class="viewcode-block" id="SymmetricCryptoAbstractionTest.MsgTestAESCBCSeperate"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.SymmetricCryptoAbstractionTest.MsgTestAESCBCSeperate">[docs]</a>    <span class="k">def</span> <span class="nf">MsgTestAESCBCSeperate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="n">ran</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span>  <span class="n">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">ran</span><span class="p">))</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>        
+        <span class="n">b</span> <span class="o">=</span>  <span class="n">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">ran</span><span class="p">))</span>
+        <span class="n">dmsg</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">);</span>
+        <span class="k">assert</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">dmsg</span> <span class="p">,</span> <span class="s">&#39;o: =&gt;</span><span class="si">%s</span><span class="se">\n</span><span class="s">m: =&gt;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">dmsg</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="AuthenticatedCryptoAbstractionTest"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.AuthenticatedCryptoAbstractionTest">[docs]</a><span class="k">class</span> <span class="nc">AuthenticatedCryptoAbstractionTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="AuthenticatedCryptoAbstractionTest.testAESCBC"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.AuthenticatedCryptoAbstractionTest.testAESCBC">[docs]</a>    <span class="k">def</span> <span class="nf">testAESCBC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+       <span class="bp">self</span><span class="o">.</span><span class="n">MsgtestAESCBC</span><span class="p">(</span><span class="n">b</span><span class="s">&quot;hello world&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AuthenticatedCryptoAbstractionTest.testAESCBCLong"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.AuthenticatedCryptoAbstractionTest.testAESCBCLong">[docs]</a>    <span class="k">def</span> <span class="nf">testAESCBCLong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+       <span class="bp">self</span><span class="o">.</span><span class="n">MsgtestAESCBC</span><span class="p">(</span><span class="n">b</span><span class="s">&quot;Lots of people working in cryptography have no deep </span><span class="se">\</span>
+<span class="s">       concern with real application issues. They are trying to discover things </span><span class="se">\</span>
+<span class="s">        clever enough to write papers about -- Whitfield Diffie.&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="AuthenticatedCryptoAbstractionTest.testAESCBC_Seperate"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.AuthenticatedCryptoAbstractionTest.testAESCBC_Seperate">[docs]</a>    <span class="k">def</span> <span class="nf">testAESCBC_Seperate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MsgTestAESCBCSeperate</span><span class="p">(</span><span class="n">b</span><span class="s">&quot;Lots of people working in cryptography have no deep </span><span class="se">\</span>
+<span class="s">        concern with real application issues. They are trying to discover things </span><span class="se">\</span>
+<span class="s">        clever enough to write papers about -- Whitfield Diffie.&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="AuthenticatedCryptoAbstractionTest.MsgtestAESCBC"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.AuthenticatedCryptoAbstractionTest.MsgtestAESCBC">[docs]</a>    <span class="k">def</span> <span class="nf">MsgtestAESCBC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span>  <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)))</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">dmsg</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">);</span>
+        <span class="k">assert</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">dmsg</span> <span class="p">,</span> <span class="s">&#39;o: =&gt;</span><span class="si">%s</span><span class="se">\n</span><span class="s">m: =&gt;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">dmsg</span><span class="p">)</span>
+   </div>
+<div class="viewcode-block" id="AuthenticatedCryptoAbstractionTest.MsgTestAESCBCSeperate"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.AuthenticatedCryptoAbstractionTest.MsgTestAESCBCSeperate">[docs]</a>    <span class="k">def</span> <span class="nf">MsgTestAESCBCSeperate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="n">ran</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span>  <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">ran</span><span class="p">))</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>        
+        <span class="n">b</span> <span class="o">=</span>  <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">sha1</span><span class="p">(</span><span class="n">ran</span><span class="p">))</span>
+        <span class="n">dmsg</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">);</span>
+        <span class="k">assert</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">dmsg</span> <span class="p">,</span> <span class="s">&#39;o: =&gt;</span><span class="si">%s</span><span class="se">\n</span><span class="s">m: =&gt;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">dmsg</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="MessageAuthenticatorTest"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.MessageAuthenticatorTest">[docs]</a><span class="k">class</span> <span class="nc">MessageAuthenticatorTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="MessageAuthenticatorTest.testSelfVerify"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.MessageAuthenticatorTest.testSelfVerify">[docs]</a>    <span class="k">def</span> <span class="nf">testSelfVerify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">))</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s">&#39;hello world&#39;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="s">&quot;expected message to verify&quot;</span><span class="p">;</span>
+</div>
+<div class="viewcode-block" id="MessageAuthenticatorTest.testSeperateVerify"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.MessageAuthenticatorTest.testSeperateVerify">[docs]</a>    <span class="k">def</span> <span class="nf">testSeperateVerify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">))</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s">&#39;hello world&#39;</span><span class="p">)</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">m1</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="s">&quot;expected message to verify&quot;</span><span class="p">;</span>
+ </div>
+<div class="viewcode-block" id="MessageAuthenticatorTest.testTamperData"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.MessageAuthenticatorTest.testTamperData">[docs]</a>    <span class="k">def</span> <span class="nf">testTamperData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">))</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s">&#39;hello world&#39;</span><span class="p">)</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">a</span><span class="p">[</span><span class="s">&quot;msg&quot;</span><span class="p">]</span><span class="o">=</span> <span class="s">&quot;tampered&quot;</span> 
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">m1</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="s">&quot;expected message to verify&quot;</span><span class="p">;</span>
+</div>
+<div class="viewcode-block" id="MessageAuthenticatorTest.testTamperMac"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.MessageAuthenticatorTest.testTamperMac">[docs]</a>    <span class="k">def</span> <span class="nf">testTamperMac</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">))</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s">&#39;hello world&#39;</span><span class="p">)</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">a</span><span class="p">[</span><span class="s">&quot;digest&quot;</span><span class="p">]</span><span class="o">=</span> <span class="s">&quot;tampered&quot;</span> 
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">m1</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="s">&quot;expected message to verify&quot;</span><span class="p">;</span>
+</div>
+<div class="viewcode-block" id="MessageAuthenticatorTest.testTamperAlg"><a class="viewcode-back" href="../test/symcrypto_test.html#symcrypto_test.MessageAuthenticatorTest.testTamperAlg">[docs]</a>    <span class="k">def</span> <span class="nf">testTamperAlg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">sha1</span><span class="p">(</span><span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">))</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s">&#39;hello world&#39;</span><span class="p">)</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">m1</span><span class="o">.</span><span class="n">_algorithm</span> <span class="o">=</span> <span class="s">&quot;alg&quot;</span> <span class="c"># bypassing the algorithm check to verify the mac is over the alg + data </span>
+        <span class="n">a</span><span class="p">[</span><span class="s">&quot;alg&quot;</span><span class="p">]</span><span class="o">=</span> <span class="s">&quot;alg&quot;</span> 
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">m1</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="s">&quot;expected message to verify&quot;</span><span class="p">;</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

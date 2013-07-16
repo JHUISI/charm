@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pairinggroup &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>pairinggroup &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
     <link rel="next" title="PKEnc" href="PKEnc.html" />
     <link rel="prev" title="pairingcurves" href="pairingcurves.html" /> 
@@ -46,7 +44,7 @@
         <li class="right" >
           <a href="pairingcurves.html" title="pairingcurves"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -63,6 +61,44 @@
 <em class="property">class </em><tt class="descclassname">pairinggroup.</tt><tt class="descname">PairingGroup</tt><big>(</big><em>param_id</em>, <em>param_file=False</em>, <em>secparam=512</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <dl class="method">
+<dt id="pairinggroup.PairingGroup.EndBenchmark">
+<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>ends an ongoing benchmark</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pairinggroup.PairingGroup.GetBenchmark">
+<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark results for any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Pair, Granular</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pairinggroup.PairingGroup.GetGeneralBenchmarks">
+<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark count for all group operations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pairinggroup.PairingGroup.GetGranularBenchmarks">
+<tt class="descname">GetGranularBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.GetGranularBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.GetGranularBenchmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves group operation count per type: ZR, G1, G2, and GT</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pairinggroup.PairingGroup.InitBenchmark">
+<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>initiates the benchmark state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pairinggroup.PairingGroup.StartBenchmark">
+<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>starts the benchmark with any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Pair, Granular</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="pairinggroup.PairingGroup.debug">
 <tt class="descname">debug</tt><big>(</big><em>data</em>, <em>prefix=None</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.debug" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -75,7 +111,8 @@
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.deserialize">
 <tt class="descname">deserialize</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.deserialize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>deserializes into a pairing object</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.encode">
@@ -95,17 +132,32 @@
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.hash">
 <tt class="descname">hash</tt><big>(</big><em>args</em>, <em>type=0</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.hash" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>hashes objects into ZR, G1 or G2 depending on the pairing curve</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.init">
 <tt class="descname">init</tt><big>(</big><em>type</em>, <em>value=None</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>initializes an object with a specified type and value</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.ismember">
 <tt class="descname">ismember</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.ismember"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.ismember" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>membership test for a pairing object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pairinggroup.PairingGroup.ismemberDict">
+<tt class="descname">ismemberDict</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.ismemberDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.ismemberDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>membership test for a dict of pairing objects</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pairinggroup.PairingGroup.ismemberList">
+<tt class="descname">ismemberList</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.ismemberList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.ismemberList" title="Permalink to this definition">¶</a></dt>
+<dd><p>membership test for a list of pairing objects</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.messageSize">
@@ -113,9 +165,16 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="pairinggroup.PairingGroup.order">
+<tt class="descname">order</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.order" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the order of the group</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="pairinggroup.PairingGroup.pair_prod">
 <tt class="descname">pair_prod</tt><big>(</big><em>lhs</em>, <em>rhs</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.pair_prod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.pair_prod" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>takes two lists of G1 &amp; G2 and computes a pairing product</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.paramgen">
@@ -125,12 +184,14 @@
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.random">
 <tt class="descname">random</tt><big>(</big><em>_type=0</em>, <em>count=1</em>, <em>seed=None</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.random" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>selects a random element in ZR, G1, G2 and GT</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pairinggroup.PairingGroup.serialize">
 <tt class="descname">serialize</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pairinggroup.PairingGroup.serialize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>serializes a pairing object into bytes</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -185,14 +246,14 @@
         <li class="right" >
           <a href="pairingcurves.html" title="pairingcurves"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Jul 04, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

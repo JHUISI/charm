@@ -1,0 +1,7 @@
+
+abenc_test
+=========================================
+.. automodule:: abenc_test
+    :show-inheritance:
+    :members:
+    :undoc-members:

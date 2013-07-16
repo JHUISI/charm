@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Charm for Android &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>Android Build &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '0.42b',
+        URL_ROOT:    './',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,9 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="index.html" />
-    <link rel="next" title="Charm Package Structure" href="packages.html" />
-    <link rel="prev" title="For App Developers" href="developers.html" /> 
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" />
+    <link rel="next" title="For Cryptographers" href="cryptographers.html" />
+    <link rel="prev" title="Platform Install Manual" href="install_source.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,12 +38,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="packages.html" title="Charm Package Structure"
+          <a href="cryptographers.html" title="For Cryptographers"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="developers.html" title="For App Developers"
+          <a href="install_source.html" title="Platform Install Manual"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -54,13 +52,19 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="charm-for-android">
-<h1>Charm for Android<a class="headerlink" href="#charm-for-android" title="Permalink to this headline">¶</a></h1>
-<p>Installing Charm on Android:</p>
+  <div class="section" id="android-build">
+<h1>Android Build<a class="headerlink" href="#android-build" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="charm-v0-43">
+<h2>Charm v0.43<a class="headerlink" href="#charm-v0-43" title="Permalink to this headline">¶</a></h2>
+<p>See the README in <tt class="docutils literal"><span class="pre">charm/installers/android</span></tt> dir (2.7-dev branch) for a clean approach to build &amp; embed Charm in Android apps using the <tt class="docutils literal"><span class="pre">android-python27</span></tt> project: <a class="reference external" href="https://code.google.com/p/android-python27/">https://code.google.com/p/android-python27/</a>. This version only works with Python 2.7 and the 3.x version is currently very buggy.</p>
+</div>
+<div class="section" id="charm-v0-41-0-42">
+<h2>Charm v0.41-0.42<a class="headerlink" href="#charm-v0-41-0-42" title="Permalink to this headline">¶</a></h2>
+<p>Here are the simple instructions for deploying Charm:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Install <tt class="docutils literal"><span class="pre">Python3ForAndroid.apk</span></tt> found in github repository on your Android device. Note that this particular installer will be posted on github soon.</li>
-<li>Install the <tt class="docutils literal"><span class="pre">SL4A</span></tt> package at the following link: <a class="reference external" href="https://android-scripting.googlecode.com/files/sl4a_r6.apk">https://android-scripting.googlecode.com/files/sl4a_r6.apk</a></li>
+<li>Install <tt class="docutils literal"><span class="pre">Python3ForAndroid.apk</span></tt> found in github repository on your Android device.</li>
+<li>Install the <tt class="docutils literal"><span class="pre">SL4A</span></tt> package at the following link: <a class="reference external" href="https://android-scripting.googlecode.com/files/sl4a_r5.apk">https://android-scripting.googlecode.com/files/sl4a_r5.apk</a>.</li>
 <li>Charm Advanced Setup: Download <tt class="docutils literal"><span class="pre">pkg_resources.py</span></tt> and place in the appropriate place using the ADB tool. Configure your device to enable the android debug bridge and connect to your machine via USB. Next, use <tt class="docutils literal"><span class="pre">adb</span></tt> to push the <tt class="docutils literal"><span class="pre">pkg_resources.py</span></tt> and <tt class="docutils literal"><span class="pre">charm-schemes</span></tt> to a specified location on your SD card. Execute the following command:</li>
 </ol>
 <ul class="simple">
@@ -76,6 +80,7 @@
 </ol>
 </div></blockquote>
 </div>
+</div>
 
 
           </div>
@@ -83,12 +88,21 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Android Build</a><ul>
+<li><a class="reference internal" href="#charm-v0-43">Charm v0.43</a></li>
+<li><a class="reference internal" href="#charm-v0-41-0-42">Charm v0.41-0.42</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
-  <p class="topless"><a href="developers.html"
-                        title="previous chapter">For App Developers</a></p>
+  <p class="topless"><a href="install_source.html"
+                        title="previous chapter">Platform Install Manual</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="packages.html"
-                        title="next chapter">Charm Package Structure</a></p>
+  <p class="topless"><a href="cryptographers.html"
+                        title="next chapter">For Cryptographers</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/mobile.txt"
@@ -121,18 +135,18 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="packages.html" title="Charm Package Structure"
+          <a href="cryptographers.html" title="For Cryptographers"
              >next</a> |</li>
         <li class="right" >
-          <a href="developers.html" title="For App Developers"
+          <a href="install_source.html" title="Platform Install Manual"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li> 
+        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 31, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

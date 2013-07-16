@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pksig_cllww12_z &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pksig_cllww12_z</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Shorter IBE and Signatures via Asymmetric Pairings</span>
+<span class="sd">  </span>
+<span class="sd">| From: &quot;J. Chen, H. Lim, S. Ling, H. Wang, H. Wee Shorter IBE and Signatures via Asymmetric Pairings&quot;, Section 5.</span>
+<span class="sd">| Published in: Pairing 2012</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2012/224</span>
+<span class="sd">| Notes: This is a shorter IBE construction based on SXDH construction.</span>
+
+<span class="sd">* type:           signature (identity-based)</span>
+<span class="sd">* setting:        bilinear groups (asymmetric)</span>
+
+<span class="sd">:Improved by: Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department</span>
+<span class="sd">:Date: 	      3/2013</span>
+<span class="sd">:Notes:</span>
+<span class="sd">1. We swapped g1 and g2 to make signature faster.</span>
+<span class="sd">2. Change all the pair($params_1$, $params_2$) to pair($params_2$, $params_1$) is required.</span>
+<span class="sd">3.The code is similar with the encryption scheme, especially in setup() function.</span>
+<span class="sd">4. Same trick in the encryption scheme applied here.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.core.crypto.cryptobase</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.matrixops</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="Sign_Chen12_z"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cllww12_z.html#pksig_cllww12_z.Sign_Chen12_z">[docs]</a><span class="k">class</span> <span class="nc">Sign_Chen12_z</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup</span>
+<span class="sd">    &gt;&gt;&gt; groupObj = PairingGroup(&#39;MNT224&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; m = &quot;plese sign this message!!!!&quot;</span>
+<span class="sd">    &gt;&gt;&gt; cllww = Sign_Chen12_z(groupObj)</span>
+<span class="sd">    &gt;&gt;&gt; (pk, sk) = cllww.keygen()</span>
+<span class="sd">    &gt;&gt;&gt; signature = cllww.sign(pk, sk, m)</span>
+<span class="sd">    &gt;&gt;&gt; cllww.verify(pk, signature, m) </span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="n">PKSig</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c">#IBEnc.setProperty(self, message_space=[GT, &#39;KEM&#39;], secdef=&#39;IND_sID_CPA&#39;, assumption=&#39;DBDH&#39;, secmodel=&#39;ROM&#39;, other={&#39;id&#39;:ZR})</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        
+<div class="viewcode-block" id="Sign_Chen12_z.keygen"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cllww12_z.html#pksig_cllww12_z.Sign_Chen12_z.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+        <span class="c">#generate the 4*4 dual pairing vector spaces.</span>
+        <span class="n">d11</span><span class="p">,</span> <span class="n">d12</span><span class="p">,</span> <span class="n">d13</span><span class="p">,</span> <span class="n">d14</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">d21</span><span class="p">,</span> <span class="n">d22</span><span class="p">,</span> <span class="n">d23</span><span class="p">,</span> <span class="n">d24</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">d31</span><span class="p">,</span> <span class="n">d32</span><span class="p">,</span> <span class="n">d33</span><span class="p">,</span> <span class="n">d34</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">d41</span><span class="p">,</span> <span class="n">d42</span><span class="p">,</span> <span class="n">d43</span><span class="p">,</span> <span class="n">d44</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">D11</span><span class="p">,</span> <span class="n">D12</span><span class="p">,</span> <span class="n">D13</span><span class="p">,</span> <span class="n">D14</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">D21</span><span class="p">,</span> <span class="n">D22</span><span class="p">,</span> <span class="n">D23</span><span class="p">,</span> <span class="n">D24</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">D31</span><span class="p">,</span> <span class="n">D32</span><span class="p">,</span> <span class="n">D33</span><span class="p">,</span> <span class="n">D34</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">D41</span><span class="p">,</span> <span class="n">D42</span><span class="p">,</span> <span class="n">D43</span><span class="p">,</span> <span class="n">D44</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+        <span class="n">one</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        
+        <span class="p">[</span><span class="n">D11</span><span class="p">,</span> <span class="n">D12</span><span class="p">,</span> <span class="n">D13</span><span class="p">,</span> <span class="n">D14</span><span class="p">]</span> <span class="o">=</span> <span class="n">GaussEliminationinGroups</span><span class="p">([[</span><span class="n">d11</span><span class="p">,</span> <span class="n">d12</span><span class="p">,</span> <span class="n">d13</span><span class="p">,</span> <span class="n">d14</span><span class="p">,</span> <span class="n">one</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="n">d21</span><span class="p">,</span> <span class="n">d22</span><span class="p">,</span> <span class="n">d23</span><span class="p">,</span> <span class="n">d24</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d31</span><span class="p">,</span> <span class="n">d32</span><span class="p">,</span> <span class="n">d33</span><span class="p">,</span> <span class="n">d34</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d41</span><span class="p">,</span> <span class="n">d42</span><span class="p">,</span> <span class="n">d43</span><span class="p">,</span> <span class="n">d44</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]])</span>
+        <span class="p">[</span><span class="n">D21</span><span class="p">,</span> <span class="n">D22</span><span class="p">,</span> <span class="n">D23</span><span class="p">,</span> <span class="n">D24</span><span class="p">]</span> <span class="o">=</span> <span class="n">GaussEliminationinGroups</span><span class="p">([[</span><span class="n">d11</span><span class="p">,</span> <span class="n">d12</span><span class="p">,</span> <span class="n">d13</span><span class="p">,</span> <span class="n">d14</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d21</span><span class="p">,</span> <span class="n">d22</span><span class="p">,</span> <span class="n">d23</span><span class="p">,</span> <span class="n">d24</span><span class="p">,</span> <span class="n">one</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="n">d31</span><span class="p">,</span> <span class="n">d32</span><span class="p">,</span> <span class="n">d33</span><span class="p">,</span> <span class="n">d34</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d41</span><span class="p">,</span> <span class="n">d42</span><span class="p">,</span> <span class="n">d43</span><span class="p">,</span> <span class="n">d44</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]])</span>
+        <span class="p">[</span><span class="n">D31</span><span class="p">,</span> <span class="n">D32</span><span class="p">,</span> <span class="n">D33</span><span class="p">,</span> <span class="n">D34</span><span class="p">]</span> <span class="o">=</span> <span class="n">GaussEliminationinGroups</span><span class="p">([[</span><span class="n">d11</span><span class="p">,</span> <span class="n">d12</span><span class="p">,</span> <span class="n">d13</span><span class="p">,</span> <span class="n">d14</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d21</span><span class="p">,</span> <span class="n">d22</span><span class="p">,</span> <span class="n">d23</span><span class="p">,</span> <span class="n">d24</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d31</span><span class="p">,</span> <span class="n">d32</span><span class="p">,</span> <span class="n">d33</span><span class="p">,</span> <span class="n">d34</span><span class="p">,</span> <span class="n">one</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="n">d41</span><span class="p">,</span> <span class="n">d42</span><span class="p">,</span> <span class="n">d43</span><span class="p">,</span> <span class="n">d44</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]])</span>
+        <span class="p">[</span><span class="n">D41</span><span class="p">,</span> <span class="n">D42</span><span class="p">,</span> <span class="n">D43</span><span class="p">,</span> <span class="n">D44</span><span class="p">]</span> <span class="o">=</span> <span class="n">GaussEliminationinGroups</span><span class="p">([[</span><span class="n">d11</span><span class="p">,</span> <span class="n">d12</span><span class="p">,</span> <span class="n">d13</span><span class="p">,</span> <span class="n">d14</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d21</span><span class="p">,</span> <span class="n">d22</span><span class="p">,</span> <span class="n">d23</span><span class="p">,</span> <span class="n">d24</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d31</span><span class="p">,</span> <span class="n">d32</span><span class="p">,</span> <span class="n">d33</span><span class="p">,</span> <span class="n">d34</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                                        <span class="p">[</span><span class="n">d41</span><span class="p">,</span> <span class="n">d42</span><span class="p">,</span> <span class="n">d43</span><span class="p">,</span> <span class="n">d44</span><span class="p">,</span> <span class="n">one</span><span class="p">]])</span>
+        
+
+        <span class="c">#generate public parameters.</span>
+        <span class="c">#PP2 = (pair(g1, g2))**(alpha*one)</span>
+        <span class="n">PP2</span> <span class="o">=</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span> <span class="n">g1</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="n">alpha</span><span class="o">*</span><span class="n">one</span><span class="p">)</span>
+        <span class="n">gd11</span> <span class="o">=</span> <span class="n">g1</span><span class="o">**</span><span class="n">d11</span>
+        <span class="n">gd12</span> <span class="o">=</span> <span class="n">g1</span><span class="o">**</span><span class="n">d12</span>
+        <span class="n">gd13</span> <span class="o">=</span> <span class="n">g1</span><span class="o">**</span><span class="n">d13</span>
+        <span class="n">gd14</span> <span class="o">=</span> <span class="n">g1</span><span class="o">**</span><span class="n">d14</span>
+        <span class="n">gd21</span> <span class="o">=</span> <span class="n">g1</span><span class="o">**</span><span class="n">d21</span>
+        <span class="n">gd22</span> <span class="o">=</span> <span class="n">g1</span><span class="o">**</span><span class="n">d22</span>
+        <span class="n">gd23</span> <span class="o">=</span> <span class="n">g1</span><span class="o">**</span><span class="n">d23</span>
+        <span class="n">gd24</span> <span class="o">=</span> <span class="n">g1</span><span class="o">**</span><span class="n">d24</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;PP2&#39;</span><span class="p">:</span><span class="n">PP2</span><span class="p">,</span> <span class="s">&#39;gd11&#39;</span><span class="p">:</span><span class="n">gd11</span><span class="p">,</span> <span class="s">&#39;gd12&#39;</span><span class="p">:</span><span class="n">gd12</span><span class="p">,</span> <span class="s">&#39;gd13&#39;</span><span class="p">:</span><span class="n">gd13</span><span class="p">,</span> <span class="s">&#39;gd14&#39;</span><span class="p">:</span><span class="n">gd14</span><span class="p">,</span>
+               <span class="s">&#39;gd21&#39;</span><span class="p">:</span><span class="n">gd21</span><span class="p">,</span> <span class="s">&#39;gd22&#39;</span><span class="p">:</span><span class="n">gd22</span><span class="p">,</span> <span class="s">&#39;gd23&#39;</span><span class="p">:</span><span class="n">gd23</span><span class="p">,</span> <span class="s">&#39;gd24&#39;</span><span class="p">:</span><span class="n">gd24</span> <span class="p">}</span>
+        <span class="c">#generate private parameters</span>
+
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span>
+               <span class="s">&#39;D11&#39;</span><span class="p">:</span><span class="n">D11</span><span class="p">,</span> <span class="s">&#39;D12&#39;</span><span class="p">:</span><span class="n">D12</span><span class="p">,</span> <span class="s">&#39;D13&#39;</span><span class="p">:</span><span class="n">D13</span><span class="p">,</span> <span class="s">&#39;D14&#39;</span><span class="p">:</span><span class="n">D14</span><span class="p">,</span>
+               <span class="s">&#39;D21&#39;</span><span class="p">:</span><span class="n">D21</span><span class="p">,</span> <span class="s">&#39;D22&#39;</span><span class="p">:</span><span class="n">D22</span><span class="p">,</span> <span class="s">&#39;D23&#39;</span><span class="p">:</span><span class="n">D23</span><span class="p">,</span> <span class="s">&#39;D24&#39;</span><span class="p">:</span><span class="n">D24</span><span class="p">}</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Public parameters...&quot;</span><span class="p">)</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">pk</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Secret parameters...&quot;</span><span class="p">)</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">sk</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Sign_Chen12_z.sign"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cllww12_z.html#pksig_cllww12_z.Sign_Chen12_z.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span><span class="o">**</span><span class="p">((</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;alpha&#39;</span><span class="p">]</span><span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D11&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D21&#39;</span><span class="p">])</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span><span class="o">**</span><span class="p">((</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;alpha&#39;</span><span class="p">]</span><span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D12&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D22&#39;</span><span class="p">])</span>
+        <span class="n">s3</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span><span class="o">**</span><span class="p">((</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;alpha&#39;</span><span class="p">]</span><span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D13&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D23&#39;</span><span class="p">])</span>
+        <span class="n">s4</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span><span class="o">**</span><span class="p">((</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;alpha&#39;</span><span class="p">]</span><span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D14&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;D24&#39;</span><span class="p">])</span>
+        
+        <span class="n">signature</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;s1&#39;</span><span class="p">:</span><span class="n">s1</span><span class="p">,</span> <span class="s">&#39;s2&#39;</span><span class="p">:</span><span class="n">s2</span><span class="p">,</span> <span class="s">&#39;s3&#39;</span><span class="p">:</span><span class="n">s3</span><span class="p">,</span> <span class="s">&#39;s4&#39;</span><span class="p">:</span><span class="n">s4</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">signature</span>
+        </div>
+<div class="viewcode-block" id="Sign_Chen12_z.verify"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cllww12_z.html#pksig_cllww12_z.Sign_Chen12_z.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;PP2&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;s1&#39;</span><span class="p">],</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;gd11&#39;</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;gd21&#39;</span><span class="p">]</span><span class="o">**</span><span class="n">M</span><span class="p">))</span> <span class="o">*</span>
+                         <span class="n">pair</span><span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;s2&#39;</span><span class="p">],</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;gd12&#39;</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;gd22&#39;</span><span class="p">]</span><span class="o">**</span><span class="n">M</span><span class="p">))</span> <span class="o">*</span>
+                         <span class="n">pair</span><span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;s3&#39;</span><span class="p">],</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;gd13&#39;</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;gd23&#39;</span><span class="p">]</span><span class="o">**</span><span class="n">M</span><span class="p">))</span> <span class="o">*</span>
+                         <span class="n">pair</span><span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;s4&#39;</span><span class="p">],</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;gd14&#39;</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;gd24&#39;</span><span class="p">]</span><span class="o">**</span><span class="n">M</span><span class="p">))</span> <span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cllww12_z.html#pksig_cllww12_z.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="s">&quot;plese sign this message!!!!&quot;</span>
+    <span class="n">cllww</span> <span class="o">=</span> <span class="n">Sign_Chen12_z</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cllww</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">cllww</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature :=&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">cllww</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s">&quot;Invalid Verification!!!!&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Individual Verification!&quot;</span><span class="p">)</span>
+    </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

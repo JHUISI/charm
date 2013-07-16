@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pksig_rsa_hw09 &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>pksig_rsa_hw09 &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +23,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -38,7 +36,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -68,23 +66,23 @@
 
 <span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">randomBits</span><span class="p">,</span><span class="n">isPrime</span><span class="p">,</span><span class="n">gcd</span><span class="p">,</span><span class="n">bitsize</span><span class="p">,</span><span class="n">serialize</span>
 <span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
-<span class="kn">from</span> <span class="nn">schemes.chamhash_rsa_hw09</span> <span class="kn">import</span> <span class="n">ChamHash_HW09</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.chamhash_rsa_hw09</span> <span class="kn">import</span> <span class="n">ChamHash_HW09</span>
 <span class="kn">from</span> <span class="nn">charm.toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
 <span class="kn">from</span> <span class="nn">charm.toolbox.specialprimes</span> <span class="kn">import</span> <span class="n">BlumWilliamsInteger</span>
 <span class="kn">import</span> <span class="nn">hmac</span><span class="o">,</span> <span class="nn">hashlib</span><span class="o">,</span> <span class="nn">math</span>
 
 <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
 
-<div class="viewcode-block" id="SHA1"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.SHA1">[docs]</a><span class="k">def</span> <span class="nf">SHA1</span><span class="p">(</span><span class="n">bytes1</span><span class="p">):</span>
+<div class="viewcode-block" id="SHA1"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.SHA1">[docs]</a><span class="k">def</span> <span class="nf">SHA1</span><span class="p">(</span><span class="n">bytes1</span><span class="p">):</span>
   <span class="n">s1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;sha1&#39;</span><span class="p">)</span>
   <span class="n">s1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bytes1</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">s1</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
 
 </div>
-<div class="viewcode-block" id="randomQR"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.randomQR">[docs]</a><span class="k">def</span> <span class="nf">randomQR</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="randomQR"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.randomQR">[docs]</a><span class="k">def</span> <span class="nf">randomQR</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
     </div>
-<div class="viewcode-block" id="LogFunction"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.LogFunction">[docs]</a><span class="k">class</span> <span class="nc">LogFunction</span><span class="p">:</span>
+<div class="viewcode-block" id="LogFunction"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.LogFunction">[docs]</a><span class="k">class</span> <span class="nc">LogFunction</span><span class="p">:</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">base</span>
   
@@ -95,16 +93,16 @@
     <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="p">)</span></div>
 <span class="n">log</span> <span class="o">=</span> <span class="n">LogFunction</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Prf"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf">[docs]</a><span class="k">class</span> <span class="nc">Prf</span><span class="p">:</span>
+<div class="viewcode-block" id="Prf"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf">[docs]</a><span class="k">class</span> <span class="nc">Prf</span><span class="p">:</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="k">pass</span>
   
   <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Prf.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.keygen">[docs]</a>  <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
+<div class="viewcode-block" id="Prf.keygen"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.keygen">[docs]</a>  <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="n">randomBits</span><span class="p">(</span><span class="n">bits</span><span class="p">))</span>
 </div>
   <span class="nd">@classmethod</span>  
-<div class="viewcode-block" id="Prf.eval"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.eval">[docs]</a>  <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">input1</span><span class="p">):</span> 
+<div class="viewcode-block" id="Prf.eval"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.eval">[docs]</a>  <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">input1</span><span class="p">):</span> 
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">:</span>
         <span class="n">h</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">serialize</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">b</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -113,13 +111,13 @@
     <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">input1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">bytes2integer</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
 </div></div>
-<div class="viewcode-block" id="BlumIntegerSquareRoot"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.BlumIntegerSquareRoot">[docs]</a><span class="k">class</span> <span class="nc">BlumIntegerSquareRoot</span><span class="p">:</span>
+<div class="viewcode-block" id="BlumIntegerSquareRoot"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.BlumIntegerSquareRoot">[docs]</a><span class="k">class</span> <span class="nc">BlumIntegerSquareRoot</span><span class="p">:</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">raisedToThePower</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
     
-<div class="viewcode-block" id="BlumIntegerSquareRoot.pow"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.BlumIntegerSquareRoot.pow">[docs]</a>  <span class="k">def</span> <span class="nf">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modularInt</span><span class="p">):</span>
+<div class="viewcode-block" id="BlumIntegerSquareRoot.pow"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.BlumIntegerSquareRoot.pow">[docs]</a>  <span class="k">def</span> <span class="nf">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modularInt</span><span class="p">):</span>
     <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">modularInt</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">repeat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raisedToThePower</span><span class="p">):</span>
@@ -131,23 +129,18 @@
     <span class="n">exp</span><span class="o">.</span><span class="n">raisedToThePower</span> <span class="o">=</span> <span class="n">power</span>
     <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Sig_RSA_Stateless_HW09"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09">[docs]</a><span class="k">class</span> <span class="nc">Sig_RSA_Stateless_HW09</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09">[docs]</a><span class="k">class</span> <span class="nc">Sig_RSA_Stateless_HW09</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	This code is time consuming, so for right now we skip it</span>
-<span class="sd"> 	when running doctests. Hence the +SKIP</span>
+<span class="sd">	This scheme is probablistic and thus time consuming, so we skip it</span>
+<span class="sd"> 	when running doctests.</span>
 <span class="sd">    #doctest: +SKIP</span>
-<span class="sd">    &gt;&gt;&gt; pksig = Sig_RSA_Stateless_HW09() # doctest:+SKIP</span>
 
-<span class="sd">    &gt;&gt;&gt; p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207) # doctest:+SKIP</span>
-
-<span class="sd">    &gt;&gt;&gt; q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543) # doctest:+SKIP</span>
-
-<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = pksig.keygen(1024, p, q) # doctest:+SKIP</span>
-
+<span class="sd">    &gt;&gt;&gt; pksig = Sig_RSA_Stateless_HW09() #doctest:+SKIP</span>
+<span class="sd">    &gt;&gt;&gt; p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207) #doctest:+SKIP</span>
+<span class="sd">    &gt;&gt;&gt; q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543) #doctest:+SKIP</span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = pksig.keygen(1024, p, q) #doctest:+SKIP</span>
 <span class="sd">    &gt;&gt;&gt; msg = SHA1(b&#39;this is the message I want to sign.&#39;) #doctest:+SKIP</span>
-
 <span class="sd">    &gt;&gt;&gt; signature = pksig.sign(public_key, secret_key, msg) #doctest:+SKIP</span>
-
 <span class="sd">    &gt;&gt;&gt; pksig.verify(public_key, msg, signature) #doctest:+SKIP</span>
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>  
@@ -156,7 +149,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Prf</span> <span class="o">=</span> <span class="n">Prf</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ChameleonHash</span> <span class="o">=</span> <span class="n">CH</span><span class="p">()</span>
         
-<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.keygen"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyLength</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.keygen"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyLength</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="c"># Generate a Blum-Williams integer N of &#39;key_length&#39; bits with factorization p,q</span>
         <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BWInt</span><span class="o">.</span><span class="n">generatePrimes</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">keyLength</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
@@ -177,7 +170,7 @@
         <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;p&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span> <span class="p">}</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">);</span>
     </div>
-<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.sign"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.sign"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Sign...&quot;</span><span class="p">)</span>
         <span class="n">L</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">keyLength</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;K&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;length&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
         <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;p&#39;</span><span class="p">],</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;q&#39;</span><span class="p">]</span>
@@ -214,7 +207,7 @@
         <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;sigma1&#39;</span><span class="p">:</span><span class="n">sigma1</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span> <span class="p">}</span>
 
 </div>
-<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.verify"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.verify"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">VERIFY</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
         <span class="n">sigma1</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;sigma1&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">]</span>
         <span class="n">K</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">keyLength</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;K&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;length&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
@@ -247,7 +240,7 @@
         <span class="c"># Default: reject the signature</span>
         <span class="k">return</span> <span class="bp">False</span>
     </div>
-<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.HW_hash"><a class="viewcode-back" href="../schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash">[docs]</a>    <span class="k">def</span> <span class="nf">HW_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">keyLen</span><span class="p">):</span>
+<div class="viewcode-block" id="Sig_RSA_Stateless_HW09.HW_hash"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash">[docs]</a>    <span class="k">def</span> <span class="nf">HW_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">keyLen</span><span class="p">):</span>
         <span class="n">C</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
         <span class="n">input_size</span> <span class="o">=</span> <span class="n">bitsize</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
         <span class="n">input_b</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
@@ -288,14 +281,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Aug 14, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

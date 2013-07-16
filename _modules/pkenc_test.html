@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pkenc_test &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pkenc_test</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">charm.adapters.pkenc_adapt_hybrid</span> <span class="kn">import</span> <span class="n">HybridEnc</span>
+<span class="kn">from</span> <span class="nn">charm.adapters.pkenc_adapt_chk04</span> <span class="kn">import</span> <span class="n">CHK04</span>
+<span class="kn">from</span> <span class="nn">charm.adapters.pkenc_adapt_bchk05</span> <span class="kn">import</span> <span class="n">BCHKIBEnc</span>
+<span class="kn">from</span> <span class="nn">charm.adapters.ibenc_adapt_identityhash</span> <span class="kn">import</span> <span class="n">HashIDAdapter</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.encap_bchk05</span> <span class="kn">import</span> <span class="n">EncapBCHK</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.ibenc.ibenc_bb03</span> <span class="kn">import</span> <span class="n">IBE_BB04</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_bls04</span> <span class="kn">import</span> <span class="n">BLS01</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_cs98</span> <span class="kn">import</span> <span class="n">CS98</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_elgamal85</span> <span class="kn">import</span> <span class="n">ElGamal</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_paillier99</span> <span class="kn">import</span> <span class="n">Pai99</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_rabin</span> <span class="kn">import</span> <span class="n">Rabin_Enc</span><span class="p">,</span> <span class="n">Rabin_Sig</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_rsa</span> <span class="kn">import</span> <span class="n">RSA_Enc</span><span class="p">,</span> <span class="n">RSA_Sig</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">GT</span> 
+<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">elliptic_curve</span><span class="p">,</span> <span class="n">ECGroup</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v1</span><span class="p">,</span> <span class="n">prime192v2</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">RSAGroup</span><span class="p">,</span> <span class="n">integer</span><span class="p">,</span> <span class="n">IntegerGroupQ</span><span class="p">,</span> <span class="n">IntegerGroup</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="BCHKIBEncTest"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.BCHKIBEncTest">[docs]</a><span class="k">class</span> <span class="nc">BCHKIBEncTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="BCHKIBEncTest.testBCHKIBEnc"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.BCHKIBEncTest.testBCHKIBEnc">[docs]</a>    <span class="k">def</span> <span class="nf">testBCHKIBEnc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+        <span class="n">encap</span> <span class="o">=</span> <span class="n">EncapBCHK</span><span class="p">()</span>
+        
+        <span class="n">hyb_ibe</span> <span class="o">=</span> <span class="n">BCHKIBEnc</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">encap</span><span class="p">)</span>
+        
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">hyb_ibe</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt; &quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt; &quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;Hello World!&quot;</span>
+        
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">hyb_ibe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Ciphertext&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;C1 =&gt;&quot;</span><span class="p">,</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;C1&#39;</span><span class="p">])</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;C2 =&gt;&quot;</span><span class="p">,</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;C2&#39;</span><span class="p">])</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;tag =&gt;&quot;</span><span class="p">,</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;tag&#39;</span><span class="p">])</span>
+
+        <span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">hyb_ibe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!! =&gt;&quot;</span><span class="p">,</span> <span class="n">decrypted_msg</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">groupObj</span>
+</div></div>
+<div class="viewcode-block" id="CHK04Test"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.CHK04Test">[docs]</a><span class="k">class</span> <span class="nc">CHK04Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="CHK04Test.testCHK04"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.CHK04Test.testCHK04">[docs]</a>    <span class="k">def</span> <span class="nf">testCHK04</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="c"># instantiate an Identity-Based Encryption scheme</span>
+        <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+        <span class="n">hash_ibe</span> <span class="o">=</span> <span class="n">HashIDAdapter</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">)</span>
+       
+        <span class="c"># instantiate an one-time signature scheme such as BLS04</span>
+        <span class="n">ots</span> <span class="o">=</span> <span class="n">BLS01</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+        
+        <span class="n">pkenc</span> <span class="o">=</span> <span class="n">CHK04</span><span class="p">(</span><span class="n">hash_ibe</span><span class="p">,</span> <span class="n">ots</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">)</span>
+        
+        <span class="c"># not sure how to enforce secparam yet</span>
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+        <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        
+        <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">rec_msg</span> <span class="o">==</span> <span class="n">msg</span><span class="p">,</span> <span class="s">&quot;FAILED Decryption!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!&quot;</span><span class="p">)</span>   
+</div></div>
+<div class="viewcode-block" id="HybridEncTest"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.HybridEncTest">[docs]</a><span class="k">class</span> <span class="nc">HybridEncTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="HybridEncTest.testHybridEnc"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.HybridEncTest.testHybridEnc">[docs]</a>    <span class="k">def</span> <span class="nf">testHybridEnc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#    pkenc = EC_CS98(prime192v1)</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v1</span><span class="p">)</span>
+        <span class="n">pkenc</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+        <span class="n">hyenc</span> <span class="o">=</span> <span class="n">HybridEnc</span><span class="p">(</span><span class="n">pkenc</span><span class="p">)</span>
+       
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">hyenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+       
+        <span class="n">m</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;this is a new message&#39;</span>
+        <span class="n">cipher</span> <span class="o">=</span> <span class="n">hyenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">orig_m</span> <span class="o">=</span> <span class="n">hyenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">cipher</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">orig_m</span><span class="p">,</span> <span class="s">&quot;Failed Decryption&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!&quot;</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="EC_CS98Test"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.EC_CS98Test">[docs]</a><span class="k">class</span> <span class="nc">EC_CS98Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="EC_CS98Test.testEC_CS98"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.EC_CS98Test.testEC_CS98">[docs]</a>    <span class="k">def</span> <span class="nf">testEC_CS98</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v1</span><span class="p">)</span>
+        <span class="n">pkenc</span> <span class="o">=</span> <span class="n">CS98</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+        
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world!!!&quot;</span>
+
+        <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        
+        <span class="n">message</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
+        
+        <span class="k">assert</span> <span class="n">M</span> <span class="o">==</span> <span class="n">message</span><span class="p">,</span> <span class="s">&quot;Failed Decryption!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESSFUL DECRYPTION!!! =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="CS98Test"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.CS98Test">[docs]</a><span class="k">class</span> <span class="nc">CS98Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="CS98Test.testCS98"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.CS98Test.testCS98">[docs]</a>    <span class="k">def</span> <span class="nf">testCS98</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">78026701315845642650478533423290697952946810503781545303994043249263895825417197979312263873458290625951595165648634453837959641616221499853309829737663096055610272863216947901196216467463121276681626666630641061058671702351757348054165492211737848899078287026481329186785666349501358041565106233731785681339</span><span class="p">)</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">IntegerGroup</span><span class="p">()</span>
+        <span class="n">pkenc</span> <span class="o">=</span> <span class="n">CS98</span><span class="p">(</span><span class="n">groupObj</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world. test message&quot;</span>
+        <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        
+        <span class="n">message</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
+        
+        <span class="k">assert</span> <span class="n">M</span> <span class="o">==</span> <span class="n">message</span><span class="p">,</span> <span class="s">&quot;UNSUCCESSFUL!!!! :-( why?&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESSFULLY RECOVERED =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>
+</div></div>
+<span class="k">class</span> <span class="nc">ElGamalTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">testElGamal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v2</span><span class="p">)</span>
+        <span class="n">el</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>   
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world!&quot;</span>
+        <span class="n">cipher1</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">cipher1</span><span class="p">)</span>    
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">msg</span><span class="p">,</span> <span class="s">&quot;Failed Decryption!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESSFULLY DECRYPTED!!!&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ElGamalTest"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.ElGamalTest">[docs]</a><span class="k">class</span> <span class="nc">ElGamalTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="ElGamalTest.testElGamal"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.ElGamalTest.testElGamal">[docs]</a>    <span class="k">def</span> <span class="nf">testElGamal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">148829018183496626261556856344710600327516732500226144177322012998064772051982752493460332138204351040296264880017943408846937646702376203733370973197019636813306480144595809796154634625021213611577190781215296823124523899584781302512549499802030946698512327294159881907114777803654670044046376468983244647367</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">74414509091748313130778428172355300163758366250113072088661006499032386025991376246730166069102175520148132440008971704423468823351188101866685486598509818406653240072297904898077317312510606805788595390607648411562261949792390651256274749901015473349256163647079940953557388901827335022023188234491622323683</span><span class="p">)</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">()</span>
+        <span class="n">el</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">groupObj</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> 
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s">&quot;hello world!&quot;</span>
+        <span class="n">cipher1</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">cipher1</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">msg</span><span class="p">,</span> <span class="s">&quot;Failed Decryption!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;SUCCESSFULLY DECRYPTED!!!&quot;</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="Pai99Test"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.Pai99Test">[docs]</a><span class="k">class</span> <span class="nc">Pai99Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="Pai99Test.testPai99"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.Pai99Test.testPai99">[docs]</a>    <span class="k">def</span> <span class="nf">testPai99</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span>
+        <span class="n">pai</span> <span class="o">=</span> <span class="n">Pai99</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+        
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="mi">12345678987654321</span><span class="p">)</span>
+        <span class="n">m2</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="mi">12345761234123409</span><span class="p">)</span>
+        <span class="n">m3</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="mi">24691440221777730</span><span class="p">)</span> <span class="c"># target</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m1</span><span class="p">)</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;c1 =&gt;&quot;</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;c2 =&gt;&quot;</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">c3</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">+</span> <span class="n">c2</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Homomorphic Add Test...</span><span class="se">\n</span><span class="s">c1 + c2 =&gt;&quot;</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+                
+        <span class="n">orig_m</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;orig_m =&gt;&quot;</span><span class="p">,</span> <span class="n">orig_m</span><span class="p">)</span>
+        
+        <span class="c"># m3 = m1 + m2</span>
+        <span class="k">assert</span> <span class="n">m3</span> <span class="o">==</span> <span class="n">orig_m</span><span class="p">,</span> <span class="s">&quot;FAILED Decryption!!!&quot;</span> 
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Homomorphic Mul Test...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">c4</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">+</span> <span class="mi">200</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;c4 = c1 + 200 =&gt;&quot;</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>        
+        <span class="n">orig_m</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;m4 =&gt;&quot;</span><span class="p">,</span> <span class="n">orig_m</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        
+        <span class="n">c5</span> <span class="o">=</span> <span class="n">c2</span> <span class="o">*</span> <span class="mi">20201</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;c5 = c2 * 2021 =&gt;&quot;</span><span class="p">,</span> <span class="n">c5</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">orig_m</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;m5 =&gt;&quot;</span><span class="p">,</span> <span class="n">orig_m</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="Rabin_EncTest"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.Rabin_EncTest">[docs]</a><span class="k">class</span> <span class="nc">Rabin_EncTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="Rabin_EncTest.testRabin_Enc"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.Rabin_EncTest.testRabin_Enc">[docs]</a>    <span class="k">def</span> <span class="nf">testRabin_Enc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rabin</span> <span class="o">=</span> <span class="n">Rabin_Enc</span><span class="p">()</span>
+        
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+        
+        <span class="n">m</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test&#39;</span>
+        <span class="c">#m = 55</span>
+        <span class="c">#m = b&#39;A&#39;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;ct =&gt;&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        
+        <span class="n">orig_m</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;recovered m =&gt;&quot;</span><span class="p">,</span> <span class="n">orig_m</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">orig_m</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!!&quot;</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="Rabin_SigTest"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.Rabin_SigTest">[docs]</a><span class="k">class</span> <span class="nc">Rabin_SigTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="Rabin_SigTest.testRabin_Sig"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.Rabin_SigTest.testRabin_Sig">[docs]</a>    <span class="k">def</span> <span class="nf">testRabin_Sig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test message.&#39;</span>
+        <span class="n">rabin</span> <span class="o">=</span> <span class="n">Rabin_Sig</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">rabin</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">rabin</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Signature!&quot;</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="RSA_EncTest"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.RSA_EncTest">[docs]</a><span class="k">class</span> <span class="nc">RSA_EncTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="RSA_EncTest.testRSA_Enc"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.RSA_EncTest.testRSA_Enc">[docs]</a>    <span class="k">def</span> <span class="nf">testRSA_Enc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Enc</span><span class="p">()</span>
+        
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        
+        <span class="n">m</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test&#39;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;ct =&gt;&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        
+        <span class="n">orig_m</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;recovered m =&gt;&quot;</span><span class="p">,</span> <span class="n">orig_m</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">m</span> <span class="o">==</span> <span class="n">orig_m</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!!&quot;</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="RSA_SigTest"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.RSA_SigTest">[docs]</a><span class="k">class</span> <span class="nc">RSA_SigTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="RSA_SigTest.testRSA_Sig"><a class="viewcode-back" href="../test/pkenc_test.html#pkenc_test.RSA_SigTest.testRSA_Sig">[docs]</a>    <span class="k">def</span> <span class="nf">testRSA_Sig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test message.&#39;</span>
+        <span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Sig</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">rsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Signature!&quot;</span><span class="p">)</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

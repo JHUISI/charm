@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>integergroup &mdash; Charm-Crypto 0.42b documentation</title>
+    <title>integergroup &mdash; Charm-Crypto 0.43b documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.42b',
+        VERSION:     '0.43b',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,10 +23,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.42b documentation" href="../index.html" />
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
     <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
     <link rel="next" title="iterate" href="iterate.html" />
-    <link rel="prev" title="IBEnc" href="IBEnc.html" /> 
+    <link rel="prev" title="IBSig" href="IBSig.html" /> 
   </head>
   <body>
     <div class="related">
@@ -44,9 +42,9 @@
           <a href="iterate.html" title="iterate"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="IBEnc.html" title="IBEnc"
+          <a href="IBSig.html" title="IBSig"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>  
@@ -62,6 +60,38 @@
 <dt id="integergroup.IntegerGroup">
 <em class="property">class </em><tt class="descclassname">integergroup.</tt><tt class="descname">IntegerGroup</tt><big>(</big><em>start=0</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="integergroup.IntegerGroup.EndBenchmark">
+<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>ends an ongoing benchmark</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.IntegerGroup.GetBenchmark">
+<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark results for any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.IntegerGroup.GetGeneralBenchmarks">
+<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark count for all group operations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.IntegerGroup.InitBenchmark">
+<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>initiates the benchmark state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.IntegerGroup.StartBenchmark">
+<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>starts the benchmark with any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="integergroup.IntegerGroup.bitsize">
 <tt class="descname">bitsize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.bitsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.bitsize" title="Permalink to this definition">¶</a></dt>
@@ -139,6 +169,38 @@
 <em class="property">class </em><tt class="descclassname">integergroup.</tt><tt class="descname">IntegerGroupQ</tt><big>(</big><em>start=0</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
 <dl class="method">
+<dt id="integergroup.IntegerGroupQ.EndBenchmark">
+<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>ends an ongoing benchmark</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.IntegerGroupQ.GetBenchmark">
+<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark results for any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.IntegerGroupQ.GetGeneralBenchmarks">
+<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark count for all group operations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.IntegerGroupQ.InitBenchmark">
+<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>initiates the benchmark state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.IntegerGroupQ.StartBenchmark">
+<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>starts the benchmark with any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="integergroup.IntegerGroupQ.decode">
 <tt class="descname">decode</tt><big>(</big><em>element</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.decode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -208,12 +270,49 @@
 <tt class="descname">serialize</tt><big>(</big><em>object</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.serialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="integergroup.IntegerGroupQ.setparam">
+<tt class="descname">setparam</tt><big>(</big><em>p</em>, <em>q</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.setparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.setparam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="integergroup.RSAGroup">
 <em class="property">class </em><tt class="descclassname">integergroup.</tt><tt class="descname">RSAGroup</tt><a class="reference internal" href="../_modules/integergroup.html#RSAGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="integergroup.RSAGroup.EndBenchmark">
+<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>ends an ongoing benchmark</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.RSAGroup.GetBenchmark">
+<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark results for any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.RSAGroup.GetGeneralBenchmarks">
+<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieves benchmark count for all group operations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.RSAGroup.InitBenchmark">
+<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>initiates the benchmark state</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="integergroup.RSAGroup.StartBenchmark">
+<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>starts the benchmark with any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="integergroup.RSAGroup.decode">
 <tt class="descname">decode</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.decode" title="Permalink to this definition">¶</a></dt>
@@ -275,8 +374,8 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="IBEnc.html"
-                        title="previous chapter">IBEnc</a></p>
+  <p class="topless"><a href="IBSig.html"
+                        title="previous chapter">IBSig</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="iterate.html"
                         title="next chapter">iterate</a></p>
@@ -315,16 +414,16 @@
           <a href="iterate.html" title="iterate"
              >next</a> |</li>
         <li class="right" >
-          <a href="IBEnc.html" title="IBEnc"
+          <a href="IBSig.html" title="IBSig"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.42b documentation</a> &raquo;</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
           <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Johns Hopkins University ISI.
-      Last updated on Jul 04, 2012.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pk_hve08 &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pk_hve08</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Vincenzo Iovino, Giuseppe Persiano (Pairing-based)</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;Hidden-Vector Encryption with Groups of Prime Order&quot;</span>
+<span class="sd">| Published in: Pairing 2008</span>
+<span class="sd">| Available from: http://dl.acm.org/citation.cfm?id=1431889</span>
+<span class="sd">| Notes: </span>
+
+<span class="sd">* type:        predicate encryption (public key)</span>
+<span class="sd">* setting:     Pairing</span>
+
+<span class="sd">:Authors:    Matthew W. Pagano</span>
+<span class="sd">:Date:       12/2012</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+<div class="viewcode-block" id="HVE08"><a class="viewcode-back" href="../charm/schemes/abenc/pk_hve08.html#pk_hve08.HVE08">[docs]</a><span class="k">class</span> <span class="nc">HVE08</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+
+<div class="viewcode-block" id="HVE08.setup"><a class="viewcode-back" href="../charm/schemes/abenc/pk_hve08.html#pk_hve08.HVE08.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span> <span class="o">**</span> <span class="n">y</span>
+
+        <span class="n">T</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">t</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">V</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">R</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">M</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">m</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+            <span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">V</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span><span class="n">g2</span><span class="p">,</span> <span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span><span class="p">:</span><span class="n">Y</span><span class="p">,</span> <span class="s">&#39;T&#39;</span><span class="p">:</span><span class="n">T</span><span class="p">,</span> <span class="s">&#39;V&#39;</span><span class="p">:</span><span class="n">V</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">:</span><span class="n">R</span><span class="p">,</span> <span class="s">&#39;M&#39;</span><span class="p">:</span><span class="n">M</span><span class="p">}</span>
+        <span class="n">msk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span> <span class="s">&#39;t&#39;</span><span class="p">:</span><span class="n">t</span><span class="p">,</span> <span class="s">&#39;v&#39;</span><span class="p">:</span><span class="n">v</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">:</span><span class="n">r</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">:</span><span class="n">m</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="HVE08.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/pk_hve08.html#pk_hve08.HVE08.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">yVector</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;yVector: expects binary attributes of 0 or 1 and &quot;dont care&quot; attriute is represented by the value 2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span>
+
+        <span class="n">yVectorLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yVector</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="n">yVectorLen</span><span class="p">),</span><span class="s">&quot;pk_hve08.py: length of yVector passed in to keygen is unequal to n passed in to setup.&quot;</span>
+
+        <span class="n">numNonDontCares</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">yVectorLen</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">yVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">numNonDontCares</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">numNonDontCares</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">sk</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="n">y</span>
+            <span class="k">return</span> <span class="n">sk</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">sum_ais_soFar</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">numNonDontCares</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">sum_ais_soFar</span> <span class="o">+=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">a</span><span class="p">[(</span><span class="n">numNonDontCares</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">sum_ais_soFar</span>
+        
+        <span class="n">YVector</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">LVector</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">current_a_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">yVectorLen</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">yVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">YVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">current_a_index</span><span class="p">]</span> <span class="o">/</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">LVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">current_a_index</span><span class="p">]</span> <span class="o">/</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;m&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">current_a_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">yVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">YVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">current_a_index</span><span class="p">]</span> <span class="o">/</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">LVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">g2</span> <span class="o">**</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">current_a_index</span><span class="p">]</span> <span class="o">/</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">current_a_index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">yVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span> <span class="c"># dont care attribute</span>
+                <span class="n">YVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+                <span class="n">LVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span><span class="s">&quot;pk_hve08.py:  one of the yVector elements is not 0, 1, or 2 (only allowable values).&quot;</span>
+
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">(</span><span class="n">YVector</span><span class="p">,</span> <span class="n">LVector</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sk</span>
+</div>
+<div class="viewcode-block" id="HVE08.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/pk_hve08.html#pk_hve08.HVE08.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">xVector</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;Y&#39;</span><span class="p">]</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        
+        <span class="n">xVectorLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xVector</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="n">xVectorLen</span><span class="p">),</span><span class="s">&quot;pk_hve08.py:  the length of the xVector passed in to encrypt is unequal to the n value passed in to setup.&quot;</span>
+
+        <span class="n">s_i</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">s_i</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="n">Y</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">s</span><span class="p">))</span>
+        <span class="n">C0</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">**</span> <span class="n">s</span>
+
+        <span class="n">XVector</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">WVector</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">xVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">XVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;R&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">s_i</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">WVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;M&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">s_i</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">xVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">XVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;T&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">s_i</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">WVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;V&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">s_i</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span><span class="s">&quot;pk_hve08.py:  one of the xVector elements passed into encrypt is not either 0 or 1 (only allowable values).&quot;</span>
+
+        <span class="n">CT</span> <span class="o">=</span> <span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">C0</span><span class="p">,</span> <span class="n">XVector</span><span class="p">,</span> <span class="n">WVector</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CT</span>
+</div>
+<div class="viewcode-block" id="HVE08.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/pk_hve08.html#pk_hve08.HVE08.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">sk</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">C0</span><span class="p">,</span> <span class="n">XVector</span><span class="p">,</span> <span class="n">WVector</span><span class="p">)</span> <span class="o">=</span> <span class="n">CT</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">YVector</span><span class="p">,</span> <span class="n">LVector</span><span class="p">)</span> <span class="o">=</span> <span class="n">sk</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">omega</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">C0</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">M</span>
+
+        <span class="n">dotProd</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">YVector</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">n</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">LVector</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">n</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">XVector</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">n</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WVector</span><span class="p">))</span> <span class="p">):</span>
+            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;pk_hve08.py:  lengths of the vectors passed to decrypt are unequal in at least one case.&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">YVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">G2</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">LVector</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">G2</span><span class="p">))</span> <span class="p">):</span>
+                <span class="n">dotProd</span> <span class="o">*=</span> <span class="p">(</span> <span class="n">pair</span><span class="p">(</span><span class="n">XVector</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">YVector</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">WVector</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">LVector</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">)</span>
+
+        <span class="n">M</span> <span class="o">=</span> <span class="n">omega</span> <span class="o">*</span> <span class="n">dotProd</span>
+        <span class="k">return</span> <span class="n">M</span>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../charm/schemes/abenc/pk_hve08.html#pk_hve08.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">grp</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&quot;MNT224&quot;</span><span class="p">)</span>
+
+    <span class="n">hve08</span> <span class="o">=</span> <span class="n">HVE08</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">hve08</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">sk</span> <span class="o">=</span> <span class="n">hve08</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+    <span class="n">CT</span> <span class="o">=</span> <span class="n">hve08</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">pk</span><span class="p">)</span>
+    <span class="n">M2</span> <span class="o">=</span> <span class="n">hve08</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">M2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">M</span> <span class="o">==</span> <span class="n">M2</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;success&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;failed&quot;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

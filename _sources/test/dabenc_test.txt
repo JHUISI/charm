@@ -1,0 +1,7 @@
+
+dabenc_test
+=========================================
+.. automodule:: dabenc_test
+    :show-inheritance:
+    :members:
+    :undoc-members:

@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>dfa_fe12 &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for dfa_fe12</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Brent Waters (Pairing-based)</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;Functional Encryption for Regular Languages&quot;.</span>
+<span class="sd">| Published in: 2012</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2012/384</span>
+<span class="sd">| Notes: </span>
+<span class="sd">| Security Assumption: </span>
+<span class="sd">|</span>
+<span class="sd">| type:           functional encryption (&quot;public index&quot;)</span>
+<span class="sd">| setting:        Pairing</span>
+
+<span class="sd">:Authors:    J Ayo Akinyele</span>
+<span class="sd">:Date:       12/2012</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.DFA</span> <span class="kn">import</span> <span class="n">DFA</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<div class="viewcode-block" id="FE_DFA"><a class="viewcode-back" href="../charm/schemes/abenc/dfa_fe12.html#dfa_fe12.FE_DFA">[docs]</a><span class="k">class</span> <span class="nc">FE_DFA</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_groupObj</span><span class="p">,</span> <span class="n">_dfaObj</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">dfaObj</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">_groupObj</span>
+        <span class="n">dfaObj</span> <span class="o">=</span> <span class="n">_dfaObj</span>
+        
+<div class="viewcode-block" id="FE_DFA.setup"><a class="viewcode-back" href="../charm/schemes/abenc/dfa_fe12.html#dfa_fe12.FE_DFA.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">):</span>
+        <span class="n">g</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">h_start</span><span class="p">,</span> <span class="n">h_end</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;start&#39;</span><span class="p">:</span><span class="n">h_start</span><span class="p">,</span> <span class="s">&#39;end&#39;</span><span class="p">:</span><span class="n">h_end</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">sigma</span> <span class="ow">in</span> <span class="n">alphabet</span><span class="p">:</span>
+            <span class="n">h</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">sigma</span><span class="p">)]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        
+        <span class="n">msk</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="o">-</span><span class="n">alpha</span>
+        <span class="n">mpk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;egg&#39;</span><span class="p">:</span><span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="n">alpha</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;z&#39;</span><span class="p">:</span><span class="n">z</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="FE_DFA.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/dfa_fe12.html#dfa_fe12.FE_DFA.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">dfaM</span><span class="p">):</span>
+        <span class="n">Q</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">F</span> <span class="o">=</span> <span class="n">dfaM</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>
+        <span class="c"># associate D_i with each state q_i in Q</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">,</span> <span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="c"># [0, q] including q-th index</span>
+        <span class="n">r_start</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">K</span><span class="p">[</span><span class="s">&#39;start1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">][</span><span class="s">&#39;start&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r_start</span><span class="p">)</span>
+        <span class="n">K</span><span class="p">[</span><span class="s">&#39;start2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r_start</span>
+        
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">T</span><span class="p">:</span> <span class="c"># for each tuple, t in transition list</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">=</span> <span class="n">t</span>
+            <span class="n">K</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">K</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+            <span class="n">K</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
+            <span class="n">K</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">*</span> <span class="p">((</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">sigma</span><span class="p">)])</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+        
+        <span class="c"># for each accept state in the set of all accept states</span>
+        <span class="n">K</span><span class="p">[</span><span class="s">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">F</span><span class="p">:</span>
+            <span class="n">rx</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">K</span><span class="p">[</span><span class="s">&#39;end&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">K</span><span class="p">[</span><span class="s">&#39;end&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">msk</span> <span class="o">*</span> <span class="n">D</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">][</span><span class="s">&#39;end&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">rx</span><span class="p">)</span>
+            <span class="n">K</span><span class="p">[</span><span class="s">&#39;end&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">rx</span>
+            
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;K&#39;</span><span class="p">:</span><span class="n">K</span><span class="p">,</span> <span class="s">&#39;dfaM&#39;</span><span class="p">:</span><span class="n">dfaM</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">sk</span>
+    </div>
+<div class="viewcode-block" id="FE_DFA.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/dfa_fe12.html#dfa_fe12.FE_DFA.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="c"># symbols of string        </span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">l</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="c"># l+1 b/c it includes &#39;l&#39;-th index</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">C</span><span class="p">[</span><span class="s">&#39;m&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;egg&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+        
+        <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">][</span><span class="s">&#39;start&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">][</span> <span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">mpk</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="n">C</span><span class="p">[</span><span class="s">&#39;end1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="n">C</span><span class="p">[</span><span class="s">&#39;end2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">][</span><span class="s">&#39;end&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>        
+        <span class="n">ct</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">C</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">:</span><span class="n">w</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">ct</span>
+    </div>
+<div class="viewcode-block" id="FE_DFA.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/dfa_fe12.html#dfa_fe12.FE_DFA.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
+        <span class="n">K</span><span class="p">,</span> <span class="n">dfaM</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;K&#39;</span><span class="p">],</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;dfaM&#39;</span><span class="p">]</span>
+        <span class="n">C</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">],</span> <span class="n">ct</span><span class="p">[</span><span class="s">&#39;w&#39;</span><span class="p">]</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c"># if DFA does not accept string, return immediately</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dfaObj</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">dfaM</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;DFA rejects: &quot;</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="n">Ti</span> <span class="o">=</span> <span class="n">dfaObj</span><span class="o">.</span><span class="n">getTransitions</span><span class="p">(</span><span class="n">dfaM</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="c"># returns a tuple of transitions </span>
+        <span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>  <span class="n">K</span><span class="p">[</span><span class="s">&#39;start1&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">K</span><span class="p">[</span><span class="s">&#39;start2&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">Ti</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;transition: &quot;</span><span class="p">,</span> <span class="n">ti</span><span class="p">)</span>
+            <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">K</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ti</span><span class="p">)][</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">K</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ti</span><span class="p">)][</span><span class="mi">2</span><span class="p">])</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">K</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ti</span><span class="p">)][</span><span class="mi">3</span><span class="p">])</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">dfaObj</span><span class="o">.</span><span class="n">getAcceptState</span><span class="p">(</span><span class="n">Ti</span><span class="p">)</span> <span class="c"># retrieve accept state</span>
+        <span class="n">Bend</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="s">&#39;end1&#39;</span><span class="p">],</span> <span class="n">K</span><span class="p">[</span><span class="s">&#39;end&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="s">&#39;end2&#39;</span><span class="p">],</span> <span class="n">K</span><span class="p">[</span><span class="s">&#39;end&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)][</span><span class="mi">2</span><span class="p">])</span> 
+        <span class="n">M</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="s">&#39;m&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">Bend</span>  
+        <span class="k">return</span> <span class="n">M</span>
+    </div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../charm/schemes/abenc/dfa_fe12.html#dfa_fe12.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">group</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&quot;SS512&quot;</span><span class="p">)</span>
+    
+    <span class="n">alphabet</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">}</span>
+    <span class="n">dfa</span> <span class="o">=</span> <span class="n">DFA</span><span class="p">(</span><span class="s">&quot;ab*a&quot;</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">)</span>
+    <span class="n">dfaM</span> <span class="o">=</span> <span class="n">dfa</span><span class="o">.</span><span class="n">constructDFA</span><span class="p">()</span>
+    
+    <span class="n">fe</span> <span class="o">=</span> <span class="n">FE_DFA</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">dfa</span><span class="p">)</span>
+    
+    <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">fe</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;mpk :=&gt;&quot;</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+    
+    <span class="n">sk</span> <span class="o">=</span> <span class="n">fe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">dfaM</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk :=&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+    
+    <span class="n">w</span> <span class="o">=</span> <span class="n">dfa</span><span class="o">.</span><span class="n">getSymbols</span><span class="p">(</span><span class="s">&quot;abba&quot;</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">fe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    
+    <span class="n">origM</span> <span class="o">=</span> <span class="n">fe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">M</span> <span class="o">==</span> <span class="n">origM</span><span class="p">,</span> <span class="s">&quot;failed decryption!&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!!!!!&quot;</span><span class="p">)</span>
+    </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">main</span><span class="p">()</span>
+    
+    
+    
+            
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,793 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FSA &mdash; Charm-Crypto 0.43b documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.43b',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
+    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="next" title="Hash" href="Hash.html" />
+    <link rel="prev" title="enum" href="enum.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Hash.html" title="Hash"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="enum.html" title="enum"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-FSA">
+<span id="fsa"></span><h1>FSA<a class="headerlink" href="#module-FSA" title="Permalink to this headline">¶</a></h1>
+<p>This module defines an FSA class, for representing and operating on
+finite-state automata (FSAs). FSAs can be used to represent regular
+expressions and to test sequences for membership in the languages
+described by regular expressions.</p>
+<p>FSAs can be deterministic or nondeterministic, and they can contain
+epsilon transitions. Methods to determinize an automaton (also
+eliminating its epsilon transitions), and to minimize an automaton,
+are provided.</p>
+<p>The transition labels for an FSA can be symbols from an alphabet, as
+in the standard formal definition of an FSA, but they can also be
+instances which represent predicates. If these instances implement
+instance.matches(), then the FSA nextState() function and accepts()
+predicate can be used. If they implement instance.complement() and
+instance.intersection(), the FSA can be be determinized and minimized,
+to find a minimal deterministic FSA that accepts an equivalent
+language.</p>
+<div class="section" id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>Instances of FSA can be created out of labels (for instance, strings)
+by the singleton() function, and combined to create more complex FSAs
+through the complement(), closure(), concatenation(), union(), and
+other constructors. For example, concatenation(singleton(&#8216;a&#8217;),
+union(singleton(&#8216;b&#8217;), closure(singleton(&#8216;c&#8217;)))) creates an FSA that
+accepts the strings &#8216;a&#8217;, &#8216;ab&#8217;, &#8216;ac&#8217;, &#8216;acc&#8217;, &#8216;accc&#8217;, and so on.</p>
+<p>Instances of FSA can also be created with the compileRE() function,
+which compiles a simple regular expression (using only &#8216;*&#8217;, &#8216;?&#8217;, &#8216;+&#8217;,
+&#8216;|&#8217;, &#8216;(&#8216;, and &#8216;)&#8217; as metacharacters) into an FSA. For example,
+compileRE(&#8216;a(b|c*)&#8217;) returns an FSA equivalent to the example in the
+previous paragraph.</p>
+<p>FSAs can be determinized, to create equivalent FSAs (FSAs accepting
+the same language) with unique successor states for each input, and
+minimized, to create an equivalent deterministic FSA with the smallest
+number of states. FSAs can also be complemented, intersected, unioned,
+and so forth as described under &#8216;FSA Functions&#8217; below.</p>
+</div>
+<div class="section" id="fsa-methods">
+<h2>FSA Methods<a class="headerlink" href="#fsa-methods" title="Permalink to this headline">¶</a></h2>
+<p>The class FSA defines the following methods.</p>
+<div class="section" id="acceptance">
+<h3>Acceptance<a class="headerlink" href="#acceptance" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>fsa.nextStates(state, input)</dt>
+<dd>returns a list of states</dd>
+<dt>fsa.nextState(state, input)</dt>
+<dd>returns None or a single state if
+<a href="#id5"><span class="problematic" id="id6">|nextStates|</span></a> &lt;= 1, otherwise it raises an exception</dd>
+<dt>fsa.nextStateSet(states, input)</dt>
+<dd>returns a list of states</dd>
+<dt>fsa.accepts(sequence)</dt>
+<dd>returns true or false</dd>
+</dl>
+</div>
+<div class="section" id="accessors-and-predicates">
+<h3>Accessors and predicates<a class="headerlink" href="#accessors-and-predicates" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>isEmpty()</dt>
+<dd>returns true iff the language accepted by the FSA is the empty language</dd>
+<dt>labels()</dt>
+<dd>returns a list of labels that are used in any transition</dd>
+<dt>nextAvailableState()</dt>
+<dd>returns an integer n such that no states in the FSA
+are numeric values &gt;= n</dd>
+</dl>
+</div>
+<div class="section" id="reductions">
+<h3>Reductions<a class="headerlink" href="#reductions" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>sorted(initial=0)</dt>
+<dd>returns an equivalent FSA whose states are numbered
+upwards from 0</dd>
+<dt>determinized()</dt>
+<dd>returns an equivalent deterministic FSA</dd>
+<dt>minimized()</dt>
+<dd>returns an equivalent minimal FSA</dd>
+<dt>trimmed()</dt>
+<dd>returns an equivalent FSA that contains no unreachable or dead
+states</dd>
+</dl>
+</div>
+<div class="section" id="presentation">
+<h3>Presentation<a class="headerlink" href="#presentation" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>toDotString()</dt>
+<dd>returns a string suitable as <a href="#id1"><span class="problematic" id="id2">*</span></a>.dot file for the &#8216;dot&#8217;
+program from AT&amp;T GraphViz</dd>
+<dt>view()</dt>
+<dd>views the FSA with a gs viewer, if gs and dot are installed</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="fsa-functions">
+<h2>FSA Functions<a class="headerlink" href="#fsa-functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="construction-from-fsas">
+<h3>Construction from FSAs<a class="headerlink" href="#construction-from-fsas" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>complement(a)</dt>
+<dd>returns an fsa that accepts exactly those sequences that its
+argument does not</dd>
+<dt>closure(a)</dt>
+<dd>returns an fsa that accepts sequences composed of zero or more
+concatenations of sequences accepted by the argument</dd>
+<dt>concatenation(a, b)</dt>
+<dd>returns an fsa that accepts sequences composed of a
+sequence accepted by a, followed by a sequence accepted by b</dd>
+<dt>containment(a, occurrences=1)</dt>
+<dd>returns an fsa that accepts sequences that
+contain at least occurrences occurrences of a subsequence recognized by the
+argument.</dd>
+<dt>difference(a, b)</dt>
+<dd>returns an fsa that accepts those sequences accepted by a
+but not b</dd>
+<dt>intersection(a, b)</dt>
+<dd>returns an fsa that accepts sequences accepted by both a
+and b</dd>
+<dt>iteration(a, min=1, max=None)</dt>
+<dd>returns an fsa that accepts sequences
+consisting of from min to max (or any number, if max is None) of sequences
+accepted by its first argument</dd>
+<dt>option(a)</dt>
+<dd>equivalent to union(a, EMPTY_STRING_FSA)</dd>
+<dt>reverse(a)</dt>
+<dd>returns an fsa that accepts strings whose reversal is accepted by
+the argument</dd>
+<dt>union(a, b)</dt>
+<dd>returns an fsa that accepts sequences accepted by both a and b</dd>
+</dl>
+</div>
+<div class="section" id="predicates">
+<h3>Predicates<a class="headerlink" href="#predicates" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>equivalent(a, b)</dt>
+<dd>returns true iff a and b accept the same language</dd>
+</dl>
+</div>
+<div class="section" id="reductions-these-equivalent-to-the-similarly-named-methods">
+<h3>Reductions (these equivalent to the similarly-named methods)<a class="headerlink" href="#reductions-these-equivalent-to-the-similarly-named-methods" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>determinize(fsa)</dt>
+<dd>returns an equivalent deterministic FSA</dd>
+<dt>minimize(fsa)</dt>
+<dd>returns an equivalent minimal FSA</dd>
+<dt>sort(fsa, initial=0)</dt>
+<dd>returns an equivalent FSA whose states are numbered from
+initial</dd>
+<dt>trim(fsa)</dt>
+<dd>returns an equivalent FSA that contains no dead or unreachable
+states</dd>
+</dl>
+</div>
+<div class="section" id="construction-from-labels">
+<h3>Construction from labels<a class="headerlink" href="#construction-from-labels" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>compileRE(string)</dt>
+<dd><p class="first">returns an FSA that accepts the language described by
+string, where string is a list of symbols and &#8216;*&#8217;, &#8216;+&#8217;, &#8216;?&#8217;, and &#8216;|&#8217; operators,</p>
+<blockquote class="last">
+<div>with &#8216;(&#8216; and &#8216;)&#8217; to control precedence.</div></blockquote>
+</dd>
+<dt>sequence(sequence)</dt>
+<dd>returns an fsa that accepts sequences that are matched by
+the elements of the argument. For example, sequence(&#8216;abc&#8217;) returns an fsa that
+accepts &#8216;abc&#8217; and [&#8216;a&#8217;, &#8216;b&#8217;, &#8216;c&#8217;].</dd>
+<dt>singleton(label)</dt>
+<dd>returns an fsa that accepts singletons whose elements are
+matched by label. For example, singleton(&#8216;a&#8217;) returns an fsa that accepts only
+the string &#8216;a&#8217;.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="fsa-constants">
+<h2>FSA Constants<a class="headerlink" href="#fsa-constants" title="Permalink to this headline">¶</a></h2>
+<p>EMPTY_STRING_FSA is an FSA that accepts the language consisting only
+of the empty string.</p>
+<p>NULL_FSA is an FSA that accepts the null language.</p>
+<p>UNIVERSAL_FSA is an FSA that accepts S*, where S is any object.</p>
+</div>
+<div class="section" id="fsa-instance-creation">
+<h2>FSA instance creation<a class="headerlink" href="#fsa-instance-creation" title="Permalink to this headline">¶</a></h2>
+<p>FSA is initialized with a list of states, an alphabet, a list of
+transition, an initial state, and a list of final states. If fsa is an
+FSA, fsa.tuple() returns these values in that order, i.e. (states,
+alphabet, transitions, initialState, finalStates). They&#8217;re also
+available as fields of fsa with those names.</p>
+<p>Each element of transition is a tuple of a start state, an end state,
+and a label: (startState, endSTate, label).</p>
+<p>If the list of states is None, it&#8217;s computed from initialState,
+finalStates, and the states in transitions.</p>
+<p>If alphabet is None, an open alphabet is used: labels are assumed to
+be objects that implements label.matches(input), label.complement(),
+and label.intersection() as follows:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">label.matches(input) returns true iff label matches input</p>
+</li>
+<li><dl class="first docutils">
+<dt>label.complement() returnseither a label or a list of labels which,</dt>
+<dd><p class="first last">together with the receiver, partition the input alphabet</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>label.intersection(other) returns either None (if label and other don&#8217;t</dt>
+<dd><p class="first last">both match any symbol), or a label that matches the set of symbols that
+both label and other match</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>As a special case, strings can be used as labels. If a strings &#8216;a&#8217; and
+&#8216;b&#8217; are used as a label and there&#8217;s no alphabet, &#8216;~a&#8217; and &#8216;~b&#8217; are
+their respective complements, and &#8216;~a&amp;~b&#8217; is the intersection of &#8216;~a&#8217;
+and &#8216;~b&#8217;. (The intersections of &#8216;a&#8217; and &#8216;b&#8217;, &#8216;a&#8217; and &#8216;~b&#8217;, and &#8216;~a&#8217;
+and &#8216;b&#8217; are, respectively, None, &#8216;a&#8217;, and &#8216;b&#8217;.)</p>
+</div>
+<div class="section" id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Permalink to this headline">¶</a></h2>
+<p>Design Goals:</p>
+<ul class="simple">
+<li>easy to use</li>
+<li>easy to read (simple implementation, direct expression of algorithms)</li>
+<li>extensible</li>
+</ul>
+<p>Non-Goals:</p>
+<ul class="simple">
+<li>efficiency</li>
+</ul>
+<dl class="class">
+<dt id="FSA.FSA">
+<em class="property">class </em><tt class="descclassname">FSA.</tt><tt class="descname">FSA</tt><big>(</big><em>states</em>, <em>alphabet</em>, <em>transitions</em>, <em>initialState</em>, <em>finalStates</em>, <em>arcMetadata=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<dl class="method">
+<dt id="FSA.FSA.accepts">
+<tt class="descname">accepts</tt><big>(</big><em>sequence</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.accepts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.accepts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.addArcMetadata">
+<tt class="descname">addArcMetadata</tt><big>(</big><em>list</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.addArcMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.addArcMetadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.addArcMetadataFor">
+<tt class="descname">addArcMetadataFor</tt><big>(</big><em>transition</em>, <em>data</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.addArcMetadataFor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.addArcMetadataFor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.additionalTransitionInfoString">
+<tt class="descname">additionalTransitionInfoString</tt><big>(</big><em>transition</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.additionalTransitionInfoString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.additionalTransitionInfoString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.coerce">
+<tt class="descname">coerce</tt><big>(</big><em>klass</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.coerce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.coerce" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.collectStates">
+<tt class="descname">collectStates</tt><big>(</big><em>transitions</em>, <em>initialState</em>, <em>finalStates</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.collectStates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.collectStates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.complement">
+<tt class="descname">complement</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.complement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.complement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.computeEpsilonClosure">
+<tt class="descname">computeEpsilonClosure</tt><big>(</big><em>state</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.computeEpsilonClosure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.computeEpsilonClosure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.computeEpsilonClosures">
+<tt class="descname">computeEpsilonClosures</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.computeEpsilonClosures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.computeEpsilonClosures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.copy">
+<tt class="descname">copy</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.create">
+<tt class="descname">create</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.creationArgs">
+<tt class="descname">creationArgs</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.creationArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.creationArgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.determinized">
+<tt class="descname">determinized</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.determinized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.determinized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a deterministic FSA that accepts the same language.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.epsilonClosure">
+<tt class="descname">epsilonClosure</tt><big>(</big><em>state</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.epsilonClosure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.epsilonClosure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.getArcMetadata">
+<tt class="descname">getArcMetadata</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.getArcMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.getArcMetadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.getArcMetadataFor">
+<tt class="descname">getArcMetadataFor</tt><big>(</big><em>transition</em>, <em>default=None</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.getArcMetadataFor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.getArcMetadataFor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.getTransitions">
+<tt class="descname">getTransitions</tt><big>(</big><em>sequence</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.getTransitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.getTransitions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.hasArcMetadata">
+<tt class="descname">hasArcMetadata</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.hasArcMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.hasArcMetadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.initializeTransitionTables">
+<tt class="descname">initializeTransitionTables</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.initializeTransitionTables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.initializeTransitionTables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.isEmpty">
+<tt class="descname">isEmpty</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.isEmpty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.isEmpty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.isFSA">
+<tt class="descname">isFSA</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.isFSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.isFSA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.labelMatches">
+<tt class="descname">labelMatches</tt><big>(</big><em>label</em>, <em>input</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.labelMatches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.labelMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.labels">
+<tt class="descname">labels</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of transition labels.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.makeStateTable">
+<tt class="descname">makeStateTable</tt><big>(</big><em>default=None</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.makeStateTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.makeStateTable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.minimized">
+<tt class="descname">minimized</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.minimized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.minimized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a minimal FSA that accepts the same language.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.nextAvailableState">
+<tt class="descname">nextAvailableState</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.nextAvailableState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.nextAvailableState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.nextState">
+<tt class="descname">nextState</tt><big>(</big><em>state</em>, <em>input</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.nextState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.nextState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.nextStateSet">
+<tt class="descname">nextStateSet</tt><big>(</big><em>states</em>, <em>input</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.nextStateSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.nextStateSet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.nextStates">
+<tt class="descname">nextStates</tt><big>(</big><em>state</em>, <em>input</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.nextStates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.nextStates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.setArcMetadata">
+<tt class="descname">setArcMetadata</tt><big>(</big><em>list</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.setArcMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.setArcMetadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.setArcMetadataFor">
+<tt class="descname">setArcMetadataFor</tt><big>(</big><em>transition</em>, <em>data</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.setArcMetadataFor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.setArcMetadataFor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.sorted">
+<tt class="descname">sorted</tt><big>(</big><em>initial=0</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.sorted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.sorted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.stateLabelString">
+<tt class="descname">stateLabelString</tt><big>(</big><em>state</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.stateLabelString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.stateLabelString" title="Permalink to this definition">¶</a></dt>
+<dd><p>A template method for specifying a state&#8217;s label, for use in dot
+diagrams. If this returns None, the default (the string representation
+of the state) is used.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.toDotString">
+<tt class="descname">toDotString</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.toDotString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.toDotString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string that can be printed by the DOT tool at
+<a class="reference external" href="http://www.research.att.com/sw/tools/graphviz/">http://www.research.att.com/sw/tools/graphviz/</a> .</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.transitionsFrom">
+<tt class="descname">transitionsFrom</tt><big>(</big><em>state</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.transitionsFrom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.transitionsFrom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.trimmed">
+<tt class="descname">trimmed</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.trimmed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.trimmed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an equivalent FSA that doesn&#8217;t include unreachable states,
+or states that only lead to dead states.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.tuple">
+<tt class="descname">tuple</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.tuple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.view">
+<tt class="descname">view</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="FSA.FSA.withoutEpsilons">
+<tt class="descname">withoutEpsilons</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/FSA.html#FSA.withoutEpsilons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.FSA.withoutEpsilons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.closure">
+<tt class="descclassname">FSA.</tt><tt class="descname">closure</tt><big>(</big><em>arg</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#closure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.closure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.compileConjunction">
+<tt class="descclassname">FSA.</tt><tt class="descname">compileConjunction</tt><big>(</big><em>str</em>, <em>index</em>, <em>options</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#compileConjunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.compileConjunction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.compileItem">
+<tt class="descclassname">FSA.</tt><tt class="descname">compileItem</tt><big>(</big><em>str</em>, <em>index</em>, <em>options</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#compileItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.compileItem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.compileRE">
+<tt class="descclassname">FSA.</tt><tt class="descname">compileRE</tt><big>(</big><em>s</em>, <em>**options</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#compileRE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.compileRE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.compileREExpr">
+<tt class="descclassname">FSA.</tt><tt class="descname">compileREExpr</tt><big>(</big><em>str</em>, <em>index</em>, <em>options</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#compileREExpr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.compileREExpr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.compileSequence">
+<tt class="descclassname">FSA.</tt><tt class="descname">compileSequence</tt><big>(</big><em>str</em>, <em>index</em>, <em>options</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#compileSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.compileSequence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.complement">
+<tt class="descclassname">FSA.</tt><tt class="descname">complement</tt><big>(</big><em>arg</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#complement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.complement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an FSA that accepts exactly those strings that the argument does
+not.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.complementLabelSet">
+<tt class="descclassname">FSA.</tt><tt class="descname">complementLabelSet</tt><big>(</big><em>labels</em>, <em>alphabet=None</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#complementLabelSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.complementLabelSet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.completion">
+<tt class="descclassname">FSA.</tt><tt class="descname">completion</tt><big>(</big><em>fsa</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#completion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.completion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an FSA that accepts the same language as the argument, but that
+lands in a defined state for every input.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.concatenation">
+<tt class="descclassname">FSA.</tt><tt class="descname">concatenation</tt><big>(</big><em>a</em>, <em>*args</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#concatenation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.concatenation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an FSA that accepts the language consisting of the concatenation
+of strings recognized by the arguments.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.consolidateTransitions">
+<tt class="descclassname">FSA.</tt><tt class="descname">consolidateTransitions</tt><big>(</big><em>transitions</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#consolidateTransitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.consolidateTransitions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.constructLabelMap">
+<tt class="descclassname">FSA.</tt><tt class="descname">constructLabelMap</tt><big>(</big><em>labels</em>, <em>alphabet</em>, <em>includeComplements=0</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#constructLabelMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.constructLabelMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of (newLabel, positives), where newLabel is an
+intersection of elements from labels and their complemens, and positives is
+a list of labels that have non-empty intersections with newLabel.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.containment">
+<tt class="descclassname">FSA.</tt><tt class="descname">containment</tt><big>(</big><em>arg</em>, <em>occurrences=1</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#containment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.containment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an FSA that matches sequences containing at least _count_
+occurrences
+of _symbol_.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.determinize">
+<tt class="descclassname">FSA.</tt><tt class="descname">determinize</tt><big>(</big><em>fsa</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#determinize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.determinize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.difference">
+<tt class="descclassname">FSA.</tt><tt class="descname">difference</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an FSA that accepts those strings accepted by the first
+argument, but not the second.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.equivalent">
+<tt class="descclassname">FSA.</tt><tt class="descname">equivalent</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#equivalent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.equivalent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true ifff a and b accept the same language.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.intersectLabelSets">
+<tt class="descclassname">FSA.</tt><tt class="descname">intersectLabelSets</tt><big>(</big><em>alist</em>, <em>blist</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#intersectLabelSets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.intersectLabelSets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.intersection">
+<tt class="descclassname">FSA.</tt><tt class="descname">intersection</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the intersection of two FSAs</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.iteration">
+<tt class="descclassname">FSA.</tt><tt class="descname">iteration</tt><big>(</big><em>fsa</em>, <em>min=1</em>, <em>max=None</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#iteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>### equivalent(iteration(singleton(&#8216;a&#8217;, 0, 2)), compileRE(&#8216;<a href="#id3"><span class="problematic" id="id4">|</span></a>a|aa&#8217;))
+### equivalent(iteration(singleton(&#8216;a&#8217;, 1, 2)), compileRE(&#8216;a|aa&#8217;))
+### equivalent(iteration(singleton(&#8216;a&#8217;, 1)), compileRE(&#8216;aa*&#8217;))</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="FSA.labelComplement">
+<tt class="descclassname">FSA.</tt><tt class="descname">labelComplement</tt><big>(</big><em>label</em>, <em>alphabet</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#labelComplement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.labelComplement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.labelComplements">
+<tt class="descclassname">FSA.</tt><tt class="descname">labelComplements</tt><big>(</big><em>label</em>, <em>alphabet</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#labelComplements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.labelComplements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.labelIntersection">
+<tt class="descclassname">FSA.</tt><tt class="descname">labelIntersection</tt><big>(</big><em>l1</em>, <em>l2</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#labelIntersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.labelIntersection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.labelMatches">
+<tt class="descclassname">FSA.</tt><tt class="descname">labelMatches</tt><big>(</big><em>label</em>, <em>input</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#labelMatches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.labelMatches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.labelString">
+<tt class="descclassname">FSA.</tt><tt class="descname">labelString</tt><big>(</big><em>label</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#labelString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.labelString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.minimize">
+<tt class="descclassname">FSA.</tt><tt class="descname">minimize</tt><big>(</big><em>fsa</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.minimize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.option">
+<tt class="descclassname">FSA.</tt><tt class="descname">option</tt><big>(</big><em>fsa</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.option" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.removeDuplicates">
+<tt class="descclassname">FSA.</tt><tt class="descname">removeDuplicates</tt><big>(</big><em>sequence</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#removeDuplicates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.removeDuplicates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.reverse">
+<tt class="descclassname">FSA.</tt><tt class="descname">reverse</tt><big>(</big><em>fsa</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#reverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.reverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.sequence">
+<tt class="descclassname">FSA.</tt><tt class="descname">sequence</tt><big>(</big><em>sequence</em>, <em>alphabet=None</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.sequence" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.singleton">
+<tt class="descclassname">FSA.</tt><tt class="descname">singleton</tt><big>(</big><em>symbol</em>, <em>alphabet=None</em>, <em>arcMetadata=None</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#singleton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.singleton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.sort">
+<tt class="descclassname">FSA.</tt><tt class="descname">sort</tt><big>(</big><em>fsa</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.symbolComplement">
+<tt class="descclassname">FSA.</tt><tt class="descname">symbolComplement</tt><big>(</big><em>symbol</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#symbolComplement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.symbolComplement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.symbolIntersection">
+<tt class="descclassname">FSA.</tt><tt class="descname">symbolIntersection</tt><big>(</big><em>s1</em>, <em>s2</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#symbolIntersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.symbolIntersection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.toFSA">
+<tt class="descclassname">FSA.</tt><tt class="descname">toFSA</tt><big>(</big><em>arg</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#toFSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.toFSA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.trim">
+<tt class="descclassname">FSA.</tt><tt class="descname">trim</tt><big>(</big><em>fsa</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#trim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.trim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.union">
+<tt class="descclassname">FSA.</tt><tt class="descname">union</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.union" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.unionLabelSets">
+<tt class="descclassname">FSA.</tt><tt class="descname">unionLabelSets</tt><big>(</big><em>alist</em>, <em>blist</em>, <em>alphabet=None</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#unionLabelSets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.unionLabelSets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="FSA.view">
+<tt class="descclassname">FSA.</tt><tt class="descname">view</tt><big>(</big><em>str</em><big>)</big><a class="reference internal" href="../_modules/FSA.html#view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#FSA.view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FSA</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#fsa-methods">FSA Methods</a><ul>
+<li><a class="reference internal" href="#acceptance">Acceptance</a></li>
+<li><a class="reference internal" href="#accessors-and-predicates">Accessors and predicates</a></li>
+<li><a class="reference internal" href="#reductions">Reductions</a></li>
+<li><a class="reference internal" href="#presentation">Presentation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fsa-functions">FSA Functions</a><ul>
+<li><a class="reference internal" href="#construction-from-fsas">Construction from FSAs</a></li>
+<li><a class="reference internal" href="#predicates">Predicates</a></li>
+<li><a class="reference internal" href="#reductions-these-equivalent-to-the-similarly-named-methods">Reductions (these equivalent to the similarly-named methods)</a></li>
+<li><a class="reference internal" href="#construction-from-labels">Construction from labels</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fsa-constants">FSA Constants</a></li>
+<li><a class="reference internal" href="#fsa-instance-creation">FSA instance creation</a></li>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="enum.html"
+                        title="previous chapter">enum</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Hash.html"
+                        title="next chapter">Hash</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/toolbox/FSA.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Hash.html" title="Hash"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="enum.html" title="enum"
+             >previous</a> |</li>
+        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
+          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jul 16, 2013.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

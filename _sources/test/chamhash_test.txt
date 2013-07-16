@@ -1,0 +1,7 @@
+
+chamhash_test
+=========================================
+.. automodule:: chamhash_test
+    :show-inheritance:
+    :members:
+    :undoc-members:
