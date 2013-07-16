@@ -22,4 +22,14 @@ We have provided several cryptographic scheme [examples](http://jhuisi.github.co
 
 If you're using Charm to implement schemes, we want to know what your experience is with our framework. Your feedback is very valuable to us! 
 
+Quick Install & Test
+====================
+Installing Charm is straightforward. First, verify that you have installed the GMP 5.x, PBC and Openssl. After that, you may proceed to install a basic configuration of Charm as follows:
+* `./configure.sh` (include --enable-darwin if on a Mac)
+* `make install` (may require super-user privileges)
+* `make test` (may also require super-user privileges)
+
+If most (or all) Python tests pass, then Charm has been successfully installed.
+
+ 
 
