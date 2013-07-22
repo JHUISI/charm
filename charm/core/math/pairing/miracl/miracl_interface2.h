@@ -58,6 +58,7 @@ void pairing_clear(pairing_t *pairing);
 // to clean up the mriacl system completely.NOTE: Make sure miracl PFC classes are patched.
 void miracl_clean(void);
 element_t *order(pairing_t *pairing);
+element_t *element_gt(const pairing_t *pairing);
 
 element_t *element_init_ZR(int value);
 element_t *_element_init_G1(void);

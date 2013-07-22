@@ -274,8 +274,8 @@ Element *convertToZR(PyObject *longObj, PyObject *elemObj) {
 void 	Pairing_dealloc(Pairing *self)
 {
 	if(self->group_init) {
-		pairing_clear(self->pair_obj);
 		element_delete(pyZR_t, self->order);
+		pairing_clear(self->pair_obj);
 		self->pair_obj = NULL;
 		self->order = NULL;
 	}

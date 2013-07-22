@@ -367,13 +367,13 @@ char * init_pbc_param(char *file, pairing_t *pairing)
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
 	SHA256_CTX sha2;
-	int i, new_input_len = input_len + 1; // extra byte for prefix
+	int i, new_input_len = input_len + 2; // extra byte for prefix
 	uint8_t first_block = 0;
 	uint8_t new_input[new_input_len+1];
 //	printf("orig input => \n");
 //	printf_buffer_as_hex(input_buf, input_len);
 
-	memset(new_input, 0, new_input_len);
+	memset(new_input, 0, new_input_len+1);
 	new_input[0] = first_block; // block number (always 0 by default)
 	new_input[1] = hash_prefix; // set hash prefix
 	memcpy((uint8_t *)(new_input+2), input_buf, input_len); // copy input bytes
@@ -1640,18 +1640,21 @@ int check_membership(Element *elementObj) {
 	else if(elementObj->element_type == G1) {
 		element_init_G1(e, elementObj->pairing->pair_obj);
 		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->G1->order);
+//		element_printf("Elment->e => '%B'\n", e);
 		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
 		element_clear(e);
 	}
 	else if(elementObj->element_type == G2) {
 		element_init_G2(e, elementObj->pairing->pair_obj);
 		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->G2->order);
+//		element_printf("Elment->e => '%B'\n", e);
 		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
 		element_clear(e);
 	}
 	else if(elementObj->element_type == GT) {
 		element_init_GT(e, elementObj->pairing->pair_obj);
 		element_pow_mpz(e, elementObj->e, elementObj->pairing->pair_obj->GT->order);
+//		element_printf("Elment->e => '%B'\n", e);
 		result = element_is1(e) ? TRUE : FALSE; // TODO: verify this
 		element_clear(e);
 	}
