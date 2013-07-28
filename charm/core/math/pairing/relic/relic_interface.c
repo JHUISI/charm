@@ -1214,13 +1214,13 @@ status_t element_to_key(element_t e, uint8_t *data, int data_len, uint8_t label)
 status_t hash_buffer_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
 	LEAVE_IF(input_buf == NULL || output_buf == NULL, "uninitialized argument.");
-	int i, new_input_len = input_len + 1; // extra byte for prefix
+	int i, new_input_len = input_len + 2; // extra byte for prefix
 	uint8_t first_block = 0;
 	uint8_t new_input[new_input_len+1];
 //	printf("orig input => \n");
 //	print_as_hex(input_buf, input_len);
 
-	memset(new_input, 0, new_input_len);
+	memset(new_input, 0, new_input_len+1);
 	new_input[0] = first_block; // block number (always 0 by default)
 	new_input[1] = hash_prefix; // set hash prefix
 	memcpy((uint8_t *)(new_input+2), input_buf, input_len); // copy input bytes

@@ -159,9 +159,7 @@ element_t *_element_init_G2()
 
 element_t *_element_init_GT(const pairing_t *pairing)
 {
-	PFC *pfc = (PFC *) pairing;
-	GT *g = new GT();
-	*g = pfc->power(*g, Big(0)); // gt ^ 0 = identity element?
+	GT *g = new GT(1); // new GT(*id); // set the identity element
 	return (element_t *) g;
 }
 
@@ -212,6 +210,20 @@ int _element_pp_init(const pairing_t *pairing, Group_t type, element_t *e)
 	}
 
 	return TRUE;
+}
+
+element_t *element_gt(const pairing_t *pairing)
+{
+	PFC *pfc = (PFC *) pairing;
+	G1 g1; // = new G1();
+	G2 g2; // = new G2();
+
+	pfc->random(g1);
+	pfc->random(g2);
+	GT g = pfc->pairing(g2, g1);
+	GT *h = new GT(g);
+	cout << "h :=> " << h->g << endl;
+	return (element_t *) h;
 }
 
 void element_random(Group_t type, const pairing_t *pairing, element_t *e) {
