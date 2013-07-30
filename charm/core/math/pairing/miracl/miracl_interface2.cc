@@ -159,7 +159,9 @@ element_t *_element_init_G2()
 
 element_t *_element_init_GT(const pairing_t *pairing)
 {
-	GT *g = new GT(1); // new GT(*id); // set the identity element
+	GT h;
+	h.g=1;
+	GT *g = new GT(h); // new GT(*id); // set the identity element
 	return (element_t *) g;
 }
 
@@ -193,16 +195,20 @@ int element_is_member(Curve_t ctype, Group_t type, const pairing_t *pairing, ele
 int _element_pp_init(const pairing_t *pairing, Group_t type, element_t *e)
 {
 	PFC *pfc = (PFC *) pairing;
+
 	if(type == pyG1_t) {
 		G1 *g = (G1 *) e;
+		if(g->g.iszero() == TRUE) { return FALSE; }
 		pfc->precomp_for_mult(*g);
 	}
 	else if(type == pyG2_t) {
 		G2 *g = (G2 *) e;
+		if(g->g.iszero() == TRUE) { return FALSE; }
 		pfc->precomp_for_mult(*g);
 	}
 	else if(type == pyGT_t) {
 		GT *g = (GT *) e;
+		if(g->g.iszero() == TRUE) { return FALSE; }
 		pfc->precomp_for_power(*g);
 	}
 	else {
@@ -989,20 +995,24 @@ element_t *_element_pairing(const pairing_t *pairing, const element_t *in1, cons
 	PFC *pfc = (PFC *) pairing;
 	G1 *g1 = (G1 *) in1;
 	G2 *g2 = (G2 *) in2;
-	G1 g_id = pfc->mult(*g1, Big(0)); // get identity elements
-	G2 g2_id = pfc->mult(*g2, Big(0));
-	GT *gt = new GT();
+	//G1 g_id; // = new G1(); // pfc->mult(*g1, Big(0)); // get identity elements
+	//G2 g2_id; // = new G2(); // pfc->mult(*g2, Big(0));
 	// check whether g1 and g2 != identity element
-	if(*g1 == g_id || *g2 == g2_id) {
-		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
+//	if(*g1 == g_id || *g2 == g2_id) {
+//		*gt = pfc->power(*gt, Big(0)); // gt ^ 0 = identity element?
 //		cout << "One of the above is the identity element!" << endl;
+	if(g1->g.iszero() == TRUE || g2->g.iszero() == TRUE) {
+		GT h;
+		h.g=1;
+		GT *gt = new GT(h);
+		return (element_t *) gt;
 	}
-	else {
+
 #if BUILD_MNT_CURVE == 1
-		pfc->precomp_for_pairing(*g2);
+	pfc->precomp_for_pairing(*g2);
 #endif
-		gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
-	}
+	GT *gt = new GT(pfc->pairing(*g2, *g1)); // assumes type-3 pairings for now
+
 //	cout << "Result of pairing => " << gt->g << endl;
 //	GT *gt_res = new GT(gt);
 //	cout << "Result of pairing2 => " << gt_res->g << endl;
@@ -1520,14 +1530,17 @@ void element_delete(Group_t type, element_t *e) {
 	}
 	else if(type == pyG1_t) {
 		G1 *point = (G1 *) e;
+		point->g.clear();
 		delete point;
 	}
 	else if(type == pyG2_t) {
 		G2 *point = (G2 *) e;
+		point->g.clear();
 		delete point;
 	}
 	else if(type == pyGT_t) {
 		GT *point = (GT *) e;
+		point->g.clear();
 		delete point;
 	}
 	else {
