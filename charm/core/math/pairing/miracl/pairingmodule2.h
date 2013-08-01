@@ -178,8 +178,8 @@ typedef struct {
 	c->e = _element_pow_zr_zr(pyZR_t, a->pairing->pair_obj, a->e, b, a->pairing->order);	\
 	c->element_type = pyZR_t;
 
-#define element_pp_init(a) \
-		_element_pp_init(a->pairing->pair_obj, a->element_type, a->e)
+#define element_pp_init(b, a) \
+		b = _element_pp_init(a->pairing->pair_obj, a->element_type, a->e)
 
 #define pairing_apply(c, a, b) \
 	if(a->pairing->curve == MNT || a->pairing->curve == BN || a->pairing->curve == SS) { \

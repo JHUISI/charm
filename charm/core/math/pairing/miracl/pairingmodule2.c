@@ -1028,7 +1028,9 @@ static PyObject  *Element_initPP(Element *self, PyObject *args)
 
     /* initialize and store preprocessing information in e_pp */
     if(self->element_type >= pyG1_t && self->element_type <= pyGT_t) {
-    	element_pp_init(self);
+    	int result;
+    	element_pp_init(result, self);
+    	if(result == FALSE) { Py_RETURN_FALSE; }
 		self->elem_initPP = TRUE;
 		Py_RETURN_TRUE;
     }
