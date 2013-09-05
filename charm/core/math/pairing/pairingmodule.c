@@ -1283,6 +1283,7 @@ PyObject *sha2_hash(Element *self, PyObject *args) {
 		return NULL;
 	}
 	
+	if(!PyElement_Check(object)) EXIT_IF(TRUE, "not a valid element object.");
 	EXIT_IF(object->elem_initialized == FALSE, "null element object.");
 	int hash_size = HASH_LEN;
 	uint8_t hash_buf[hash_size + 1];
