@@ -30,7 +30,7 @@ class Dabe(ABEncMultiAuth):
         Setup a user and give him some keys
     >>> ID, secret_keys = "bob", {}
     >>> usr_attrs = ['THREE', 'ONE', 'TWO']
-    >>> for i in usr_attrs: dabe.keygen(public_parameters, master_secret_key, i, ID, secret_keys)
+    >>> for i in usr_attrs:  dabe.keygen(public_parameters, master_secret_key, i, ID, secret_keys)
     >>> msg = group.random(GT)
     >>> policy = '((one or three) and (TWO or FOUR))'
     >>> cipher_text = dabe.encrypt(master_public_key, public_parameters, msg, policy)
@@ -101,6 +101,7 @@ class Dabe(ABEncMultiAuth):
             print("Key gen for %s on %s" % (gid, i))
             print("H(GID): '%s'" % h)
             print("K = g^alpha_i * H(GID) ^ y_i: %s" % K)
+        return None
 
     def encrypt(self, pk, gp, M, policy_str):
         '''Encrypt'''
@@ -141,7 +142,7 @@ class Dabe(ABEncMultiAuth):
         policy = util.createPolicy(ct['policy'])
         pruned = util.prune(policy, usr_attribs)
         if pruned == False:
-            return False        
+            raise Exception("Don't have the required attributes for decryption!")        
         coeffs = util.getCoefficients(policy)
     
         h_gid = gp['H'](sk['gid'])  #find H(GID)
