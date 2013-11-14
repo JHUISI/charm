@@ -102,7 +102,7 @@ class Dabe(ABEncMultiAuth):
             print("H(GID): '%s'" % h)
             print("K = g^alpha_i * H(GID) ^ y_i: %s" % K)
         
-        return pkey[i]
+        return None
 
     def encrypt(self, pk, gp, M, policy_str):
         '''Encrypt'''
