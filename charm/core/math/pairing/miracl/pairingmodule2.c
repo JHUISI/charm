@@ -1152,6 +1152,10 @@ PyObject *sha2_hash(Element *self, PyObject *args) {
 		return NULL;
 	}
 
+	if(!PyElement_Check(object)) {
+		PyErr_SetString(ElementError, "not a valid element object.");
+		return NULL;
+	}
 	if(!object->elem_initialized) {
 		PyErr_SetString(ElementError, "null element object");
 		return NULL;
@@ -1440,6 +1444,10 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 		return NULL;
 	}
 
+	if(!PyElement_Check(self)) {
+		PyErr_SetString(ElementError, "not a valid element object.");
+		return NULL;
+	}
 	if(self->elem_initialized == FALSE) {
 		PyErr_SetString(ElementError, "element not initialized.");
 		return NULL;

@@ -1892,6 +1892,7 @@ static PyObject *serialize(PyObject *self, PyObject *args) {
 	if (!PyArg_ParseTuple(args, "O", &obj)) {
 		ErrorMsg("invalid argument");
 	}
+	if(!PyInteger_Check(obj)) EXIT_IF(TRUE, "not a valid element object.");
 
 	// export the object first
 	size_t count1 = 0, count2 = 0;

@@ -1069,8 +1069,8 @@ PyObject *sha2_hash(Element *self, PyObject *args) {
 	debug("Hashing the element...\n");
 	EXIT_IF(!PyArg_ParseTuple(args, "O|c", &object, &label), "missing element object");
 
+	if(!PyElement_Check(object)) EXIT_IF(TRUE, "not a valid element object.");
 	EXIT_IF(object->elem_initialized == FALSE, "null element object.");
-
 	int hash_size = SHA_LEN;
 	uint8_t hash_buf[hash_size + 1];
 	memset(hash_buf, 0, hash_size);
@@ -1319,6 +1319,7 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 
 	Element *self = NULL;
 	EXIT_IF(!PyArg_ParseTuple(args, "O", &self), "invalid argument.");
+	if(!PyElement_Check(self)) EXIT_IF(TRUE, "not a valid element object.");
 	EXIT_IF(self->elem_initialized == FALSE, "element not initialized");
 
 	int elem_len = 0;
