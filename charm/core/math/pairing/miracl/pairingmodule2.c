@@ -1444,6 +1444,10 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 		return NULL;
 	}
 
+	if(!PyElement_Check(self)) {
+		PyErr_SetString(ElementError, "not a valid element object.");
+		return NULL;
+	}
 	if(self->elem_initialized == FALSE) {
 		PyErr_SetString(ElementError, "element not initialized.");
 		return NULL;
