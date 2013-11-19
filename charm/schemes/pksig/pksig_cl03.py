@@ -35,11 +35,12 @@ class Sig_CL03(PKSig):
     >>> signature = pksig.sign(public_key, secret_key, msg)
     >>> pksig.verify(public_key, msg, signature)
     True
+    >>> from charm.toolbox.conversion import Conversion
     >>> g  = {}
     >>> m = {}
     >>> j = 16
     >>> for i in range(1, j + 1): g[str(i)] = randomQR(public_key['N'])
-    >>> for i in range(1, j + 1): m[str(i)] = random(public_key['N'])
+    >>> for i in range(1, j + 1): m[str(i)] = integer(SHA1(Conversion.IP2OS(random(public_key['N']))))
     >>> Cx = 1 % public_key['N']
     >>> for i in range(1, len(m) + 1): Cx = Cx*(g[str(i)] ** m[str(i)])
     >>> pksig = Sig_CL03() 
