@@ -9,7 +9,7 @@
 * type:           signature
 * setting:        integer groups 
 
-:Authors:    ?/Antonio de la Piedra
+:Authors:    Christina Garman/Antonio de la Piedra
 :Date:       11/2013
  '''
 from charm.toolbox.PKSig import PKSig
