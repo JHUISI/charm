@@ -48,7 +48,7 @@ class Joye():
     def destruction_keys(self):
         k={}
         for i in range(self.users):
-            k['k'+str(i)]=integer(group.random(20))
+            k['k'+str(i)]=integer(group.random())
         k[0]=integer(-1)*(sum(k.values())) #inverse of the sum of all user keys. Acts as annihilation for keys.
         k[1]=(sum(k.values()))           
         #self.ak=integer(1)/integer(self.r)**integer(k[0])
