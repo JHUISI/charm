@@ -45,10 +45,10 @@ class Joye():
         self.users=users
         self.r=14 #this value act as the common hash output H(r) according to the protocol.
 
-    def destruction_keys(self):
+    def destruction_keys(self,pk):
         k={}
         for i in range(self.users):
-            k['k'+str(i)]=integer(group.random())
+            k['k'+str(i)]=integer(group.random(102))#exponentiation works only for small keys (needs investigation)
         k[0]=integer(-1)*(sum(k.values())) #inverse of the sum of all user keys. Acts as annihilation for keys.
         k[1]=(sum(k.values()))           
         #self.ak=integer(1)/integer(self.r)**integer(k[0])
@@ -92,7 +92,7 @@ class Joye():
 if __name__=='__main__':
     joye = Joye()
     pk = joye.keygen()
-    k = joye.destruction_keys()
+    k = joye.destruction_keys(pk)
 
     c1 = joye.encrypt(2,pk,k['k0'])
     c2 = joye.encrypt(4,pk,k['k1'])
