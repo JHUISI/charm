@@ -33,7 +33,7 @@
 
 ; Constants.
 !define PRODUCT_NAME "charm-crypto"
-!define PRODUCT_VERSION "0.42"
+!define PRODUCT_VERSION "0.43"
 !define PRODUCT_PUBLISHER "Johns Hopkins University, HMS Lab"
 !define PRODUCT_WEB_SITE "http://charm-crypto.com/Main.html"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
