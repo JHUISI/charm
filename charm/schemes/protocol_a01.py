@@ -57,7 +57,7 @@ class Asig(Protocol):
         q = group.q
            
     def signer_state1(self):
-        print "SIGNER state #1"
+        print("SIGNER state #1")
 
         x, g, = self.group.random(), self.group.randomGen()
         z, h, = self.group.randomGen(), self.group.randomGen()
@@ -80,7 +80,7 @@ class Asig(Protocol):
         return { 'g':g, 'y':y, 'h':h, 'z':z  }
 
     def user_state2(self, input):
-        print "USER state #2"
+        print("USER state #2")
         
         g = input.get('g')
         y = input.get('y')
@@ -92,7 +92,7 @@ class Asig(Protocol):
         return { 'g':g, 'y':y }
 
     def signer_state3(self, input):
-        print "SIGNER state #3"
+        print("SIGNER state #3")
 
         rnd = (integer(randomBits(80)))
 
@@ -119,7 +119,7 @@ class Asig(Protocol):
         return { 'rnd':rnd, 'a':a, 'b1':b1, 'b2':b2  }
 
     def user_state4(self, input):
-        print "USER state #4"
+        print("USER state #4")
 
         (g, y, h ,z) = Protocol.get(self,  ['g', 'y', 'h', 'z'])
         
@@ -163,7 +163,7 @@ class Asig(Protocol):
         return { 'e':e }        
         
     def signer_state5(self, input):
-        print "SIGNER state #5"
+        print("SIGNER state #5")
 
         e = input.get('e')
         (d, u, x) = Protocol.get(self, ['d', 'u', 'x'])
@@ -176,7 +176,7 @@ class Asig(Protocol):
         return { 'r':r, 'c':c, 'd':d }
 
     def user_state6(self, input):
-        print "USER state #6"
+        print("USER state #6")
 
         r = input.get('r')
         c = input.get('c')
@@ -188,7 +188,7 @@ class Asig(Protocol):
         return { 'r':r }
 
     def signer_state7(self, input):
-        print "SIGNER state #7"
+        print("SIGNER state #7")
 
         (s1, s2) = Protocol.get(self, ['s1', 's2'])
                         
@@ -197,7 +197,7 @@ class Asig(Protocol):
         return { 's1':s1, 's2':s2 }
 
     def user_state8(self, input):
-        print "USER state #8"
+        print("USER state #8")
 
         s1 = input.get('s1')
         s2 = input.get('s2')
@@ -229,7 +229,7 @@ class Asig(Protocol):
         p1 = (omega + delta) % q
         p2 = self.group.hash(zeta, zeta1, tmp1, tmp2, tmp3, tmp4, "msg")        
         
-        print "Verification OK:", p1 == p2
+        print("Verification OK:", p1 == p2)
         
         Protocol.setState(self, None)
         return None

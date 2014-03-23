@@ -55,7 +55,7 @@ class AOSig(Protocol):
         q = group.q
            
     def signer_state1(self):
-        print "SIGNER state #1"
+        print("SIGNER state #1")
 
         p = self.group.p
         q = self.group.q
@@ -70,7 +70,7 @@ class AOSig(Protocol):
         return { 'g':g, 'y':y }
 
     def user_state2(self, input):
-        print "USER state #2"
+        print("USER state #2")
         
         g = input.get('g')
         y = input.get('y')
@@ -80,7 +80,7 @@ class AOSig(Protocol):
         return { 'g':g, 'y':y }
 
     def signer_state3(self, input):
-        print "SIGNER state #3"
+        print("SIGNER state #3")
 
         u = self.group.random()        
         s = self.group.random()        
@@ -103,7 +103,7 @@ class AOSig(Protocol):
         return { 'a':a, 'b':b, 's':s }
 
     def user_state4(self, input):
-        print "USER state #4"
+        print("USER state #4")
         
         p = self.group.p
         q = self.group.q
@@ -136,7 +136,7 @@ class AOSig(Protocol):
         return { 'e':e }        
         
     def signer_state5(self, input):
-        print "SIGNER state #5"
+        print("SIGNER state #5")
 
         e = input.get('e')
         (d, u, x, s) = Protocol.get(self, ['d', 'u', 'x', 's'])
@@ -149,7 +149,7 @@ class AOSig(Protocol):
         return { 'r':r, 'c':c, 'd':d }
 
     def user_state6(self, input):
-        print "USER state #6"
+        print("USER state #6")
 
         r = input.get('r')
         c = input.get('c')
@@ -171,7 +171,7 @@ class AOSig(Protocol):
         p1 = (omega + delta) % q
         p2 = self.group.hash(tmp1, tmp2, z, "msg")
         
-        print "Verification OK:", p1 == p2
+        print("Verification OK:", p1 == p2)
 
         Protocol.setState(self, None)
         return None
