@@ -7,12 +7,14 @@ Into this directory, download and decrompress charm and its dependencies. The fo
 android-ndk-r8e (http://developer.android.com/tools/sdk/ndk/index.html)
 android-sdk-linux (http://developer.android.com/sdk/index.html)
 android-python27 (http://code.google.com/p/android-python27/source/checkout)
-gmp (http://gmplib.org/#DOWNLOAD)
-pbc (http://crypto.stanford.edu/pbc/download.html)
+gmp (http://gmplib.org/#DOWNLOAD) - use 5.0.2, since 5.1.3 has serious performance regression (6.0.x not tested yet)
+pbc (http://crypto.stanford.edu/pbc/download.html) - use version 0.5.14, earlier versions crash when embedded in multi-threaded applications
 charm (http://www.charm-crypto.com/Main.html)
 python-lib (from the PY4A project) (https://code.google.com/p/python-for-android/)
 
-At the beggining of each script is a definition for the $BD variable. Either set these to the path of the directory you just created, or set BD to said directory in your shell
+Replace the config.sub and config.guess files in the gmp and pbc directories with the ones from this folder.
+
+At the beginning of each script is a definition for the $BD variable. Either set these to the path of the directory you just created, or set BD to said directory in your shell
 
 To build the dependencies:
 cd $BD/android-python27 && $SCRIPTS/python.sh
@@ -24,3 +26,5 @@ Finnally, to package charm into a zip, run:
 cd $BD && $SCRIPTS/collect.sh
 
 This will create a file at $BD/out/python_27.zip. This zip contains the cross compile python, charm, and dependencies.
+
+Manually copy the pyparsing.py file into the resulting .zip file (inside the site-packages folder)
