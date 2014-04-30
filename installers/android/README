@@ -7,7 +7,7 @@ Into this directory, download and decrompress charm and its dependencies. The fo
 android-ndk-r8e (http://developer.android.com/tools/sdk/ndk/index.html)
 android-sdk-linux (http://developer.android.com/sdk/index.html)
 android-python27 (http://code.google.com/p/android-python27/source/checkout)
-gmp (http://gmplib.org/#DOWNLOAD) - use 5.0.2, since 5.1.3 has serious performance regression (6.0.x not tested yet)
+gmp (http://gmplib.org/#DOWNLOAD) - use 6.0.0a, since 5.1.3 has serious 14x performance regression (5.0.2 is only 6% slower but was tested/compiled with --disable-assembly as per upstream)
 pbc (http://crypto.stanford.edu/pbc/download.html) - use version 0.5.14, earlier versions crash when embedded in multi-threaded applications
 charm (http://www.charm-crypto.com/Main.html)
 python-lib (from the PY4A project) (https://code.google.com/p/python-for-android/)
