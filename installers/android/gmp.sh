@@ -16,4 +16,4 @@ export LDFLAGS="-L$NDK/platforms/android-9/arch-arm/usr/lib/"
 ln -s $NDK/platforms/android-9/arch-arm/usr/lib/crtbegin_so.o .
 ln -s $NDK/platforms/android-9/arch-arm/usr/lib/crtend_so.o .
 
-./configure --host=$HOST --target=$HOST --enable-shared --disable-assembly --prefix=$BD/obj && make && make install
+./configure --host=$HOST --target=$HOST --enable-shared --prefix=$BD/obj && make && make install
