@@ -8,7 +8,7 @@ except Exception as err:
   exit(-1)
 
 class PairingGroup():
-    def __init__(self, param_id, param_file=False, secparam=512):        
+    def __init__(self, param_id, param_file=False, secparam=512, verbose=False):
         #legacy handler to handle calls that still pass in a file path
         if param_file:
           self.Pairing = pairing(file=param_id)
@@ -26,7 +26,7 @@ class PairingGroup():
           self.param   = param_id
  
         self.secparam = secparam # number of bits
-        self._verbose = False
+        self._verbose = verbose
     
     def __str__(self):
         return str(self.Pairing)
@@ -106,16 +106,20 @@ class PairingGroup():
         return deserialize(self.Pairing, obj)
     
     def debug(self, data, prefix=None):
-        if type(data) == dict and self._verbose:
-           for k,v in data.items():
+        if not self._verbose:
+            return
+        if type(data) == dict:
+            for k,v in data.items():
                print(k,v)
-        elif type(data) == list and self._verbose:
-           for i in range(0, len(data)):
-               print(prefix, (i+1),':',data[i])            
-           print('')
-        elif type(data) == str and self._verbose:
-           print(data)
-        return None
+        elif type(data) == list:
+            for i in range(0, len(data)):
+               print(prefix, (i+1),':',data[i])
+            print('')
+        elif type(data) == str:
+            print(data)
+        else:
+            print(type(data), ':', data)
+        return
     
     def pair_prod(self, lhs, rhs):
         """takes two lists of G1 & G2 and computes a pairing product"""
