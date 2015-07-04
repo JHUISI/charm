@@ -31,7 +31,7 @@ class EKPabe(ABEnc):
     >>> (master_public_key, master_key) = kpabe.setup(attributes)
     >>> policy = '(ONE or THREE) and (THREE or TWO)'
     >>> secret_key = kpabe.keygen(master_public_key, master_key, policy)
-    >>> msg=group.random(ZR)
+    >>> msg = b"Some Random Message"
     >>> cipher_text = kpabe.encrypt(master_public_key, msg, attributes)
     >>> decrypted_msg = kpabe.decrypt(cipher_text, secret_key)
     >>> decrypted_msg == msg
