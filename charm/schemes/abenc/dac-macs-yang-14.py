@@ -187,7 +187,7 @@ class DACMACS(object):
         CT['C'][attribute] = CT['C'][attribute] * (CT['DS'][attribute] ** CUK)
 
 def basicTest():
-    print "RUN basicTest"
+    print("RUN basicTest")
     groupObj = PairingGroup('SS512')
     dac = DACMACS(groupObj)
     GPP, GMK = dac.setup()
@@ -220,10 +220,10 @@ def basicTest():
     # print "PT", PT
     
     assert k == PT, 'FAILED DECRYPTION!'
-    print 'SUCCESSFUL DECRYPTION'
+    print('SUCCESSFUL DECRYPTION')
 
 def revokedTest():
-    print "RUN revokedTest"
+    print("RUN revokedTest")
     groupObj = PairingGroup('SS512')
     dac = DACMACS(groupObj)
     GPP, GMK = dac.setup()
@@ -259,7 +259,7 @@ def revokedTest():
     
     assert k == PT1a, 'FAILED DECRYPTION (1a)!'
     assert k == PT1b, 'FAILED DECRYPTION (1b)!'
-    print 'SUCCESSFUL DECRYPTION 1'
+    print('SUCCESSFUL DECRYPTION 1')
     
     # revoke bob on "ONE"
     attribute = "ONE"
@@ -274,7 +274,7 @@ def revokedTest():
     
     assert k == PT2a, 'FAILED DECRYPTION (2a)!'
     assert k != PT2b, 'SUCCESSFUL DECRYPTION (2b)!'
-    print 'SUCCESSFUL DECRYPTION 2'
+    print('SUCCESSFUL DECRYPTION 2')
 
 def test():
     groupObj = PairingGroup('SS512')

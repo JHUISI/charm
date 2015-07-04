@@ -12,7 +12,6 @@ Xuanxia Yao, Zhi Chen, Ye Tian
 :Authors:    artjomb
 :Date:       10/2014
 '''
-from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.symcrypto import SymmetricCryptoAbstraction
