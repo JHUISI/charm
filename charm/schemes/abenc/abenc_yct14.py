@@ -27,9 +27,9 @@ class EKPabe(ABEnc):
     >>> from charm.toolbox.pairinggroup import PairingGroup,GT
     >>> group = PairingGroup('MNT224')
     >>> kpabe = EKPabe(group)
-    >>> (master_public_key, master_key) = kpabe.setup()
-    >>> policy = '(ONE or THREE) and (THREE or TWO)'
     >>> attributes = [ 'ONE', 'TWO', 'THREE', 'FOUR' ]
+    >>> (master_public_key, master_key) = kpabe.setup(attributes)
+    >>> policy = '(ONE or THREE) and (THREE or TWO)'
     >>> secret_key = kpabe.keygen(master_public_key, master_key, policy)
     >>> msg=group.random(ZR)
     >>> cipher_text = kpabe.encrypt(master_public_key, msg, attributes)
