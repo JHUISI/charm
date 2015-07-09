@@ -16,6 +16,12 @@ Documentation
 =============
 For complete install, see our [documentation](http://jhuisi.github.com/charm/install_source.html). 
 
+Pull Requests
+=============
+
+We welcome and encourage scheme contributions. If you'd like your scheme implementation included in the Charm distribution, please note a few things.
+Schemes in the dev branch are Python 3.x only and ones in the 2.7-dev branch are Python 2.x. For your scheme to be included in unit tests (`make test`), you must include a doctest at a minimum (see schemes in the charm/schemes directory). 
+
 Schemes
 =======
 We have provided several cryptographic scheme [examples](http://jhuisi.github.com/charm/schemes.html) to get you going. If this doesn't help, then feel free to reach us for questions and/or comments at support@charm-crypto.com.
@@ -36,6 +42,4 @@ After that, you may proceed to install a basic configuration of Charm as follows
 * `make test` (may also require super-user privileges)
 
 If most (or all) Python tests pass, then the Charm installation was successful. Enjoy!
-
- 
 
