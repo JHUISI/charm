@@ -92,7 +92,7 @@ class IBE_BonehFranklinTest(unittest.TestCase):
         id = 'user@email.com'
         key = ibe.extract(sk, id)
         
-        m = "hello world!!!!!"
+        m = b"hello world!!!!!"
         ciphertext = ibe.encrypt(pk, id, m)
 
         msg = ibe.decrypt(pk, key, ciphertext)
