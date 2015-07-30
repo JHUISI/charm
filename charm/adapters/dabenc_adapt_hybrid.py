@@ -60,7 +60,8 @@ class HybridABEncMA(ABEncMultiAuth):
         return abencma.keygen(gp, sk, i, gid, pkey)
 
     def encrypt(self, pk, gp, M, policy_str):
-        if type(M) != bytes and type(policy_str) != str: raise "message and policy not right type!"        
+        if type(M) != bytes and type(policy_str) != str:
+            raise Exception("message and policy not right type!")
         key = group.random(GT)
         c1 = abencma.encrypt(pk, gp, key, policy_str)
         # instantiate a symmetric enc scheme from this key
@@ -71,6 +72,8 @@ class HybridABEncMA(ABEncMultiAuth):
     def decrypt(self, gp, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = abencma.decrypt(gp, sk, c1)
+        if key is False:
+            raise Exception("failed to decrypt!")
         cipher = AuthenticatedCryptoAbstraction(sha1(key))
         return cipher.decrypt(c2)
         

@@ -44,6 +44,8 @@ class HybridABEnc(ABEnc):
     def decrypt(self, pk, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = abenc.decrypt(pk, sk, c1)
+        if key is False:
+            raise Exception("failed to decrypt!")
         cipher = AuthenticatedCryptoAbstraction(sha1(key))
         return cipher.decrypt(c2)
     
