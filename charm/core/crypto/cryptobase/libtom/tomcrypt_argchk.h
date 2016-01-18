@@ -1,13 +1,19 @@
 /* Defines the LTC_ARGCHK macro used within the library */
-/* ARGTYPE is defined in mycrypt_cfg.h */
+/* ARGTYPE is defined in tomcrypt_cfg.h */
 #if ARGTYPE == 0
 
 #include <signal.h>
 
 /* this is the default LibTomCrypt macro  */
-void crypt_argchk(char *v, char *s, int d);
-#define LTC_ARGCHK(x) if (!(x)) { crypt_argchk(#x, __FILE__, __LINE__); }
-#define LTC_ARGCHKVD(x) LTC_ARGCHK(x)
+#if defined(__clang__) || defined(__GNUC_MINOR__)
+#define NORETURN __attribute__ ((noreturn))
+#else
+#define NORETURN
+#endif
+
+void crypt_argchk(char *v, char *s, int d) NORETURN;
+#define LTC_ARGCHK(x) do { if (!(x)) { crypt_argchk(#x, __FILE__, __LINE__); } }while(0)
+#define LTC_ARGCHKVD(x) do { if (!(x)) { crypt_argchk(#x, __FILE__, __LINE__); } }while(0)
 
 #elif ARGTYPE == 1
 
@@ -22,7 +28,7 @@ void crypt_argchk(char *v, char *s, int d);
 
 #elif ARGTYPE == 3
 
-#define LTC_ARGCHK(x) 
+#define LTC_ARGCHK(x)
 #define LTC_ARGCHKVD(x) LTC_ARGCHK(x)
 
 #elif ARGTYPE == 4
@@ -33,6 +39,6 @@ void crypt_argchk(char *v, char *s, int d);
 #endif
 
 
-/* $Source: /cvs/libtom/libtomcrypt/src/headers/tomcrypt_argchk.h,v $ */
-/* $Revision: 1.5 $ */
-/* $Date: 2006/08/27 20:50:21 $ */
+/* $Source$ */
+/* $Revision$ */
+/* $Date$ */
