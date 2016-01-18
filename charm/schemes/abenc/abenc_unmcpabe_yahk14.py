@@ -24,7 +24,7 @@ debug = False
 class CPABE_YAHK14(ABEnc):
     """
     >>> from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-    >>> group = PairingGroup('MNT224')
+    >>> group = PairingGroup('SS512')
     >>> cpabe = CPABE_YAHK14(group)
     >>> msg = group.random(GT)
     >>> attributes = ['2', '3'] # must be integer strings
@@ -157,7 +157,6 @@ class CPABE_YAHK14(ABEnc):
         return group.random(GT)
 
 def main():
-    #curve = 'MNT224'
     curve = 'SS512'
 
     groupObj = PairingGroup(curve)

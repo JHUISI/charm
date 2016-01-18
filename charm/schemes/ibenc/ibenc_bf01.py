@@ -26,10 +26,10 @@ class IBE_BonehFranklin(IBEnc):
     >>> (master_public_key, master_secret_key) = ibe.setup()
     >>> ID = 'user@email.com'
     >>> private_key = ibe.extract(master_secret_key, ID)
-    >>> msg = "hello world!!!!!"
+    >>> msg = b"hello world!!!!!"
     >>> cipher_text = ibe.encrypt(master_public_key, ID, msg)
     >>> ibe.decrypt(master_public_key, private_key, cipher_text)
-    'hello world!!!!!'
+    b'hello world!!!!!'
     """
     def __init__(self, groupObj):
         IBEnc.__init__(self)
@@ -102,13 +102,13 @@ class IBE_BonehFranklin(IBEnc):
         return None
 
     def encodeToZn(self, message):
+        assert type(message) == bytes, "Input must be of type bytes"
         return integer(message)
         
     def decodeFromZn(self, element):
         if type(element) == integer:
             msg = int2Bytes(element)
             return msg
-            #return bytes.decode(msg, 'utf8') # convert back to string
         return None
      
 
