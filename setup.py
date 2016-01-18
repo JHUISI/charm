@@ -1,5 +1,5 @@
-from distribute_setup import use_setuptools
-use_setuptools() #bootstrap installs Distribute if not installed
+#from distribute_setup import use_setuptools
+#use_setuptools() #bootstrap installs Distribute if not installed
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 from distutils.core import  Command, Extension

@@ -25,7 +25,7 @@ setup:
 .PHONY: all
 all: setup 
 	@echo "Building the Charm Framework"
-	${PYTHON} distribute_setup.py
+	#${PYTHON} distribute_setup.py
 	${PYTHON} setup.py build ${PYTHONFLAGS} ${PYTHONBUILDEXT}
 	@echo "Complete"
 
