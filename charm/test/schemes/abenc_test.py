@@ -3,10 +3,31 @@ from charm.adapters.kpabenc_adapt_hybrid import HybridABEnc as HybridKPABEnc
 from charm.schemes.abenc.abenc_bsw07 import CPabe_BSW07
 from charm.schemes.abenc.abenc_waters09 import CPabe09
 from charm.schemes.abenc.abenc_lsw08 import KPabe
+import charm.schemes.abenc.abenc_maabe_yj14 as abenc_maabe_yj14
+import charm.schemes.abenc.abenc_dacmacs_yj14 as abenc_dacmacs_yj14
+import charm.schemes.abenc.abenc_tbpre_lww14 as abenc_tbpre_lww14
 from charm.toolbox.pairinggroup import PairingGroup,GT
 import unittest
 
 debug = False
+
+# unit test for scheme contributed by artjomb
+class MAabe_YJ14Test(unittest.TestCase):
+    def testMAabe_YJ14(self):
+        abenc_maabe_yj14.basicTest()
+        abenc_maabe_yj14.revokedTest()
+
+# unit test for scheme contributed by artjomb
+class DacMacs_YJ14Test(unittest.TestCase):
+    def testDacmacs_YJ14(self):
+        abenc_dacmacs_yj14.basicTest()
+        abenc_dacmacs_yj14.revokedTest()
+
+# unit test for scheme contributed by artjomb
+class TBPre_LWW14Test(unittest.TestCase):
+    def testTBPre_LWW14(self):
+        abenc_tbpre_lww14.basicTest()
+        #abenc_tbpre_lww14.basicTest2() # seems to fail
 
 class HybridABEncTest(unittest.TestCase):
     def testHybridABEnc(self):
