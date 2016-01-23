@@ -8,6 +8,7 @@ setup1=$(shell mkdir -p /tmp/build-charm)
 dest_build=/tmp/build-charm
 
 help:
+	@echo "make deps - Build dependency libs locally."
 	@echo "make source - Create source package."
 	@echo "make install - Install on local system."
 	@echo "make clean - Get rid of scratch and byte files."
@@ -27,6 +28,11 @@ all: setup
 	@echo "Building the Charm Framework"
 	${PYTHON} setup.py build ${PYTHONFLAGS} ${PYTHONBUILDEXT}
 	@echo "Complete"
+
+.PHONY: deps
+deps:
+	@echo "Building the dependency libs"
+	make -C deps
 
 .PHONY: source
 source:
