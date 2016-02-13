@@ -144,9 +144,9 @@ class Pai99Test(unittest.TestCase):
             
         (pk, sk) = pai.keygen()
         
-        m1 = pai.encode(pk['n'], 12345678987654321)
-        m2 = pai.encode(pk['n'], 12345761234123409)
-        m3 = pai.encode(pk['n'], 24691440221777730) # target
+        m1 = 12345678987654321
+        m2 = 12345761234123409
+        m3 = 24691440221777730 # target
         c1 = pai.encrypt(pk, m1)
         c2 = pai.encrypt(pk, m2)
             
@@ -172,6 +172,26 @@ class Pai99Test(unittest.TestCase):
         if debug: print("c5 = c2 * 2021 =>", c5, "\n")
         orig_m = pai.decrypt(pk, sk, c5)
         if debug: print("m5 =>", orig_m, "\n")
+
+        messages = range(0, 10)
+        cts = []
+
+        for m in messages:
+            c = pai.encrypt(pk, pai.encode(pk['n'], m))
+            cts.append(c)
+            enc_m = pai.encode(pk['n'], m)
+            rec_m = pai.decrypt(pk, sk, c)
+            assert rec_m == m, "Failed to decrypt"
+
+        # test homomorphic properties (addition)
+        c0 = cts[0]
+        for i in range(1, len(cts)):
+            c0 = c0 + cts[i]
+
+        rec_sum = pai.decrypt(pk, sk, c0)
+        print("Total Sum: ", rec_sum)
+        tot_sum = sum(list(messages))
+        assert rec_sum == tot_sum, "Failed to decrypt to correct sum"
 
 class Rabin_EncTest(unittest.TestCase):
     def testRabin_Enc(self):

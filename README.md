@@ -43,3 +43,7 @@ After that, you may proceed to install a basic configuration of Charm as follows
 
 If most (or all) Python tests pass, then the Charm installation was successful. Enjoy!
 
+Licensing
+=========
+
+Charm is released under an LGPL version 3 license due to libraries that we build on. See the `LICENSE.txt` for details.
