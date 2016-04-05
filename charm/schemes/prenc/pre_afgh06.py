@@ -29,7 +29,7 @@ class AFGH06(PREnc):
     >>> msg = groupObj.random(GT)
     >>> c_a = pre.encrypt(params, pk_a, msg)
     >>> rk = pre.rekeygen(params, pk_a, sk_a, pk_b, sk_b)
-    >>> c_b = pre.reEncrypt(params, rk, c_a)
+    >>> c_b = pre.re_encrypt(params, rk, c_a)
     >>> assert msg == pre.decrypt(params, sk_b, c_b), 'Decryption of re-encrypted ciphertext was incorrect'
     """
 
@@ -100,7 +100,7 @@ class AFGH06(PREnc):
         #return group.decode(m)
         return m
         
-    def reEncrypt(self, params, rk, c_a):
+    def re_encrypt(self, params, rk, c_a):
         c1 = c_a['c1'] 
         c2 = c_a['c2']
 

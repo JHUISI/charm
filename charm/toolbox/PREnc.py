@@ -3,7 +3,7 @@
  Notes: This class implements an interface for a standard proxy re-encryption scheme.
  
  A proxy re-encryption scheme consists of six algorithms: 
- (setup, keygen, encrypt, decrypt, rekeygen, reencrypt).
+ (setup, keygen, encrypt, decrypt, rekeygen, re_encrypt).
 '''
 from charm.toolbox.schemebase import *
 
@@ -28,5 +28,5 @@ class PREnc(SchemeBase):
     def rekeygen(self, params, pk_a, sk_a, pk_b, sk_b):
         raise NotImplementedError
     
-    def reEncrypt(self, params, rk, c_a):
+    def re_encrypt(self, params, rk, c_a):
         raise NotImplementedError

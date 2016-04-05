@@ -12,9 +12,10 @@ BBS Proxy Re-Encryption
 '''
 
 from charm.toolbox.ecgroup import G
+from charm.toolbox.PREnc import PREnc
 
 debug = False
-class BBS98:
+class BBS98(PREnc):
     """
     Testing BBS98 implementation 
 
@@ -28,8 +29,8 @@ class BBS98:
     >>> msg = b"hello world!!!"
     >>> c_a = bbs.encrypt(params, pk_a, msg)
     >>> assert msg == bbs.decrypt(params, sk_a, c_a), 'Decryption of original ciphertext was incorrect'
-    >>> rk = bbs.rekeygen(params, sk_a, sk_b)
-    >>> c_b = bbs.reEncrypt(params, rk, c_a)
+    >>> rk = bbs.rekeygen(params, pk_a, sk_a, pk_b, sk_b)
+    >>> c_b = bbs.re_encrypt(params, rk, c_a)
     >>> assert msg == bbs.decrypt(params, sk_b, c_b), 'Decryption of re-encrypted ciphertext was incorrect'
     """
 
@@ -68,7 +69,7 @@ class BBS98:
             print("sk => '%s'" % sk)
         return (pk, sk)
 
-    def rekeygen(self, params, sk_a, sk_b):
+    def rekeygen(self, params, pk_a, sk_a, pk_b, sk_b):
         rk = sk_b * (~sk_a)
         if(debug):
             print('\nReKeyGen...')
@@ -103,7 +104,7 @@ class BBS98:
         
     
         
-    def reEncrypt(self, params, rk, c_a):
+    def re_encrypt(self, params, rk, c_a):
         c1 = c_a['c1'] 
         c2 = c_a['c2']
 
