@@ -13,9 +13,10 @@ AFGH Proxy Re-Encryption
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.toolbox.PREnc import PREnc
 
 debug = False
-class AFGH06:
+class AFGH06(PREnc):
     """
     Testing AFGH06 implementation 
 
@@ -27,7 +28,7 @@ class AFGH06:
     >>> (pk_b, sk_b) = pre.keygen(params)
     >>> msg = groupObj.random(GT)
     >>> c_a = pre.encrypt(params, pk_a, msg)
-    >>> rk = pre.rekeygen(params, sk_a, pk_b)
+    >>> rk = pre.rekeygen(params, pk_a, sk_a, pk_b, sk_b)
     >>> c_b = pre.reEncrypt(params, rk, c_a)
     >>> assert msg == pre.decrypt(params, sk_b, c_b), 'Decryption of re-encrypted ciphertext was incorrect'
     """
@@ -60,7 +61,7 @@ class AFGH06:
             print("sk => '%s'" % sk)
         return (pk, sk)
 
-    def rekeygen(self, params, sk_a, pk_b):
+    def rekeygen(self, params, pk_a, sk_a, pk_b, sk_b):
         pk_b2 = pk_b['pk2']
         sk_a1 = sk_a['sk1']
         rk = pk_b2 ** sk_a1

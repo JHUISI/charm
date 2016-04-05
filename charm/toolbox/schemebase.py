@@ -8,7 +8,7 @@ OW,RSA,StrongRSA,DL,DH,CDH,DDH,DBDH,q_SDH,LRSW = "OW","RSA","StrongRSA","DL","DH
 # security models: standard, random oracle and common reference string
 baseSecModels = Enum('SM', 'ROM', 'CRS')
 # scheme types
-SchemeType = Enum('PKEnc', 'PKSig', 'IBEnc', 'IBSig', 'RingSig', 'GroupSig', 'ABEnc', 'DABEnc','Commitment', 'Hash', 'ChamHash', 'Protocol')
+SchemeType = Enum('PKEnc', 'PKSig', 'IBEnc', 'IBSig', 'RingSig', 'GroupSig', 'ABEnc', 'DABEnc','Commitment', 'Hash', 'ChamHash', 'Protocol', 'PREnc')
 # security hardness assumptions
 secAssump = Enum('OW','RSA','StrongRSA','DL','DH','CDH','DDH','DBDH','q_SDH','LRSW') # need to expand this since it captures implications
 
