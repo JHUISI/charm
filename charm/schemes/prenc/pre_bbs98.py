@@ -16,7 +16,6 @@ from charm.toolbox.PREnc import PREnc
 
 debug = False
 class BBS98(PREnc):
-    
     """
     Testing BBS98 implementation 
 
