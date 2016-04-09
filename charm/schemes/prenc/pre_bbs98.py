@@ -16,6 +16,7 @@ from charm.toolbox.PREnc import PREnc
 
 debug = False
 class BBS98(PREnc):
+    
     """
     Testing BBS98 implementation 
 
@@ -113,7 +114,6 @@ class BBS98(PREnc):
             print('\nRe-encrypt...')
             group.debug(c_b)
         return c_b
-
 
 
     
