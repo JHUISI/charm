@@ -17,7 +17,7 @@ from charm.toolbox.PREnc import PREnc
 debug = False
 class BBS98(PREnc):
     """
-    Testing BBS98 implementation 
+    Testing BBS98 implementation
 
     >>> from charm.toolbox.eccurve import prime192v1
     >>> from charm.toolbox.ecgroup import ECGroup
@@ -39,7 +39,7 @@ class BBS98(PREnc):
         group = groupObj
         if group.groupSetting() == 'integer':
             group.p, group.q, group.r = p, q, 2
-        
+
     def setup(self, secparam=0):
         global g
         if group.groupSetting() == 'integer':
@@ -48,9 +48,9 @@ class BBS98(PREnc):
             g = group.randomGen()
         elif group.groupSetting() == 'elliptic_curve':
             group.paramgen(secparam)
-            g =  group.random(G)
+            g = group.random(G)
 
-        params = { 'g': g }
+        params = {'g': g}
         if(debug):
             print("Setup: Public parameters...")
             group.debug(params)
@@ -60,9 +60,9 @@ class BBS98(PREnc):
         x = group.random()
         g_x = params['g'] ** x
 
-        sk = x #{ 'sk' : x }
-        pk = g_x #{ 'pk' : g_x }
-        
+        sk = x      # { 'sk' : x }
+        pk = g_x    # { 'pk' : g_x }
+
         if(debug):
             print('\nKeygen...')
             print("pk => '%s'" % pk)
@@ -82,37 +82,33 @@ class BBS98(PREnc):
         c1 = pk ** r
         c2 = (params['g'] ** r) * m
 
-        c = { 'c1' : c1, 'c2' : c2 }
-               
+        c = {'c1': c1, 'c2': c2}
+
         if(debug):
             print('\nEncrypt...')
             print('m => %s' % m)
             print('r => %s' % r)
             group.debug(c)
-        return c  
-        
+        return c
+
     def decrypt(self, params, sk, c):
-        c1 = c['c1'] 
+        c1 = c['c1']
         c2 = c['c2']
         m = c2 / (c1 ** (~sk))
-        
+
         if(debug):
             print('\nDecrypt...')
             print('m => %s' % m)
 
         return group.decode(m)
-        
-    
-        
+
     def re_encrypt(self, params, rk, c_a):
-        c1 = c_a['c1'] 
+        c1 = c_a['c1']
         c2 = c_a['c2']
 
-        c_b = { 'c1' : (c1 ** rk), 'c2' : c2 }
+        c_b = {'c1': (c1 ** rk), 'c2': c2}
+
         if(debug):
             print('\nRe-encrypt...')
             group.debug(c_b)
         return c_b
-
-
-    

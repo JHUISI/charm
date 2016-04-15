@@ -7,7 +7,7 @@ AFGH Proxy Re-Encryption
 * properties:     CPA-secure, unidirectional, single-hop, non-interactive, collusion-resistant
 * setting:        Pairing groups (Type 1 "symmetric")
 * assumption:     eDBDH (Extended Decisional Bilinear DH)
-* to-do:          first-level encryption
+* to-do:          first-level encryption & second-level decryption
 :Authors:    D. Nuñez
 :Date:       04/2016
 '''
