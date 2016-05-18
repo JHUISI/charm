@@ -1532,7 +1532,7 @@ static PyObject *Serialize_cmp(PyObject *self, PyObject *args) {
 	if(!PyArg_ParseTuple(args, "O|p:serialize", &element, &compression)) return NULL;
 
 	if(!PyElement_Check(element)) {
-		PyErr_SetString(PyExc_TypeError, "Invalid element type.");	
+		PyErr_SetString(PyExc_TypeError, "Invalid element type.");
 		return NULL;
 	}
 	if(element->elem_initialized == FALSE) {
@@ -1630,7 +1630,7 @@ static PyObject *Deserialize_cmp(PyObject *self, PyObject *args) {
 		free(binary_buf);
 		return (PyObject *) origObject;
 	}
-	
+
 	PyErr_SetString(PyExc_ValueError, "Nothing to deserialize in element.");
 	return NULL;
 }
