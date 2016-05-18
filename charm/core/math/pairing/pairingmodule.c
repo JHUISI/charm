@@ -1525,17 +1525,18 @@ BINARY(instance_add, 'a', Element_add)
 BINARY(instance_sub, 's', Element_sub)
 
 static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
+
 	Element *self = NULL;
 	int compression = 1;
 
-    if(!PyArg_ParseTuple(args, "O|p:serialize", &self, &compression)) return NULL;
+	if(!PyArg_ParseTuple(args, "O|p:serialize", &self, &compression)) return NULL;
 
-    if(!PyElement_Check(self)) EXIT_IF(TRUE, "not a valid element object.");
-    if(self->elem_initialized == FALSE) {
-	    PyErr_SetString(ElementError, "element not initialized.");
-	    return NULL;
-    }
-	
+	if(!PyElement_Check(self)) EXIT_IF(TRUE, "not a valid element object.");
+	if(self->elem_initialized == FALSE) {
+		PyErr_SetString(ElementError, "element not initialized.");
+		return NULL;
+	}
+
 	int elem_len = 0;
 	uint8_t *data_buf = NULL;
 	size_t bytes_written;
@@ -1553,18 +1554,18 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	else if(self->element_type != NONE_G) {
 	// object initialized now retrieve element and serialize to a char buffer.
 		if(compression){
-    		elem_len = element_length_in_bytes_compressed(self->e);
+			elem_len = element_length_in_bytes_compressed(self->e);
 		}else{
-		    elem_len = element_length_in_bytes(self->e);
+			elem_len = element_length_in_bytes(self->e);
 		}
 		data_buf = (uint8_t *) malloc(elem_len + 1);
 		EXIT_IF(data_buf == NULL, "out of memory.");
 		// write to char buffer
 		if(compression){
-    		bytes_written = element_to_bytes_compressed(data_buf, self->e);
-    	} else {
-    	    bytes_written = element_to_bytes(data_buf, self->e);
-    	}
+			bytes_written = element_to_bytes_compressed(data_buf, self->e);
+		} else {
+			bytes_written = element_to_bytes(data_buf, self->e);
+		}
 	}
 	else {
 		EXIT_IF(TRUE, "invalid type.\n");
@@ -1588,40 +1589,37 @@ static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
 	PyObject *object;
 	int compression = 1;
 
-    if(!PyArg_ParseTuple(args, "OO|p:deserialize",
-                         &group, &object, &compression)) return NULL;
-
+	if(!PyArg_ParseTuple(args, "OO|p:deserialize", &group, &object, &compression)) return NULL;
 	VERIFY_GROUP(group);
-	if(PyBytes_Check(object)) {
-		uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
-		int type = atoi((const char *) &(serial_buf[0]));
-		uint8_t *base64_buf = (uint8_t *)(serial_buf + 2);
+	if(!PyBytes_Check(object)) EXIT_IF(TRUE, "nothing to deserialize in element.");
 
-		size_t deserialized_len = 0;
-		uint8_t *binary_buf = NewBase64Decode((const char *) base64_buf, strlen((char *) base64_buf), &deserialized_len);
+	uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
+	int type = atoi((const char *) &(serial_buf[0]));
+	uint8_t *base64_buf = (uint8_t *)(serial_buf + 2);
 
-		if((type == ZR || type == GT) && deserialized_len > 0) {
-//				debug("result => ");
-//				printf_buffer_as_hex(binary_buf, deserialized_len);
-			origObject = createNewElement(type, group);
+	size_t deserialized_len = 0;
+	uint8_t *binary_buf = NewBase64Decode((const char *) base64_buf, strlen((char *) base64_buf), &deserialized_len);
+
+	if((type == ZR || type == GT) && deserialized_len > 0) {
+	//				debug("result => ");
+	//				printf_buffer_as_hex(binary_buf, deserialized_len);
+		origObject = createNewElement(type, group);
+		element_from_bytes(origObject->e, binary_buf);
+		free(binary_buf);
+		return (PyObject *) origObject;
+	}
+	else if((type == G1 || type == G2) && deserialized_len > 0) {
+		// now convert element back to an element type (assume of type ZR for now)
+		origObject = createNewElement(type, group);
+		if(compression) {
+			element_from_bytes_compressed(origObject->e, binary_buf);
+		} else {
 			element_from_bytes(origObject->e, binary_buf);
-			free(binary_buf);
-			return (PyObject *) origObject;
 		}
-		else if((type == G1 || type == G2) && deserialized_len > 0) {
-			// now convert element back to an element type (assume of type ZR for now)
-			origObject = createNewElement(type, group);
-			if(compression) {
-				element_from_bytes_compressed(origObject->e, binary_buf);
-			} else {
-				element_from_bytes(origObject->e, binary_buf);
-			}
-			free(binary_buf);
-			return (PyObject *) origObject;
-		}
+		free(binary_buf);
+		return (PyObject *) origObject;
 	}
 
-	EXIT_IF(TRUE, "nothing to deserialize in element.");
 }
 
 void print_mpz(mpz_t x, int base) {
