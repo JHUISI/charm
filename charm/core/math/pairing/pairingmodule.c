@@ -1542,7 +1542,7 @@ static PyObject *Serialize_cmp(PyObject *self, PyObject *args) {
 
 	if(!PyElement_Check(element)) {
 		PyErr_SetString(PyExc_TypeError, "Invalid element type.");	
-        return NULL;
+		return NULL;
 	}
 	if(element->elem_initialized == FALSE) {
 		PyErr_SetString(PyExc_ValueError, "Element not initialized.");
@@ -1555,9 +1555,9 @@ static PyObject *Serialize_cmp(PyObject *self, PyObject *args) {
 
 	if(element->element_type == ZR || element->element_type == GT) {
 		elem_len = element_length_in_bytes(element->e);
-
 		data_buf = (uint8_t *) malloc(elem_len + 1);
-		EXIT_IF(data_buf == NULL, "out of memory.");
+		if(data_buf == NULL)
+			return PyErr_NoMemory();
 		// write to char buffer
 		bytes_written = element_to_bytes(data_buf, element->e);
 		debug("result => ");
@@ -1571,7 +1571,8 @@ static PyObject *Serialize_cmp(PyObject *self, PyObject *args) {
 			elem_len = element_length_in_bytes(element->e);
 		}
 		data_buf = (uint8_t *) malloc(elem_len + 1);
-		EXIT_IF(data_buf == NULL, "out of memory.");
+		if(data_buf == NULL)
+			return PyErr_NoMemory();
 		// write to char buffer
 		if(compression){
 			bytes_written = element_to_bytes_compressed(data_buf, element->e);
@@ -1602,9 +1603,15 @@ static PyObject *Deserialize_cmp(PyObject *self, PyObject *args) {
 	PyObject *object;
 	int compression = 1;
 
-	if(!PyArg_ParseTuple(args, "OO|p:deserialize", &group, &object, &compression)) return NULL;
+	if(!PyArg_ParseTuple(args, "OO|p:deserialize", &group, &object, &compression))
+		return NULL;
+
 	VERIFY_GROUP(group);
-	if(!PyBytes_Check(object)) return NULL;
+
+	if(!PyBytes_Check(object)){
+		PyErr_SetString(PyExc_TypeError, "Serialized object must be bytes.");
+		return NULL;
+	}
 
 	uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
 	int type = atoi((const char *) &(serial_buf[0]));
@@ -1632,7 +1639,9 @@ static PyObject *Deserialize_cmp(PyObject *self, PyObject *args) {
 		free(binary_buf);
 		return (PyObject *) origObject;
 	}
-
+	
+	PyErr_SetString(PyExc_ValueError, "Nothing to deserialize in element.");
+	return NULL;
 }
 
 void print_mpz(mpz_t x, int base) {
