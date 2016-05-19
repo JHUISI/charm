@@ -164,7 +164,7 @@ PyObject *Element_call(Element *elem, PyObject *args, PyObject *kwds);
 void	Element_dealloc(Element* self);
 Element *convertToZR(PyObject *LongObj, PyObject *elemObj);
 
-PyObject *Apply_pairing(Element *self, PyObject *args);
+PyObject *Apply_pairing(PyObject *self, PyObject *args);
 PyObject *sha2_hash(Element *self, PyObject *args);
 
 int exp_rule(GroupType lhs, GroupType rhs);
@@ -205,7 +205,7 @@ void print_mpz(mpz_t x, int base);
 
 #define IS_SAME_GROUP(a, b) \
 	if(strncmp((const char *) a->pairing->hash_id, (const char *) b->pairing->hash_id, ID_LEN) != 0) {	\
-		PyErr_SetString(ElementError, "mixing group elements from different curves.");	\
+		PyErr_SetString(PyExc_ValueError, "mixing group elements from different curves.");	\
 		return NULL;	\
 	}
 
