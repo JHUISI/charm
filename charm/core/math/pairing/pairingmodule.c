@@ -1217,7 +1217,7 @@ PyObject *multi_pairing(Pairing *groupObj, PyObject *listG1, PyObject *listG2) {
 /* this is a type method that is visible on the global or class level. Therefore,
    the function prototype needs the self (element class) and the args (tuple of Element objects).
  */
-PyObject *Apply_pairing(Element *self, PyObject *args)
+PyObject *Apply_pairing(PyObject *self, PyObject *args)
 {
 	// lhs => G1 and rhs => G2
 	Element *newObject, *lhs, *rhs;
@@ -1225,50 +1225,68 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 	PyObject *lhs2, *rhs2;
 	
 	debug("Applying pairing...\n");	
-	if(!PyArg_ParseTuple(args, "OO|O", &lhs2, &rhs2, &group)) {
-		EXIT_IF(TRUE, "invalid arguments: G1, G2, groupObject.");
+	if(!PyArg_ParseTuple(args, "OO|O:pairing_prod", &lhs2, &rhs2, &group)) {
+		// EXIT_IF(TRUE, "invalid arguments: G1, G2, groupObject.");
+		return NULL;
 	}
 	
 	if(PySequence_Check(lhs2) && PySequence_Check(rhs2)) {
 		VERIFY_GROUP(group);
 		return multi_pairing(group, lhs2, rhs2);
 	}
-	else if(PyElement_Check(lhs2) && PyElement_Check(rhs2)) {
-
-		lhs = (Element *) lhs2;
-		rhs = (Element *) rhs2;
-		IS_SAME_GROUP(lhs, rhs);
-		if(pairing_is_symmetric(lhs->pairing->pair_obj)) {
-
-			debug("Pairing is symmetric.\n");
-			debug_e("LHS: '%B'\n", lhs->e);
-			debug_e("RHS: '%B'\n", rhs->e);
-			newObject = createNewElement(GT, lhs->pairing);
-			pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
-#ifdef BENCHMARK_ENABLED
-			UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
-#endif
-			return (PyObject *) newObject;
-		}
-
-		if(Check_Elements(lhs, rhs) && pair_rule(lhs->element_type, rhs->element_type) == TRUE) {
-			// apply pairing
-			debug_e("LHS: '%B'\n", lhs->e);
-			debug_e("RHS: '%B'\n", rhs->e);
-			newObject = createNewElement(GT, lhs->pairing);
-			if(lhs->element_type == G1)
-				pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
-			else if(lhs->element_type == G2)
-				pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
-
-#ifdef BENCHMARK_ENABLED
-			UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
-#endif
-			return (PyObject *) newObject;
-		}
-	}
 	
-	EXIT_IF(TRUE, "pairings only apply to elements of G1 x G2 --> GT");
+	if(!PyElement_Check(lhs2)){
+		PyErr_SetString(PyExc_TypeError, "Left value is not a valid Element or Sequence of Elements type.");
+		return NULL;
+	}
+
+	if(!PyElement_Check(rhs2)){
+		PyErr_SetString(PyExc_TypeError, "Right value is not a valid Element or Sequence of Elements type.");
+		return NULL;
+	}
+
+	lhs = (Element *) lhs2;
+	rhs = (Element *) rhs2;
+	IS_SAME_GROUP(lhs, rhs);
+	if(pairing_is_symmetric(lhs->pairing->pair_obj)) {
+		debug("Pairing is symmetric.\n");
+		debug_e("LHS: '%B'\n", lhs->e);
+		debug_e("RHS: '%B'\n", rhs->e);
+		newObject = createNewElement(GT, lhs->pairing);
+		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
+#ifdef BENCHMARK_ENABLED
+		UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
+#endif
+		return (PyObject *) newObject;
+	}
+
+	if(lhs->element_type == rhs->element_type){
+		if(lhs->element_type == G1){
+			PyErr_SetString(PyExc_ValueError, "Both elements are of type G1 in asymmetric pairing");
+			return NULL;
+		}
+		if(lhs->element_type == G2){
+			PyErr_SetString(PyExc_ValueError, "Both elements are of type G2 in asymmetric pairing");
+			return NULL;
+		}
+		PyErr_SetString(PyExc_ValueError, "Unexpected elements type in asymmetric pairing product");
+		return NULL;
+	}
+
+	// execute asymmetric pairing
+	debug_e("LHS: '%B'\n", lhs->e);
+	debug_e("RHS: '%B'\n", rhs->e);
+	newObject = createNewElement(GT, lhs->pairing);
+	if(lhs->element_type == G1)
+		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
+	else if(lhs->element_type == G2)
+		pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
+
+#ifdef BENCHMARK_ENABLED
+	UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
+#endif
+	return (PyObject *) newObject;
+
 }
 
 PyObject *sha2_hash(Element *self, PyObject *args) {
