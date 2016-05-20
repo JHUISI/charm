@@ -148,6 +148,8 @@ else:
 _charm_version = opt.get('VERSION')
 lib_config_file = 'charm/config.py'
 library_dirs = [s[2:] for s in opt.get('LDFLAGS').split() if s.startswith('-L')]
+runtime_library_dirs = [s[11:] for s in opt.get('LDFLAGS').split()
+                        if s.lower().startswith('-wl,-rpath,')]
 if opt.get('PAIR_MOD') == 'yes':
     if opt.get('USE_PBC') == 'yes':
         replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.pbc")
@@ -157,7 +159,7 @@ if opt.get('PAIR_MOD') == 'yes':
                             sources = [math_path+'pairing/pairingmodule.c', 
                                         utils_path+'base64.c'],
                             libraries=['pbc', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
-                            library_dirs=library_dirs)
+                            library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
 
     elif opt.get('USE_RELIC') == 'yes':
         # check if RELIC lib has been built. if not, bail
@@ -172,7 +174,7 @@ if opt.get('PAIR_MOD') == 'yes':
                                         math_path + 'pairing/relic/relic_interface.c',
                                         utils_path + 'base64.c'],
                             libraries=['relic', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
-                            library_dirs=library_dirs)
+                            library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
                             #extra_objects=[relic_lib], extra_compile_args=None)
 
     elif opt.get('USE_MIRACL') == 'yes':
@@ -188,7 +190,7 @@ if opt.get('PAIR_MOD') == 'yes':
                                         math_path + 'pairing/miracl/miracl_interface2.cc'],
                             libraries=['gmp', 'crypto', 'stdc++'], define_macros=_macros, undef_macros=_undef_macro,
                             extra_objects=[miracl_lib], extra_compile_args=None,
-                            library_dirs=library_dirs)
+                            library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
 
     _ext_modules.append(pairing_module)
    
@@ -199,7 +201,8 @@ if opt.get('INT_MOD') == 'yes':
                                             benchmark_path],
                             sources = [math_path + 'integer/integermodule.c', 
                                         utils_path + 'base64.c'], 
-                            libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
+                            libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
+                            library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
    _ext_modules.append(integer_module)
    
 if opt.get('ECC_MOD') == 'yes':
@@ -209,7 +212,8 @@ if opt.get('ECC_MOD') == 'yes':
                                 benchmark_path], 
 				sources = [math_path + 'elliptic_curve/ecmodule.c',
                             utils_path + 'base64.c'], 
-				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
+				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
+                library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
    _ext_modules.append(ecc_module)
 
 benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
