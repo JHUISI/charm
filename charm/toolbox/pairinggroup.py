@@ -97,13 +97,25 @@ class PairingGroup():
         """hashes objects into ZR, G1 or G2 depending on the pairing curve"""
         return H(self.Pairing, args, type)
     
-    def serialize(self, obj):
-        """serializes a pairing object into bytes"""
-        return serialize(obj)
+    def serialize(self, obj, *, compression=True):
+        """serializes a pairing object into bytes.
+           The optional argument compression [bool] sets compressed
+           representation of the curve elements. Default is True.
+           >>> p = PairingGroup('SS512')
+           >>> v1 = p.random(G1)
+           >>> p.serialize(v1, compression=False)
+           Calling the serialize method without optional parameters activate
+           elements compression, taking about half the space but potentially
+           incurring in high computation costs in the deserialization phase.
+        """
+        return serialize(obj, compression)
     
-    def deserialize(self, obj):
-        """deserializes into a pairing object"""
-        return deserialize(self.Pairing, obj)
+    def deserialize(self, obj, *, compression=True):
+        """deserializes into a pairing object. 
+           The optional argument compression should be the same used in the
+           serialization phase. See the serialize method for details.
+        """
+        return deserialize(self.Pairing, obj, compression)
     
     def debug(self, data, prefix=None):
         if not self._verbose:
