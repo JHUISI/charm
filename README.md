@@ -1,5 +1,11 @@
 Charm
 =====
+
+| Branch      | Status                                                                                                          |
+| ----------- | --------------------------------------------------------------------------------------------------------------- |
+| `dev`       | [![Build Status](https://travis-ci.org/JHUISI/charm.svg?branch=dev)](https://travis-ci.org/JHUISI/charm)        |
+| `dev-2.7`   | [![Build Status](https://travis-ci.org/JHUISI/charm.svg?branch=2.7-dev)](https://travis-ci.org/JHUISI/charm)    |
+
 Charm is a framework for rapidly prototyping advanced cryptosystems.  Based on the Python language, it was designed from the ground up to minimize development time and code complexity while promoting the reuse of components.
 
 Charm uses a hybrid design: performance intensive mathematical operations are implemented in native C modules, while cryptosystems themselves are written in a readable, high-level language.  Charm additionally provides a number of new components to facilitate the rapid development of new schemes and protocols.

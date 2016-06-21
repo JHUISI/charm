@@ -514,7 +514,7 @@ else
             exit 1
         fi
 fi
-py_config="$python_path-config"
+py_config="$(which python-config)"
 if ! test -e "$py_config"
 then
     echo "$py_config not found.  This version of Charm requires the python 2.7 development environment (probably in python-dev package)."
@@ -730,6 +730,7 @@ echo "CHARM_CFLAGS       $CHARM_CFLAGS"
 echo "LDFLAGS           $LDFLAGS"
 echo "make              $make"
 echo "python            $python_path"
+echo "python-config     $py_config"
 echo "build_ext options build_ext $PYTHONBUILDEXT"
 echo "install           $install"
 echo "host CPU          $cpu"
