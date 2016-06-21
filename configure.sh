@@ -515,7 +515,7 @@ else
             exit 1
         fi
 fi
-py_config="$python_path-config"
+py_config="$(which python3-config)"
 if ! test -e "$py_config"
 then
     echo "$py_config not found.  This version of Charm requires the python development environment (probably in python3-dev package)."
