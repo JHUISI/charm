@@ -1,2 +1,1 @@
-pyparsing==2.1.2
-python-config==0.1
+pyparsing==2.1.5
