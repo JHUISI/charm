@@ -179,7 +179,8 @@ class MaabeRW15(ABEncMultiAuth):
         C0 = message * (gp['egg'] ** s)
         C1, C2, C3, C4 = {}, {}, {}, {}
         for i in attribute_list:
-            attr, auth, _ = self.unpack_attribute(i)
+            attribute_name, auth, _ = self.unpack_attribute(i)
+            attr = "%s@%s" % (attribute_name, auth)
             tx = self.group.random()
             C1[i] = gp['egg'] ** secret_shares[i] * pks[auth]['egga'] ** tx
             C2[i] = gp['g1'] ** (-tx)
