@@ -1,9 +1,9 @@
-'''
-Rouselakis - Waters Unbounded Multi-Authority Ciphertext-Policy Attribute-Based Encryption
+"""
+Rouselakis - Waters Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption
 
-| From:
-| Published in:
-| Available from:
+| From:             Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption
+| Published in:     Financial Crypto 2015
+| Available from:   http://eprint.iacr.org/2015/016.pdf
 | Notes:
 
 * type:          attribute-based encryption (public key)
@@ -12,29 +12,27 @@ Rouselakis - Waters Unbounded Multi-Authority Ciphertext-Policy Attribute-Based 
 
 :Authors:		Yannis Rouselakis
 :Date:      	11/12
-'''
+"""
 
-from toolbox.pairinggroup import *
+from charm.toolbox.pairinggroup import *
 from charm.cryptobase import *
-from toolbox.secretutil import SecretUtil
-from toolbox.ABEnc import *
-from BenchmarkFunctions import *
+from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 
 debug = False
 
 
-class MAABE_RW12():
-    def randomMessage(self):
+class MaabeRW15(ABEncMultiAuth):
+    def random_message(self):
         return group.random(GT)
 
-    # Defining a function to pick explicit exponents in the group
     def exp(self, value):
         return group.init(ZR, value)
 
-    def getAuth(self, x):
+    def get_authority(self, x):
         i = x.find("@")
         if (i == -1):
-            print("Error: No @ char in [auth@attr] name")
+            print("Error: No @ char in [attribute@authority] name")
             return
 
         j = x.find("_")
@@ -43,20 +41,19 @@ class MAABE_RW12():
         else:
             return x[i + 1:j]
 
-    def getAttr(self, attrWithUnderscore):
-        i = attrWithUnderscore.rfind("_")
+    def extract_attribute_name(self, attribute):
+        i = attribute.rfind("_")
         if (i == -1):
-            return attrWithUnderscore
+            return attribute
         else:
-            return attrWithUnderscore[:i]
+            return attribute[:i]
 
     def __init__(self, groupObj, verbose=False):
-
         global util, group
         group = groupObj
         util = SecretUtil(group, verbose)
 
-    def GlobalSetup(self):
+    def setup(self):
         g1 = group.random(G1)
         g2 = group.random(G2)
         egg = pair(g1, g2)
@@ -65,20 +62,19 @@ class MAABE_RW12():
         gp = {'g1': g1, 'g2': g2, 'egg': egg, 'H': H, 'F': F}
         return gp
 
-    def AuthSetup(self, gp, name):
+    def authsetup(self, gp, name):
         alpha, y = group.random(), group.random()
         egga = gp['egg'] ** alpha
         gy = gp['g1'] ** y
         pk = {'name': name, 'egga': egga, 'gy': gy}
         sk = {'name': name, 'alpha': alpha, 'y': y}
-        return (pk, sk)
+        return pk, sk
 
-    def KeyGenOne(self, gp, gid, sk, attr):  # the authority's name is included in the secret key
-
+    def single_keygen(self, gp, gid, sk, attr):
+        # the authority's name is included in the secret key
         # check here if gid name is legal
-
         # checking if attribute is legal
-        if (sk['name'] != self.getAuth(attr)):
+        if (sk['name'] != self.get_authority(attr)):
             print("Error: Attribute ", attr, " does not belong to authority ", sk['name'])
             return
 
@@ -89,18 +85,18 @@ class MAABE_RW12():
 
         return {'user': gid, 'auth': sk['name'], 'attr': attr, 'K': K, 'KP': KP}
 
-    def KeyGen(self, gp, gid, authSkChain, attributes):
+    def keygen(self, gp, gid, authSkChain, attributes):
         # check here if gid name is legal
 
         sks = {}
         for attr in attributes:
-            auth = self.getAuth(attr)
-            sk = self.KeyGenOne(gp, gid, authSkChain[auth], attr)
+            auth = self.get_authority(attr)
+            sk = self.single_keygen(gp, gid, authSkChain[auth], attr)
             sks[attr] = sk
 
         return {'GID': gid, 'Attributes': attributes, 'Chain': sks}
 
-    def Encrypt(self, gp, pks, message, policy_str):
+    def encrypt(self, gp, pks, message, policy_str):
         s = group.random()  # secret to be shared
         w = group.init(ZR, 0)  # 0 to be shared
 
@@ -117,8 +113,8 @@ class MAABE_RW12():
 
         C1, C2, C3, C4 = {}, {}, {}, {}
         for i in a_list:
-            auth = self.getAuth(i)
-            attr = self.getAttr(i)  # take out the possible underscore
+            auth = self.get_authority(i)
+            attr = self.extract_attribute_name(i)  # take out the possible underscore
             tx = group.random()
             C1[i] = gp['egg'] ** secretShares[i] * pks[auth]['egga'] ** tx
             C2[i] = gp['g1'] ** (-tx)
@@ -127,7 +123,7 @@ class MAABE_RW12():
 
         return {'Policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4}
 
-    def Decrypt(self, gp, sk_chain, ct):
+    def decrypt(self, gp, sk_chain, ct):
         hgid = gp['H'](sk_chain['GID'])
 
         policy = util.createPolicy(ct['Policy'])
@@ -152,93 +148,94 @@ class MAABE_RW12():
         return ct['C0'] / B
 
 
-def prettyPrint(initStr, myDict, tab=""):
-    typesEnum = ["ZP", "G1", "G2", "GT"]
-    if (len(initStr) > 0):
-        print(initStr)
-    for (k, v) in myDict.items():
-        if (isinstance(v, dict)):
+def pretty_print(init_str, my_dict, tab=""):
+    types_enum = ["ZP", "G1", "G2", "GT"]
+    if len(init_str) > 0:
+        print(init_str)
+    for (k, v) in my_dict.items():
+        if isinstance(v, dict):
             print(tab, k, ": ", type(v))
-            prettyPrint("", v, tab + "    ")
-        elif (isinstance(v, str)):
+            pretty_print("", v, tab + "    ")
+        elif isinstance(v, str):
             print(tab, k, ": ", v)
-        elif (isinstance(v, set)):
+        elif isinstance(v, set):
             print(tab, k, ": ", v)
-        elif (isinstance(v, pairing)):
-            print(tab, k, ": ", typesEnum[v.type])
+        elif isinstance(v, pairing):
+            print(tab, k, ": ", types_enum[v.type])
         else:
             print(tab, k, ": ", type(v))
-    if (tab == ""):
+    if tab == "":
         print("\n")
 
 
 def main():
-    curve = 'MNT224'
-
-    groupObj = PairingGroup(curve)
-    scheme = MAABE_RW12(groupObj)
-    print("Curve = ", curve)
-
-    ID = InitBenchmark()
-    startAll(ID)
-    gp = scheme.GlobalSetup()
-    EndBenchmark(ID)
-    boxGS = getResAndClear(ID, "GSetup(" + curve + ")", "Done!")
-
-    # prettyPrint("The global parameters are ", gp)
-
-    pks, sks = {}, {}
-
-    ID = InitBenchmark()
-    startAll(ID)
-    (pk, sk) = scheme.AuthSetup(gp, "UT")
-    EndBenchmark(ID)
-    boxAS = getResAndClear(ID, "ASetup(" + "UT" + ")", "Done!")
-
-    pks[pk['name']] = pk
-    sks[sk['name']] = sk
-
-    (pk, sk) = scheme.AuthSetup(gp, "OU")
-    pks[pk['name']] = pk
-    sks[sk['name']] = sk
-
-    # prettyPrint("The authority public key chain is ", pks)
-    # prettyPrint("The authority secret key chain is ", sks)
-
-    ID = InitBenchmark()
-    startAll(ID)
-    key = scheme.KeyGen(gp, "YANNIS", sks, {"STUDENT@UT", "PHD@UT"})
-    EndBenchmark(ID)
-    boxKG = getResAndClear(ID, "KeyGen", "Done!")
-
-    # prettyPrint("The secret key is ", key)
-
-    m = scheme.randomMessage()
-    policy = '(STUDENT@UT or PROFESSOR@OU) and (STUDENT@UT or MASTERS@OU)'
-
-    ID = InitBenchmark()
-    startAll(ID)
-    ct = scheme.Encrypt(gp, pks, m, policy)
-    EndBenchmark(ID)
-    boxEC = getResAndClear(ID, "Encrypt", "Done!")
-
-    # prettyPrint("The ciphertext is ", ct)
-
-    ID = InitBenchmark()
-    startAll(ID)
-    res = scheme.Decrypt(gp, key, ct)
-    EndBenchmark(ID)
-
-    if res == m:
-        fin = "Successful Decryption :)"
-    else:
-        fin = "Failed Decryption :("
-
-    boxDE = getResAndClear(ID, "Decrypt", fin)
-
-    # print(fin)
-
-    print(formatNice(boxGS, boxAS, boxKG, boxEC, boxDE))
+    pass
+    # curve = 'MNT224'
+    #
+    # groupObj = PairingGroup(curve)
+    # scheme = MAABE_RW12(groupObj)
+    # print("Curve = ", curve)
+    #
+    # ID = InitBenchmark()
+    # startAll(ID)
+    # gp = scheme.GlobalSetup()
+    # EndBenchmark(ID)
+    # boxGS = getResAndClear(ID, "GSetup(" + curve + ")", "Done!")
+    #
+    # # prettyPrint("The global parameters are ", gp)
+    #
+    # pks, sks = {}, {}
+    #
+    # ID = InitBenchmark()
+    # startAll(ID)
+    # (pk, sk) = scheme.AuthSetup(gp, "UT")
+    # EndBenchmark(ID)
+    # boxAS = getResAndClear(ID, "ASetup(" + "UT" + ")", "Done!")
+    #
+    # pks[pk['name']] = pk
+    # sks[sk['name']] = sk
+    #
+    # (pk, sk) = scheme.AuthSetup(gp, "OU")
+    # pks[pk['name']] = pk
+    # sks[sk['name']] = sk
+    #
+    # # prettyPrint("The authority public key chain is ", pks)
+    # # prettyPrint("The authority secret key chain is ", sks)
+    #
+    # ID = InitBenchmark()
+    # startAll(ID)
+    # key = scheme.keygen(gp, "YANNIS", sks, {"STUDENT@UT", "PHD@UT"})
+    # EndBenchmark(ID)
+    # boxKG = getResAndClear(ID, "KeyGen", "Done!")
+    #
+    # # prettyPrint("The secret key is ", key)
+    #
+    # m = scheme.random_message()
+    # policy = '(STUDENT@UT or PROFESSOR@OU) and (STUDENT@UT or MASTERS@OU)'
+    #
+    # ID = InitBenchmark()
+    # startAll(ID)
+    # ct = scheme.encrypt(gp, pks, m, policy)
+    # EndBenchmark(ID)
+    # boxEC = getResAndClear(ID, "Encrypt", "Done!")
+    #
+    # # prettyPrint("The ciphertext is ", ct)
+    #
+    # ID = InitBenchmark()
+    # startAll(ID)
+    # res = scheme.decrypt(gp, key, ct)
+    # EndBenchmark(ID)
+    #
+    # if res == m:
+    #     fin = "Successful Decryption :)"
+    # else:
+    #     fin = "Failed Decryption :("
+    #
+    # boxDE = getResAndClear(ID, "Decrypt", fin)
+    #
+    # # print(fin)
+    #
+    # print(formatNice(boxGS, boxAS, boxKG, boxEC, boxDE))
 
 
 if __name__ == '__main__':
