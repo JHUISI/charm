@@ -4,7 +4,8 @@ Rouselakis - Waters Efficient Statically-Secure Large-Universe Multi-Authority A
 | From:             Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption
 | Published in:     Financial Crypto 2015
 | Available from:   http://eprint.iacr.org/2015/016.pdf
-| Notes:
+| Notes:            Implementation based on implementation (maabe_rw12.py)
+                    which cah be found here: https://sites.google.com/site/yannisrouselakis/rwabe
 
 * type:          attribute-based encryption (public key)
 * setting:       bilinear pairing group of prime order
@@ -19,6 +20,17 @@ from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 
 debug = False
+
+
+def merge_dicts(*dict_args):
+    """
+    Given any number of dicts, shallow copy and merge into a new dict,
+    precedence goes to key value pairs in latter dicts.
+    """
+    result = {}
+    for dictionary in dict_args:
+        result.update(dictionary)
+    return result
 
 
 class MaabeRW15(ABEncMultiAuth):
@@ -41,9 +53,9 @@ class MaabeRW15(ABEncMultiAuth):
     >>> gid = "bob"
     >>> user_attributes1 = ['STUDENT@UT', 'PHD@UT']
     >>> user_attributes2 = ['STUDENT@OU']
-    >>> user_keys1 = maabe.keygen(public_parameters, secret_key1, gid, user_attributes1)
-    >>> user_keys2 = dabe.keygen(public_parameters, secret_key2, gid, user_attributes2)
-    >>> user_keys = {'UT': user_keys1, 'OU': user_keys2}
+    >>> user_keys1 = maabe.multiple_attributes_keygen(public_parameters, secret_key1, gid, user_attributes1)
+    >>> user_keys2 = maabe.multiple_attributes_keygen(public_parameters, secret_key2, gid, user_attributes2)
+    >>> user_keys = {'GID': gid, 'keys': merge_dicts(user_keys1, user_keys2)}
 
         Create a random message
     >>> message = maabe.random_message()
@@ -57,6 +69,7 @@ class MaabeRW15(ABEncMultiAuth):
     >>> decrypted_message == message
     True
     """
+
     def random_message(self):
         return group.random(GT)
 
@@ -65,7 +78,7 @@ class MaabeRW15(ABEncMultiAuth):
 
     def get_authority(self, x):
         i = x.find("@")
-        if (i == -1):
+        if i == -1:
             print("Error: No @ char in [attribute@authority] name")
             return
 
@@ -77,12 +90,13 @@ class MaabeRW15(ABEncMultiAuth):
 
     def extract_attribute_name(self, attribute):
         i = attribute.rfind("_")
-        if (i == -1):
+        if i == -1:
             return attribute
         else:
             return attribute[:i]
 
     def __init__(self, groupObj, verbose=False):
+        super(MaabeRW15, self).__init__()
         global util, group
         group = groupObj
         util = SecretUtil(group, verbose)
@@ -105,10 +119,8 @@ class MaabeRW15(ABEncMultiAuth):
         return pk, sk
 
     def keygen(self, gp, sk, gid, attr):
-        # the authority's name is included in the secret key
-        # check here if gid name is legal
-        # checking if attribute is legal
-        assert (sk['name'] == self.get_authority(attr), "Error: Attribute ", attr, " does not belong to authority ", sk['name'])
+        assert (
+        sk['name'] == self.get_authority(attr), "Error: Attribute ", attr, " does not belong to authority ", sk['name'])
 
         t = group.random()
         K = gp['g2'] ** sk['alpha'] * gp['H'](gid) ** sk['y'] * gp['F'](attr) ** t
@@ -117,16 +129,11 @@ class MaabeRW15(ABEncMultiAuth):
 
         return {'user': gid, 'auth': sk['name'], 'attr': attr, 'K': K, 'KP': KP}
 
-    def chain_keygen(self, gp, gid, authSkChain, attributes):
-        # check here if gid name is legal
-
-        sks = {}
-        for attr in attributes:
-            auth = self.get_authority(attr)
-            sk = self.keygen(gp, gid, authSkChain[auth], attr)
-            sks[attr] = sk
-
-        return {'GID': gid, 'Attributes': attributes, 'Chain': sks}
+    def multiple_attributes_keygen(self, gp, sk, gid, attributes):
+        uk = {}
+        for attribute in attributes:
+            uk[attribute] = self.keygen(gp, sk, gid, attribute)
+        return uk
 
     def encrypt(self, pks, gp, message, policy_str):
         s = group.random()  # secret to be shared
@@ -153,17 +160,13 @@ class MaabeRW15(ABEncMultiAuth):
             C3[i] = pks[auth]['gy'] ** tx * gp['g1'] ** zeroShares[i]
             C4[i] = gp['F'](attr) ** tx
 
-        return {'Policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4}
+        return {'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4}
 
-    def decrypt(self, gp, sk_chain, ct):
-        hgid = gp['H'](sk_chain['GID'])
-
-        policy = util.createPolicy(ct['Policy'])
-        z = util.getCoefficients(policy)
-        #		print("\n\n THE COEFF-LIST IS", z,"\n\n")
-
-        pruned_list = util.prune(policy, sk_chain['Attributes'])
-        #		print("\n\n THE PRUNED-LIST IS", pruned_list,"\n\n")
+    def decrypt(self, gp, sk, ct):
+        hgid = gp['H'](sk['GID'])
+        policy = util.createPolicy(ct['policy'])
+        coefficients = util.getCoefficients(policy)
+        pruned_list = util.prune(policy, sk['keys'].keys())
 
         if not pruned_list:
             return group.init(GT, 1)
@@ -172,11 +175,8 @@ class MaabeRW15(ABEncMultiAuth):
         for i in range(len(pruned_list)):
             x = pruned_list[i].getAttribute()  # without the underscore
             y = pruned_list[i].getAttributeAndIndex()  # with the underscore
-            # print(x,y)
-            # print(z[y])
-            B *= (ct['C1'][y] * pair(ct['C2'][y], sk_chain['Chain'][x]['K']) * pair(ct['C3'][y], hgid) * pair(
-                sk_chain['Chain'][x]['KP'], ct['C4'][y])) ** z[y]
-
+            B *= (ct['C1'][y] * pair(ct['C2'][y], sk['keys'][x]['K']) * pair(ct['C3'][y], hgid) * pair(
+                sk['keys'][x]['KP'], ct['C4'][y])) ** coefficients[y]
         return ct['C0'] / B
 
 
