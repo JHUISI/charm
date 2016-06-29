@@ -83,6 +83,9 @@ class MaabeRW15(ABEncMultiAuth):
         H = lambda x: self.group.hash(x, G2)
         F = lambda x: self.group.hash(x, G2)
         gp = {'g1': g1, 'g2': g2, 'egg': egg, 'H': H, 'F': F}
+        if debug:
+            print("Setup")
+            print(gp)
         return gp
 
     def unpack_attribute(self, attribute):
@@ -114,6 +117,10 @@ class MaabeRW15(ABEncMultiAuth):
         gy = gp['g1'] ** y
         pk = {'name': name, 'egga': egga, 'gy': gy}
         sk = {'name': name, 'alpha': alpha, 'y': y}
+        if debug:
+            print("Authsetup: %s" % name)
+            print(pk)
+            print(sk)
         return pk, sk
 
     def keygen(self, gp, sk, gid, attribute):
@@ -131,7 +138,10 @@ class MaabeRW15(ABEncMultiAuth):
         t = self.group.random()
         K = gp['g2'] ** sk['alpha'] * gp['H'](gid) ** sk['y'] * gp['F'](attribute) ** t
         KP = gp['g1'] ** t
-
+        if debug:
+            print("Keygen")
+            print("User: %s, Attribute: %s" % (gid, attribute))
+            print({'K': K, 'KP': KP})
         return {'K': K, 'KP': KP}
 
     def multiple_attributes_keygen(self, gp, sk, gid, attributes):
@@ -167,7 +177,6 @@ class MaabeRW15(ABEncMultiAuth):
         zero_shares = self.util.calculateSharesDict(w, policy)
 
         C0 = message * (gp['egg'] ** s)
-
         C1, C2, C3, C4 = {}, {}, {}, {}
         for i in attribute_list:
             attr, auth, _ = self.unpack_attribute(i)
@@ -176,7 +185,10 @@ class MaabeRW15(ABEncMultiAuth):
             C2[i] = gp['g1'] ** (-tx)
             C3[i] = pks[auth]['gy'] ** tx * gp['g1'] ** zero_shares[i]
             C4[i] = gp['F'](attr) ** tx
-
+        if debug:
+            print("Encrypt")
+            print(message)
+            print({'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4})
         return {'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4}
 
     def decrypt(self, gp, sk, ct):
@@ -201,9 +213,18 @@ class MaabeRW15(ABEncMultiAuth):
             y = pruned_list[i].getAttributeAndIndex()  # with the underscore
             B *= (ct['C1'][y] * pair(ct['C2'][y], sk['keys'][x]['K']) * pair(ct['C3'][y], gp['H'](sk['GID'])) * pair(
                 sk['keys'][x]['KP'], ct['C4'][y])) ** coefficients[y]
+        if debug:
+            print("Decrypt")
+            print("SK:")
+            print(sk)
+            print("Decrypted Message:")
+            print(ct['C0'] / B)
         return ct['C0'] / B
 
 
 if __name__ == '__main__':
+    debug = True
+
     import doctest
+
     doctest.testmod()
