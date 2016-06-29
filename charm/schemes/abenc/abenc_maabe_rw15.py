@@ -15,7 +15,6 @@ Rouselakis - Waters Efficient Statically-Secure Large-Universe Multi-Authority A
 """
 
 from charm.toolbox.pairinggroup import *
-from charm.cryptobase import *
 from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 
@@ -23,6 +22,41 @@ debug = False
 
 
 class MaabeRW15(ABEncMultiAuth):
+    """
+    Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption
+    Rouselakis - Waters
+
+    >>> group = PairingGroup('SS512')
+    >>> maabe = MaabeRW15(group)
+    >>> public_parameters = maabe.setup()
+
+        Setup the attribute authorities
+    >>> attributes1 = ['ONE', 'TWO']
+    >>> attributes2 = ['THREE', 'FOUR']
+    >>> (public_key1, secret_key1) = maabe.authsetup(public_parameters, 'UT')
+    >>> (public_key2, secret_key2) = maabe.authsetup(public_parameters, 'OU')
+    >>> public_keys = {'UT': public_key1, 'OU': public_key2}
+
+        Setup a user and give him some keys
+    >>> gid = "bob"
+    >>> user_attributes1 = ['STUDENT@UT', 'PHD@UT']
+    >>> user_attributes2 = ['STUDENT@OU']
+    >>> user_keys1 = maabe.keygen(public_parameters, secret_key1, gid, user_attributes1)
+    >>> user_keys2 = dabe.keygen(public_parameters, secret_key2, gid, user_attributes2)
+    >>> user_keys = {'UT': user_keys1, 'OU': user_keys2}
+
+        Create a random message
+    >>> message = maabe.random_message()
+
+        Encrypt the message
+    >>> access_policy = '(STUDENT@UT or PROFESSOR@OU) and (STUDENT@UT or MASTERS@OU)'
+    >>> cipher_text = maabe.encrypt(public_keys, public_parameters, message, access_policy)
+
+        Decrypt the message
+    >>> decrypted_message = maabe.decrypt(public_parameters, user_keys, cipher_text)
+    >>> decrypted_message == message
+    True
+    """
     def random_message(self):
         return group.random(GT)
 
@@ -70,13 +104,11 @@ class MaabeRW15(ABEncMultiAuth):
         sk = {'name': name, 'alpha': alpha, 'y': y}
         return pk, sk
 
-    def single_keygen(self, gp, gid, sk, attr):
+    def keygen(self, gp, sk, gid, attr):
         # the authority's name is included in the secret key
         # check here if gid name is legal
         # checking if attribute is legal
-        if (sk['name'] != self.get_authority(attr)):
-            print("Error: Attribute ", attr, " does not belong to authority ", sk['name'])
-            return
+        assert (sk['name'] == self.get_authority(attr), "Error: Attribute ", attr, " does not belong to authority ", sk['name'])
 
         t = group.random()
         K = gp['g2'] ** sk['alpha'] * gp['H'](gid) ** sk['y'] * gp['F'](attr) ** t
@@ -85,18 +117,18 @@ class MaabeRW15(ABEncMultiAuth):
 
         return {'user': gid, 'auth': sk['name'], 'attr': attr, 'K': K, 'KP': KP}
 
-    def keygen(self, gp, gid, authSkChain, attributes):
+    def chain_keygen(self, gp, gid, authSkChain, attributes):
         # check here if gid name is legal
 
         sks = {}
         for attr in attributes:
             auth = self.get_authority(attr)
-            sk = self.single_keygen(gp, gid, authSkChain[auth], attr)
+            sk = self.keygen(gp, gid, authSkChain[auth], attr)
             sks[attr] = sk
 
         return {'GID': gid, 'Attributes': attributes, 'Chain': sks}
 
-    def encrypt(self, gp, pks, message, policy_str):
+    def encrypt(self, pks, gp, message, policy_str):
         s = group.random()  # secret to be shared
         w = group.init(ZR, 0)  # 0 to be shared
 
@@ -133,7 +165,7 @@ class MaabeRW15(ABEncMultiAuth):
         pruned_list = util.prune(policy, sk_chain['Attributes'])
         #		print("\n\n THE PRUNED-LIST IS", pruned_list,"\n\n")
 
-        if (pruned_list == False):
+        if not pruned_list:
             return group.init(GT, 1)
 
         B = group.init(GT, 1)
