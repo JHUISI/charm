@@ -1516,6 +1516,15 @@ static long Element_index(Element *o1) {
 		mpz_clear(o);
 		Py_XDECREF(temp);
 	}
+	if(o1->element_type != NONE_G){
+		uint8_t *buff;
+		size_t len;
+		len = element_length_in_bytes(o1->e);
+		buff = (uint8_t*) malloc(len);
+		element_to_bytes(buff, o1->e);
+		result = PyObject_Hash(PyBytes_FromStringAndSize((char*)buff, len));
+		free(buff);
+	}
 	return result;
 }
 
