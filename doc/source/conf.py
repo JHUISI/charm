@@ -21,6 +21,7 @@ import sys, os
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../../charm/schemes'))
 sys.path.insert(0, os.path.abspath('../../charm/schemes/abenc'))
+sys.path.insert(0, os.path.abspath('../../charm/schemes/prenc'))
 #sys.path.insert(0, os.path.abspath('../../charm/schemes/dabenc'))
 sys.path.insert(0, os.path.abspath('../../charm/schemes/pkenc'))
 sys.path.insert(0, os.path.abspath('../../charm/schemes/pksig'))

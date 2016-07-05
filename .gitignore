@@ -5,6 +5,7 @@ log.txt
 dist/
 build/
 doc/build/*
+charm/config.py
 *.pyc 
 **.pyc
 *.swp
