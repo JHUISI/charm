@@ -1217,7 +1217,7 @@ PyObject *multi_pairing(Pairing *groupObj, PyObject *listG1, PyObject *listG2) {
 /* this is a type method that is visible on the global or class level. Therefore,
    the function prototype needs the self (element class) and the args (tuple of Element objects).
  */
-PyObject *Apply_pairing(Element *self, PyObject *args)
+PyObject *Apply_pairing(PyObject *self, PyObject *args)
 {
 	// lhs => G1 and rhs => G2
 	Element *newObject, *lhs, *rhs;
@@ -1225,50 +1225,68 @@ PyObject *Apply_pairing(Element *self, PyObject *args)
 	PyObject *lhs2, *rhs2;
 	
 	debug("Applying pairing...\n");	
-	if(!PyArg_ParseTuple(args, "OO|O", &lhs2, &rhs2, &group)) {
-		EXIT_IF(TRUE, "invalid arguments: G1, G2, groupObject.");
+	if(!PyArg_ParseTuple(args, "OO|O:pairing_prod", &lhs2, &rhs2, &group)) {
+		// EXIT_IF(TRUE, "invalid arguments: G1, G2, groupObject.");
+		return NULL;
 	}
 	
 	if(PySequence_Check(lhs2) && PySequence_Check(rhs2)) {
 		VERIFY_GROUP(group);
 		return multi_pairing(group, lhs2, rhs2);
 	}
-	else if(PyElement_Check(lhs2) && PyElement_Check(rhs2)) {
-
-		lhs = (Element *) lhs2;
-		rhs = (Element *) rhs2;
-		IS_SAME_GROUP(lhs, rhs);
-		if(pairing_is_symmetric(lhs->pairing->pair_obj)) {
-
-			debug("Pairing is symmetric.\n");
-			debug_e("LHS: '%B'\n", lhs->e);
-			debug_e("RHS: '%B'\n", rhs->e);
-			newObject = createNewElement(GT, lhs->pairing);
-			pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
-#ifdef BENCHMARK_ENABLED
-			UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
-#endif
-			return (PyObject *) newObject;
-		}
-
-		if(Check_Elements(lhs, rhs) && pair_rule(lhs->element_type, rhs->element_type) == TRUE) {
-			// apply pairing
-			debug_e("LHS: '%B'\n", lhs->e);
-			debug_e("RHS: '%B'\n", rhs->e);
-			newObject = createNewElement(GT, lhs->pairing);
-			if(lhs->element_type == G1)
-				pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
-			else if(lhs->element_type == G2)
-				pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
-
-#ifdef BENCHMARK_ENABLED
-			UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
-#endif
-			return (PyObject *) newObject;
-		}
-	}
 	
-	EXIT_IF(TRUE, "pairings only apply to elements of G1 x G2 --> GT");
+	if(!PyElement_Check(lhs2)){
+		PyErr_SetString(PyExc_TypeError, "Left value is not a valid Element or Sequence of Elements type.");
+		return NULL;
+	}
+
+	if(!PyElement_Check(rhs2)){
+		PyErr_SetString(PyExc_TypeError, "Right value is not a valid Element or Sequence of Elements type.");
+		return NULL;
+	}
+
+	lhs = (Element *) lhs2;
+	rhs = (Element *) rhs2;
+	IS_SAME_GROUP(lhs, rhs);
+	if(pairing_is_symmetric(lhs->pairing->pair_obj)) {
+		debug("Pairing is symmetric.\n");
+		debug_e("LHS: '%B'\n", lhs->e);
+		debug_e("RHS: '%B'\n", rhs->e);
+		newObject = createNewElement(GT, lhs->pairing);
+		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
+#ifdef BENCHMARK_ENABLED
+		UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
+#endif
+		return (PyObject *) newObject;
+	}
+
+	if(lhs->element_type == rhs->element_type){
+		if(lhs->element_type == G1){
+			PyErr_SetString(PyExc_ValueError, "Both elements are of type G1 in asymmetric pairing");
+			return NULL;
+		}
+		if(lhs->element_type == G2){
+			PyErr_SetString(PyExc_ValueError, "Both elements are of type G2 in asymmetric pairing");
+			return NULL;
+		}
+		PyErr_SetString(PyExc_ValueError, "Unexpected elements type in asymmetric pairing product");
+		return NULL;
+	}
+
+	// execute asymmetric pairing
+	debug_e("LHS: '%B'\n", lhs->e);
+	debug_e("RHS: '%B'\n", rhs->e);
+	newObject = createNewElement(GT, lhs->pairing);
+	if(lhs->element_type == G1)
+		pairing_apply(newObject->e, lhs->e, rhs->e, rhs->pairing->pair_obj);
+	else if(lhs->element_type == G2)
+		pairing_apply(newObject->e, rhs->e, lhs->e, rhs->pairing->pair_obj);
+
+#ifdef BENCHMARK_ENABLED
+	UPDATE_BENCHMARK(PAIRINGS, newObject->pairing->dBench);
+#endif
+	return (PyObject *) newObject;
+
 }
 
 PyObject *sha2_hash(Element *self, PyObject *args) {
@@ -1533,17 +1551,19 @@ UNARY(instance_invert, 'i', Element_invert)
 BINARY(instance_add, 'a', Element_add)
 BINARY(instance_sub, 's', Element_sub)
 
-static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
+static PyObject *Serialize_cmp(PyObject *self, PyObject *args) {
 
-	Element *self = NULL;
-	if(!PyArg_ParseTuple(args, "O", &self)) {
-		PyErr_SetString(ElementError, "invalid argument.");
+	Element *element = NULL;
+	int compression = 1;
+
+	if(!PyArg_ParseTuple(args, "O|p:serialize", &element, &compression)) return NULL;
+
+	if(!PyElement_Check(element)) {
+		PyErr_SetString(PyExc_TypeError, "Invalid element type.");
 		return NULL;
 	}
-
-	if(!PyElement_Check(self)) EXIT_IF(TRUE, "not a valid element object.");
-	if(self->elem_initialized == FALSE) {
-		PyErr_SetString(ElementError, "element not initialized.");
+	if(element->elem_initialized == FALSE) {
+		PyErr_SetString(PyExc_ValueError, "Element not initialized.");
 		return NULL;
 	}
 
@@ -1551,75 +1571,95 @@ static PyObject *Serialize_cmp(Element *o1, PyObject *args) {
 	uint8_t *data_buf = NULL;
 	size_t bytes_written;
 
-	if(self->element_type == ZR || self->element_type == GT) {
-		elem_len = element_length_in_bytes(self->e);
-
+	if(element->element_type == ZR || element->element_type == GT) {
+		elem_len = element_length_in_bytes(element->e);
 		data_buf = (uint8_t *) malloc(elem_len + 1);
-		EXIT_IF(data_buf == NULL, "out of memory.");
+		if(data_buf == NULL)
+			return PyErr_NoMemory();
 		// write to char buffer
-		bytes_written = element_to_bytes(data_buf, self->e);
+		bytes_written = element_to_bytes(data_buf, element->e);
 		debug("result => ");
 		printf_buffer_as_hex(data_buf, bytes_written);
 	}
-	else if(self->element_type != NONE_G) {
+	else if(element->element_type != NONE_G) {
 	// object initialized now retrieve element and serialize to a char buffer.
-		elem_len = element_length_in_bytes_compressed(self->e);
+		if(compression){
+			elem_len = element_length_in_bytes_compressed(element->e);
+		}else{
+			elem_len = element_length_in_bytes(element->e);
+		}
 		data_buf = (uint8_t *) malloc(elem_len + 1);
-		EXIT_IF(data_buf == NULL, "out of memory.");
+		if(data_buf == NULL)
+			return PyErr_NoMemory();
 		// write to char buffer
-		bytes_written = element_to_bytes_compressed(data_buf, self->e);
+		if(compression){
+			bytes_written = element_to_bytes_compressed(data_buf, element->e);
+		} else {
+			bytes_written = element_to_bytes(data_buf, element->e);
+		}
 	}
 	else {
-		EXIT_IF(TRUE, "invalid type.\n");
+		PyErr_SetString(PyExc_TypeError, "Invalid element type.");
+		return NULL;
 	}
 
 	// convert to base64 and return as a string?
 	size_t length = 0;
 	char *base64_data_buf = NewBase64Encode(data_buf, bytes_written, FALSE, &length);
-	//PyObject *result = PyUnicode_FromFormat("%d:%s", self->element_type, (const char *) base64_data_buf);
+	//PyObject *result = PyUnicode_FromFormat("%d:%s", element->element_type, (const char *) base64_data_buf);
 	// free(base64_data_buf);
-	PyObject *result = PyBytes_FromFormat("%d:%s", self->element_type, (const char *) base64_data_buf);
+	PyObject *result = PyBytes_FromFormat("%d:%s", element->element_type, (const char *) base64_data_buf);
 	debug("base64 enc => '%s'\n", base64_data_buf);
 	free(base64_data_buf);
 	free(data_buf);
 	return result;
 }
 
-static PyObject *Deserialize_cmp(Element *self, PyObject *args) {
+static PyObject *Deserialize_cmp(PyObject *self, PyObject *args) {
 	Element *origObject = NULL;
 	Pairing *group = NULL;
 	PyObject *object;
+	int compression = 1;
 
-	if(PyArg_ParseTuple(args, "OO", &group, &object)) {
-		VERIFY_GROUP(group);
-		if(PyBytes_Check(object)) {
-			uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
-			int type = atoi((const char *) &(serial_buf[0]));
-			uint8_t *base64_buf = (uint8_t *)(serial_buf + 2);
+	if(!PyArg_ParseTuple(args, "OO|p:deserialize", &group, &object, &compression))
+		return NULL;
 
-			size_t deserialized_len = 0;
-			uint8_t *binary_buf = NewBase64Decode((const char *) base64_buf, strlen((char *) base64_buf), &deserialized_len);
+	VERIFY_GROUP(group);
 
-			if((type == ZR || type == GT) && deserialized_len > 0) {
-//				debug("result => ");
-//				printf_buffer_as_hex(binary_buf, deserialized_len);
-				origObject = createNewElement(type, group);
-				element_from_bytes(origObject->e, binary_buf);
-				free(binary_buf);
-				return (PyObject *) origObject;
-			}
-			else if((type == G1 || type == G2) && deserialized_len > 0) {
-				// now convert element back to an element type (assume of type ZR for now)
-				origObject = createNewElement(type, group);
-				element_from_bytes_compressed(origObject->e, binary_buf);
-				free(binary_buf);
-				return (PyObject *) origObject;
-			}
-		}
-		EXIT_IF(TRUE, "string object malformed.");
+	if(!PyBytes_Check(object)){
+		PyErr_SetString(PyExc_TypeError, "Serialized object must be bytes.");
+		return NULL;
 	}
 
-	EXIT_IF(TRUE, "nothing to deserialize in element.");
+	uint8_t *serial_buf = (uint8_t *) PyBytes_AsString(object);
+	int type = atoi((const char *) &(serial_buf[0]));
+	uint8_t *base64_buf = (uint8_t *)(serial_buf + 2);
+
+	size_t deserialized_len = 0;
+	uint8_t *binary_buf = NewBase64Decode((const char *) base64_buf, strlen((char *) base64_buf), &deserialized_len);
+
+	if((type == ZR || type == GT) && deserialized_len > 0) {
+	//				debug("result => ");
+	//				printf_buffer_as_hex(binary_buf, deserialized_len);
+		origObject = createNewElement(type, group);
+		element_from_bytes(origObject->e, binary_buf);
+		free(binary_buf);
+		return (PyObject *) origObject;
+	}
+	else if((type == G1 || type == G2) && deserialized_len > 0) {
+		// now convert element back to an element type (assume of type ZR for now)
+		origObject = createNewElement(type, group);
+		if(compression) {
+			element_from_bytes_compressed(origObject->e, binary_buf);
+		} else {
+			element_from_bytes(origObject->e, binary_buf);
+		}
+		free(binary_buf);
+		return (PyObject *) origObject;
+	}
+
+	PyErr_SetString(PyExc_ValueError, "Nothing to deserialize in element.");
+	return NULL;
 }
 
 void print_mpz(mpz_t x, int base) {
