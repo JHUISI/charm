@@ -18,7 +18,7 @@ messageSpaceType = "messageSpace"
 secModelType = "secModel"
 secDefType   = "secDef"
 
-class SchemeBase:
+class SchemeBase(object):
     '''Base class for all crypto, which defines security properties of cryptosystem'''
     def __init__(self):
         self.properties = {}
