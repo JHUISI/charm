@@ -1,6 +1,6 @@
 import unittest
 
-from charm.schemes.dabe_aw11 import Dabe
+from charm.schemes.abenc.dabe_aw11 import Dabe
 from charm.toolbox.pairinggroup import PairingGroup, GT
 
 debug = False
@@ -31,7 +31,7 @@ class DabeTest(unittest.TestCase):
         m = groupObj.random(GT)
         policy = '((one or three) and (TWO or FOUR))'
         if debug: print('Acces Policy: %s' % policy)
-        CT = dabe.encrypt(PK, GP, m, policy)
+        CT = dabe.encrypt(GP, PK, m, policy)
         if debug: print("\nCiphertext...")
         if debug: groupObj.debug(CT)
 
