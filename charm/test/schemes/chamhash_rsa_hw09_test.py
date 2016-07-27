@@ -1,6 +1,7 @@
 import unittest
 
 from charm.schemes.chamhash_rsa_hw09 import ChamHash_HW09
+from charm.toolbox.integergroup import integer
 
 debug = False
 

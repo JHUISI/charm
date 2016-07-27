@@ -2,7 +2,7 @@ import unittest
 
 from charm.schemes.ibenc.ibenc_waters05 import IBE_N04
 from charm.toolbox.hash_module import Waters
-from charm.toolbox.pairinggroup import PairingGroup
+from charm.toolbox.pairinggroup import PairingGroup, GT
 
 debug = False
 

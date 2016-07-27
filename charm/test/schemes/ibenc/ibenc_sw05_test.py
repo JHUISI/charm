@@ -1,7 +1,7 @@
 import unittest
 
 from charm.schemes.ibenc.ibenc_sw05 import IBE_SW05_LUC
-from charm.toolbox.pairinggroup import PairingGroup
+from charm.toolbox.pairinggroup import PairingGroup, GT
 
 debug = False
 

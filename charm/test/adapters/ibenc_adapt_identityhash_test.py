@@ -2,7 +2,7 @@ import unittest
 
 from charm.adapters.ibenc_adapt_identityhash import HashIDAdapter
 from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
-from charm.toolbox.pairinggroup import PairingGroup
+from charm.toolbox.pairinggroup import PairingGroup, GT
 
 debug = False
 

@@ -2,6 +2,7 @@ import unittest
 
 from charm.schemes.ibenc.ibenc_bb03 import IBE_BB04
 from charm.toolbox.pairinggroup import PairingGroup
+from charm.toolbox.pairinggroup import ZR, GT
 
 debug = False
 

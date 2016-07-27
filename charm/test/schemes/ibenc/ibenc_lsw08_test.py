@@ -1,7 +1,7 @@
 import unittest
 
 from charm.schemes.ibenc.ibenc_lsw08 import IBE_Revoke
-from charm.toolbox.pairinggroup import PairingGroup
+from charm.toolbox.pairinggroup import PairingGroup, GT
 
 debug = False
 

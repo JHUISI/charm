@@ -2,6 +2,7 @@ import unittest
 
 from charm.schemes.commit.commit_pedersen92 import CM_Ped92
 from charm.toolbox.ecgroup import ECGroup
+from charm.toolbox.pairinggroup import ZR
 
 debug = False
 

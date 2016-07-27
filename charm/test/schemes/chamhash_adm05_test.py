@@ -1,6 +1,7 @@
 import unittest
 
 from charm.schemes.chamhash_adm05 import ChamHash_Adm05
+from charm.toolbox.integergroup import integer
 
 debug = False
 

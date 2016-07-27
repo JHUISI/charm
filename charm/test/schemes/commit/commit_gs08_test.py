@@ -1,7 +1,7 @@
 import unittest
 
 from charm.schemes.commit.commit_gs08 import Commitment_GS08
-from charm.toolbox.pairinggroup import PairingGroup
+from charm.toolbox.pairinggroup import PairingGroup, G1
 
 debug = False
 

@@ -1,7 +1,7 @@
 import unittest
 
 from charm.schemes.ibenc.ibenc_waters09 import DSE09
-from charm.toolbox.pairinggroup import PairingGroup
+from charm.toolbox.pairinggroup import PairingGroup, GT
 
 debug = False
 
