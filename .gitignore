@@ -6,6 +6,8 @@ dist/
 build/
 doc/build/*
 charm/config.py
+.cache/
+.eggs/
 *.pyc 
 **.pyc
 *.swp
