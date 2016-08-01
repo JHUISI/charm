@@ -220,9 +220,4 @@ void print_mpz(mpz_t x, int base);
 	PyErr_SetString(ElementError, msg); \
 	return NULL;	}
 
-#define EXITCODE_IF(check, msg, code) \
-	if(check) {						     \
-	PyErr_SetString(ElementError, msg);	 \
-	return Py_BuildValue("i", code);	}
-
 #endif
