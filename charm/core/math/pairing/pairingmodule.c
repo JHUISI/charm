@@ -2059,7 +2059,6 @@ PyMemberDef Element_members[] = {
 
 PyMethodDef Element_methods[] = {
 	{"initPP", (PyCFunction)Element_initPP, METH_NOARGS, "Initialize the pre-processing field of element."},
-		
 	{"set", (PyCFunction)Element_set, METH_VARARGS, "Set an element to a fixed value."},
     {NULL}  /* Sentinel */
 };
