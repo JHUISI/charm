@@ -6,6 +6,8 @@ dist/
 build/
 doc/build/*
 charm/config.py
+.cache/
+.eggs/
 *.pyc 
 **.pyc
 *.swp
@@ -52,5 +54,3 @@ nosetests.xml
 
 #Mr Developer
 .mr.developer.cfg
-.cache/
-.eggs/
