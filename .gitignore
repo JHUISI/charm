@@ -52,3 +52,5 @@ nosetests.xml
 
 #Mr Developer
 .mr.developer.cfg
+.cache/
+.eggs/
