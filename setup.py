@@ -21,7 +21,8 @@ class PyTest(TestCommand):
     def run_tests(self):
         #import here, cause outside the eggs aren't loaded
         import pytest
-        pytest.main(self.test_args)
+        import sys
+        sys.exit(pytest.main(self.test_args))
 
 class UninstallCommand(Command):
     description = "remove old files"
