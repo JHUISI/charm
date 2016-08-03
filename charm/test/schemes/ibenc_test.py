@@ -24,7 +24,7 @@ class HybridIBEncTest(unittest.TestCase):
         
         (pk, mk) = hyb_ibe.setup()
 
-        kID = 'waldoayo@gmail.com'
+        kID = 'john.doe@example.com'
         sk = hyb_ibe.extract(mk, kID)
 
         msg = b"This is a test message."
@@ -50,7 +50,7 @@ class HashIDAdapterTest(unittest.TestCase):
         
         (pk, mk) = hashID.setup()
         
-        kID = 'waldoayo@email.com'
+        kID = 'john.doe@example.com'
         sk = hashID.extract(mk, kID)
         if debug: print("Keygen for %s" % kID)
         if debug: print(sk)

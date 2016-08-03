@@ -10,7 +10,7 @@ Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
 '''
 from charm.core.engine.util import pickleObject, serializeObject 
 import hmac, hashlib, math
-from charm.schemes.ibenc.ibenc_bb03 import IBEnc, ZR, GT, sha1
+from charm.schemes.ibenc.ibenc_bb03 import IBEnc, ZR, GT, sha2
 
 debug = False
 class BCHKIBEnc(IBEnc):
@@ -46,7 +46,7 @@ class BCHKIBEnc(IBEnc):
         b = math.ceil(length / hash_len)
         gStr = b''
         for i in range(1, b+1):
-            gStr += sha1(g, i)
+            gStr += sha2(g, i)
         return gStr[:length]
     
     def __init__(self, scheme, groupObj, encscheme):
@@ -83,7 +83,7 @@ class BCHKIBEnc(IBEnc):
         
         C1prime = pickleObject(serializeObject(C1, group))
         
-        tag = hmac.new(k, C1prime+C2, hashlib.sha1).digest()
+        tag = hmac.new(k, C1prime+C2, hashlib.sha256).digest()
         
         cipher = { 'ID':ID, 'C1':C1, 'C2':C2, 'tag':tag }
         return cipher
@@ -102,7 +102,7 @@ class BCHKIBEnc(IBEnc):
 
         C1prime = pickleObject(serializeObject(c['C1'], group))
         
-        if(c['tag'] == hmac.new(k, C1prime+c['C2'], hashlib.sha1).digest()):
+        if(c['tag'] == hmac.new(k, C1prime+c['C2'], hashlib.sha256).digest()):
             return bytes(m2.split(':')[0], 'utf8')
         else:
             return b'FALSE'

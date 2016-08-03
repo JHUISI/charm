@@ -22,8 +22,8 @@ party = Enum('Signer', 'User')
 SIGNER, USER = party.Signer, party.User
 HOST, PORT = "", 8082
 
-def SHA1(bytes1):
-    s1 = hashlib.new('sha1')
+def SHA2(bytes1):
+    s1 = hashlib.new('sha256')
     s1.update(bytes1)
     return s1.digest()
 
@@ -91,7 +91,7 @@ class AOSig(Protocol):
         
         str = "info"
 
-        msg = integer(SHA1(str))
+        msg = integer(SHA2(str))
         z = (msg ** ((p - 1)/q)) % p
                 
         a = g ** u
@@ -121,7 +121,7 @@ class AOSig(Protocol):
         
         str = "info"
                 
-        msg = integer(SHA1(str))
+        msg = integer(SHA2(str))
         z = (msg ** ((p - 1)/q)) % p
                 
         alpha = a * (g ** t1) * (y ** t2) % p

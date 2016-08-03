@@ -14,9 +14,9 @@ class HybridIBEnc(IBEnc):
     >>> hashID = HashIDAdapter(ibe, group)
     >>> hyb_ibe = HybridIBEnc(hashID, group)
     >>> (master_public_key, master_key) = hyb_ibe.setup()
-    >>> ID = 'waldoayo@gmail.com'
+    >>> ID = 'john.doe@example.com'
     >>> secret_key = hyb_ibe.extract(master_key, ID)
-    >>> msg = b"Hello World My name is blah blah!!!! Word!"
+    >>> msg = b"Hello World!"
     >>> cipher_text = hyb_ibe.encrypt(master_public_key, ID, msg)
     >>> decrypted_msg = hyb_ibe.decrypt(master_public_key, secret_key, cipher_text)
     >>> decrypted_msg == msg

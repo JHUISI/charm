@@ -135,7 +135,6 @@ class hashFunc:
             self.hashObj = hashlib.new(_hash_type)
         
     #message must be a binary string
-    #def __call__(self, message : [str, bytes]):
     def __call__(self, message):
         h = self.hashObj.copy()
         if type(message) == str:

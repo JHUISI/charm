@@ -14,9 +14,8 @@ Boneh-Boyen Identity Based Encryption
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.core.crypto.cryptobase import *
 from charm.toolbox.IBEnc import *
-from charm.core.math.pairing import hashPair as sha1
+from charm.core.math.pairing import hashPair as sha2
 
 debug = False
 class IBE_BB04(IBEnc):
@@ -69,7 +68,7 @@ class IBE_BB04(IBEnc):
 
     def keyenc(self, params, ID, msg):
         s = group.random()
-        A = sha1(params['v'] ** s) # session key
+        A = sha2(params['v'] ** s) # session key
         B = params['Y'] ** s
         C = (params['X'] ** s) * (params['g'] ** (s * ID))
         # use prf here?
@@ -84,5 +83,5 @@ class IBE_BB04(IBEnc):
     def keydec(self, pk, dID, CT):
         A, B, C = CT['A'], CT['B'], CT['C']
         v_s = pair(((B ** dID['r']) * C), dID['K'])
-        return sha1(v_s)
+        return sha2(v_s)
 
