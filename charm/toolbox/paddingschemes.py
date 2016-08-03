@@ -417,7 +417,7 @@ class PKCS7Padding(object):
 
     def _padlength(self,_bytes):
         ln=len(_bytes)
-        pad_bytes_needed = self.block_size -(ln % self.block_size)
+        pad_bytes_needed = self.block_size - (ln % self.block_size)
         if pad_bytes_needed == 0:
             pad_bytes_needed = self.block_size
         return pad_bytes_needed

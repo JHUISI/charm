@@ -6,11 +6,11 @@ Boneh-Boyen Identity Based Encryption
 | Available from: http://crypto.stanford.edu/~dabo/pubs/papers/bbibe.pdf
 | Notes: This is the IBE (1-level HIBE) implementation of the HIBE scheme BB_2.
 
-* type:			encryption (identity-based)
-* setting:		bilinear groups (asymmetric)
+* type:     encryption (identity-based)
+* setting:  bilinear groups (asymmetric)
 
-:Authors:	J Ayo Akinyele
-:Date:			11/2010
+:Authors:   J Ayo Akinyele
+:Date:      11/2010
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

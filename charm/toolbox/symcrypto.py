@@ -76,12 +76,12 @@ class SymmetricCryptoAbstraction(object):
     b"Friendly Fire Isn't"
     """
 
-    def __init__(self,key, alg = AES, mode = MODE_CBC):
+    def __init__(self, key, alg = AES, mode = MODE_CBC):
         self._alg = alg
         self.key_len = 16
         self._block_size = 16 
         self._mode = mode
-        self._key = key[0:self.key_len]
+        self._key = key[0:self.key_len] # expected to be bytes
         self._padding = PKCS7Padding()
  
     def _initCipher(self,IV = None):
@@ -136,14 +136,20 @@ class SymmetricCryptoAbstraction(object):
 class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction): 
     def encrypt(self, msg):
         # warning only valid in the random oracle
-        mac = MessageAuthenticator(sha2(b'Poor Mans Key Extractor'+self._key).digest())
+        mac_key = sha2(b'Poor Mans Key Extractor'+self._key).digest()
+        mac = MessageAuthenticator(mac_key)
         enc = super(AuthenticatedCryptoAbstraction, self).encrypt(msg)
         return mac.mac(enc)
 
-    def decrypt(self,cipherText):
+    def decrypt(self, cipherText):
         # warning only valid in the random oracle
-        mac = MessageAuthenticator(sha2(b'Poor Mans Key Extractor'+self._key).digest())
+        mac_key = sha2(b'Poor Mans Key Extractor'+self._key).digest()
+        mac = MessageAuthenticator(mac_key)
         if not mac.verify(cipherText):
+            print("cipherText: ", cipherText)
+            print("key: ", self._key)
+            print("hash1: ", mac_key)
+            print("test dec: ", super(AuthenticatedCryptoAbstraction, self).decrypt(cipherText['msg']))
             raise ValueError("Invalid mac. Your data was tampered with or your key is wrong")
         else:
             return super(AuthenticatedCryptoAbstraction, self).decrypt(cipherText['msg'])
