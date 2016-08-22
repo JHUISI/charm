@@ -9,7 +9,7 @@ class HashIDAdapter(IBEnc):
     >>> ibe = IBE_BB04(group)
     >>> hashID = HashIDAdapter(ibe, group)
     >>> (master_public_key, master_key) = hashID.setup()
-    >>> ID = 'waldoayo@email.com'
+    >>> ID = 'john.doe@example.com'
     >>> secret_key = hashID.extract(master_key, ID)
     >>> msg = group.random(GT)
     >>> cipher_text = hashID.encrypt(master_public_key, ID, msg)

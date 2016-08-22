@@ -46,14 +46,14 @@ class HybridEnc(PKEnc):
         # use symmetric key encryption to enc actual message
         cipher = AuthenticatedCryptoAbstraction(key)
         c2 = cipher.encrypt(M)
-        if debug: print("Ciphertext 2...")
+        if debug: print("Ciphertext...")
         if debug: print(c2)
         return { 'c1':c1, 'c2':c2 }
     
     def decrypt(self, pk, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = self.pkenc.decrypt(pk, sk, c1)[:self.key_len]
-        if debug: print("Rec key =>", key,", len =", len(key))
+        if debug: print("Rec key =>", key, ", len =", len(key))
         cipher = AuthenticatedCryptoAbstraction(key)
         msg = cipher.decrypt(c2)
         if debug: print("Rec msg =>", msg)

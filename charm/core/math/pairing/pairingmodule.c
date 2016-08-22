@@ -1104,7 +1104,10 @@ static PyObject *Element_set(Element *self, PyObject *args)
     long int value;
     int errcode = TRUE;
 
-    EXITCODE_IF(self->elem_initialized == FALSE, "must initialize element to a field (G1,G2,GT, or Zr)", FALSE);
+	if(self->elem_initialized == FALSE){
+		PyErr_SetString(PyExc_ValueError, "Must initialize element to a field (G1, G2, or GT).");
+		return NULL;
+	}
 
     debug("Creating a new element\n");
     if(PyArg_ParseTuple(args, "l", &value)) {
@@ -1123,8 +1126,9 @@ static PyObject *Element_set(Element *self, PyObject *args)
     else if(PyArg_ParseTuple(args, "O", &object)){
             element_set(self->e, object->e);
     }
-    else { //
-    	EXITCODE_IF(TRUE, "type not supported: signed int or Element object", FALSE);
+    else {
+    	// PyArg_ParseTuple already set the due error type and string
+            return NULL;
     }
 
     return Py_BuildValue("i", errcode);
@@ -1132,8 +1136,15 @@ static PyObject *Element_set(Element *self, PyObject *args)
 
 static PyObject  *Element_initPP(Element *self, PyObject *args)
 {
-    EXITCODE_IF(self->elem_initPP == TRUE, "initialized the pre-processing function already", FALSE);
-    EXITCODE_IF(self->elem_initialized == FALSE, "must initialize element to a field (G1,G2, or GT)", FALSE);
+	if(self->elem_initPP == TRUE){
+		PyErr_SetString(PyExc_ValueError, "Pre-processing table alreay initialized.");
+		return NULL;
+	}
+
+	if(self->elem_initialized == FALSE){
+		PyErr_SetString(PyExc_ValueError, "Must initialize element to a field (G1, G2, or GT).");
+		return NULL;
+	}
 
     /* initialize and store preprocessing information in e_pp */
     if(self->element_type >= G1 && self->element_type <= GT) {
@@ -2041,6 +2052,8 @@ PyMemberDef Element_members[] = {
 		"group type"},
     {"initialized", T_INT, offsetof(Element, elem_initialized), 0,
 		"determine initialization status"},
+    {"preproc", T_INT, offsetof(Element, elem_initPP), 0,
+		"determine pre-processing status"},
     {NULL}  /* Sentinel */
 };
 

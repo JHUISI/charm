@@ -34,7 +34,7 @@ class IBE_N04_Sig(PKSig):
     >>> waters = Waters(group)
     >>> ibe = IBE_N04_Sig(group)
     >>> (public_key, secret_key) = ibe.keygen()
-    >>> ID = "bob@mail.com"
+    >>> ID = "bob@example.com"
     >>> msg = waters.hash("This is a test.")    
     >>> signature = ibe.sign(public_key, secret_key, msg)
     >>> ibe.verify(public_key, msg, signature)
@@ -50,15 +50,17 @@ class IBE_N04_Sig(PKSig):
         group = groupObj        
         
     def keygen(self, l=32):
-        '''l is the security parameter
-        with l = 32, and the hash function at 160 bits = n * l with n = 5'''
+        """l is the security parameter
+        with l = 32, and the hash function at 256 bits = n * l with n = 8"""
         global waters
-        sha1_func, sha1_len = 'sha1', 20
         g = group.random(G2)      # generator for group G of prime order p
         
-        hLen = sha1_len * 8
+        #hLen = sha1_len * 8
+        #int(math.floor(hLen / l))
+        sha2_byte_len = 32
+        hLen = sha2_byte_len * 8
         n = int(math.floor(hLen / l))
-        waters = Waters(group, n, l, sha1_func)
+        waters = Waters(group, n, l, 'sha256')
         
         alpha = group.random(ZR)  #from Zp
         g2    = g ** alpha      
@@ -78,7 +80,7 @@ class IBE_N04_Sig(PKSig):
         return (pk, mk)
     
     def sign(self, pk, sk, m):
-        '''v = (v1, .., vn) is an identity'''
+        """v = (v1, .., vn) is an identity"""
         r = group.random(ZR)
         u = sk['u']
         for i in range(pk['n']):
@@ -103,7 +105,7 @@ def main():
     (pk, sk) = ibe.keygen()
 
     # represents public identity
-    M = "bob@mail.com"
+    M = "bob@example.com"
     msg = waters.hash("This is a test.")    
     sig = ibe.sign(pk, sk, msg)
     if debug:
@@ -117,4 +119,3 @@ def main():
 if __name__ == '__main__':
     debug = True
     main()
-    

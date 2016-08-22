@@ -6,11 +6,10 @@ from charm.toolbox.bitstring import Bytes
 import hashlib, base64
 
 class Hash():
-    def __init__(self, htype='sha1', pairingElement=None, integerElement=None):        
-        if htype == 'sha1':
-            self.hash_type = htype 
-            # instance of PairingGroup
-            self.group = pairingElement
+    def __init__(self, pairingElement=None, htype='sha256', integerElement=None):
+        self.hash_type = htype
+        # instance of PairingGroup
+        self.group = pairingElement
         
     def hashToZn(self, value):
         if type(value) == pc_element:
@@ -51,17 +50,18 @@ class Hash():
 
 """
 Waters Hash technique: how to hash in standard model.
-Default - len=5 bits=32 ==> 160-bits total
+Default - len=8, bits=32 ==> 256-bits total (for SHA-256)
+For SHA1, len=5 bits=32 ==> 160-bits total
 """
 class Waters:
     """
     >>> from charm.toolbox.pairinggroup import *
     >>> from charm.toolbox.hash_module import Waters
     >>> group = PairingGroup("SS512")
-    >>> waters = Waters(group, length=5, bits=32)
+    >>> waters = Waters(group, length=8, bits=32)
     >>> a = waters.hash("user@email.com")
     """
-    def __init__(self, group, length=5, bits=32, hash_func='sha1'):
+    def __init__(self, group, length=8, bits=32, hash_func='sha256'):
         self._group = group
         self._length = length
         self._bitsize = bits
@@ -69,7 +69,7 @@ class Waters:
         self._hashObj = hashlib.new(self.hash_function)
         self.hashLen = len(self._hashObj.digest())
 
-    def sha1(self, message):
+    def sha2(self, message):
         h = self._hashObj.copy()
         h.update(bytes(message, 'utf-8'))
         return Bytes(h.digest())    
@@ -77,7 +77,7 @@ class Waters:
     def hash(self, strID):
         '''Hash the identity string and break it up in to l bit pieces'''
         assert type(strID) == str, "invalid input type"
-        hash = self.sha1(strID)
+        hash = self.sha2(strID)
         
         val = Conversion.OS2IP(hash) #Convert to integer format
         bstr = bin(val)[2:]   #cut out the 0b header

@@ -17,7 +17,7 @@ from charm.core.math.integer import integer,isPrime,random,randomPrime,randomBit
 import hashlib
 
 def SHA1(bytes1):
-    s1 = hashlib.new('sha1')
+    s1 = hashlib.new('sha256')
     s1.update(bytes1)
     return s1.digest()
 

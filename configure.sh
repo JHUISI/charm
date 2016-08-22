@@ -450,10 +450,11 @@ echo "  --enable-debug           enable common debug build options"
 echo "  --disable-integer        disable INTEGER base module"
 echo "  --disable-ecc            disable ECC base module"
 echo "  --disable-pairing        disable PAIRING base module"
-echo "  --enable-pairing-miracl= enable use of MIRACL lib for pairing module. Options: 'mnt', 'bn', 'ss'"
-echo "  --enable-pairing-pbc     enable use of PBC lib for pairing module (DEFAULT)"
-echo "  --enable-integer-openssl enable use of openssl for integer module"
-echo "  --enable-integer-gmp     enable use of GMP lib for integer module (DEFAULT)"
+echo "  --enable-pairing-miracl= enable MIRACL lib for pairing module. Options: 'mnt', 'bn', 'ss'"
+echo "  --enable-pairing-pbc     enable PBC lib for pairing module (DEFAULT)"
+echo "  --enable-pairing-relic   enable RELIC lib for pairing module"
+echo "  --enable-integer-openssl enable openssl for integer module"
+echo "  --enable-integer-gmp     enable GMP lib for integer module (DEFAULT)"
 echo "  --disable-benchmark      disable BENCHMARK base module (DEFAULT is no)"
 echo "  --disable-werror         disable compilation abort on warning"
 echo "  --enable-cocoa           enable COCOA (Mac OS X only)"
@@ -515,14 +516,17 @@ else
             exit 1
         fi
 fi
-py_config="$(which python3-config)"
-if ! test -e "$py_config"
-then
-    echo "$py_config not found.  This version of Charm requires the python development environment (probably in python3-dev package)."
-    exit 1
+
+if [ "$targetos" != "MINGW32" ] ; then
+    py_config="$(which python3-config)"
+    if ! test -e "$py_config"
+    then
+        echo "$py_config not found.  This version of Charm requires the python development environment (probably in python3-dev package)."
+        exit 1
+    fi
+    PY_CFLAGS=`$py_config --cflags`
+    PY_LDFLAGS=`$py_config --ldflags`
 fi
-PY_CFLAGS=`$py_config --cflags`
-PY_LDFLAGS=`$py_config --ldflags`
 
 # check that the C compiler works.
 cat > $TMPC <<EOF
@@ -891,9 +895,11 @@ if test "$pairing_pbc" = "yes" ; then
     echo "USE_PBC=$pairing_pbc" >> $config_mk
     echo "USE_GMP=$pairing_pbc" >> $config_mk
     echo "USE_MIRACL=no" >> $config_mk
+    echo "USE_RELIC=no" >> $config_mk
 elif test "$pairing_miracl" = "yes" ; then
     echo "USE_MIRACL=$pairing_miracl" >> $config_mk
     echo "USE_PBC=no" >> $config_mk
+    echo "USE_RELIC=no" >> $config_mk
 elif test "$pairing_relic" = "yes" ; then
     echo "USE_RELIC=$pairing_relic" >> $config_mk
     echo "USE_PBC=no" >> $config_mk
@@ -901,19 +907,19 @@ elif test "$pairing_relic" = "yes" ; then
 fi
 
 if test "$pairing_miracl" = "yes" ; then
-	if test "$pairing_arg" = "mnt" ; then
-		echo "MIRACL_MNT=yes" >> $config_mk
-		echo "MIRACL_BN=no" >> $config_mk
-		echo "MIRACL_SS=no" >> $config_mk
-	elif test "$pairing_arg" = "bn" ; then
-		echo "MIRACL_MNT=no" >> $config_mk
-		echo "MIRACL_BN=yes" >> $config_mk	
-		echo "MIRACL_SS=no" >> $config_mk
-	elif test "$pairing_arg" = "ss" ; then
-		echo "MIRACL_MNT=no" >> $config_mk
-		echo "MIRACL_BN=no" >> $config_mk	
-		echo "MIRACL_SS=yes" >> $config_mk
-	fi
+    if test "$pairing_arg" = "mnt" ; then
+        echo "MIRACL_MNT=yes" >> $config_mk
+        echo "MIRACL_BN=no" >> $config_mk
+        echo "MIRACL_SS=no" >> $config_mk
+    elif test "$pairing_arg" = "bn" ; then
+        echo "MIRACL_MNT=no" >> $config_mk
+        echo "MIRACL_BN=yes" >> $config_mk
+        echo "MIRACL_SS=no" >> $config_mk
+    elif test "$pairing_arg" = "ss" ; then
+        echo "MIRACL_MNT=no" >> $config_mk
+        echo "MIRACL_BN=no" >> $config_mk
+        echo "MIRACL_SS=yes" >> $config_mk
+    fi
 fi
 
 if test "$disable_benchmark" = "yes" ; then
@@ -923,16 +929,16 @@ else
 fi
 
 if test "$wget" = "" ; then
-	if [ "$targetos" = "MINGW32" ] ; then
-		printf "wget not found!\n\n.Will now run Internet Explorer to download wget for windows.\n\n Please be sure to add the GNU32 bin directory to your path! Right-click Computer, Properties, Advanced System Settings, Advanced, Environment Variables, Path."
-		/c/Program\ Files/Internet\ Explorer/iexplore.exe http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-setup.exe
-		rm $config_mk
-		exit -1
-	else
-		echo "wget not found. Please install first, its required if installing dependencies."
-		rm $config_mk
-		exit -1
-	fi
+    if [ "$targetos" = "MINGW32" ] ; then
+        printf "wget not found!\n\n.Will now run Internet Explorer to download wget for windows.\n\n Please be sure to add the GNU32 bin directory to your path! Right-click Computer, Properties, Advanced System Settings, Advanced, Environment Variables, Path."
+        /c/Program\ Files/Internet\ Explorer/iexplore.exe http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-setup.exe
+        rm $config_mk
+        exit -1
+    else
+        echo "wget not found. Please install first, its required if installing dependencies."
+        rm $config_mk
+        exit -1
+    fi
 fi
 
 if [ "$targetos" = "MINGW32" ] ; then

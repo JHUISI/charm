@@ -135,7 +135,6 @@ class hashFunc:
             self.hashObj = hashlib.new(_hash_type)
         
     #message must be a binary string
-    #def __call__(self, message : [str, bytes]):
     def __call__(self, message):
         h = self.hashObj.copy()
         if type(message) == str:
@@ -418,7 +417,7 @@ class PKCS7Padding(object):
 
     def _padlength(self,_bytes):
         ln=len(_bytes)
-        pad_bytes_needed = self.block_size -(ln % self.block_size)
+        pad_bytes_needed = self.block_size - (ln % self.block_size)
         if pad_bytes_needed == 0:
             pad_bytes_needed = self.block_size
         return pad_bytes_needed

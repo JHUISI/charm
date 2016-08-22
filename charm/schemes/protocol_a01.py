@@ -25,7 +25,7 @@ SIGNER, USER = party.Signer, party.User
 HOST, PORT = "", 8082
 
 def SHA1(bytes1):
-    s1 = hashlib.new('sha1')
+    s1 = hashlib.new('sha256')
     s1.update(bytes1)
     return s1.digest()
 
@@ -64,7 +64,7 @@ class Asig(Protocol):
         
         y = g ** x 
 
-        hs1 = hashlib.new('sha1')
+        hs1 = hashlib.new('sha256')
         hs1.update(Conversion.IP2OS(integer(p)))
         hs1.update(Conversion.IP2OS(integer(q)))
         hs1.update(Conversion.IP2OS(integer(g)))
