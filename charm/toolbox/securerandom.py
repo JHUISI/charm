@@ -44,7 +44,7 @@ class OpenSSLRand(SecureRandom):
     def getRandomBytes(self, length):
         bits = length * 8;
         val = randomBits(bits)
-        return Conversion.IP2OS(val, length)    
+        return Conversion.IP2OS(val, length)
     
     def getRandomBits(self, length):
         i = randomBits(length)

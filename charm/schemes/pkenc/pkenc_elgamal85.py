@@ -51,7 +51,7 @@ class ElGamal(PKEnc):
     >>> groupObj = ECGroup(prime192v2)
     >>> el = ElGamal(groupObj)    
     >>> (public_key, secret_key) = el.keygen()
-    >>> msg = b"hello world!"
+    >>> msg = b"hello world!12345678"
     >>> cipher_text = el.encrypt(public_key, msg)
     >>> decrypted_msg = el.decrypt(public_key, secret_key, cipher_text)    
     >>> decrypted_msg == msg

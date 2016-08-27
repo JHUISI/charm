@@ -16,11 +16,10 @@ class MessageAuthenticator(object):
         it asymmetrically. Rather, we hash a random group element to get the
         symmetric key.
 
-    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
-    >>> from charm.core.math.pairing import hashPair as extractor
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT,extract_key
     >>> groupObj = PairingGroup('SS512')
     >>> key = groupObj.random(GT)
-    >>> m = MessageAuthenticator(extractor(key))
+    >>> m = MessageAuthenticator(extract_key(key))
     >>> AuthenticatedMessage = m.mac('Hello World')
     >>> m.verify(AuthenticatedMessage)
     True
@@ -67,10 +66,9 @@ class SymmetricCryptoAbstraction(object):
     it asymmetrically. Rather, we hash a random group element to get the
     symmetric key.
 
-    >>> from charm.toolbox.pairinggroup import PairingGroup,GT
+    >>> from charm.toolbox.pairinggroup import PairingGroup,GT,extract_key
     >>> groupObj = PairingGroup('SS512')
-    >>> from charm.core.math.pairing import hashPair as extractor
-    >>> a = SymmetricCryptoAbstraction(extractor(groupObj.random(GT)))
+    >>> a = SymmetricCryptoAbstraction(extract_key(groupObj.random(GT)))
     >>> ct = a.encrypt(b"Friendly Fire Isn't")
     >>> a.decrypt(ct)
     b"Friendly Fire Isn't"
@@ -82,6 +80,7 @@ class SymmetricCryptoAbstraction(object):
         self._block_size = 16 
         self._mode = mode
         self._key = key[0:self.key_len] # expected to be bytes
+        assert len(self._key) == self.key_len, "SymmetricCryptoAbstraction key too short"
         self._padding = PKCS7Padding()
  
     def _initCipher(self,IV = None):
@@ -146,10 +145,6 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
         mac_key = sha2(b'Poor Mans Key Extractor'+self._key).digest()
         mac = MessageAuthenticator(mac_key)
         if not mac.verify(cipherText):
-            print("cipherText: ", cipherText)
-            print("key: ", self._key)
-            print("hash1: ", mac_key)
-            print("test dec: ", super(AuthenticatedCryptoAbstraction, self).decrypt(cipherText['msg']))
             raise ValueError("Invalid mac. Your data was tampered with or your key is wrong")
         else:
             return super(AuthenticatedCryptoAbstraction, self).decrypt(cipherText['msg'])

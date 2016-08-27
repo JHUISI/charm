@@ -33,7 +33,7 @@ class CS98(PKEnc):
     >>> groupObj = ECGroup(prime192v1)
     >>> pkenc = CS98(groupObj)
     >>> (public_key, secret_key) = pkenc.keygen()
-    >>> msg = b"hello world!!!"
+    >>> msg = b"hello world!!!123456"
     >>> cipher_text = pkenc.encrypt(public_key, msg)
     >>> decrypted_msg = pkenc.decrypt(public_key, secret_key, cipher_text)
     >>> decrypted_msg == msg

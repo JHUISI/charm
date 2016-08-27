@@ -13,7 +13,7 @@ extern "C" {
 
 // set default if not passed in by compiler
 //#ifndef BENCHMARK_ENABLED
-//#define BENCHMARK_ENABLED 1
+//#define BENCHMARK_ENABLED 1vi bad
 //#endif
 //#define DEBUG   1
 #define TRUE	1

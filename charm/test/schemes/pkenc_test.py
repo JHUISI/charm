@@ -14,6 +14,7 @@ from charm.toolbox.pairinggroup import PairingGroup, GT
 from charm.toolbox.ecgroup import elliptic_curve, ECGroup
 from charm.toolbox.eccurve import prime192v1, prime192v2
 from charm.toolbox.integergroup import RSAGroup, integer, IntegerGroupQ, IntegerGroup
+
 import unittest
 
 debug = False
@@ -69,14 +70,14 @@ class CHK04Test(unittest.TestCase):
 
 class HybridEncTest(unittest.TestCase):
     def testHybridEnc(self):
-        #    pkenc = EC_CS98(prime192v1)
         groupObj = ECGroup(prime192v1)
         pkenc = ElGamal(groupObj)
-        hyenc = HybridEnc(pkenc)
+        hyenc = HybridEnc(pkenc, msg_len=groupObj.bitsize())
        
         (pk, sk) = hyenc.keygen()
-       
-        m = b'this is a new message'
+
+        # message len should be group.bitsize() len for prime192v1 (or 20 bytes)
+        m = b'the hello world msg1'
         cipher = hyenc.encrypt(pk, m)
         orig_m = hyenc.decrypt(pk, sk, cipher)
         assert m == orig_m, "Failed Decryption"
@@ -88,10 +89,10 @@ class EC_CS98Test(unittest.TestCase):
         pkenc = CS98(groupObj)
         
         (pk, sk) = pkenc.keygen()
-        M = b"hello world!!!"
 
+        # message len should be group.bitsize() len for prime192v1 (or 20 bytes)
+        M = b'the hello world msg1'
         ciphertext = pkenc.encrypt(pk, M)
-        
         message = pkenc.decrypt(pk, sk, ciphertext)
         
         assert M == message, "Failed Decryption!!!"
@@ -118,7 +119,8 @@ class ElGamalTest(unittest.TestCase):
         groupObj = ECGroup(prime192v2)
         el = ElGamal(groupObj)   
         (pk, sk) = el.keygen()
-        msg = b"hello world!"
+        # message len should be group.bitsize() len for prime192v1 (or 20 bytes)
+        msg = b'the hello world msg1'
         cipher1 = el.encrypt(pk, msg)
         m = el.decrypt(pk, sk, cipher1)    
         assert m == msg, "Failed Decryption!!!"

@@ -173,3 +173,13 @@ class PairingGroup():
         """retrieves benchmark results for any of these options: 
         RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Pair, Granular"""
         return pg.GetBenchmark(self.Pairing, option)
+
+
+def extract_key(g):
+    """
+    Given a group element, extract a symmetric key
+    :param g:
+    :return:
+    """
+    g_in_hex = hashPair(g).decode('utf-8')
+    return bytes(bytearray.fromhex(g_in_hex))
