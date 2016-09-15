@@ -227,7 +227,7 @@ else
 fi
 
 case "$cpu" in
-  alpha|cris|ia64|lm32|m68k|microblaze|ppc|ppc64|sparc64|unicore32|armv6l)
+  alpha|cris|ia64|lm32|m68k|microblaze|ppc|ppc64|sparc64|unicore32|armv6l|armv7l)
     cpu="$cpu"
   ;;
   i386|i486|i586|i686|i86pc|BePC)
@@ -784,7 +784,7 @@ case "$cpu" in
   i386|x86_64|alpha|cris|hppa|ia64|lm32|m68k|microblaze|mips|mips64|ppc|ppc64|s390|s390x|sparc|sparc64|unicore32)
     ARCH=$cpu
   ;;
-  armv4b|armv4l|armv6l)
+  armv4b|armv4l|armv6l|armv7l)
     ARCH=arm
   ;;
 esac
