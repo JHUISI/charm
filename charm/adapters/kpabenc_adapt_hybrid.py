@@ -1,7 +1,6 @@
 
 from charm.toolbox.pairinggroup import PairingGroup,GT,extract_key
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from charm.core.math.pairing import hashPair as sha1
 from charm.toolbox.ABEnc import ABEnc
 from charm.schemes.abenc.abenc_lsw08 import KPabe
 

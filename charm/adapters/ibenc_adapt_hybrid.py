@@ -1,6 +1,6 @@
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.core.math.pairing import hashPair as sha1
+from charm.core.math.pairing import hashPair as sha2
 from charm.adapters.ibenc_adapt_identityhash import HashIDAdapter
 from charm.toolbox.IBEnc import IBEnc
 from charm.core.crypto.cryptobase import *
@@ -39,13 +39,13 @@ class HybridIBEnc(IBEnc):
         key = group.random(GT)
         c1 = ibenc.encrypt(pk, ID, key)
         # instantiate a symmetric enc scheme from this key
-        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        cipher = AuthenticatedCryptoAbstraction(sha2(key))
         c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
     
     def decrypt(self, pk, ID, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = ibenc.decrypt(pk, ID, c1)        
-        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        cipher = AuthenticatedCryptoAbstraction(sha2(key))
         return cipher.decrypt(c2)
     

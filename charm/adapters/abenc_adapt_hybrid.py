@@ -3,7 +3,7 @@ from charm.toolbox.ABEnc import ABEnc
 from charm.schemes.abenc.abenc_bsw07 import CPabe_BSW07
 from charm.toolbox.pairinggroup import PairingGroup,GT
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from charm.core.math.pairing import hashPair as sha1
+from charm.core.math.pairing import hashPair as sha2
 from math import ceil
 
 debug = False
@@ -37,7 +37,7 @@ class HybridABEnc(ABEnc):
         key = self.group.random(GT)
         c1 = abenc.encrypt(pk, key, object)
         # instantiate a symmetric enc scheme from this key
-        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        cipher = AuthenticatedCryptoAbstraction(sha2(key))
         c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
     
@@ -46,7 +46,7 @@ class HybridABEnc(ABEnc):
         key = abenc.decrypt(pk, sk, c1)
         if key is False:
             raise Exception("failed to decrypt!")
-        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        cipher = AuthenticatedCryptoAbstraction(sha2(key))
         return cipher.decrypt(c2)
     
 def main():
