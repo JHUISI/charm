@@ -26,7 +26,7 @@ class BBS98(PREnc):
     >>> params = bbs.setup()
     >>> (pk_a, sk_a) = bbs.keygen(params)
     >>> (pk_b, sk_b) = bbs.keygen(params)
-    >>> msg = b"hello world!!!"
+    >>> msg = b"hello world!!!123456"
     >>> c_a = bbs.encrypt(params, pk_a, msg)
     >>> assert msg == bbs.decrypt(params, sk_a, c_a), 'Decryption of original ciphertext was incorrect'
     >>> rk = bbs.rekeygen(params, pk_a, sk_a, pk_b, sk_b)

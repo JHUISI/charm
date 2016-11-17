@@ -39,4 +39,3 @@ class EncapBCHK():
             return m
         else:
             return b'FALSE'
-    

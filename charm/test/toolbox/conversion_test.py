@@ -1,7 +1,6 @@
 '''
-Created on Jul 5, 2011
-
-:authors: Gary belvin
+:Date: Jul 5, 2011
+:Authors: Gary Belvin
 '''
 from charm.toolbox.conversion import Conversion
 import unittest

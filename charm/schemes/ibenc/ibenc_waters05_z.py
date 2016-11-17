@@ -21,9 +21,8 @@
 from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import IBEnc
-from charm.toolbox.bitstring import Bytes
 from charm.toolbox.hash_module import Waters
-import hashlib, math, time, string, random
+import math, string, random
 
 def randomStringGen(size=30, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
@@ -62,13 +61,13 @@ class IBE_N04_z(IBEnc):
         '''l is the security parameter
         with l = 32, and the hash function at 160 bits = n * l with n = 5'''
         global waters
-        sha1_func, sha1_len = 'sha1', 20
         g = group.random(G1)      # generator for group G of prime order p
         
-        hLen = sha1_len * 8
+        sha2_byte_len = 32
+        hLen = sha2_byte_len * 8
         n = int(math.floor(hLen / l))
-        waters = Waters(group, n, l, sha1_func)
-                
+        waters = Waters(group, n, l, 'sha256')
+
         alpha = group.random(ZR)  #from Zp
         g1    = g ** alpha      # G1
         g2    = group.random(G2)    #G2

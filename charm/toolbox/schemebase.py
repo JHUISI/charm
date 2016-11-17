@@ -161,8 +161,9 @@ class Output:
 
     def __call__(self, func, *args):
         def check_output(*args):
+            # we do not mask error raised by the function not related to types
+            output = func(*args)
             try:
-                output = func(*args)
                 # check the output        
                 if self.check_first:
                     # situation where only one type is defined and it could be a single dict or list of many types, 

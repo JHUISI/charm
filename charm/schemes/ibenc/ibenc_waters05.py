@@ -43,15 +43,15 @@ class IBE_N04(IBEnc):
         group = groupObj
 
     def setup(self, l=32):
-        '''l is the security parameter
-        with l = 32, and the hash function at 160 bits = n * l with n = 5'''
+        """l is the security parameter
+        with l = 32, and the hash function at 256 bits = n * l with n = 8"""
         global waters
-        sha1_func, sha1_len = 'sha1', 20
         g = group.random(G1)      # generator for group G of prime order p
-        
-        hLen = sha1_len * 8
+
+        sha2_byte_len = 32
+        hLen = sha2_byte_len * 8
         n = int(math.floor(hLen / l))
-        waters = Waters(group, n, l, sha1_func)
+        waters = Waters(group, n, l, 'sha256')
                 
         alpha = group.random()  #from Zp
         g1    = g ** alpha      # G1

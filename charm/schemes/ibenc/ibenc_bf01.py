@@ -35,7 +35,7 @@ class IBE_BonehFranklin(IBEnc):
         IBEnc.__init__(self)
         global group,h
         group = groupObj
-        h = Hash('sha1', group)
+        h = Hash(group)
         
     def setup(self):
         s, P = group.random(ZR), group.random(G2)

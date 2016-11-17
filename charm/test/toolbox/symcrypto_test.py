@@ -1,7 +1,7 @@
 import unittest 
 from charm.toolbox.symcrypto import SymmetricCryptoAbstraction,AuthenticatedCryptoAbstraction, MessageAuthenticator
 from charm.toolbox.pairinggroup import PairingGroup,GT
-from charm.core.math.pairing import hashPair as sha1
+from charm.core.math.pairing import hashPair as sha2
 class SymmetricCryptoAbstractionTest(unittest.TestCase):
     
     def testAESCBC(self):
@@ -19,7 +19,7 @@ class SymmetricCryptoAbstractionTest(unittest.TestCase):
 
     def MsgtestAESCBC(self,msg):
         groupObj = PairingGroup('SS512')
-        a =  SymmetricCryptoAbstraction(sha1(groupObj.random(GT)))
+        a =  SymmetricCryptoAbstraction(sha2(groupObj.random(GT)))
         ct = a.encrypt(msg)
         dmsg = a.decrypt(ct);
         assert msg == dmsg , 'o: =>%s\nm: =>%s' % (msg, dmsg)
@@ -27,9 +27,9 @@ class SymmetricCryptoAbstractionTest(unittest.TestCase):
     def MsgTestAESCBCSeperate(self,msg):
         groupObj = PairingGroup('SS512')
         ran = groupObj.random(GT)
-        a =  SymmetricCryptoAbstraction(sha1(ran))
+        a =  SymmetricCryptoAbstraction(sha2(ran))
         ct = a.encrypt(msg)        
-        b =  SymmetricCryptoAbstraction(sha1(ran))
+        b =  SymmetricCryptoAbstraction(sha2(ran))
         dmsg = b.decrypt(ct);
         assert msg == dmsg , 'o: =>%s\nm: =>%s' % (msg, dmsg)
 
@@ -50,7 +50,7 @@ class AuthenticatedCryptoAbstractionTest(unittest.TestCase):
 
     def MsgtestAESCBC(self,msg):
         groupObj = PairingGroup('SS512')
-        a =  AuthenticatedCryptoAbstraction(sha1(groupObj.random(GT)))
+        a =  AuthenticatedCryptoAbstraction(sha2(groupObj.random(GT)))
         ct = a.encrypt(msg)
         dmsg = a.decrypt(ct);
         assert msg == dmsg , 'o: =>%s\nm: =>%s' % (msg, dmsg)
@@ -58,28 +58,28 @@ class AuthenticatedCryptoAbstractionTest(unittest.TestCase):
     def MsgTestAESCBCSeperate(self,msg):
         groupObj = PairingGroup('SS512')
         ran = groupObj.random(GT)
-        a =  AuthenticatedCryptoAbstraction(sha1(ran))
+        a =  AuthenticatedCryptoAbstraction(sha2(ran))
         ct = a.encrypt(msg)        
-        b =  AuthenticatedCryptoAbstraction(sha1(ran))
+        b =  AuthenticatedCryptoAbstraction(sha2(ran))
         dmsg = b.decrypt(ct);
         assert msg == dmsg , 'o: =>%s\nm: =>%s' % (msg, dmsg)
 
 class MessageAuthenticatorTest(unittest.TestCase):
     def testSelfVerify(self):
-        key = sha1(PairingGroup('SS512').random(GT))
+        key = sha2(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         assert m.verify(a), "expected message to verify";
 
     def testSeperateVerify(self):
-        key = sha1(PairingGroup('SS512').random(GT))
+        key = sha2(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         m1 = MessageAuthenticator(key)
         assert m1.verify(a), "expected message to verify";
  
     def testTamperData(self):
-        key = sha1(PairingGroup('SS512').random(GT))
+        key = sha2(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         m1 = MessageAuthenticator(key)
@@ -87,7 +87,7 @@ class MessageAuthenticatorTest(unittest.TestCase):
         assert not m1.verify(a), "expected message to verify";
 
     def testTamperMac(self):
-        key = sha1(PairingGroup('SS512').random(GT))
+        key = sha2(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         m1 = MessageAuthenticator(key)
@@ -95,7 +95,7 @@ class MessageAuthenticatorTest(unittest.TestCase):
         assert not m1.verify(a), "expected message to verify";
 
     def testTamperAlg(self):
-        key = sha1(PairingGroup('SS512').random(GT))
+        key = sha2(PairingGroup('SS512').random(GT))
         m = MessageAuthenticator(key)
         a = m.mac('hello world')
         m1 = MessageAuthenticator(key)

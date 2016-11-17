@@ -41,13 +41,13 @@ class ECGroup():
             return random(self.ec_group, _type)
         return None
     
-    def encode(self, message):
+    def encode(self, message, include_ctr=False):
         """encode arbitrary string as a group element. Max size is dependent on the EC group order"""
-        return encode(self.ec_group, message)
+        return encode(self.ec_group, message, include_ctr)
     
-    def decode(self, msg_bytes):
+    def decode(self, msg_bytes, include_ctr=False):
         """decode a group element into a string"""
-        return decode(self.ec_group, msg_bytes)
+        return decode(self.ec_group, msg_bytes, include_ctr)
     
     def serialize(self, object):
         """serializes a pairing object into bytes"""        

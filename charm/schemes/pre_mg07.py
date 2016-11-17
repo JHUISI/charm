@@ -39,7 +39,7 @@ class PreGA:
     def __init__(self, groupObj):
         global group,h
         group = groupObj
-        h = Hash('sha1', group)
+        h = Hash(group) # use the default
         
     def setup(self):
         s = group.random(ZR) 

@@ -1,5 +1,5 @@
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
-from charm.core.math.pairing import hashPair as sha1
+from charm.core.math.pairing import hashPair as sha2
 from charm.schemes.dabe_aw11 import Dabe
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 from charm.toolbox.pairinggroup import PairingGroup,GT
@@ -65,7 +65,7 @@ class HybridABEncMA(ABEncMultiAuth):
         key = group.random(GT)
         c1 = abencma.encrypt(pk, gp, key, policy_str)
         # instantiate a symmetric enc scheme from this key
-        cipher = AuthenticatedCryptoAbstraction(sha1(key)) 
+        cipher = AuthenticatedCryptoAbstraction(sha2(key))
         c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
     
@@ -74,7 +74,7 @@ class HybridABEncMA(ABEncMultiAuth):
         key = abencma.decrypt(gp, sk, c1)
         if key is False:
             raise Exception("failed to decrypt!")
-        cipher = AuthenticatedCryptoAbstraction(sha1(key))
+        cipher = AuthenticatedCryptoAbstraction(sha2(key))
         return cipher.decrypt(c2)
         
 def main():
