@@ -1567,7 +1567,12 @@ static PyObject *Serialize_cmp(PyObject *self, PyObject *args) {
 	Element *element = NULL;
 	int compression = 1;
 
-	if(!PyArg_ParseTuple(args, "O|p:serialize", &element, &compression)) return NULL;
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	if(!PyArg_ParseTuple(args, "O|p:serialize", &element, &compression))
+#else
+	if(!PyArg_ParseTuple(args, "O|i:serialize", &element, &compression))
+#endif
+        return NULL;
 
 	if(!PyElement_Check(element)) {
 		PyErr_SetString(PyExc_TypeError, "Invalid element type.");
@@ -1632,7 +1637,11 @@ static PyObject *Deserialize_cmp(PyObject *self, PyObject *args) {
 	PyObject *object;
 	int compression = 1;
 
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
 	if(!PyArg_ParseTuple(args, "OO|p:deserialize", &group, &object, &compression))
+#else
+	if(!PyArg_ParseTuple(args, "OO|i:deserialize", &group, &object, &compression))
+#endif
 		return NULL;
 
 	VERIFY_GROUP(group);

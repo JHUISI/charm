@@ -97,7 +97,7 @@ class PairingGroup():
         """hashes objects into ZR, G1 or G2 depending on the pairing curve"""
         return H(self.Pairing, args, type)
     
-    def serialize(self, obj, *, compression=True):
+    def serialize(self, obj, compression=True):
         """Serialize a pairing object into bytes.
 
            :param compression: serialize the compressed representation of the
@@ -119,7 +119,7 @@ class PairingGroup():
         """
         return serialize(obj, compression)
     
-    def deserialize(self, obj, *, compression=True):
+    def deserialize(self, obj, compression=True):
         """Deserialize a bytes serialized element into a pairing object. 
 
            :param compression: must be used for objects serialized with the
