@@ -40,7 +40,7 @@ class HybridABEncMA(ABEncMultiAuth):
         Encrypt a message to anyone who is both a profesor at JHU and a researcher at JHMI.
     >>> msg = b'Hello World, I am a sensitive record!'
     >>> policy_str = "(jhmi.doctor or (jhmi.researcher and jhu.professor))"
-    >>> cipher_text = hyb_abema.encrypt(allAuth_public_key, global_parameters, msg, policy_str)    
+    >>> cipher_text = hyb_abema.encrypt(global_parameters, allAuth_public_key, msg, policy_str)
     >>> hyb_abema.decrypt(global_parameters, secrets_keys, cipher_text)
     b'Hello World, I am a sensitive record!'
     """
@@ -59,11 +59,11 @@ class HybridABEncMA(ABEncMultiAuth):
     def keygen(self, gp, sk, i, gid, pkey):
         return abencma.keygen(gp, sk, i, gid, pkey)
 
-    def encrypt(self, pk, gp, M, policy_str):
+    def encrypt(self, gp, pk, M, policy_str):
         if type(M) != bytes and type(policy_str) != str:
             raise Exception("message and policy not right type!")
         key = group.random(GT)
-        c1 = abencma.encrypt(pk, gp, key, policy_str)
+        c1 = abencma.encrypt(gp, pk, key, policy_str)
         # instantiate a symmetric enc scheme from this key
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
         c2 = cipher.encrypt(M)
