@@ -33,7 +33,7 @@ class Dabe(ABEncMultiAuth):
     >>> for i in usr_attrs:  dabe.keygen(public_parameters, master_secret_key, i, ID, secret_keys)
     >>> msg = group.random(GT)
     >>> policy = '((one or three) and (TWO or FOUR))'
-    >>> cipher_text = dabe.encrypt(master_public_key, public_parameters, msg, policy)
+    >>> cipher_text = dabe.encrypt(public_parameters, master_public_key, msg, policy)
     >>> decrypted_msg = dabe.decrypt(public_parameters, secret_keys, cipher_text)
     >>> decrypted_msg == msg
     True
@@ -104,7 +104,7 @@ class Dabe(ABEncMultiAuth):
 
         return None
 
-    def encrypt(self, pk, gp, M, policy_str):
+    def encrypt(self, gp, pk, M, policy_str):
         '''Encrypt'''
         #M is a group element
         #pk is a dictionary with all the attributes of all authorities put together.
@@ -183,7 +183,7 @@ def main():
     m = groupObj.random(GT)
     policy = '((one or three) and (TWO or FOUR))'
     if debug: print('Acces Policy: %s' % policy)
-    CT = dabe.encrypt(PK, GP, m, policy)
+    CT = dabe.encrypt(GP, PK, m, policy)
     if debug: print("\nCiphertext...")
     if debug: groupObj.debug(CT)
 

@@ -63,7 +63,7 @@ class MaabeRW15(ABEncMultiAuth):
 
         Encrypt the message
     >>> access_policy = '(STUDENT@UT or PROFESSOR@OU) and (STUDENT@UT or MASTERS@OU)'
-    >>> cipher_text = maabe.encrypt(public_keys, public_parameters, message, access_policy)
+    >>> cipher_text = maabe.encrypt(public_parameters, public_keys, message, access_policy)
 
         Decrypt the message
     >>> decrypted_message = maabe.decrypt(public_parameters, user_keys, cipher_text)
@@ -158,11 +158,11 @@ class MaabeRW15(ABEncMultiAuth):
             uk[attribute] = self.keygen(gp, sk, gid, attribute)
         return uk
 
-    def encrypt(self, pks, gp, message, policy_str):
+    def encrypt(self, gp, pks, message, policy_str):
         """
         Encrypt a message under an access policy
-        :param pks: The public keys of the relevant attribute authorities, as dict from authority name to public key.
         :param gp: The global parameters.
+        :param pks: The public keys of the relevant attribute authorities, as dict from authority name to public key.
         :param message: The message to encrypt.
         :param policy_str: The access policy to use.
         :return: The encrypted message.
