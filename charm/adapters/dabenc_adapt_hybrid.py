@@ -1,8 +1,8 @@
-from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.core.math.pairing import hashPair as sha2
-from charm.schemes.dabe_aw11 import Dabe
+from charm.schemes.abenc.dabe_aw11 import Dabe
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 from charm.toolbox.pairinggroup import PairingGroup,GT
+from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 
 debug = False
 class HybridABEncMA(ABEncMultiAuth):
