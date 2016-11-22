@@ -1,7 +1,7 @@
 import unittest
 
 from charm.adapters.dabenc_adapt_hybrid import HybridABEncMA
-from charm.schemes.dabe_aw11 import Dabe
+from charm.schemes.abenc.dabe_aw11 import Dabe
 from charm.toolbox.pairinggroup import PairingGroup, GT
 
 debug = False
@@ -38,7 +38,7 @@ class HybridABEncMATest(unittest.TestCase):
         msg = b'Hello World, I am a sensitive record!'
         size = len(msg)
         policy_str = "(jhmi.doctor or (jhmi.researcher and jhu.professor))"
-        ct = hyb_abema.encrypt(allAuthPK, gp, msg, policy_str)
+        ct = hyb_abema.encrypt(gp, allAuthPK, msg, policy_str)
 
         if debug:
             print("Ciphertext")
