@@ -177,7 +177,7 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     >>> key = sha256(b'shameful secret key').digest()
     >>> key
     b"\x14zo \x9a\xb8\xb0\xdc\x1a$F\x08\xfa\x1b\xfa&\xe8\xda\x1d\xb4\xde\xed\x14\xafYxi\x9a\xf1%G'"
-    >>> cipher = symcrypto.AuthenticatedCryptoAbstraction(key)
+    >>> cipher = charm.toolbox.symcrypto.AuthenticatedCryptoAbstraction(key)
     >>> ciphertext = cipher.encrypt('My age is 42.')
     >>> ciphertext
     {'digest': '0af403e93aa86cd75b0d08818b6f13deb82c1ae4bb4fb878c3d2c85ad26e4ec9', 'msg': '{"MODE": 2, "IV": "TW3agHgZJIMUWjb+9D1hwg==", "CipherText": "fdL9hbr0kHk+kazhr8i1Ng==", "ALG": 0}', 'alg': 'HMAC_SHA2'}
@@ -194,13 +194,13 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     >>> cipher.decrypt(ciphertextAdditionalData)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
-      File "/media/sf_code/AuthenticationService/authenticationservice/symcrypto2.py", line 233, in decrypt
+      File "./charm/toolbox/symcrypto.py", line 233, in decrypt
         raise ValueError("Invalid mac. Your data was tampered with or your key is wrong")
     ValueError: Invalid mac. Your data was tampered with or your key is wrong
     >>> cipher.decrypt(ciphertextAdditionalData, additionalData='wrong data')
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
-      File "/media/sf_code/AuthenticationService/authenticationservice/symcrypto2.py", line 233, in decrypt
+      File "./charm/toolbox/symcrypto.py", line 233, in decrypt
         raise ValueError("Invalid mac. Your data was tampered with or your key is wrong")
     ValueError: Invalid mac. Your data was tampered with or your key is wrong
     >>> cipher.decrypt(ciphertextAdditionalData, additionalData=b'\x10\x11\x0a\x0b')
