@@ -177,18 +177,12 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     >>> key = sha256(b'shameful secret key').digest()
     >>> cipher = charm.toolbox.symcrypto.AuthenticatedCryptoAbstraction(key)
     >>> ciphertext = cipher.encrypt('My age is 42.')
-    >>> ciphertext
-    {'digest': '0af403e93aa86cd75b0d08818b6f13deb82c1ae4bb4fb878c3d2c85ad26e4ec9', 'msg': '{"MODE": 2, "IV": "TW3agHgZJIMUWjb+9D1hwg==", "CipherText": "fdL9hbr0kHk+kazhr8i1Ng==", "ALG": 0}', 'alg': 'HMAC_SHA2'}
     >>> cipher.decrypt(ciphertext)
     b'My age is 42.'
     >>> ciphertext2 = cipher.encrypt(b'My age is 42.')
-    >>> ciphertext2
-    {'digest': '71ee405bdd51c507d960f7351efa186fa3f9c9a16164bfbe4420f6215b0f60cb', 'msg': '{"MODE": 2, "IV": "EL34abDraiSitGG60idAyA==", "CipherText": "jbPygJh+UnzGsucTCJyYew==", "ALG": 0}', 'alg': 'HMAC_SHA2'}
     >>> cipher.decrypt(ciphertext2)
     b'My age is 42.'
     >>> ciphertextAdditionalData = cipher.encrypt('Some network PDU.', additionalData=b'\x10\x11\x0a\x0b')
-    >>> ciphertextAdditionalData
-    {'digest': 'd781dbe8906b20a1d91f4bd28b57a84b93b0a520e08502a40208fd153bfb3206', 'msg': '{"MODE": 2, "IV": "pgg2Ik6ale5SjinjSpQejw==", "CipherText": "SsdRdwoX5yzdZNZnbbYbpUKlmCVbGVJPQl4/Bn9MBWo=", "ALG": 0}', 'alg': 'HMAC_SHA2'}
     >>> cipher.decrypt(ciphertextAdditionalData)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
