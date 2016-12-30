@@ -182,7 +182,8 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     >>> ciphertext2 = cipher.encrypt(b'My age is 42.')
     >>> cipher.decrypt(ciphertext2)
     b'My age is 42.'
-    >>> ciphertextAdditionalData = cipher.encrypt('Some network PDU.', additionalData=b'\x10\x11\x0a\x0b')
+    >>> ad = b'\x10\x11\x0a\x0b'
+    >>> ciphertextAdditionalData = cipher.encrypt('Some network PDU.', additionalData=ad)
     >>> cipher.decrypt(ciphertextAdditionalData)
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
