@@ -181,8 +181,8 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     b'My age is 42.'
     >>> ciphertext2 = cipher.encrypt(b'My age is 42.')
     >>> cipher.decrypt(ciphertext2)
-    b'My age is 42.'
-    >>> ad = b'\x10\x11\x0a\x0b'
+    b'My age is 42.
+    >>> ad = b'\x10\x11\x11\x11'
     >>> ciphertextAdditionalData = cipher.encrypt('Some network PDU.', additionalData=ad)
     >>> cipher.decrypt(ciphertextAdditionalData)
     Traceback (most recent call last):
@@ -196,7 +196,7 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
       File "./charm/toolbox/symcrypto.py", line 233, in decrypt
         raise ValueError("Invalid mac. Your data was tampered with or your key is wrong")
     ValueError: Invalid mac. Your data was tampered with or your key is wrong
-    >>> cipher.decrypt(ciphertextAdditionalData, additionalData=b'\x10\x11\x0a\x0b')
+    >>> cipher.decrypt(ciphertextAdditionalData, additionalData=b'\x10\x11\x11\x11')
     b'Some network PDU.'
     >>>
     """
