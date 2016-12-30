@@ -173,7 +173,7 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     Examples
     --------
     >>> from hashlib import sha256
-    >>> import symcrypto
+    >>> import charm.toolbox.symcrypto
     >>> key = sha256(b'shameful secret key').digest()
     >>> key
     b"\x14zo \x9a\xb8\xb0\xdc\x1a$F\x08\xfa\x1b\xfa&\xe8\xda\x1d\xb4\xde\xed\x14\xafYxi\x9a\xf1%G'"
