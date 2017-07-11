@@ -116,59 +116,34 @@ void longObjToMPZ(mpz_t m, PyObject * o) {
 //}
 
 PyObject *bnToLongObj(BIGNUM *m) {
-	PyLongObject *v = NULL;
-	BN_ULONG t;
-	int bits = BN_num_bits(m), i = 0;
-	int ndigits = (bits + PyLong_SHIFT - 1) / PyLong_SHIFT;
-	int digitsleft = ndigits;
-	int bitsleft = bits;
-
-	v = _PyLong_New(ndigits);
-	if (v != NULL) {
-		digit *p = v->ob_digit;
-		for(i = 0; i < m->dmax; i++) {
-			t = m->d[i];
-			*p++ = (digit)(t & PyLong_MASK);
-			i++;
-			digitsleft--;
-			bitsleft -= PyLong_SHIFT;
-		}
-	}
-
-	return (PyObject *) v;
+	return PyLong_FromString(BN_bn2hex(m), NULL, 16);
 }
 
 int bnToMPZ(BIGNUM *p, mpz_t m) {
-	int size;
-	if (!BN_is_negative(p))
-		size = p->top;
-	else
-		size = -(p->top);
-
-	if(BN_BITS2 == GMP_NUMB_BITS) {
-		// expand the mpz_t type
-		if(!_mpz_realloc(m, size))
-			return FALSE;
-		memcpy(&m->_mp_d[0], &p->d[0], size * sizeof(p->d[0]));
-		m->_mp_size = size;
+	size_t count = BN_num_bytes(p);
+	unsigned char* tmp = malloc(count);
+	if(!tmp) {
+		return FALSE;
 	}
+	BN_bn2bin(p, tmp);
+	mpz_import(m, count, 1, 1, 0, 0, tmp);
+	if(BN_is_negative(p)) {
+		mpz_neg(m, m);
+	}
+	free(tmp);
 
 	return TRUE;
 }
 
 // generate a BN from an mpz_t type
 int mpzToBN(mpz_t m, BIGNUM *b) {
-	int size = (m->_mp_size >= 0) ? m->_mp_size : -m->_mp_size;
+	void (*freefunc) (void *, size_t);
+	mp_get_memory_functions (NULL, NULL, &freefunc);
 
-	// make sure mpz will fit into BN
-	if(BN_BITS2 == GMP_NUMB_BITS) {
-		BN_zero(b);
-		if(bn_expand2(b, size) == NULL)
-			return FALSE;
-		b->top = size;
-		memcpy(&b->d[0], &m->_mp_d[0], size * sizeof(b->d[0]));
-		bn_correct_top(b);
-	}
+	size_t count;
+	unsigned char* bytes = mpz_export (NULL, &count, 1, 1, 0, 0, m);
+	BN_bin2bn(bytes, count, b);
+	freefunc(bytes, count);
 
 	debug("Original input m => ");
 	print_mpz(m, 10);
