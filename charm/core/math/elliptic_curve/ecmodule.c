@@ -1318,7 +1318,8 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
                 printf_buffer_as_hex((uint8_t *) input, len);
                 encObj = createNewPoint(G, gobj);
                 BN_bin2bn((const uint8_t *) input, len, x);
-                BN_init(y);
+                BN_free(y);
+                y = BN_new();
                 // Uncomment for debugging purposes
                 //char *xstr = BN_bn2dec(x);
                 //debug("gen x => %s\n", xstr);
