@@ -41,10 +41,10 @@
 #include "benchmarkmodule.h"
 #include "base64.h"
 /* used to initialize the RNG */
-#include "openssl/objects.h"
-#include "openssl/rand.h"
-#include "openssl/bn.h"
-#include "openssl/sha.h"
+#include <openssl/objects.h>
+#include <openssl/rand.h>
+#include <openssl/bn.h>
+#include <openssl/sha.h>
 
 /* integermath */
 #define MAX_RUN  	25

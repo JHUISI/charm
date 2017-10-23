@@ -1840,8 +1840,8 @@ static int ec_traverse(PyObject *m, visitproc visit, void *arg) {
 }
 
 static int ec_clear(PyObject *m) {
-	Py_CLEAR(GETSTATE(m)->error);
-    Py_XDECREF(PyECErrorObject);
+  Py_CLEAR(GETSTATE(m)->error);
+  Py_XDECREF(PyECErrorObject);
 	return 0;
 }
 
@@ -1919,9 +1919,9 @@ void initelliptic_curve(void) 		{
 
 LEAVE:
 	if (PyErr_Occurred()) {
-		PyErr_Clear();
-        Py_XDECREF(m);
-	    INITERROR;
+    PyErr_Clear();
+    Py_XDECREF(m);
+    INITERROR;
 	}
 
 #if PY_MAJOR_VERSION >= 3

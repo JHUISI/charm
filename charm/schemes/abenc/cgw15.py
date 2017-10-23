@@ -16,7 +16,7 @@ Jie Chen, Romain Gay, and Hoeteck Wee
 
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from charm.toolbox.ABEnc import ABEnc
-from msp import MSP
+from charm.toolbox.msp import MSP
 
 debug = False
 

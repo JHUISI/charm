@@ -148,6 +148,7 @@ else:
 
 _charm_version = opt.get('VERSION')
 lib_config_file = 'charm/config.py'
+inc_dirs = [s[2:] for s in opt.get('CHARM_CFLAGS').split() if s.startswith('-I')]
 library_dirs = [s[2:] for s in opt.get('LDFLAGS').split() if s.startswith('-L')]
 runtime_library_dirs = [s[11:] for s in opt.get('LDFLAGS').split()
                         if s.lower().startswith('-wl,-rpath,')]
@@ -156,7 +157,7 @@ if opt.get('PAIR_MOD') == 'yes':
         replaceString(lib_config_file, "pairing_lib=libs ", "pairing_lib=libs.pbc")
         pairing_module = Extension(math_prefix+'.pairing', 
                             include_dirs = [utils_path,
-                                            benchmark_path], 
+                                            benchmark_path] + inc_dirs,
                             sources = [math_path+'pairing/pairingmodule.c', 
                                         utils_path+'base64.c'],
                             libraries=['pbc', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
@@ -199,7 +200,7 @@ if opt.get('INT_MOD') == 'yes':
    replaceString(lib_config_file, "int_lib=libs ", "int_lib=libs.gmp")
    integer_module = Extension(math_prefix + '.integer', 
                             include_dirs = [utils_path,
-                                            benchmark_path],
+                                            benchmark_path] + inc_dirs,
                             sources = [math_path + 'integer/integermodule.c', 
                                         utils_path + 'base64.c'], 
                             libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
@@ -210,7 +211,7 @@ if opt.get('ECC_MOD') == 'yes':
    replaceString(lib_config_file, "ec_lib=libs ", "ec_lib=libs.openssl")    
    ecc_module = Extension(math_prefix + '.elliptic_curve',
                 include_dirs = [utils_path,
-                                benchmark_path], 
+                                benchmark_path] + inc_dirs,
 				sources = [math_path + 'elliptic_curve/ecmodule.c',
                             utils_path + 'base64.c'], 
 				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
@@ -251,7 +252,7 @@ setup(name = 'Charm-Crypto',
 	ext_modules = _ext_modules,
 	author = "J. Ayo Akinyele",
 	author_email = "ayo.akinyele@charm-crypto.com",
-	url = "http://charm-crypto.com/",
+	url = "http://charm-crypto.io/",
     install_requires = ['setuptools',
                         'pyparsing >= 1.5.5'],
     tests_require=['pytest'],
