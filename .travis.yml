@@ -11,7 +11,6 @@ before_install:
 # Install GMP
 - sudo apt-get install -y libgmp10 libgmp-dev
 # Install PBC
-- cd ./deps/pbc && make
 #- wget http://voltar.org/pbcfiles/libpbc0_0.5.12_amd64.deb
 #- wget http://voltar.org/pbcfiles/libpbc-dev_0.5.12_amd64.deb
 #- sudo dpkg -i libpbc0_0.5.12_amd64.deb
@@ -21,6 +20,7 @@ before_install:
 install:
 - pip install -r requirements.txt
 - ./configure.sh
+- cd ./deps/pbc && make && cd -
 - make
 - make install
 script:
