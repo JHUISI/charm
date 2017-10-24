@@ -12,7 +12,7 @@ ${LIBPBC}/.built: ${LIBPBC}
 	cd $<; \
 	./configure --prefix=$(prefix) && \
 	make && \
-	make install && \
+	sudo make install && \
 	touch .built
 
 ${LIBPBC}: ${LIBPBC}.tar.gz
