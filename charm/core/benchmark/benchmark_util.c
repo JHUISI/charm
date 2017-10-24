@@ -1,3 +1,5 @@
+
+#if defined(__APPLE__)
 // benchmark new
 PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
@@ -66,6 +68,8 @@ PyTypeObject BenchmarkType = {
   0,                         /* tp_alloc */
   Benchmark_new,                 /* tp_new */
 };
+
+#endif
 
 void Operations_dealloc(Operations *self)
 {

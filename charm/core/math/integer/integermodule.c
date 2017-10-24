@@ -2056,6 +2056,7 @@ static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 #ifdef BENCHMARK_ENABLED
 #define BenchmarkIdentifier 	3
 
+#if defined(__APPLE__)
 // benchmark new
 PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
@@ -2125,6 +2126,7 @@ PyTypeObject BenchmarkType = {
   Benchmark_new,                 /* tp_new */
 };
 
+#endif
 
 PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 	Benchmark *b = GETSTATE(self)->dBench;
