@@ -11,7 +11,7 @@ fi
 
 if [ -f "${PBC}-${VERSION}.tar.gz" ]; then
     echo "Found: ${PBC}-${VERSION}.tar.gz. Delete first if updating."
-    exit 1
+    exit 0
 fi
 
 wget ${REPO}/${PBC}-${VERSION}.tar.gz
