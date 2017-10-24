@@ -3,7 +3,7 @@ include ../config.mk
 .PHONY: all clean
 
 # relic openssl pbc
-DIRS=relic
+DIRS=relic pbc
 all: $(DIRS)
 	for d in $(DIRS); do \
 		make -C $$d; \
