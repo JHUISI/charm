@@ -1,0 +1,229 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>abenc_tbpre_lww14 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="abenc_unmcpabe_yahk14" href="abenc_unmcpabe_yahk14.html" />
+    <link rel="prev" title="abenc_maabe_yj14" href="abenc_maabe_yj14.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="abenc_unmcpabe_yahk14.html" title="abenc_unmcpabe_yahk14"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="abenc_maabe_yj14.html" title="abenc_maabe_yj14"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-abenc_tbpre_lww14">
+<span id="abenc-tbpre-lww14"></span><h1>abenc_tbpre_lww14<a class="headerlink" href="#module-abenc_tbpre_lww14" title="Permalink to this headline">¶</a></h1>
+<p>Qin Liu, Guojun Wang, Jie Wu</p>
+<div class="line-block">
+<div class="line">From: Time-based proxy re-encryption scheme for secure data sharing in a cloud environment</div>
+<div class="line">Published in: Information Sciences (Volume: 258, year: 2014)</div>
+<div class="line">Available From: <a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S0020025512006275">http://www.sciencedirect.com/science/article/pii/S0020025512006275</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:      ciphertext-policy attribute-based encryption (public key)</li>
+<li>setting:   Pairing</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">artjomb</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">07/2014</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="abenc_tbpre_lww14.TBPRE">
+<em class="property">class </em><code class="descclassname">abenc_tbpre_lww14.</code><code class="descname">TBPRE</code><span class="sig-paren">(</span><em>groupObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.decrypt">
+<code class="descname">decrypt</code><span class="sig-paren">(</span><em>CT</em>, <em>user</em>, <em>term=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrypts the content(-key) from the cipher-text (executed by user/content consumer)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.encrypt">
+<code class="descname">encrypt</code><span class="sig-paren">(</span><em>PK</em>, <em>policy</em>, <em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the cipher-text from the content(-key) and a policy (executed by the content owner)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="abenc_tbpre_lww14.TBPRE.group">
+<code class="descname">group</code><em class="property"> = None</em><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prime order group</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.hashDate">
+<code class="descname">hashDate</code><span class="sig-paren">(</span><em>H</em>, <em>time</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.hashDate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.hashDate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.keygen">
+<code class="descname">keygen</code><span class="sig-paren">(</span><em>MK</em>, <em>PK</em>, <em>H</em>, <em>s</em>, <em>user</em>, <em>pubuser</em>, <em>attribute</em>, <em>time</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.keygen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate user keys for a specific attribute (executed by CA)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.policyTerm">
+<code class="descname">policyTerm</code><span class="sig-paren">(</span><em>user</em>, <em>policy</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.policyTerm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.policyTerm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.reencrypt">
+<code class="descname">reencrypt</code><span class="sig-paren">(</span><em>PK</em>, <em>H</em>, <em>s</em>, <em>CT</em>, <em>currentTime</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.reencrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.reencrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Re-encrypts the cipher-text using the current time (executed by cloud service provider)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.registerUser">
+<code class="descname">registerUser</code><span class="sig-paren">(</span><em>PK</em>, <em>H</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.registerUser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.registerUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers a user by id (executed by user)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global Setup (executed by CA)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abenc_tbpre_lww14.TBPRE.timeSuffices">
+<code class="descname">timeSuffices</code><span class="sig-paren">(</span><em>timeRange</em>, <em>needle</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.timeSuffices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.timeSuffices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="abenc_tbpre_lww14.basicTest">
+<code class="descclassname">abenc_tbpre_lww14.</code><code class="descname">basicTest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#basicTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.basicTest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="abenc_tbpre_lww14.basicTest2">
+<code class="descclassname">abenc_tbpre_lww14.</code><code class="descname">basicTest2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#basicTest2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.basicTest2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Month-based attributes are used</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="abenc_tbpre_lww14.gcd">
+<code class="descclassname">abenc_tbpre_lww14.</code><code class="descname">gcd</code><span class="sig-paren">(</span><em>*numbers</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#gcd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.gcd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the greatest common divisor of the given integers</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="abenc_tbpre_lww14.lcm">
+<code class="descclassname">abenc_tbpre_lww14.</code><code class="descname">lcm</code><span class="sig-paren">(</span><em>numbers</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#lcm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.lcm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return lowest common multiple.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="abenc_tbpre_lww14.test">
+<code class="descclassname">abenc_tbpre_lww14.</code><code class="descname">test</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_tbpre_lww14.test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="abenc_maabe_yj14.html"
+                        title="previous chapter">abenc_maabe_yj14</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="abenc_unmcpabe_yahk14.html"
+                        title="next chapter">abenc_unmcpabe_yahk14</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/abenc/abenc_tbpre_lww14.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="abenc_unmcpabe_yahk14.html" title="abenc_unmcpabe_yahk14"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="abenc_maabe_yj14.html" title="abenc_maabe_yj14"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

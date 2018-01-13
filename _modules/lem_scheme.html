@@ -1,0 +1,285 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>lem_scheme &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for lem_scheme</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Iraklis Leontiadis, Kaoutar Elkhiyaoui, Refik Molva(Aggregation Scheme)</span>
+<span class="sd">   </span>
+<span class="sd">| From: &quot;Private and Dynamic Time-Series Data Aggregation with Trust Relaxation&quot; </span>
+<span class="sd">| Published in: CANS 2014</span>
+<span class="sd">| Available from: http://eprint.iacr.org/2014/256.pdf</span>
+<span class="sd"> </span>
+
+<span class="sd">   </span>
+<span class="sd">type:           Plaintext Evaluation of the sum from encrypted values. </span>
+<span class="sd">setting:        Integer</span>
+
+<span class="sd">Authors:    Iraklis Leontiadis</span>
+<span class="sd">Date:            2/2015</span>
+<span class="sd">&#39;&#39;&#39;</span>
+                          
+<span class="c1">#!/usr/bin/env python3</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">RSAGroup</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_paillier99</span> <span class="k">import</span> <span class="n">Pai99</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">lcm</span><span class="p">,</span><span class="n">integer</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKEnc</span> <span class="k">import</span> <span class="n">PKEnc</span>
+<span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">mktime</span>
+<span class="kn">import</span> <span class="nn">hashlib</span> <span class="o">,</span> <span class="nn">os</span> <span class="o">,</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">fractions</span> <span class="k">import</span> <span class="n">gcd</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="k">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>
+
+<span class="c1">#This generates values of p,q,n and n2</span>
+<span class="k">global</span> <span class="n">n</span><span class="p">,</span><span class="n">n2</span>
+<span class="n">group</span><span class="o">=</span><span class="n">RSAGroup</span><span class="p">()</span>
+<span class="n">pai</span><span class="o">=</span><span class="n">Pai99</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="p">(</span><span class="n">public_key</span><span class="p">,</span><span class="n">secret_key</span><span class="p">)</span><span class="o">=</span><span class="n">pai</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="n">npom</span><span class="o">=</span><span class="n">public_key</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span>
+<span class="n">n</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">npom</span><span class="p">)</span>
+<span class="n">nn</span><span class="o">=</span><span class="n">public_key</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span>
+<span class="n">n2</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
+
+<div class="viewcode-block" id="hash"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.hash">[docs]</a><span class="k">def</span> <span class="nf">hash</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Computing hash value of time</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">d</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%b/</span><span class="si">%d</span><span class="s2">/%Y/%H:%M:%S&quot;</span><span class="p">)</span>
+    <span class="n">e</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="n">c</span><span class="o">=</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="n">htp</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">htp</span> <span class="o">&lt;</span> <span class="n">n2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gcd</span><span class="p">(</span><span class="n">htp</span><span class="p">,</span><span class="n">n2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">htp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">hash</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">hash</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="secretkey"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.secretkey">[docs]</a><span class="k">def</span> <span class="nf">secretkey</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Generating random secret key smaller than n2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">b</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">ska</span><span class="o">=</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="s1">&#39;big&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ska</span> <span class="o">&lt;</span> <span class="n">n2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ska</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">secretkey</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Aggregator"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.Aggregator">[docs]</a><span class="k">class</span>  <span class="nc">Aggregator</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Class for computing Pka and generating Ska</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">pka</span><span class="p">,</span><span class="n">ht</span>
+        <span class="n">ht</span><span class="o">=</span><span class="nb">hash</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ska</span><span class="o">=</span><span class="n">secretkey</span><span class="p">()</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">gcd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ska</span><span class="p">,</span><span class="n">n2</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ska</span><span class="o">=</span><span class="n">secretkey</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pkap</span><span class="o">=</span><span class="nb">pow</span><span class="p">(</span><span class="n">ht</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ska</span><span class="p">,</span><span class="n">n2</span><span class="p">)</span>
+        <span class="n">pka</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pkap</span>
+
+<div class="viewcode-block" id="Aggregator.decrypt"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.Aggregator.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">encarray</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Decrypting the sum</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">cprod</span><span class="o">=</span><span class="mi">1</span>
+        <span class="c1">#length=len(encarray)</span>
+        <span class="c1">#for x in range(length):</span>
+
+         <span class="c1">#   cprod=(cprod*int(encarray[x]))</span>
+         <span class="c1">#   cprodfin=cprod%n2</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">encarray</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="p">:</span>
+            <span class="n">cprod</span> <span class="o">*=</span> <span class="n">x</span>
+            <span class="n">cprod</span> <span class="o">%=</span> <span class="n">n2</span>
+        <span class="n">cprodfin</span><span class="o">=</span><span class="n">cprod</span>
+        <span class="n">pt</span><span class="o">=</span><span class="nb">pow</span><span class="p">(</span><span class="n">cprodfin</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ska</span><span class="p">,</span><span class="n">n2</span><span class="p">)</span>
+        <span class="n">auxin</span><span class="o">=</span><span class="n">modinv</span><span class="p">(</span><span class="n">auxt</span><span class="p">,</span><span class="n">n2</span><span class="p">)</span>
+        <span class="n">it</span><span class="o">=</span><span class="p">(</span><span class="n">pt</span><span class="o">*</span><span class="n">auxin</span><span class="p">)</span><span class="o">%</span><span class="n">n2</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">pom1</span><span class="o">=</span><span class="n">it</span><span class="o">//</span><span class="n">n</span>
+        <span class="n">skapr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ska</span><span class="o">%</span><span class="n">n</span>
+        <span class="n">pom2</span><span class="o">=</span><span class="n">modinv</span><span class="p">(</span><span class="n">skapr</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">rez</span><span class="o">=</span><span class="p">(</span><span class="n">pom2</span><span class="o">*</span><span class="n">pom1</span><span class="p">)</span><span class="o">%</span><span class="n">n</span>
+        <span class="k">return</span> <span class="n">rez</span></div></div>
+       
+
+<div class="viewcode-block" id="encryptfunc"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.encryptfunc">[docs]</a><span class="k">def</span> <span class="nf">encryptfunc</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Encryption of one value, where a=plaintext(number), d=ski</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">v1</span><span class="o">=</span><span class="nb">pow</span><span class="p">(</span><span class="n">ht</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">n2</span><span class="p">)</span>
+    <span class="n">v2</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="n">n</span><span class="p">)</span><span class="o">%</span><span class="n">n2</span>
+    <span class="n">v3</span><span class="o">=</span><span class="p">(</span><span class="n">v1</span><span class="o">*</span><span class="n">v2</span><span class="p">)</span><span class="o">%</span><span class="n">n2</span>
+    <span class="n">rez</span><span class="o">=</span><span class="n">v3</span>
+    <span class="k">return</span> <span class="n">rez</span></div>
+
+<div class="viewcode-block" id="auxiliaryfunc"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.auxiliaryfunc">[docs]</a><span class="k">def</span> <span class="nf">auxiliaryfunc</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Auxiliary information of one value, where  b=ski </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">rez</span><span class="o">=</span><span class="nb">pow</span><span class="p">(</span><span class="n">pka</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">n2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rez</span></div>
+
+<div class="viewcode-block" id="egcd"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.egcd">[docs]</a><span class="k">def</span> <span class="nf">egcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Extended Euclidian gcd function between a and b</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">a</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">q</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">b</span><span class="o">//</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">%</span><span class="n">a</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">-</span><span class="n">u</span><span class="o">*</span><span class="n">q</span><span class="p">,</span> <span class="n">y</span><span class="o">-</span><span class="n">v</span><span class="o">*</span><span class="n">q</span>
+        <span class="n">b</span><span class="p">,</span><span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span><span class="n">v</span> <span class="o">=</span> <span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span><span class="n">n</span>
+    <span class="n">gcd</span> <span class="o">=</span> <span class="n">b</span>
+    <span class="k">return</span> <span class="n">gcd</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+<div class="viewcode-block" id="modinv"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.modinv">[docs]</a><span class="k">def</span> <span class="nf">modinv</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Finding modulo inverse of a mod m</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">gcd</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">egcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gcd</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># modular inverse does not exist</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">%</span> <span class="n">m</span></div>
+
+
+<div class="viewcode-block" id="Users"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.Users">[docs]</a><span class="k">class</span> <span class="nc">Users</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Computing users secret keys(ski) for users list *userdata</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">userdata</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">userdata</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dat</span><span class="o">=</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">userdata</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sk</span><span class="o">=</span><span class="p">[</span><span class="n">secretkey</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="Users.encrypt"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.Users.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Encrypts all user data into a list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">encp</span><span class="o">=</span><span class="p">[</span><span class="n">encryptfunc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dat</span><span class="p">[</span><span class="n">x</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">sk</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">encp</span></div>
+
+<div class="viewcode-block" id="Users.auxiliary"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.Users.auxiliary">[docs]</a>    <span class="k">def</span> <span class="nf">auxiliary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            Computes auxiliary for all users into a list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">array</span><span class="o">=</span><span class="p">[</span><span class="n">auxiliaryfunc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sk</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">array</span></div></div>
+
+<div class="viewcode-block" id="Collector"><a class="viewcode-back" href="../charm/schemes/lem_scheme.html#lem_scheme.Collector">[docs]</a><span class="k">class</span> <span class="nc">Collector</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Computes auxt from list of auxiliary information from all users</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">auxarray</span><span class="p">):</span>
+
+        <span class="k">global</span> <span class="n">auxt</span>
+        <span class="n">auxtpom</span><span class="o">=</span><span class="mi">1</span>
+        <span class="c1">#length=len(auxarray)</span>
+        <span class="c1">#for x in range(length):</span>
+        <span class="c1">#    auxtpom=(auxtpom*int(auxarray[x]))%n2</span>
+
+        <span class="c1">#auxt=auxtpom</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">auxarray</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="p">:</span>
+            <span class="n">auxtpom</span> <span class="o">*=</span> <span class="n">x</span>
+            <span class="n">auxtpom</span> <span class="o">%=</span> <span class="n">n2</span>
+        <span class="n">auxt</span><span class="o">=</span><span class="n">auxtpom</span></div>
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

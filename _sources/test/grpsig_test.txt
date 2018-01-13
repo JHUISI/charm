@@ -1,7 +1,0 @@
-
-grpsig_test
-=========================================
-.. automodule:: grpsig_test
-    :show-inheritance:
-    :members:
-    :undoc-members:

@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pk_vrf &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <title>pk_vrf &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../schemes.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pre_mg07" href="pre_mg07.html" />
-    <link rel="prev" title="encap_bchk05" href="encap_bchk05.html" /> 
+    <link rel="prev" title="lem_scheme" href="lem_scheme.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -42,23 +40,23 @@
           <a href="pre_mg07.html" title="pre_mg07"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="encap_bchk05.html" title="encap_bchk05"
+          <a href="lem_scheme.html" title="lem_scheme"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-pk_vrf">
 <span id="pk-vrf"></span><h1>pk_vrf<a class="headerlink" href="#module-pk_vrf" title="Permalink to this headline">¶</a></h1>
 <p>Susan Hohenberger and Brent Waters (Pairing-based)</p>
 <div class="line-block">
-<div class="line">From: &#8220;Constructing Verifiable Random Functions with Large Input Spaces&#8221;</div>
+<div class="line">From: “Constructing Verifiable Random Functions with Large Input Spaces”</div>
 <div class="line">Published in: ePrint</div>
 <div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2010/102.pdf">http://eprint.iacr.org/2010/102.pdf</a></div>
 <div class="line">Notes: applications to resetable ZK proofs, micropayment schemes, updatable ZK DBs
@@ -80,10 +78,10 @@ and verifiable transaction escrow schemes to name a few</div>
 </table>
 <dl class="class">
 <dt id="pk_vrf.VRF10">
-<em class="property">class </em><tt class="descclassname">pk_vrf.</tt><tt class="descname">VRF10</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+<em class="property">class </em><code class="descclassname">pk_vrf.</code><code class="descname">VRF10</code><span class="sig-paren">(</span><em>groupObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vrf</span> <span class="o">=</span> <span class="n">VRF10</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">statement</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span> 
@@ -95,30 +93,30 @@ and verifiable transaction escrow schemes to name a few</div>
 </div>
 <dl class="method">
 <dt id="pk_vrf.VRF10.F">
-<tt class="descname">F</tt><big>(</big><em>sk</em>, <em>x</em><big>)</big><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.F"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.F" title="Permalink to this definition">¶</a></dt>
+<code class="descname">F</code><span class="sig-paren">(</span><em>sk</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.F"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.F" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pk_vrf.VRF10.prove">
-<tt class="descname">prove</tt><big>(</big><em>sk</em>, <em>x</em><big>)</big><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.prove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.prove" title="Permalink to this definition">¶</a></dt>
+<code class="descname">prove</code><span class="sig-paren">(</span><em>sk</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.prove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.prove" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pk_vrf.VRF10.setup">
-<tt class="descname">setup</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.setup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setup</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>n = bit length of inputs</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pk_vrf.VRF10.verify">
-<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>x</em>, <em>st</em><big>)</big><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.verify" title="Permalink to this definition">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>pk</em>, <em>x</em>, <em>st</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.VRF10.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="pk_vrf.main">
-<tt class="descclassname">pk_vrf.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/pk_vrf.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pk_vrf.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pk_vrf.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -127,37 +125,36 @@ and verifiable transaction escrow schemes to name a few</div>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="encap_bchk05.html"
-                        title="previous chapter">encap_bchk05</a></p>
+  <p class="topless"><a href="lem_scheme.html"
+                        title="previous chapter">lem_scheme</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="pre_mg07.html"
                         title="next chapter">pre_mg07</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/charm/schemes/pk_vrf.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/charm/schemes/pk_vrf.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -170,16 +167,16 @@ and verifiable transaction escrow schemes to name a few</div>
           <a href="pre_mg07.html" title="pre_mg07"
              >next</a> |</li>
         <li class="right" >
-          <a href="encap_bchk05.html" title="encap_bchk05"
+          <a href="lem_scheme.html" title="lem_scheme"
              >previous</a> |</li>
-        <li><a href="../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

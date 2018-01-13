@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_hw &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <title>pksig_hw &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="pksig_rsa_hw09" href="pksig_rsa_hw09.html" />
     <link rel="prev" title="pksig_hess" href="pksig_hess.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,21 +42,21 @@
         <li class="right" >
           <a href="pksig_hess.html" title="pksig_hess"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-pksig_hw">
 <span id="pksig-hw"></span><h1>pksig_hw<a class="headerlink" href="#module-pksig_hw" title="Permalink to this headline">¶</a></h1>
 <p>Hohenberger-Waters - Realizing hash-and-sign signatures</p>
 <div class="line-block">
-<div class="line">From: &#8220;S. Hohenberger and B. Waters - Realizing hash-and-sign signatures under standard assumptions.&#8221;</div>
+<div class="line">From: “S. Hohenberger and B. Waters - Realizing hash-and-sign signatures under standard assumptions.”</div>
 <div class="line">Published in: EUROCRYPT 2009</div>
 <div class="line">Available from: pages 333-350</div>
 <div class="line">Notes: CDH construction</div>
@@ -83,43 +81,43 @@
 </table>
 <dl class="class">
 <dt id="pksig_hw.HW">
-<em class="property">class </em><tt class="descclassname">pksig_hw.</tt><tt class="descname">HW</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_hw.html#HW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></tt></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">GT</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+<em class="property">class </em><code class="descclassname">pksig_hw.</code><code class="descname">HW</code><span class="sig-paren">(</span><em>groupObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_hw.html#HW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">GT</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hw</span> <span class="o">=</span> <span class="n">HW</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">hw</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;please sign this message now please!&quot;</span>    
-<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">hw</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">public_key</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">],</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;please sign this message now please!&quot;</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">hw</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">public_key</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">],</span> <span class="n">msg</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hw</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <dl class="method">
 <dt id="pksig_hw.HW.ceilog">
-<tt class="descname">ceilog</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_hw.html#HW.ceilog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW.ceilog" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ceilog</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_hw.html#HW.ceilog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW.ceilog" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_hw.HW.setup">
-<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_hw.html#HW.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW.setup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_hw.html#HW.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW.setup" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_hw.HW.sign">
-<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>s</em>, <em>msg</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_hw.html#HW.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW.sign" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sign</code><span class="sig-paren">(</span><em>pk</em>, <em>sk</em>, <em>s</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_hw.html#HW.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW.sign" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_hw.HW.verify">
-<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>msg</em>, <em>sig</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_hw.html#HW.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW.verify" title="Permalink to this definition">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>pk</em>, <em>msg</em>, <em>sig</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_hw.html#HW.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.HW.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="pksig_hw.main">
-<tt class="descclassname">pksig_hw.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_hw.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pksig_hw.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_hw.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_hw.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -128,7 +126,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="pksig_hess.html"
@@ -136,29 +134,28 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="pksig_rsa_hw09.html"
                         title="next chapter">pksig_rsa_hw09</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../../_sources/charm/schemes/pksig/pksig_hw.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/pksig/pksig_hw.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -173,14 +170,14 @@
         <li class="right" >
           <a href="pksig_hess.html" title="pksig_hess"
              >previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

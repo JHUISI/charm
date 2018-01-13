@@ -1,0 +1,188 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>joye_scheme &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for joye_scheme</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">   Marc Joye, Benoit Libert  (Aggregation Scheme)</span>
+<span class="sd">    </span>
+<span class="sd">   | From: &quot;A Scalable Scheme for Privacy-Preserving Aggregation of Time-Series Data&quot; </span>
+<span class="sd">   | Published in: Financial Crypto 2013</span>
+<span class="sd">   | Available from: http://joye.site88.net/papers/JL13aggreg.pdf</span>
+
+<span class="sd">   | Notes: </span>
+<span class="sd">   </span>
+<span class="sd">   * type:           Plaintext Evaluation of the sum from encrypted values. </span>
+<span class="sd">   * setting:        Integer</span>
+<span class="sd">  </span>
+<span class="sd">  :Authors:    Iraklis Leontiadis</span>
+<span class="sd">  :Date:            12/2013</span>
+<span class="sd">&#39;&#39;&#39;</span>
+ 
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">RSAGroup</span> 
+<span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_paillier99</span> <span class="k">import</span> <span class="n">Pai99</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">lcm</span><span class="p">,</span><span class="n">integer</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKEnc</span> <span class="k">import</span> <span class="n">PKEnc</span>
+<span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Test script for two values</span>
+<span class="sd">===========================</span>
+<span class="sd">group = RSAGroup()</span>
+<span class="sd">pai = Pai99(group)</span>
+<span class="sd">(public_key, secret_key) = pai.keygen()</span>
+<span class="sd">n=public_key[&#39;n&#39;]</span>
+<span class="sd">n2=public_key[&#39;n2&#39;]</span>
+<span class="sd">x1=3 #testing values for user 1</span>
+<span class="sd">x2=2 #testing values for user 2</span>
+<span class="sd">msg1 = pai.encode(n2, 1+x1*n)</span>
+<span class="sd">msg2 = pai.encode(n2, 1+x2*n)</span>
+<span class="sd">  </span>
+<span class="sd">prod=pai.encode(n2,msg1*msg2)</span>
+<span class="sd">print (integer(prod-integer(1)%n2)/n)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Joye"><a class="viewcode-back" href="../charm/schemes/joye_scheme.html#joye_scheme.Joye">[docs]</a><span class="k">class</span> <span class="nc">Joye</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">users</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">pai</span><span class="p">,</span><span class="n">group</span>
+        <span class="n">group</span><span class="o">=</span><span class="n">RSAGroup</span><span class="p">()</span>
+        <span class="n">pai</span><span class="o">=</span><span class="n">Pai99</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="o">=</span><span class="n">users</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">=</span><span class="mi">14</span> <span class="c1">#this value act as the common hash output H(r) according to the protocol.</span>
+
+<div class="viewcode-block" id="Joye.destruction_keys"><a class="viewcode-back" href="../charm/schemes/joye_scheme.html#joye_scheme.Joye.destruction_keys">[docs]</a>    <span class="k">def</span> <span class="nf">destruction_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">pk</span><span class="p">):</span>
+        <span class="n">k</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">):</span>
+            <span class="n">k</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span><span class="o">=</span><span class="n">integer</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">102</span><span class="p">))</span><span class="c1">#exponentiation works only for small keys (needs investigation)</span>
+        <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">integer</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="c1">#inverse of the sum of all user keys. Acts as annihilation for keys.</span>
+        <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>           
+        <span class="c1">#self.ak=integer(1)/integer(self.r)**integer(k[0])</span>
+        <span class="k">return</span> <span class="n">k</span></div>
+
+<div class="viewcode-block" id="Joye.encrypt"><a class="viewcode-back" href="../charm/schemes/joye_scheme.html#joye_scheme.Joye.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">pk</span><span class="p">,</span><span class="n">sk</span><span class="p">):</span>
+        <span class="n">c1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">pk</span><span class="p">)</span><span class="o">%</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span>
+        <span class="n">c2</span><span class="o">=</span><span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">],</span><span class="n">integer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="o">%</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">])</span><span class="o">**</span><span class="n">integer</span><span class="p">(</span><span class="n">sk</span><span class="o">%</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]))</span>
+        <span class="n">cipher</span><span class="o">=</span><span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">],</span><span class="n">c1</span><span class="o">*</span><span class="n">c2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cipher</span></div>
+
+    <span class="sd">&#39;&#39;&#39;def decrypt(self,c,pk,sk):</span>
+<span class="sd">        c=pai.encode(pk[&#39;n2&#39;],c)</span>
+<span class="sd">        mul=pai.encode(pk[&#39;n2&#39;],integer(self.r)**integer(sk))</span>
+<span class="sd">        inter=pai.encode(pk[&#39;n2&#39;],c*mul)</span>
+<span class="sd">        result =pai.encode(pk[&#39;n&#39;],integer(inter-integer(1)%pk[&#39;n2&#39;])/pk[&#39;n&#39;])</span>
+<span class="sd">        return result</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Joye.keygen"><a class="viewcode-back" href="../charm/schemes/joye_scheme.html#joye_scheme.Joye.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">public_key</span><span class="p">,</span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">pai</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">public_key</span></div>
+
+<div class="viewcode-block" id="Joye.encode"><a class="viewcode-back" href="../charm/schemes/joye_scheme.html#joye_scheme.Joye.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">pk</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="o">+</span><span class="n">integer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Joye.sumfree"><a class="viewcode-back" href="../charm/schemes/joye_scheme.html#joye_scheme.Joye.sumfree">[docs]</a>    <span class="k">def</span> <span class="nf">sumfree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">pk</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Tests sum evaluations without encryption&#39;&#39;&#39;</span>
+        <span class="n">msg1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">msg2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">prod</span><span class="o">=</span><span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">],</span><span class="n">msg1</span><span class="o">*</span><span class="n">msg2</span><span class="p">)</span>
+        <span class="n">sumres</span><span class="o">=</span><span class="n">integer</span><span class="p">(</span><span class="n">prod</span><span class="o">%</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">integer</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">])</span><span class="o">/</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">sumres</span></div>
+
+<div class="viewcode-block" id="Joye.sum"><a class="viewcode-back" href="../charm/schemes/joye_scheme.html#joye_scheme.Joye.sum">[docs]</a>    <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">pk</span><span class="p">,</span><span class="n">k0</span><span class="p">):</span>
+        <span class="n">prod</span><span class="o">=</span><span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">],</span><span class="n">x1</span><span class="o">*</span><span class="n">x2</span><span class="p">)</span>
+        <span class="n">inter</span><span class="o">=</span><span class="n">pai</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">],</span><span class="n">integer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span><span class="o">**</span><span class="n">integer</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">k0</span><span class="p">))</span>
+        <span class="n">inter2</span><span class="o">=</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span><span class="o">/</span><span class="n">integer</span><span class="p">(</span><span class="n">inter</span><span class="p">))</span>
+        <span class="n">sumres</span><span class="o">=</span><span class="n">integer</span><span class="p">(</span><span class="n">inter2</span><span class="o">%</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">integer</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">])</span><span class="o">/</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">sumres</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">joye</span> <span class="o">=</span> <span class="n">Joye</span><span class="p">()</span>
+    <span class="n">pk</span> <span class="o">=</span> <span class="n">joye</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">joye</span><span class="o">.</span><span class="n">destruction_keys</span><span class="p">(</span><span class="n">pk</span><span class="p">)</span>
+
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">joye</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">pk</span><span class="p">,</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;k0&#39;</span><span class="p">])</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">joye</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="n">pk</span><span class="p">,</span><span class="n">k</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">])</span>
+    
+    <span class="nb">print</span> <span class="p">(</span><span class="n">joye</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">c2</span><span class="p">,</span><span class="n">pk</span><span class="p">,</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

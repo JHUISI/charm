@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pkenc_rsa &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <title>pkenc_rsa &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
-    <link rel="next" title="chamhash_adm05" href="../chamhash_adm05.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="pksig_bls04" href="../pksig/pksig_bls04.html" />
     <link rel="prev" title="pkenc_rabin" href="pkenc_rabin.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -39,25 +37,25 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../chamhash_adm05.html" title="chamhash_adm05"
+          <a href="../pksig/pksig_bls04.html" title="pksig_bls04"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="pkenc_rabin.html" title="pkenc_rabin"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-pkenc_rsa">
 <span id="pkenc-rsa"></span><h1>pkenc_rsa<a class="headerlink" href="#module-pkenc_rsa" title="Permalink to this headline">¶</a></h1>
 <div class="line-block">
-<div class="line">From: &#8220;Rivest-Shamir-Adleman Standard algorithm&#8221;.</div>
+<div class="line">From: “Rivest-Shamir-Adleman Standard algorithm”.</div>
 <div class="line">Published in: 1978</div>
 <div class="line">Security Assumption: RSA factoring</div>
 </div>
@@ -77,32 +75,32 @@
 </table>
 <dl class="class">
 <dt id="pkenc_rsa.RSA">
-<em class="property">class </em><tt class="descclassname">pkenc_rsa.</tt><tt class="descname">RSA</tt><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">pkenc_rsa.</code><code class="descname">RSA</code><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="pkenc_rsa.RSA.convert">
-<tt class="descname">convert</tt><big>(</big><em>N</em>, <em>e</em>, <em>d</em>, <em>p</em>, <em>q</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA.convert" title="Permalink to this definition">¶</a></dt>
+<code class="descname">convert</code><span class="sig-paren">(</span><em>N</em>, <em>e</em>, <em>d</em>, <em>p</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA.convert" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pkenc_rsa.RSA.keygen">
-<tt class="descname">keygen</tt><big>(</big><em>secparam=1024</em>, <em>params=None</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA.keygen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">keygen</code><span class="sig-paren">(</span><em>secparam=1024</em>, <em>params=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA.keygen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pkenc_rsa.RSA.paramgen">
-<tt class="descname">paramgen</tt><big>(</big><em>secparam</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA.paramgen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">paramgen</code><span class="sig-paren">(</span><em>secparam</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA.paramgen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="pkenc_rsa.RSA_Enc">
-<em class="property">class </em><tt class="descclassname">pkenc_rsa.</tt><tt class="descname">RSA_Enc</tt><big>(</big><em>padding=&lt;charm.toolbox.paddingschemes.OAEPEncryptionPadding object at 0x1040457d0&gt;</em>, <em>params=None</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pkenc_rsa.RSA" title="pkenc_rsa.RSA"><tt class="xref py py-class docutils literal"><span class="pre">pkenc_rsa.RSA</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKEnc.PKEnc</span></tt></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Enc</span><span class="p">()</span>
+<em class="property">class </em><code class="descclassname">pkenc_rsa.</code><code class="descname">RSA_Enc</code><span class="sig-paren">(</span><em>padding=&lt;charm.toolbox.paddingschemes.OAEPEncryptionPadding object&gt;</em>, <em>params=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pkenc_rsa.RSA" title="pkenc_rsa.RSA"><code class="xref py py-class docutils literal"><span class="pre">pkenc_rsa.RSA</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKEnc.PKEnc</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Enc</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;This is a test&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
@@ -111,21 +109,21 @@
 </div>
 <dl class="method">
 <dt id="pkenc_rsa.RSA_Enc.decrypt">
-<tt class="descname">decrypt</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>c</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc.decrypt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decrypt</code><span class="sig-paren">(</span><em>pk</em>, <em>sk</em>, <em>c</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc.decrypt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pkenc_rsa.RSA_Enc.encrypt">
-<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>m</em>, <em>salt=None</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc.encrypt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encrypt</code><span class="sig-paren">(</span><em>pk</em>, <em>m</em>, <em>salt=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc.encrypt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="pkenc_rsa.RSA_Sig">
-<em class="property">class </em><tt class="descclassname">pkenc_rsa.</tt><tt class="descname">RSA_Sig</tt><big>(</big><em>padding=&lt;charm.toolbox.paddingschemes.PSSPadding object at 0x1040c4fd0&gt;</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pkenc_rsa.RSA" title="pkenc_rsa.RSA"><tt class="xref py py-class docutils literal"><span class="pre">pkenc_rsa.RSA</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></tt></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;This is a test message.&#39;</span>
+<em class="property">class </em><code class="descclassname">pkenc_rsa.</code><code class="descname">RSA_Sig</code><span class="sig-paren">(</span><em>padding=&lt;charm.toolbox.paddingschemes.PSSPadding object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pkenc_rsa.RSA" title="pkenc_rsa.RSA"><code class="xref py py-class docutils literal"><span class="pre">pkenc_rsa.RSA</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;This is a test message.&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Sig</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
@@ -135,12 +133,12 @@
 </div>
 <dl class="method">
 <dt id="pkenc_rsa.RSA_Sig.sign">
-<tt class="descname">sign</tt><big>(</big><em>sk</em>, <em>M</em>, <em>salt=None</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig.sign" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sign</code><span class="sig-paren">(</span><em>sk</em>, <em>M</em>, <em>salt=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig.sign" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pkenc_rsa.RSA_Sig.verify">
-<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>M</em>, <em>S</em><big>)</big><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig.verify" title="Permalink to this definition">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>pk</em>, <em>M</em>, <em>S</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -151,37 +149,36 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="pkenc_rabin.html"
                         title="previous chapter">pkenc_rabin</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../chamhash_adm05.html"
-                        title="next chapter">chamhash_adm05</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../../_sources/charm/schemes/pkenc/pkenc_rsa.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <p class="topless"><a href="../pksig/pksig_bls04.html"
+                        title="next chapter">pksig_bls04</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/pkenc/pkenc_rsa.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -191,19 +188,19 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../chamhash_adm05.html" title="chamhash_adm05"
+          <a href="../pksig/pksig_bls04.html" title="pksig_bls04"
              >next</a> |</li>
         <li class="right" >
           <a href="pkenc_rabin.html" title="pkenc_rabin"
              >previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

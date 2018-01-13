@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_test &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>pksig_test &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,48 +34,48 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for pksig_test</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">charm.adapters.pksig_adapt_naor01</span> <span class="kn">import</span> <span class="n">Sig_Generic_ibetosig_Naor01</span>
-<span class="kn">from</span> <span class="nn">charm.adapters.ibenc_adapt_identityhash</span> <span class="kn">import</span> <span class="n">HashIDAdapter</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.ibenc.ibenc_bb03</span> <span class="kn">import</span> <span class="n">IBE_BB04</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_bls04</span> <span class="kn">import</span> <span class="n">BLS01</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_boyen</span> <span class="kn">import</span> <span class="n">Boyen</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_chch</span> <span class="kn">import</span> <span class="n">CHCH</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_chp</span> <span class="kn">import</span> <span class="n">CHP</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_cl03</span> <span class="kn">import</span> <span class="n">Sig_CL03</span><span class="p">,</span> <span class="n">SHA1</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_cl04</span> <span class="kn">import</span> <span class="n">CL04</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_cyh</span> <span class="kn">import</span> <span class="n">CYH</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_dsa</span> <span class="kn">import</span> <span class="n">DSA</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_ecdsa</span> <span class="kn">import</span> <span class="n">ECDSA</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_hess</span> <span class="kn">import</span> <span class="n">Hess</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_hw</span> <span class="kn">import</span> <span class="n">HW</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_rsa_hw09</span> <span class="kn">import</span> <span class="n">Sig_RSA_Stateless_HW09</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_schnorr91</span> <span class="kn">import</span> <span class="n">SchnorrSig</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_waters05</span> <span class="kn">import</span> <span class="n">IBE_N04_Sig</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_waters09</span> <span class="kn">import</span> <span class="n">IBEWaters09</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_waters</span> <span class="kn">import</span> <span class="n">WatersSig</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">ZR</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v2</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">integer</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.hash_module</span> <span class="kn">import</span> <span class="n">Waters</span>
+<span></span><span class="kn">from</span> <span class="nn">charm.adapters.pksig_adapt_naor01</span> <span class="k">import</span> <span class="n">Sig_Generic_ibetosig_Naor01</span>
+<span class="kn">from</span> <span class="nn">charm.adapters.ibenc_adapt_identityhash</span> <span class="k">import</span> <span class="n">HashIDAdapter</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.ibenc.ibenc_bb03</span> <span class="k">import</span> <span class="n">IBE_BB04</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_bls04</span> <span class="k">import</span> <span class="n">BLS01</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_boyen</span> <span class="k">import</span> <span class="n">Boyen</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_chch</span> <span class="k">import</span> <span class="n">CHCH</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_chp</span> <span class="k">import</span> <span class="n">CHP</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_cl03</span> <span class="k">import</span> <span class="n">Sig_CL03</span><span class="p">,</span> <span class="n">SHA1</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_cl04</span> <span class="k">import</span> <span class="n">CL04</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_cyh</span> <span class="k">import</span> <span class="n">CYH</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_dsa</span> <span class="k">import</span> <span class="n">DSA</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_ecdsa</span> <span class="k">import</span> <span class="n">ECDSA</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_hess</span> <span class="k">import</span> <span class="n">Hess</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_hw</span> <span class="k">import</span> <span class="n">HW</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_rsa_hw09</span> <span class="k">import</span> <span class="n">Sig_RSA_Stateless_HW09</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_schnorr91</span> <span class="k">import</span> <span class="n">SchnorrSig</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_waters05</span> <span class="k">import</span> <span class="n">IBE_N04_Sig</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_waters09</span> <span class="k">import</span> <span class="n">IBEWaters09</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.pksig.pksig_waters</span> <span class="k">import</span> <span class="n">WatersSig</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">ZR</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="k">import</span> <span class="n">ECGroup</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="k">import</span> <span class="n">prime192v2</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">integer</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.hash_module</span> <span class="k">import</span> <span class="n">Waters</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
-<span class="c">#import pytest</span>
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1">#import pytest</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="PKSig_Naor01Test"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.PKSig_Naor01Test">[docs]</a><span class="k">class</span> <span class="nc">PKSig_Naor01Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="PKSig_Naor01Test.testPKSig_Naor01"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.PKSig_Naor01Test.testPKSig_Naor01">[docs]</a>    <span class="k">def</span> <span class="nf">testPKSig_Naor01</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
         
         <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
         
@@ -86,104 +84,104 @@
 
         <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
         
-        <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;I want a signature on this message!&quot;</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="s2">&quot;I want a signature on this message!&quot;</span>
 
         <span class="n">sigma</span> <span class="o">=</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Message =&gt;&quot;</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Sigma =&gt;&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Message =&gt;&quot;</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sigma =&gt;&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
         
-        <span class="k">assert</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sigma</span><span class="p">),</span> <span class="s">&quot;Failed Verification!!!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Verification!!!&quot;</span><span class="p">)</span>
-        <span class="k">del</span> <span class="n">groupObj</span>
-</div></div>
+        <span class="k">assert</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sigma</span><span class="p">),</span> <span class="s2">&quot;Failed Verification!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful Verification!!!&quot;</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">groupObj</span></div></div>
+
 <div class="viewcode-block" id="BLS01Test"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.BLS01Test">[docs]</a><span class="k">class</span> <span class="nc">BLS01Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="BLS01Test.testBLS04"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.BLS01Test.testBLS04">[docs]</a>    <span class="k">def</span> <span class="nf">testBLS04</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
         
-        <span class="n">m</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;a&#39;</span><span class="p">:</span><span class="s">&quot;hello world!!!&quot;</span> <span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span><span class="s">&quot;test message&quot;</span> <span class="p">}</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="s2">&quot;hello world!!!&quot;</span> <span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="s2">&quot;test message&quot;</span> <span class="p">}</span>
         <span class="n">bls</span> <span class="o">=</span> <span class="n">BLS01</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
         
         <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         
-        <span class="n">sig</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">],</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">m</span><span class="p">)</span>
         
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Message: &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature: &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">sig</span><span class="p">)</span>     
-        <span class="k">assert</span> <span class="n">bls</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s">&quot;Failure!!!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;SUCCESS!!!&#39;</span><span class="p">)</span>
-</div></div>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Message: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">sig</span><span class="p">)</span>     
+        <span class="k">assert</span> <span class="n">bls</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s2">&quot;Failure!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SUCCESS!!!&#39;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="BoyenTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.BoyenTest">[docs]</a><span class="k">class</span> <span class="nc">BoyenTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="BoyenTest.testBoyen"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.BoyenTest.testBoyen">[docs]</a>    <span class="k">def</span> <span class="nf">testBoyen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
-       <span class="c">#groupObj = PairingGroup(MNT160)</span>
+       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+       <span class="c1">#groupObj = PairingGroup(MNT160)</span>
        <span class="n">boyen</span> <span class="o">=</span> <span class="n">Boyen</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
        <span class="n">mpk</span> <span class="o">=</span> <span class="n">boyen</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Pub parameters&quot;</span><span class="p">)</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pub parameters&quot;</span><span class="p">)</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
        
        <span class="n">num_signers</span> <span class="o">=</span> <span class="mi">3</span>
        <span class="n">L_keys</span> <span class="o">=</span> <span class="p">[</span> <span class="n">boyen</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_signers</span><span class="p">)]</span>     
        <span class="n">L_pk</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">L_sk</span> <span class="o">=</span> <span class="p">{}</span>
        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">L_keys</span><span class="p">)):</span>
-           <span class="n">L_pk</span><span class="p">[</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span> <span class="o">=</span> <span class="n">L_keys</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="mi">0</span> <span class="p">]</span> <span class="c"># pk</span>
+           <span class="n">L_pk</span><span class="p">[</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span> <span class="o">=</span> <span class="n">L_keys</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="mi">0</span> <span class="p">]</span> <span class="c1"># pk</span>
            <span class="n">L_sk</span><span class="p">[</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="p">]</span> <span class="o">=</span> <span class="n">L_keys</span><span class="p">[</span> <span class="n">i</span> <span class="p">][</span> <span class="mi">1</span> <span class="p">]</span>
 
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sec keys =&gt;&quot;</span><span class="p">,</span> <span class="n">L_sk</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">L_sk</span><span class="p">)</span> 
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keygen...&quot;</span><span class="p">)</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sec keys =&gt;&quot;</span><span class="p">,</span> <span class="n">L_sk</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">L_sk</span><span class="p">)</span> 
 
        <span class="n">signer</span> <span class="o">=</span> <span class="mi">3</span>
        <span class="n">sk</span> <span class="o">=</span> <span class="n">L_sk</span><span class="p">[</span><span class="n">signer</span><span class="p">]</span> 
-       <span class="n">M</span> <span class="o">=</span> <span class="s">&#39;please sign this new message!&#39;</span>
+       <span class="n">M</span> <span class="o">=</span> <span class="s1">&#39;please sign this new message!&#39;</span>
        <span class="n">sig</span> <span class="o">=</span> <span class="n">boyen</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">signer</span><span class="p">,</span> <span class="n">mpk</span><span class="p">,</span> <span class="n">L_pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Signature...&quot;</span><span class="p">)</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Signature...&quot;</span><span class="p">)</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
 
-       <span class="k">assert</span> <span class="n">boyen</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L_pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
-</div></div>
+       <span class="k">assert</span> <span class="n">boyen</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L_pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;invalid signature!&quot;</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Verification successful!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="CHCHTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CHCHTest">[docs]</a><span class="k">class</span> <span class="nc">CHCHTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="CHCHTest.testCHCH"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CHCHTest.testCHCH">[docs]</a>    <span class="k">def</span> <span class="nf">testCHCH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
        <span class="n">chch</span> <span class="o">=</span> <span class="n">CHCH</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
        <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
-       <span class="n">_id</span> <span class="o">=</span> <span class="s">&quot;janedoe@email.com&quot;</span>
+       <span class="n">_id</span> <span class="o">=</span> <span class="s2">&quot;janedoe@email.com&quot;</span>
        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">_id</span><span class="p">)</span>  
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keygen...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
      
-       <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;this is a message!&quot;</span> 
+       <span class="n">M</span> <span class="o">=</span> <span class="s2">&quot;this is a message!&quot;</span> 
        <span class="n">sig</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
 
-       <span class="k">assert</span> <span class="n">chch</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
-</div></div>
+       <span class="k">assert</span> <span class="n">chch</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;invalid signature!&quot;</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Verification successful!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="CHPTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CHPTest">[docs]</a><span class="k">class</span> <span class="nc">CHPTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="CHPTest.testCHP"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CHPTest.testCHP">[docs]</a>    <span class="k">def</span> <span class="nf">testCHP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
        <span class="n">chp</span> <span class="o">=</span> <span class="n">CHP</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
        <span class="n">mpk</span> <span class="o">=</span> <span class="n">chp</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chp</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span> 
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> 
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keygen...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
       
-       <span class="n">M</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;t1&#39;</span><span class="p">:</span><span class="s">&#39;time_1&#39;</span><span class="p">,</span> <span class="s">&#39;t2&#39;</span><span class="p">:</span><span class="s">&#39;time_2&#39;</span><span class="p">,</span> <span class="s">&#39;t3&#39;</span><span class="p">:</span><span class="s">&#39;time_3&#39;</span><span class="p">,</span> <span class="s">&#39;str&#39;</span><span class="p">:</span><span class="s">&#39;this is the message&#39;</span><span class="p">}</span>
+       <span class="n">M</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;t1&#39;</span><span class="p">:</span><span class="s1">&#39;time_1&#39;</span><span class="p">,</span> <span class="s1">&#39;t2&#39;</span><span class="p">:</span><span class="s1">&#39;time_2&#39;</span><span class="p">,</span> <span class="s1">&#39;t3&#39;</span><span class="p">:</span><span class="s1">&#39;time_3&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">:</span><span class="s1">&#39;this is the message&#39;</span><span class="p">}</span>
        <span class="n">sig</span> <span class="o">=</span> <span class="n">chp</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
 
-       <span class="k">assert</span> <span class="n">chp</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
-</div></div>
+       <span class="k">assert</span> <span class="n">chp</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;invalid signature!&quot;</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Verification successful!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="CL03Test"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CL03Test">[docs]</a><span class="k">class</span> <span class="nc">CL03Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="CL03Test.testCL03"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CL03Test.testCL03">[docs]</a>    <span class="k">def</span> <span class="nf">testCL03</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">pksig</span> <span class="o">=</span> <span class="n">Sig_CL03</span><span class="p">()</span> 
@@ -193,63 +191,63 @@
 
         <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Public parameters...&quot;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Public parameters...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
         
-        <span class="n">m</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">SHA1</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;This is the message I want to hash.&#39;</span><span class="p">))</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">SHA1</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;This is the message I want to hash.&#39;</span><span class="p">))</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
         
-        <span class="k">assert</span> <span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;FAILED VERIFICATION!!!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Verification!!!&quot;</span><span class="p">)</span>
-</div></div>
+        <span class="k">assert</span> <span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;FAILED VERIFICATION!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful Verification!!!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="CL04Test"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CL04Test">[docs]</a><span class="k">class</span> <span class="nc">CL04Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="CL04Test.testCL04"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CL04Test.testCL04">[docs]</a>    <span class="k">def</span> <span class="nf">testCL04</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">grp</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+        <span class="n">grp</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
         <span class="n">cl</span> <span class="o">=</span> <span class="n">CL04</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
         
         <span class="n">mpk</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
         
         <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">mpk</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk :=&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk :=&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keygen...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pk :=&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sk :=&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
         
-        <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;Please sign this stupid message!&quot;</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="s2">&quot;Please sign this stupid message!&quot;</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature: &quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature: &quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
         
         <span class="n">result</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">result</span><span class="p">,</span> <span class="s">&quot;INVALID signature!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Verification!!!&quot;</span><span class="p">)</span>
-</div></div>
+        <span class="k">assert</span> <span class="n">result</span><span class="p">,</span> <span class="s2">&quot;INVALID signature!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful Verification!!!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="CYHTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CYHTest">[docs]</a><span class="k">class</span> <span class="nc">CYHTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="CYHTest.testCYH"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.CYHTest.testCYH">[docs]</a>    <span class="k">def</span> <span class="nf">testCYH</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-       <span class="n">L</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;alice&quot;</span><span class="p">,</span> <span class="s">&quot;bob&quot;</span><span class="p">,</span> <span class="s">&quot;carlos&quot;</span><span class="p">,</span> <span class="s">&quot;dexter&quot;</span><span class="p">,</span> <span class="s">&quot;eddie&quot;</span><span class="p">]</span> 
-       <span class="n">ID</span> <span class="o">=</span> <span class="s">&quot;bob&quot;</span>
-       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+       <span class="n">L</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;alice&quot;</span><span class="p">,</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span> <span class="s2">&quot;carlos&quot;</span><span class="p">,</span> <span class="s2">&quot;dexter&quot;</span><span class="p">,</span> <span class="s2">&quot;eddie&quot;</span><span class="p">]</span> 
+       <span class="n">ID</span> <span class="o">=</span> <span class="s2">&quot;bob&quot;</span>
+       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
        <span class="n">cyh</span> <span class="o">=</span> <span class="n">CYH</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
        <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cyh</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
        <span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">Pk</span><span class="p">,</span> <span class="n">Sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">cyh</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>  
        <span class="n">sk</span> <span class="o">=</span> <span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">Pk</span><span class="p">,</span> <span class="n">Sk</span><span class="p">)</span>
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keygen...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
       
-       <span class="n">M</span> <span class="o">=</span> <span class="s">&#39;please sign this new message!&#39;</span>
+       <span class="n">M</span> <span class="o">=</span> <span class="s1">&#39;please sign this new message!&#39;</span>
        <span class="n">sig</span> <span class="o">=</span> <span class="n">cyh</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
 
-       <span class="k">assert</span> <span class="n">cyh</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
-</div></div>
+       <span class="k">assert</span> <span class="n">cyh</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;invalid signature!&quot;</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Verification successful!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="DSATest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.DSATest">[docs]</a><span class="k">class</span> <span class="nc">DSATest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="DSATest.testDSA"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.DSATest.testDSA">[docs]</a>    <span class="k">def</span> <span class="nf">testDSA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679</span><span class="p">)</span>
@@ -257,98 +255,98 @@
         <span class="n">dsa</span> <span class="o">=</span> <span class="n">DSA</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
 
         <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">dsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="s">&quot;hello world test message!!!&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;hello world test message!!!&quot;</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">dsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">dsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s">&quot;Failed verification!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature Verified!!!&quot;</span><span class="p">)</span>
-</div></div>
+        <span class="k">assert</span> <span class="n">dsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s2">&quot;Failed verification!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature Verified!!!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="ECDSATest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.ECDSATest">[docs]</a><span class="k">class</span> <span class="nc">ECDSATest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="ECDSATest.testECDSA"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.ECDSATest.testECDSA">[docs]</a>    <span class="k">def</span> <span class="nf">testECDSA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v2</span><span class="p">)</span>
         <span class="n">ecdsa</span> <span class="o">=</span> <span class="n">ECDSA</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
         
         <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ecdsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="s">&quot;hello world! this is a test message.&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;hello world! this is a test message.&quot;</span>
 
         <span class="n">sig</span> <span class="o">=</span> <span class="n">ecdsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">ecdsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s">&quot;Failed verification!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature Verified!!!&quot;</span><span class="p">)</span>
-</div></div>
+        <span class="k">assert</span> <span class="n">ecdsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s2">&quot;Failed verification!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature Verified!!!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="HessTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.HessTest">[docs]</a><span class="k">class</span> <span class="nc">HessTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="HessTest.testHess"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.HessTest.testHess">[docs]</a>    <span class="k">def</span> <span class="nf">testHess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
        <span class="n">chch</span> <span class="o">=</span> <span class="n">Hess</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
        <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
-       <span class="n">_id</span> <span class="o">=</span> <span class="s">&quot;janedoe@email.com&quot;</span>
+       <span class="n">_id</span> <span class="o">=</span> <span class="s2">&quot;janedoe@email.com&quot;</span>
        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">_id</span><span class="p">)</span>
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>  
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keygen...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
      
-       <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;this is a message!&quot;</span> 
+       <span class="n">M</span> <span class="o">=</span> <span class="s2">&quot;this is a message!&quot;</span> 
        <span class="n">sig</span> <span class="o">=</span> <span class="n">chch</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
 
-       <span class="k">assert</span> <span class="n">chch</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
-</div></div>
+       <span class="k">assert</span> <span class="n">chch</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;invalid signature!&quot;</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Verification successful!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="HWTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.HWTest">[docs]</a><span class="k">class</span> <span class="nc">HWTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="HWTest.testHW"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.HWTest.testHW">[docs]</a>    <span class="k">def</span> <span class="nf">testHW</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c">#AES_SECURITY = 80</span>
-        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="c1">#AES_SECURITY = 80</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
         <span class="n">hw</span> <span class="o">=</span> <span class="n">HW</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
         
         <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">hw</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Public parameters&quot;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Public parameters&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pk =&gt;&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
 
-        <span class="n">m</span> <span class="o">=</span> <span class="s">&quot;please sign this message now please!&quot;</span>    
-        <span class="n">sig</span> <span class="o">=</span> <span class="n">hw</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">],</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;please sign this message now please!&quot;</span>    
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">hw</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">],</span> <span class="n">m</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">hw</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification Successful!!&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">hw</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;invalid signature&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Verification Successful!!&quot;</span><span class="p">)</span></div></div>
 
-<span class="c">#@pytest.mark.skpifif(&quot;1=1&quot;)</span>
-<span class="c">#class RSA_HW09Test(unittest.TestCase):</span>
-<span class="c">#    def testRSA_HW09(self):</span>
-<span class="c">#        pksig = Sig_RSA_Stateless_HW09() </span>
-<span class="c">#        # fixed params for unit tests</span>
-<span class="c">#        p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207)</span>
-<span class="c">#        q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543)</span>
-<span class="c">#        (pk, sk) = pksig.keygen(1024, p, q)</span>
-<span class="c">#        if debug:</span>
-<span class="c">#            print(&quot;Public parameters...&quot;)</span>
-<span class="c">#            print(&quot;pk =&gt;&quot;, pk)</span>
-<span class="c">#            print(&quot;sk =&gt;&quot;, sk)</span>
-<span class="c">#        </span>
-<span class="c">#        m = SHA1(b&#39;this is the message I want to hash.&#39;)</span>
-<span class="c">#        m2 = SHA1(b&#39;please sign this message too!&#39;)</span>
-<span class="c">#        #m = b&#39;This is a message to hash&#39;</span>
-<span class="c">#        sig = pksig.sign(pk, sk, m)</span>
-<span class="c">#        if debug:</span>
-<span class="c">#            print(&quot;Signature...&quot;)</span>
-<span class="c">#            print(&quot;sig =&gt;&quot;, sig)</span>
-<span class="c">#        sig2 = pksig.sign(pk, sk, m2)</span>
-<span class="c">#        if debug:</span>
-<span class="c">#            print(&quot;Signature 2...&quot;)</span>
-<span class="c">#            print(&quot;sig2 =&gt;&quot;, sig2)</span>
-<span class="c">#        </span>
-<span class="c">#        assert pksig.verify(pk, m, sig), &quot;FAILED VERIFICATION!!!&quot;</span>
-<span class="c">#        assert pksig.verify(pk, m2, sig2), &quot;FAILED VERIFICATION!!!&quot;</span>
-<span class="c">#        if debug: print(&quot;Successful Verification!!!&quot;)</span>
-</div></div>
+<span class="c1">#@pytest.mark.skpifif(&quot;1=1&quot;)</span>
+<span class="c1">#class RSA_HW09Test(unittest.TestCase):</span>
+<span class="c1">#    def testRSA_HW09(self):</span>
+<span class="c1">#        pksig = Sig_RSA_Stateless_HW09() </span>
+<span class="c1">#        # fixed params for unit tests</span>
+<span class="c1">#        p = integer(13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207)</span>
+<span class="c1">#        q = integer(12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543)</span>
+<span class="c1">#        (pk, sk) = pksig.keygen(1024, p, q)</span>
+<span class="c1">#        if debug:</span>
+<span class="c1">#            print(&quot;Public parameters...&quot;)</span>
+<span class="c1">#            print(&quot;pk =&gt;&quot;, pk)</span>
+<span class="c1">#            print(&quot;sk =&gt;&quot;, sk)</span>
+<span class="c1">#        </span>
+<span class="c1">#        m = SHA1(b&#39;this is the message I want to hash.&#39;)</span>
+<span class="c1">#        m2 = SHA1(b&#39;please sign this message too!&#39;)</span>
+<span class="c1">#        #m = b&#39;This is a message to hash&#39;</span>
+<span class="c1">#        sig = pksig.sign(pk, sk, m)</span>
+<span class="c1">#        if debug:</span>
+<span class="c1">#            print(&quot;Signature...&quot;)</span>
+<span class="c1">#            print(&quot;sig =&gt;&quot;, sig)</span>
+<span class="c1">#        sig2 = pksig.sign(pk, sk, m2)</span>
+<span class="c1">#        if debug:</span>
+<span class="c1">#            print(&quot;Signature 2...&quot;)</span>
+<span class="c1">#            print(&quot;sig2 =&gt;&quot;, sig2)</span>
+<span class="c1">#        </span>
+<span class="c1">#        assert pksig.verify(pk, m, sig), &quot;FAILED VERIFICATION!!!&quot;</span>
+<span class="c1">#        assert pksig.verify(pk, m2, sig2), &quot;FAILED VERIFICATION!!!&quot;</span>
+<span class="c1">#        if debug: print(&quot;Successful Verification!!!&quot;)</span>
+
 <div class="viewcode-block" id="SchnorrSigTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.SchnorrSigTest">[docs]</a><span class="k">class</span> <span class="nc">SchnorrSigTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="SchnorrSigTest.testSchnorrSig"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.SchnorrSigTest.testSchnorrSig">[docs]</a>    <span class="k">def</span> <span class="nf">testSchnorrSig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c"># test only parameters for p,q</span>
+        <span class="c1"># test only parameters for p,q</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">156816585111264668689583680968857341596876961491501655859473581156994765485015490912709775771877391134974110808285244016265856659644360836326566918061490651852930016078015163968109160397122004869749553669499102243382571334855815358562585736488447912605222780091120196023676916968821094827532746274593222577067</span><span class="p">)</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">78408292555632334344791840484428670798438480745750827929736790578497382742507745456354887885938695567487055404142622008132928329822180418163283459030745325926465008039007581984054580198561002434874776834749551121691285667427907679281292868244223956302611390045560098011838458484410547413766373137296611288533</span><span class="p">)</span>    
         <span class="n">pksig</span> <span class="o">=</span> <span class="n">SchnorrSig</span><span class="p">()</span>
@@ -357,97 +355,94 @@
         
         <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
         
-        <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;hello world.&quot;</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="s2">&quot;hello world.&quot;</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
         
-        <span class="k">assert</span> <span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">M</span><span class="p">),</span> <span class="s">&quot;Failed verification!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature verified!!!!&quot;</span><span class="p">)</span>
-</div></div>
+        <span class="k">assert</span> <span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">M</span><span class="p">),</span> <span class="s2">&quot;Failed verification!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature verified!!!!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="IBE_N04_SigTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.IBE_N04_SigTest">[docs]</a><span class="k">class</span> <span class="nc">IBE_N04_SigTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="IBE_N04_SigTest.testIBE_N04_Sig"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.IBE_N04_SigTest.testIBE_N04_Sig">[docs]</a>    <span class="k">def</span> <span class="nf">testIBE_N04_Sig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c"># initialize the element object so that object references have global scope</span>
-        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+        <span class="c1"># initialize the element object so that object references have global scope</span>
+        <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
         <span class="n">waters</span> <span class="o">=</span> <span class="n">Waters</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
         <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_N04_Sig</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
         <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
 
-        <span class="c"># represents public identity</span>
-        <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;bob@mail.com&quot;</span>
+        <span class="c1"># represents public identity</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="s2">&quot;bob@mail.com&quot;</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;original msg =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;msg =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">sig</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;original msg =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;msg =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">sig</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;Failed verification!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Verification!!! msg =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
-</div></div>
+        <span class="k">assert</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;Failed verification!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful Verification!!! msg =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="IBEWaters09Test"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.IBEWaters09Test">[docs]</a><span class="k">class</span> <span class="nc">IBEWaters09Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="IBEWaters09Test.testIBEWaters09"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.IBEWaters09Test.testIBEWaters09">[docs]</a>    <span class="k">def</span> <span class="nf">testIBEWaters09</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c"># scheme designed for symmetric billinear groups</span>
-        <span class="n">grp</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+        <span class="c1"># scheme designed for symmetric billinear groups</span>
+        <span class="n">grp</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
         
         <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBEWaters09</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
         
         <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
         
-        <span class="n">m</span> <span class="o">=</span> <span class="s">&quot;plese sign this message!!!!&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;plese sign this message!!!!&quot;</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature :=&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature :=&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
             
-        <span class="k">assert</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s">&quot;Invalid Verification!!!!&quot;</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Individual Verification!&quot;</span><span class="p">)</span>
-</div></div>
+        <span class="k">assert</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="s2">&quot;Invalid Verification!!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful Individual Verification!&quot;</span><span class="p">)</span></div></div>
+
 <div class="viewcode-block" id="WatersSigTest"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.WatersSigTest">[docs]</a><span class="k">class</span> <span class="nc">WatersSigTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="WatersSigTest.testWatersSig"><a class="viewcode-back" href="../test/pksig_test.html#pksig_test.WatersSigTest.testWatersSig">[docs]</a>    <span class="k">def</span> <span class="nf">testWatersSig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
        <span class="n">z</span> <span class="o">=</span> <span class="mi">5</span>
-       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+       <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
 
        <span class="n">waters</span> <span class="o">=</span> <span class="n">WatersSig</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
        <span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">)</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
 
-       <span class="n">ID</span> <span class="o">=</span> <span class="s">&#39;janedoe@email.com&#39;</span>
+       <span class="n">ID</span> <span class="o">=</span> <span class="s1">&#39;janedoe@email.com&#39;</span>
        <span class="n">sk</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>  
        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Keygen...&quot;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keygen...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sk =&gt;&quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
      
-       <span class="n">M</span> <span class="o">=</span> <span class="s">&#39;please sign this new message!&#39;</span>
+       <span class="n">M</span> <span class="o">=</span> <span class="s1">&#39;please sign this new message!&#39;</span>
        <span class="n">sig</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Signature...&quot;</span><span class="p">)</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature...&quot;</span><span class="p">)</span>
 
-       <span class="k">assert</span> <span class="n">waters</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;invalid signature!&quot;</span>
-       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Verification successful!&quot;</span><span class="p">)</span>
-</div></div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+       <span class="k">assert</span> <span class="n">waters</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">mpk</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;invalid signature!&quot;</span>
+       <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Verification successful!&quot;</span><span class="p">)</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -456,14 +451,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

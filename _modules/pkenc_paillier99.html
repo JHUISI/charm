@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pkenc_paillier99 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>pkenc_paillier99 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,37 +34,35 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for pkenc_paillier99</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Pascal Paillier (Public-Key)</span>
 <span class="sd"> </span>
 <span class="sd">| From: &quot;Public-Key Cryptosystems Based on Composite Degree Residuosity Classes&quot; </span>
 <span class="sd">| Published in: EUROCRYPT 1999</span>
-<span class="sd">| Available from: http://eprint.iacr.org/2009/309.pdf</span>
+<span class="sd">| Available from: http://link.springer.com/chapter/10.1007%2F3-540-48910-X_16</span>
 <span class="sd">| Notes: </span>
 
-<span class="sd">* type:           public-key encryption (public key)</span>
-<span class="sd">* setting:        Integer</span>
+<span class="sd">* type       public-key encryption (public key)</span>
+<span class="sd">* setting:   Integer</span>
 
 <span class="sd">:Authors:    J Ayo Akinyele</span>
-<span class="sd">:Date:            4/2011</span>
+<span class="sd">:Date:       4/2011 (updated 2/2016)</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="c">#from charm.integer import *</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">lcm</span><span class="p">,</span><span class="n">integer</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.PKEnc</span> <span class="kn">import</span> <span class="n">PKEnc</span>
-<span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">lcm</span><span class="p">,</span><span class="n">integer</span><span class="p">,</span><span class="n">toInt</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKEnc</span> <span class="k">import</span> <span class="n">PKEnc</span>
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="sd">&quot;&quot;&quot;A ciphertext class with homomorphic properties&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Ciphertext"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Ciphertext">[docs]</a><span class="k">class</span> <span class="nc">Ciphertext</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -81,11 +77,7 @@
 <span class="sd">    &gt;&gt;&gt; msg_1=12345678987654321</span>
 <span class="sd">    &gt;&gt;&gt; msg_2=12345761234123409</span>
 <span class="sd">    &gt;&gt;&gt; msg_3 = msg_1 + msg_2</span>
-<span class="sd">    </span>
-<span class="sd">    &gt;&gt;&gt; msg_1 = pai.encode(public_key[&#39;n&#39;], msg_1)</span>
-<span class="sd">    &gt;&gt;&gt; msg_2 = pai.encode(public_key[&#39;n&#39;], msg_2)</span>
-<span class="sd">    &gt;&gt;&gt; msg_3 = pai.encode(public_key[&#39;n&#39;], msg_3) </span>
-<span class="sd">    </span>
+<span class="sd">        </span>
 <span class="sd">    &gt;&gt;&gt; cipher_1 = pai.encrypt(public_key, msg_1)</span>
 <span class="sd">    &gt;&gt;&gt; cipher_2 = pai.encrypt(public_key, msg_2)</span>
 <span class="sd">    &gt;&gt;&gt; cipher_3 = cipher_1 + cipher_2</span>
@@ -95,94 +87,97 @@
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="nb">dict</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+        <span class="nb">dict</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">pk</span><span class="p">,</span> <span class="n">key</span>
     
     <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span> <span class="c"># rhs must be Cipher</span>
-           <span class="n">lhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-           <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span><span class="n">lhs</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">other</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n2&#39;</span><span class="p">])</span> <span class="p">},</span> 
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span> <span class="c1"># rhs must be Cipher</span>
+           <span class="n">lhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+           <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:</span><span class="n">lhs</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">other</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">])</span> <span class="p">},</span> 
                              <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>        
-        <span class="k">else</span><span class="p">:</span> <span class="c"># neither are plain ints</span>
-           <span class="n">lhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-           <span class="n">rhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:(</span><span class="n">lhs</span> <span class="o">*</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n2&#39;</span><span class="p">]},</span> 
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># neither are plain ints</span>
+           <span class="n">lhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+           <span class="n">rhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:(</span><span class="n">lhs</span> <span class="o">*</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]},</span> 
                           <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span> 
         
     <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-            <span class="n">lhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">lhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:(</span><span class="n">lhs</span> <span class="o">**</span> <span class="n">other</span><span class="p">)},</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
     
-<div class="viewcode-block" id="Ciphertext.randomize"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Ciphertext.randomize">[docs]</a>    <span class="k">def</span> <span class="nf">randomize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span> <span class="c"># need to provide random value</span>
-        <span class="n">lhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-        <span class="n">rhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n2&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:(</span><span class="n">lhs</span> <span class="o">*</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n2&#39;</span><span class="p">]})</span>
-    </div>
+<div class="viewcode-block" id="Ciphertext.randomize"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Ciphertext.randomize">[docs]</a>    <span class="k">def</span> <span class="nf">randomize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span> <span class="c1"># need to provide random value</span>
+        <span class="n">lhs</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">rhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">:(</span><span class="n">lhs</span> <span class="o">*</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]})</span></div>
+    
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">value</span> <span class="c"># + &quot;, pk =&quot; + str(pk)</span>
-    </div>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="c1"># + &quot;, pk =&quot; + str(pk)</span></div>
+    
 <div class="viewcode-block" id="Pai99"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Pai99">[docs]</a><span class="k">class</span> <span class="nc">Pai99</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
-        <span class="n">PKEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">PKEnc</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">global</span> <span class="n">group</span>
         <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
     
 <div class="viewcode-block" id="Pai99.L"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Pai99.L">[docs]</a>    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
-                </div>
+        <span class="c1"># computes L(u) =&gt; ((u - 1) / n)</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">U</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">U</span> <span class="o">/</span> <span class="n">n</span></div>
+                
 <div class="viewcode-block" id="Pai99.keygen"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Pai99.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
         <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
-        <span class="n">g</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">lam</span> <span class="o">=</span> <span class="n">lcm</span><span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">n2</span> <span class="o">=</span> <span class="n">n</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
         <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">(((</span><span class="n">g</span> <span class="o">%</span> <span class="n">n2</span><span class="p">)</span> <span class="o">**</span> <span class="n">lam</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;n2&#39;</span><span class="p">:</span><span class="n">n2</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;lamda&#39;</span><span class="p">:</span><span class="n">lam</span><span class="p">,</span> <span class="s">&#39;u&#39;</span><span class="p">:</span><span class="n">u</span><span class="p">}</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
-</div>
+        <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;n&#39;</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s1">&#39;n2&#39;</span><span class="p">:</span><span class="n">n2</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;lamda&#39;</span><span class="p">:</span><span class="n">lam</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span><span class="n">u</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Pai99.encrypt"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Pai99.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
-        <span class="n">g</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n2&#39;</span><span class="p">]</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">])</span>
+        <span class="n">g</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">])</span>
         <span class="n">c</span> <span class="o">=</span> <span class="p">((</span><span class="n">g</span> <span class="o">%</span> <span class="n">n2</span><span class="p">)</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">r</span> <span class="o">%</span> <span class="n">n2</span><span class="p">)</span> <span class="o">**</span> <span class="n">n</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="s">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span><span class="p">},</span> <span class="n">pk</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">)</span>
-    </div>
+        <span class="k">return</span> <span class="n">Ciphertext</span><span class="p">({</span><span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span><span class="p">},</span> <span class="n">pk</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">)</span></div>
+    
 <div class="viewcode-block" id="Pai99.decrypt"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Pai99.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
-        <span class="n">n</span><span class="p">,</span> <span class="n">n2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;n2&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;lamda&#39;</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">n</span>
-    </div>
+        <span class="n">n</span><span class="p">,</span> <span class="n">n2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;lamda&#39;</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">n</span>
+        <span class="k">return</span> <span class="n">toInt</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Pai99.encode"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Pai99.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulus</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="c"># takes a string and represents as a bytes object</span>
+        <span class="c1"># takes a string and represents as a bytes object</span>
         <span class="n">elem</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">elem</span> <span class="o">%</span> <span class="n">modulus</span>
-        </div>
+        <span class="k">return</span> <span class="n">elem</span> <span class="o">%</span> <span class="n">modulus</span></div>
+        
 <div class="viewcode-block" id="Pai99.decode"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_paillier99.html#pkenc_paillier99.Pai99.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
-        <span class="k">pass</span>
-</pre></div></div></div>
+        <span class="k">pass</span></div></div>
+
+</pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -191,14 +186,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

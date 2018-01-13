@@ -1,32 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>How To Get Started &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <title>How To Get Started &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" /> 
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -35,101 +34,101 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Charm-Crypto 0.50 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="how-to-get-started">
 <h1>How To Get Started<a class="headerlink" href="#how-to-get-started" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="installation-and-dependencies">
 <h2>Installation and dependencies<a class="headerlink" href="#installation-and-dependencies" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference internal" href="install_source.html#platform-install-manual"><em>Platform Install Manual</em></a> for installation instructions.</p>
+<p>See <a class="reference internal" href="install_source.html#platform-install-manual"><span class="std std-ref">Platform Install Manual</span></a> for installation instructions.</p>
 </div>
 <div class="section" id="implement-a-scheme">
 <h2>Implement a Scheme<a class="headerlink" href="#implement-a-scheme" title="Permalink to this headline">¶</a></h2>
-<p>Interested in implementing your cryptographic scheme in Charm? Here&#8217;s a guide to navigate our framework to implement your cryptosystem. The following provides an example implementation compared with the algorithm described in the research paper.</p>
+<p>Interested in implementing your cryptographic scheme in Charm? Here’s a guide to navigate our framework to implement your cryptosystem. The following provides an example implementation compared with the algorithm described in the research paper.</p>
 <p>We begin with a public-key encryption scheme due to Cramer-Shoup 1998 <a class="reference external" href="http://knot.kaist.ac.kr/seminar/archive/46/46.pdf">http://knot.kaist.ac.kr/seminar/archive/46/46.pdf</a>, which is provably secure against adaptive chosen ciphertext attacks.</p>
-<p>Typical implementations follow an object-oriented model such that an implementation of a cryptosystem can be easily reused or extended for other purposes. To this end, we provide several base classes with standard interfaces for a variety of cryptographic primitives such as <tt class="docutils literal"><span class="pre">PKEnc</span></tt> or public-key encryption, <tt class="docutils literal"><span class="pre">PKSig</span></tt> or public-key signatures, <tt class="docutils literal"><span class="pre">ABEnc</span></tt> or attribute-based encryption and many more. So, the following describes the python code that implements the Cramer-Shoup PKEnc scheme in Charm:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
+<p>Typical implementations follow an object-oriented model such that an implementation of a cryptosystem can be easily reused or extended for other purposes. To this end, we provide several base classes with standard interfaces for a variety of cryptographic primitives such as <code class="docutils literal"><span class="pre">PKEnc</span></code> or public-key encryption, <code class="docutils literal"><span class="pre">PKSig</span></code> or public-key signatures, <code class="docutils literal"><span class="pre">ABEnc</span></code> or attribute-based encryption and many more. So, the following describes the python code that implements the Cramer-Shoup PKEnc scheme in Charm:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="k">import</span> <span class="n">ECGroup</span>
 
 <span class="k">class</span> <span class="nc">CS98</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>
      <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve</span><span class="p">):</span>
-         <span class="n">PKEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+         <span class="n">PKEnc</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
          <span class="k">global</span> <span class="n">group</span>
          <span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">curve</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Before we get started, it is important to understand that in our toolbox each cryptographic setting has a corresponding group abstraction such as elliptic curve group or <tt class="docutils literal"><span class="pre">ECGroup</span></tt>, pairing group or <tt class="docutils literal"><span class="pre">PairingGroup</span></tt>, and integer groups or <tt class="docutils literal"><span class="pre">IntegerGroup</span></tt>. This abstraction provides a simple interface for selecting group parameters, performing group operations, and etc. See the <tt class="docutils literal"><span class="pre">toolbox</span></tt> documentation for more details.</p>
+<p>Before we get started, it is important to understand that in our toolbox each cryptographic setting has a corresponding group abstraction such as elliptic curve group or <code class="docutils literal"><span class="pre">ECGroup</span></code>, pairing group or <code class="docutils literal"><span class="pre">PairingGroup</span></code>, and integer groups or <code class="docutils literal"><span class="pre">IntegerGroup</span></code>. This abstraction provides a simple interface for selecting group parameters, performing group operations, and etc. See the <code class="docutils literal"><span class="pre">toolbox</span></code> documentation for more details.</p>
 <p>Thus, at the beginning of the scheme, you must import the corresponding group setting in which the cryptographic scheme will be implemented</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="k">import</span> <span class="n">ECGroup</span>
 </pre></div>
 </div>
-<p>Next, let&#8217;s explain what goes on during class initialization. During <tt class="docutils literal"><span class="pre">__init__</span></tt>, you define the basic security properties of the <tt class="docutils literal"><span class="pre">PKEnc</span></tt> scheme and in this case accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as <tt class="docutils literal"><span class="pre">self.group</span> <span class="pre">=</span> <span class="pre">ECGroup(curve)</span></tt>.</p>
+<p>Next, let’s explain what goes on during class initialization. During <code class="docutils literal"><span class="pre">__init__</span></code>, you define the basic security properties of the <code class="docutils literal"><span class="pre">PKEnc</span></code> scheme and in this case accept as input a NIST standard elliptic curve identifier. The group object can either be defined globally or defined as a class member. The idea is that any routine within this scheme will have access to the group object to perform any operation. In our example, we define group as a global variable. Alternatively, you could define group as <code class="docutils literal"><span class="pre">self.group</span> <span class="pre">=</span> <span class="pre">ECGroup(curve)</span></code>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Also, the <tt class="docutils literal"><span class="pre">init</span></tt> routine arguments can vary depending on the scheme and group setting. What is shown above is only an example and see other schemes we have implemented for other possibilities.</p>
+<p class="last">Also, the <code class="docutils literal"><span class="pre">init</span></code> routine arguments can vary depending on the scheme and group setting. What is shown above is only an example and see other schemes we have implemented for other possibilities.</p>
 </div>
-<p>We describe the first algorithm in the paper, <tt class="docutils literal"><span class="pre">keygen</span></tt>. Keygen only accepts a security parameter and generates the public and private keys and returns to the user. The paper description is as follows:</p>
-<div class="math" id="equation-keygen1">
-<p><span class="eqno">(1)</span><img src="_images/math/babfd8689f532a9a2531927e2a0222e1663535ed.png" alt="g_1, g_2 \in G"/></p>
-</div><div class="math" id="equation-keygen2">
-<p><span class="eqno">(2)</span><img src="_images/math/245216c199118f1ba4bf6b397943cfbf49441045.png" alt="x_1, x_2, y_1, y_2, z \in Z_q"/></p>
-</div><div class="math" id="equation-keygen3">
-<p><span class="eqno">(3)</span><img src="_images/math/a1fb6cb03dd9d9d3ba6a62b376cf95b7cfb67ec4.png" alt="c = {g_1}^{x_1} \cdot {g_2}^{x_2}, d = {g_1}^{y_1} \cdot {g_2}^{y_2}, h = {g_1}^z"/></p>
-</div><div class="math" id="equation-pk">
-<p><span class="eqno">(4)</span><img src="_images/math/59711f4e0462a5b6ab884ed4e19d7e1892c1a541.png" alt="pk = (g_1, g_2, c, d, h, H)"/></p>
-</div><div class="math" id="equation-sk">
-<p><span class="eqno">(5)</span><img src="_images/math/9f601bd3bc30a1fbeb40505bf46c3c61d38b7497.png" alt="sk = (x_1, x_2, y_1, y_2, z)"/></p>
-</div><p>Random elements <a href="#equation-keygen1">(1)</a> are chosen and random elements <a href="#equation-keygen2">(2)</a> are also chosen. Next, the group elements <a href="#equation-keygen3">(3)</a> are computed. Select a hash function H from the family of universal one-way hash functions. The public key is defined by <a href="#equation-pk">(4)</a> and the private key is defined by <a href="#equation-sk">(5)</a>. Below is the Charm <tt class="docutils literal"><span class="pre">keygen</span></tt> function defined in the <tt class="docutils literal"><span class="pre">CS98</span></tt> class:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
+<p>We describe the first algorithm in the paper, <code class="docutils literal"><span class="pre">keygen</span></code>. Keygen only accepts a security parameter and generates the public and private keys and returns to the user. The paper description is as follows:</p>
+<div class="math">
+<p><img src="_images/math/68daa260f70d2016741ef92b11646b04dd8941d4.png" alt="g_1, g_2 \in G"/></p>
+</div><div class="math">
+<p><img src="_images/math/8c0ba324c678fec876e3cbfd346b70c8f34a27d8.png" alt="x_1, x_2, y_1, y_2, z \in Z_q"/></p>
+</div><div class="math">
+<p><img src="_images/math/5e58859d062207bb2baa2e055fbc8036f21640c9.png" alt="c = {g_1}^{x_1} \cdot {g_2}^{x_2}, d = {g_1}^{y_1} \cdot {g_2}^{y_2}, h = {g_1}^z"/></p>
+</div><div class="math">
+<p><img src="_images/math/3bb00e1a6e63a3a2526f39e250a94b8bdfc613d4.png" alt="pk = (g_1, g_2, c, d, h, H)"/></p>
+</div><div class="math">
+<p><img src="_images/math/aac19f55f081ce378d8c99eda11ad5a54717c054.png" alt="sk = (x_1, x_2, y_1, y_2, z)"/></p>
+</div><p>Random elements <a class="reference internal" href="cryptographers.html#equation-keygen1">(1)</a> are chosen and random elements <a class="reference internal" href="cryptographers.html#equation-keygen2">(2)</a> are also chosen. Next, the group elements <a class="reference internal" href="cryptographers.html#equation-keygen3">(3)</a> are computed. Select a hash function H from the family of universal one-way hash functions. The public key is defined by <a class="reference internal" href="cryptographers.html#equation-pk">(4)</a> and the private key is defined by <a class="reference internal" href="cryptographers.html#equation-sk">(5)</a>. Below is the Charm <code class="docutils literal"><span class="pre">keygen</span></code> function defined in the <code class="docutils literal"><span class="pre">CS98</span></code> class:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
     <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
     <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
     <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span> <span class="o">**</span> <span class="n">x1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">g2</span> <span class="o">**</span> <span class="n">x2</span><span class="p">)</span>
     <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span> <span class="o">**</span> <span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">g2</span> <span class="o">**</span> <span class="n">y2</span><span class="p">)</span>
     <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span> <span class="o">**</span> <span class="n">z</span><span class="p">)</span>
 
-    <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g1&#39;</span> <span class="p">:</span> <span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span> <span class="p">:</span> <span class="n">g2</span><span class="p">,</span> <span class="s">&#39;c&#39;</span> <span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s">&#39;d&#39;</span> <span class="p">:</span> <span class="n">d</span><span class="p">,</span> <span class="s">&#39;h&#39;</span> <span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s">&#39;H&#39;</span> <span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span> <span class="p">}</span>
-    <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;x1&#39;</span> <span class="p">:</span> <span class="n">x1</span><span class="p">,</span> <span class="s">&#39;x2&#39;</span> <span class="p">:</span> <span class="n">x2</span><span class="p">,</span> <span class="s">&#39;y1&#39;</span> <span class="p">:</span> <span class="n">y1</span><span class="p">,</span> <span class="s">&#39;y2&#39;</span> <span class="p">:</span> <span class="n">y2</span><span class="p">,</span> <span class="s">&#39;z&#39;</span> <span class="p">:</span> <span class="n">z</span> <span class="p">}</span>
+    <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;g1&#39;</span> <span class="p">:</span> <span class="n">g1</span><span class="p">,</span> <span class="s1">&#39;g2&#39;</span> <span class="p">:</span> <span class="n">g2</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span> <span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span> <span class="p">:</span> <span class="n">d</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span> <span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span> <span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span> <span class="p">}</span>
+    <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;x1&#39;</span> <span class="p">:</span> <span class="n">x1</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span> <span class="p">:</span> <span class="n">x2</span><span class="p">,</span> <span class="s1">&#39;y1&#39;</span> <span class="p">:</span> <span class="n">y1</span><span class="p">,</span> <span class="s1">&#39;y2&#39;</span> <span class="p">:</span> <span class="n">y2</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span> <span class="p">:</span> <span class="n">z</span> <span class="p">}</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="math" id="equation-prelim">
-<p><span class="eqno">(6)</span><img src="_images/math/41d2b200a4581da954de6de757f419bfef3ebcef.png" alt="m \in G, r \in Z_q"/></p>
-</div><div class="math" id="equation-encrypt">
-<p><span class="eqno">(7)</span><img src="_images/math/2d17612f9a0a0b76f35acc7acd3a52dbc2483454.png" alt="u_1 = {g_1}^r, u_2 = {g_2}^r, e = h^r\cdot m, \alpha = H(u_1, u_2, e), v = c^r\cdot d^{r\alpha}"/></p>
-</div><div class="math" id="equation-ciphertext">
-<p><span class="eqno">(8)</span><img src="_images/math/ce422a7be60e2095d1997ff9f803453171760274.png" alt="(u_1, u_2, e, v)"/></p>
-</div><p>We now describe the encrypt routine as described by the paper. Given a message in G, the encryption algorithm first selects a random integer r <a href="#equation-prelim">(6)</a>, then computes <a href="#equation-encrypt">(7)</a> and returns the ciphertext as <a href="#equation-ciphertext">(8)</a>. The <tt class="docutils literal"><span class="pre">encrypt</span></tt> algorithm defined in Charm:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<div class="math">
+<p><img src="_images/math/5d3ec2ecd23d8d62a2bab4a65fc10793d03c89a1.png" alt="m \in G, r \in Z_q"/></p>
+</div><div class="math">
+<p><img src="_images/math/0548bb475904a37e3ff97076aae0ced8e26778d8.png" alt="u_1 = {g_1}^r, u_2 = {g_2}^r, e = h^r\cdot m, \alpha = H(u_1, u_2, e), v = c^r\cdot d^{r\alpha}"/></p>
+</div><div class="math">
+<p><img src="_images/math/56b20563e2ee7a969c53e42c7733643d20ee7e73.png" alt="(u_1, u_2, e, v)"/></p>
+</div><p>We now describe the encrypt routine as described by the paper. Given a message in G, the encryption algorithm first selects a random integer r <a class="reference internal" href="cryptographers.html#equation-prelim">(6)</a>, then computes <a class="reference internal" href="cryptographers.html#equation-encrypt">(7)</a> and returns the ciphertext as <a class="reference internal" href="cryptographers.html#equation-ciphertext">(8)</a>. The <code class="docutils literal"><span class="pre">encrypt</span></code> algorithm defined in Charm:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
     <span class="n">r</span>   <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-    <span class="n">u1</span>  <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
-    <span class="n">u2</span>  <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
-    <span class="n">e</span>   <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">](</span><span class="n">u1</span><span class="p">,</span> <span class="n">u2</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
-    <span class="n">v</span>   <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;d&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
+    <span class="n">u1</span>  <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
+    <span class="n">u2</span>  <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
+    <span class="n">e</span>   <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">](</span><span class="n">u1</span><span class="p">,</span> <span class="n">u2</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="n">v</span>   <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;u1&#39;</span> <span class="p">:</span> <span class="n">u1</span><span class="p">,</span> <span class="s">&#39;u2&#39;</span> <span class="p">:</span> <span class="n">u2</span><span class="p">,</span> <span class="s">&#39;e&#39;</span> <span class="p">:</span> <span class="n">e</span><span class="p">,</span> <span class="s">&#39;v&#39;</span> <span class="p">:</span> <span class="n">v</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;u1&#39;</span> <span class="p">:</span> <span class="n">u1</span><span class="p">,</span> <span class="s1">&#39;u2&#39;</span> <span class="p">:</span> <span class="n">u2</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span> <span class="p">:</span> <span class="n">e</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span> <span class="p">:</span> <span class="n">v</span> <span class="p">}</span>
 </pre></div>
 </div>
-<div class="math" id="equation-decrypt1">
-<p><span class="eqno">(9)</span><img src="_images/math/b3401ade40bb08743ae6d28562325096d202adbe.png" alt="\alpha = H(u_1, u_2, e)"/></p>
-</div><div class="math" id="equation-decrypt2">
-<p><span class="eqno">(10)</span><img src="_images/math/4c8c6ab5ce5f4c7eb58bb0927e2f398e82e6dcf5.png" alt="{u_1}^{x_1 + y_1\alpha} {u_2}^{x_2 + y_2\alpha} = v"/></p>
-</div><div class="math" id="equation-decrypt3">
-<p><span class="eqno">(11)</span><img src="_images/math/373ff473647f7fff090a56d6f58c039f0aaeba10.png" alt="m = e / {u_1}^z"/></p>
-</div><p>Finally, the decryption routine as described by the paper. Given a ciphertext, the decryption algorithm runs as follows and first computes <a href="#equation-decrypt1">(9)</a>, and tests if <a href="#equation-decrypt2">(10)</a> condition holds, and if so outputs <a href="#equation-decrypt3">(11)</a> otherwise &#8220;reject&#8221;. The <tt class="docutils literal"><span class="pre">decrypt</span></tt> algorithm defined in Charm:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;H&#39;</span><span class="p">](</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span>
+<div class="math">
+<p><img src="_images/math/1ee94ac15a30ab8b09405e6985b249f90c8f9289.png" alt="\alpha = H(u_1, u_2, e)"/></p>
+</div><div class="math">
+<p><img src="_images/math/60a5f522f97c067ae90bd994d7dbc83b1bb22a8d.png" alt="{u_1}^{x_1 + y_1\alpha} {u_2}^{x_2 + y_2\alpha} = v"/></p>
+</div><div class="math">
+<p><img src="_images/math/a8e8bc237e64e5df015ed5cdba8ec65342271279.png" alt="m = e / {u_1}^z"/></p>
+</div><p>Finally, the decryption routine as described by the paper. Given a ciphertext, the decryption algorithm runs as follows and first computes <a class="reference internal" href="cryptographers.html#equation-decrypt1">(9)</a>, and tests if <a class="reference internal" href="cryptographers.html#equation-decrypt2">(10)</a> condition holds, and if so outputs <a class="reference internal" href="cryptographers.html#equation-decrypt3">(11)</a> otherwise “reject”. The <code class="docutils literal"><span class="pre">decrypt</span></code> algorithm defined in Charm:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">](</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;u1&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;u2&#39;</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">])</span>
 
-    <span class="n">v_prime</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;x1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;y1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)))</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;x2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;y2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)))</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">v_prime</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&#39;reject&#39;</span>
-    <span class="k">return</span> <span class="n">group</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;u1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">]))</span>
+    <span class="n">v_prime</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;u1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;x1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;y1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)))</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;u2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;x2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;y2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">v_prime</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;reject&#39;</span>
+    <span class="k">return</span> <span class="n">group</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;u1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]))</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -140,17 +139,17 @@
 </div>
 <div class="section" id="using-a-scheme">
 <h2>Using a Scheme<a class="headerlink" href="#using-a-scheme" title="Permalink to this headline">¶</a></h2>
-<p>To use any of our existing schemes in your application, each scheme includes a <tt class="docutils literal"><span class="pre">main</span></tt> routine that runs through every alorithm (with sample inputs) defined for that scheme. Thus, the <tt class="docutils literal"><span class="pre">main</span></tt> function provides a test that the scheme works in addition to demonstrate how to use it. For example, below is an example of how to instantiate the Cramer-Shoup scheme from above within your application:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">schemes.pkenc.pkenc_cs98.py</span> <span class="kn">import</span> <span class="n">CS98</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v1</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
+<p>To use any of our existing schemes in your application, each scheme includes a <code class="docutils literal"><span class="pre">main</span></code> routine that runs through every alorithm (with sample inputs) defined for that scheme. Thus, the <code class="docutils literal"><span class="pre">main</span></code> function provides a test that the scheme works in addition to demonstrate how to use it. For example, below is an example of how to instantiate the Cramer-Shoup scheme from above within your application:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">schemes.pkenc.pkenc_cs98.py</span> <span class="k">import</span> <span class="n">CS98</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="k">import</span> <span class="n">prime192v1</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="k">import</span> <span class="n">ECGroup</span>
 
 <span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v1</span><span class="p">)</span>
 <span class="n">pkenc</span> <span class="o">=</span> <span class="n">CS98</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
 
 <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
 
-<span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;Hello World!&#39;</span>
+<span class="n">M</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;Hello World!&#39;</span>
 <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
 
 <span class="n">message</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
@@ -159,20 +158,20 @@
 </div>
 <div class="section" id="group-abstractions">
 <h2>Group Abstractions<a class="headerlink" href="#group-abstractions" title="Permalink to this headline">¶</a></h2>
-<p>We now describe how to take advantage of Charm&#8217;s group abstraction. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking:</p>
-<p>At the moment, there are three cryptographic settings covered by Charm: <tt class="docutils literal"><span class="pre">integergroups</span></tt>, <tt class="docutils literal"><span class="pre">ecgroups</span></tt>, and <tt class="docutils literal"><span class="pre">pairinggroups</span></tt>.
-To initialize a group in the EC, refer to the <tt class="docutils literal"><span class="pre">toolbox.eccurve</span></tt> for all the full set of identifiers for supported NIST approved curves (e.g., <tt class="docutils literal"><span class="pre">prime192v1</span></tt>). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric curves. For example, the <tt class="docutils literal"><span class="pre">'SS512'</span></tt> represents a symmetric curve with a 512-bit base field and <tt class="docutils literal"><span class="pre">'MNT159'</span></tt> represents an asymmetric curve with 159-bit base field.
-Finally, for integer groups, typically defining large primes <tt class="docutils literal"><span class="pre">p</span></tt> and <tt class="docutils literal"><span class="pre">q</span></tt> is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., <tt class="docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">2q</span> <span class="pre">+</span> <span class="pre">1</span></tt>). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">IntegerGroup</span>
+<p>We now describe how to take advantage of Charm’s group abstraction. Modern cryptographic algorithms are typically implemented on top of mathematical groups based on certain hardness assumptions (e.g., Diffie-Hellman). We provide the same building blocks to facilitate development in this way of thinking:</p>
+<p>At the moment, there are three cryptographic settings covered by Charm: <code class="docutils literal"><span class="pre">integergroups</span></code>, <code class="docutils literal"><span class="pre">ecgroups</span></code>, and <code class="docutils literal"><span class="pre">pairinggroups</span></code>.
+To initialize a group in the EC, refer to the <code class="docutils literal"><span class="pre">toolbox.eccurve</span></code> for all the full set of identifiers for supported NIST approved curves (e.g., <code class="docutils literal"><span class="pre">prime192v1</span></code>). For EC with billinear maps (or pairings), we provide a set of identifiers for both symmetric and asymmetric curves. For example, the <code class="docutils literal"><span class="pre">'SS512'</span></code> represents a symmetric curve with a 512-bit base field and <code class="docutils literal"><span class="pre">'MNT159'</span></code> represents an asymmetric curve with 159-bit base field.
+Finally, for integer groups, typically defining large primes <code class="docutils literal"><span class="pre">p</span></code> and <code class="docutils literal"><span class="pre">q</span></code> is enough to generate an RSA group. For schnorr groups, these group parameters may take some time to generate because they require safe primes (e.g., <code class="docutils literal"><span class="pre">p</span> <span class="pre">=</span> <span class="pre">2q</span> <span class="pre">+</span> <span class="pre">1</span></code>). Here are detailed examples below for integer and pairing groups (see above for EC group initialization):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">IntegerGroup</span>
 
 <span class="n">group1</span> <span class="o">=</span> <span class="n">IntegerGroup</span><span class="p">()</span>
 <span class="n">group1</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
 
 <span class="n">g</span> <span class="o">=</span> <span class="n">group1</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
 
-<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">G1</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">G1</span>
 
-<span class="n">group2</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="n">group2</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
 
 <span class="n">g</span> <span class="o">=</span> <span class="n">group2</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
 </pre></div>
@@ -180,32 +179,33 @@ Finally, for integer groups, typically defining large primes <tt class="docutils
 </div>
 <div class="section" id="using-serialization-api">
 <h2>Using serialization API<a class="headerlink" href="#using-serialization-api" title="Permalink to this headline">¶</a></h2>
-<p>To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects embedded in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc) which are <tt class="docutils literal"><span class="pre">objectToBytes()</span></tt> and <tt class="docutils literal"><span class="pre">bytesToObject()</span></tt> from the <tt class="docutils literal"><span class="pre">charm.engine.util</span></tt> package. These functions provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object.
+<p>To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects embedded in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc) which are <code class="docutils literal"><span class="pre">objectToBytes()</span></code> and <code class="docutils literal"><span class="pre">bytesToObject()</span></code> from the <code class="docutils literal"><span class="pre">charm.engine.util</span></code> package. These functions provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object.
 We also show below how to customize our serialization routines:</p>
-<p>Here is an example of how to use the API with any of the supported group objects (<tt class="docutils literal"><span class="pre">integergroup</span></tt>, <tt class="docutils literal"><span class="pre">pairinggroup</span></tt> or <tt class="docutils literal"><span class="pre">ecgroup</span></tt>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
+<p>Here is an example of how to use the API with any of the supported group objects (<code class="docutils literal"><span class="pre">integergroup</span></code>, <code class="docutils literal"><span class="pre">pairinggroup</span></code> or <code class="docutils literal"><span class="pre">ecgroup</span></code>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="k">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
 
 <span class="n">pk_bytes</span> <span class="o">=</span> <span class="n">objectToBytes</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
 
 <span class="n">orig_pk</span> <span class="o">=</span> <span class="n">bytesToObject</span><span class="p">(</span><span class="n">pk_bytes</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If you would like to define your own custom serialization routine in conjunction with our API, the following example works for schemes based on the <tt class="docutils literal"><span class="pre">integergroup</span></tt> which in some cases do not utilize a group object:</p>
-<div class="highlight-python"><pre>from charm.core.math.integer import integer,serialize,deserialize
+<p>If you would like to define your own custom serialization routine in conjunction with our API, the following example works for schemes based on the <code class="docutils literal"><span class="pre">integergroup</span></code> which in some cases do not utilize a group object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">serialize</span><span class="p">,</span><span class="n">deserialize</span>
 
-class mySerializeAPI:
-        def __init__(self)
-                ...
+<span class="k">class</span> <span class="nc">mySerializeAPI</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="o">...</span>
 
-        def serialize(self, charm_object):
-            assert type(charm_object) == integer, &quot;required type is integer, not: &quot;, type(charm_object)
-            return serialize(charm_object)
+        <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">charm_object</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">charm_object</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">,</span> <span class="s2">&quot;required type is integer, not: &quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">charm_object</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="n">charm_object</span><span class="p">)</span>
 
-        def deserialize(self, object):
-            assert type(object) == bytes, &quot;required type is bytes, not: &quot;, type(object)
-            return deserialize(object)</pre>
+        <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s2">&quot;required type is bytes, not: &quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.engine.util</span> <span class="k">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
 
 <span class="n">serObject</span> <span class="o">=</span> <span class="n">mySerializeAPI</span><span class="p">()</span>
 
@@ -222,7 +222,7 @@ class mySerializeAPI:
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -236,29 +236,28 @@ class mySerializeAPI:
 </li>
 </ul>
 
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/tutorial.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tutorial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -267,13 +266,13 @@ class mySerializeAPI:
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Charm-Crypto 0.50 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

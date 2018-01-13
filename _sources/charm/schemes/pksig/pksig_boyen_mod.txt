@@ -1,7 +1,0 @@
-
-pksig_boyen_mod
-=========================================
-.. automodule:: pksig_boyen_mod
-    :show-inheritance:
-    :members:
-    :undoc-members:

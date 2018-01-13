@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>protocol_cns07 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <title>protocol_cns07 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../schemes.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="protocol_schnorr91" href="protocol_schnorr91.html" />
-    <link rel="prev" title="pre_mg07" href="pre_mg07.html" /> 
+    <link rel="prev" title="protocol_ao00" href="protocol_ao00.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -42,23 +40,23 @@
           <a href="protocol_schnorr91.html" title="protocol_schnorr91"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="pre_mg07.html" title="pre_mg07"
+          <a href="protocol_ao00.html" title="protocol_ao00"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-protocol_cns07">
 <span id="protocol-cns07"></span><h1>protocol_cns07<a class="headerlink" href="#module-protocol_cns07" title="Permalink to this headline">¶</a></h1>
 <p>Camenisch-Neven-shelat - Oblivious Transfer</p>
 <div class="line-block">
-<div class="line">From: &#8220;J. Camenisch, G. Neven, a. shelat - Simulatable Adaptive Oblivious Transfer&#8221;</div>
+<div class="line">From: “J. Camenisch, G. Neven, a. shelat - Simulatable Adaptive Oblivious Transfer”</div>
 <div class="line">Published in: EUROCRYPT 2007</div>
 <div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2008/014">http://eprint.iacr.org/2008/014</a></div>
 <div class="line">Notes: </div>
@@ -83,56 +81,56 @@
 </table>
 <dl class="class">
 <dt id="protocol_cns07.ObliviousTransfer">
-<em class="property">class </em><tt class="descclassname">protocol_cns07.</tt><tt class="descname">ObliviousTransfer</tt><big>(</big><em>messages=None</em>, <em>groupObj=None</em>, <em>common_input=None</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.core.engine.protocol.Protocol</span></tt></p>
+<em class="property">class </em><code class="descclassname">protocol_cns07.</code><code class="descname">ObliviousTransfer</code><span class="sig-paren">(</span><em>messages=None</em>, <em>groupObj=None</em>, <em>common_input=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.core.engine.protocol.Protocol</span></code></p>
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.get_common">
-<tt class="descname">get_common</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.get_common"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.get_common" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_common</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.get_common"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.get_common" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.receiver_init2">
-<tt class="descname">receiver_init2</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_init2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_init2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">receiver_init2</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_init2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_init2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.receiver_transfer4">
-<tt class="descname">receiver_transfer4</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer4" title="Permalink to this definition">¶</a></dt>
+<code class="descname">receiver_transfer4</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer4" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.receiver_transfer6">
-<tt class="descname">receiver_transfer6</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer6" title="Permalink to this definition">¶</a></dt>
+<code class="descname">receiver_transfer6</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer6" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.receiver_transfer8">
-<tt class="descname">receiver_transfer8</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer8"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer8" title="Permalink to this definition">¶</a></dt>
+<code class="descname">receiver_transfer8</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer8"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer8" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.sender_init1">
-<tt class="descname">sender_init1</tt><big>(</big><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_init1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_init1" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sender_init1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_init1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_init1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.sender_init3">
-<tt class="descname">sender_init3</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_init3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_init3" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sender_init3</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_init3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_init3" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.sender_transfer5">
-<tt class="descname">sender_transfer5</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer5" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sender_transfer5</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer5" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.sender_transfer7">
-<tt class="descname">sender_transfer7</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer7" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sender_transfer7</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer7" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="protocol_cns07.ObliviousTransfer.sender_transfer9">
-<tt class="descname">sender_transfer9</tt><big>(</big><em>input</em><big>)</big><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer9" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sender_transfer9</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer9" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -143,37 +141,36 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="pre_mg07.html"
-                        title="previous chapter">pre_mg07</a></p>
+  <p class="topless"><a href="protocol_ao00.html"
+                        title="previous chapter">protocol_ao00</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="protocol_schnorr91.html"
                         title="next chapter">protocol_schnorr91</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/charm/schemes/protocol_cns07.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/charm/schemes/protocol_cns07.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -186,16 +183,16 @@
           <a href="protocol_schnorr91.html" title="protocol_schnorr91"
              >next</a> |</li>
         <li class="right" >
-          <a href="pre_mg07.html" title="pre_mg07"
+          <a href="protocol_ao00.html" title="protocol_ao00"
              >previous</a> |</li>
-        <li><a href="../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>PKSig &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>PKSig &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,71 +34,71 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for PKSig</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Base class for public-key signatures</span>
 <span class="sd"> </span>
 <span class="sd">Notes: This class implements an interface for a standard public-key signature scheme.</span>
 <span class="sd">A public key signature consists of three algorithms: (keygen, sign, verify).</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.schemebase</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.schemebase</span> <span class="k">import</span> <span class="o">*</span>
 
-<span class="n">pksigBaseSecDefs</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">&#39;EU_CMA&#39;</span><span class="p">,</span> <span class="s">&#39;wEU_CMA&#39;</span><span class="p">,</span> <span class="s">&#39;sEU_CMA&#39;</span><span class="p">)</span>
-<span class="n">EU_CMA</span><span class="p">,</span><span class="n">wEU_CMA</span><span class="p">,</span><span class="n">sEU_CMA</span><span class="o">=</span><span class="s">&quot;EU_CMA&quot;</span><span class="p">,</span><span class="s">&quot;wEU_CMA&quot;</span><span class="p">,</span><span class="s">&quot;sEU_CMA&quot;</span>
+<span class="n">pksigBaseSecDefs</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;EU_CMA&#39;</span><span class="p">,</span> <span class="s1">&#39;wEU_CMA&#39;</span><span class="p">,</span> <span class="s1">&#39;sEU_CMA&#39;</span><span class="p">)</span>
+<span class="n">EU_CMA</span><span class="p">,</span><span class="n">wEU_CMA</span><span class="p">,</span><span class="n">sEU_CMA</span><span class="o">=</span><span class="s2">&quot;EU_CMA&quot;</span><span class="p">,</span><span class="s2">&quot;wEU_CMA&quot;</span><span class="p">,</span><span class="s2">&quot;sEU_CMA&quot;</span>
 
 <div class="viewcode-block" id="PKSig"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig">[docs]</a><span class="k">class</span> <span class="nc">PKSig</span><span class="p">(</span><span class="n">SchemeBase</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&#39;PKSig&#39;</span><span class="p">)</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;PKSig&#39;</span><span class="p">)</span>
     
-<div class="viewcode-block" id="PKSig.setProperty"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.setProperty">[docs]</a>    <span class="k">def</span> <span class="nf">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secDef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">messageSpace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secModel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">secDef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">secDef</span> <span class="ow">in</span> <span class="n">pksigBaseSecDefs</span><span class="o">.</span><span class="n">getList</span><span class="p">(),</span> <span class="s">&quot;not a valid security definition for this scheme type.&quot;</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">pksigBaseSecDefs</span><span class="p">[</span><span class="n">secDef</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">assumption</span><span class="p">),</span> <span class="n">messageSpace</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">secModel</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">True</span>
-    </div>
+<div class="viewcode-block" id="PKSig.setProperty"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.setProperty">[docs]</a>    <span class="k">def</span> <span class="nf">setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secDef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">messageSpace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secModel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">secDef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">secDef</span> <span class="ow">in</span> <span class="n">pksigBaseSecDefs</span><span class="o">.</span><span class="n">getList</span><span class="p">(),</span> <span class="s2">&quot;not a valid security definition for this scheme type.&quot;</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pksigBaseSecDefs</span><span class="p">[</span><span class="n">secDef</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">assumption</span><span class="p">),</span> <span class="n">messageSpace</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">secModel</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+    
 <div class="viewcode-block" id="PKSig.getProperty"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.getProperty">[docs]</a>    <span class="k">def</span> <span class="nf">getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">baseProp</span> <span class="o">=</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_getProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">baseProp</span>
-    </div>
+        <span class="k">return</span> <span class="n">baseProp</span></div>
+    
 <div class="viewcode-block" id="PKSig.checkProperty"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.checkProperty">[docs]</a>    <span class="k">def</span> <span class="nf">checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemeObj</span><span class="p">,</span> <span class="n">_reqProps</span><span class="p">):</span>
         <span class="n">reqProps</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">_reqProps</span> <span class="p">]</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_checkProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemeObj</span><span class="p">,</span> <span class="n">reqProps</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-</div>
-<div class="viewcode-block" id="PKSig.updateProperty"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.updateProperty">[docs]</a>    <span class="k">def</span> <span class="nf">updateProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">secDef</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">messageSpace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">secModel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="c"># 1. inherit the scheme&#39;s properties</span>
-        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="s">&#39;properties&#39;</span><span class="p">),</span> <span class="s">&quot;schemeObj does not have getProperty() method.&quot;</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="PKSig.updateProperty"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.updateProperty">[docs]</a>    <span class="k">def</span> <span class="nf">updateProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">secDef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">messageSpace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">secModel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># 1. inherit the scheme&#39;s properties</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="s1">&#39;properties&#39;</span><span class="p">),</span> <span class="s2">&quot;schemeObj does not have getProperty() method.&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">scheme</span><span class="o">.</span><span class="n">getProperty</span><span class="p">())</span>
-        <span class="c"># 2. make sure things are consistent, then update to new properties</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">schemeType</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="s">&quot;scheme type wasn&#39;t specified on initialization&quot;</span>
-        <span class="k">assert</span> <span class="n">secDef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">secDef</span> <span class="ow">in</span> <span class="n">pksigBaseSecDefs</span><span class="o">.</span><span class="n">getList</span><span class="p">(),</span> <span class="s">&quot;not a valid security definition for this scheme type.&quot;</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">pksigBaseSecDefs</span><span class="p">[</span><span class="n">secDef</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">assumption</span><span class="p">),</span> <span class="n">messageSpace</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">secModel</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span>
-</div>
+        <span class="c1"># 2. make sure things are consistent, then update to new properties</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">schemeType</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;scheme type wasn&#39;t specified on initialization&quot;</span>
+        <span class="k">assert</span> <span class="n">secDef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">secDef</span> <span class="ow">in</span> <span class="n">pksigBaseSecDefs</span><span class="o">.</span><span class="n">getList</span><span class="p">(),</span> <span class="s2">&quot;not a valid security definition for this scheme type.&quot;</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pksigBaseSecDefs</span><span class="p">[</span><span class="n">secDef</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">assumption</span><span class="p">),</span> <span class="n">messageSpace</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">secModel</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
 <div class="viewcode-block" id="PKSig.printProperties"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.printProperties">[docs]</a>    <span class="k">def</span> <span class="nf">printProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;&#39;&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&lt;=== </span><span class="si">%s</span><span class="s"> Properties ===&gt;&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;=== </span><span class="si">%s</span><span class="s2"> Properties ===&gt;&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s">&quot;:&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;&lt;=== </span><span class="si">%s</span><span class="s"> Properties ===&gt;&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>            
-        <span class="k">return</span>
-    </div>
+            <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;=== </span><span class="si">%s</span><span class="s2"> Properties ===&gt;&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>            
+        <span class="k">return</span></div>
+    
 <div class="viewcode-block" id="PKSig.keygen"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">securityparam</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>		
-</div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>		</div>
+
 <div class="viewcode-block" id="PKSig.sign"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-    </div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+    
 <div class="viewcode-block" id="PKSig.verify"><a class="viewcode-back" href="../toolbox/PKSig.html#PKSig.PKSig.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 </pre></div>
@@ -108,26 +106,23 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -136,14 +131,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

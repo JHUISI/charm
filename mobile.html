@@ -1,34 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Android Build &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <title>Android Build &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="For Cryptographers" href="cryptographers.html" />
     <link rel="prev" title="Platform Install Manual" href="install_source.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -43,33 +42,33 @@
         <li class="right" >
           <a href="install_source.html" title="Platform Install Manual"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Charm-Crypto 0.50 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="android-build">
 <h1>Android Build<a class="headerlink" href="#android-build" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="charm-v0-43">
 <h2>Charm v0.43<a class="headerlink" href="#charm-v0-43" title="Permalink to this headline">¶</a></h2>
-<p>See the README in <tt class="docutils literal"><span class="pre">charm/installers/android</span></tt> dir (2.7-dev branch) for a clean approach to build &amp; embed Charm in Android apps using the <tt class="docutils literal"><span class="pre">android-python27</span></tt> project: <a class="reference external" href="https://code.google.com/p/android-python27/">https://code.google.com/p/android-python27/</a>. This version only works with Python 2.7 and the 3.x version is currently very buggy.</p>
+<p>See the README in <code class="docutils literal"><span class="pre">charm/installers/android</span></code> dir (2.7-dev branch) for a clean approach to build &amp; embed Charm in Android apps using the <code class="docutils literal"><span class="pre">android-python27</span></code> project: <a class="reference external" href="https://code.google.com/p/android-python27/">https://code.google.com/p/android-python27/</a>. This version only works with Python 2.7 and the 3.x version is currently very buggy.</p>
 </div>
 <div class="section" id="charm-v0-41-0-42">
 <h2>Charm v0.41-0.42<a class="headerlink" href="#charm-v0-41-0-42" title="Permalink to this headline">¶</a></h2>
 <p>Here are the simple instructions for deploying Charm:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Install <tt class="docutils literal"><span class="pre">Python3ForAndroid.apk</span></tt> found in github repository on your Android device.</li>
-<li>Install the <tt class="docutils literal"><span class="pre">SL4A</span></tt> package at the following link: <a class="reference external" href="https://android-scripting.googlecode.com/files/sl4a_r5.apk">https://android-scripting.googlecode.com/files/sl4a_r5.apk</a>.</li>
-<li>Charm Advanced Setup: Download <tt class="docutils literal"><span class="pre">pkg_resources.py</span></tt> and place in the appropriate place using the ADB tool. Configure your device to enable the android debug bridge and connect to your machine via USB. Next, use <tt class="docutils literal"><span class="pre">adb</span></tt> to push the <tt class="docutils literal"><span class="pre">pkg_resources.py</span></tt> and <tt class="docutils literal"><span class="pre">charm-schemes</span></tt> to a specified location on your SD card. Execute the following command:</li>
+<li>Install <code class="docutils literal"><span class="pre">Python3ForAndroid.apk</span></code> found in github repository on your Android device.</li>
+<li>Install the <code class="docutils literal"><span class="pre">SL4A</span></code> package at the following link: <a class="reference external" href="https://android-scripting.googlecode.com/files/sl4a_r5.apk">https://android-scripting.googlecode.com/files/sl4a_r5.apk</a>.</li>
+<li>Charm Advanced Setup: Download <code class="docutils literal"><span class="pre">pkg_resources.py</span></code> and place in the appropriate place using the ADB tool. Configure your device to enable the android debug bridge and connect to your machine via USB. Next, use <code class="docutils literal"><span class="pre">adb</span></code> to push the <code class="docutils literal"><span class="pre">pkg_resources.py</span></code> and <code class="docutils literal"><span class="pre">charm-schemes</span></code> to a specified location on your SD card. Execute the following command:</li>
 </ol>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">adb</span> <span class="pre">push</span> <span class="pre">pkg_resources</span> <span class="pre">/mnt/sdcard/com.googlecode.python3forandroid/extras/python3/lib/python3.2/site-packages</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">adb</span> <span class="pre">push</span> <span class="pre">schemes</span> <span class="pre">/mnt/sdcard/sl4a/scripts/schemes</span></tt></li>
+<li><code class="docutils literal"><span class="pre">adb</span> <span class="pre">push</span> <span class="pre">pkg_resources</span> <span class="pre">/mnt/sdcard/com.googlecode.python3forandroid/extras/python3/lib/python3.2/site-packages</span></code></li>
+<li><code class="docutils literal"><span class="pre">adb</span> <span class="pre">push</span> <span class="pre">schemes</span> <span class="pre">/mnt/sdcard/sl4a/scripts/schemes</span></code></li>
 </ul>
 </div></blockquote>
 <p>See more detailed blog posts on installing Charm on Android:</p>
@@ -86,7 +85,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -103,29 +102,28 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="cryptographers.html"
                         title="next chapter">For Cryptographers</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/mobile.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/mobile.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -140,13 +138,13 @@
         <li class="right" >
           <a href="install_source.html" title="Platform Install Manual"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Charm-Crypto 0.50 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

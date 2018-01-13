@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>conversion &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>conversion &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,25 +34,25 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for conversion</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">:Date: Jul 5, 2011</span>
 <span class="sd">:Authors: Gary Belvin</span>
 
 <span class="sd">This class facilitates conversion between domain spaces</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.bitstring</span> <span class="kn">import</span> <span class="n">Bytes</span><span class="p">,</span><span class="n">py3</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">integer</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.bitstring</span> <span class="k">import</span> <span class="n">Bytes</span><span class="p">,</span><span class="n">py3</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
 <div class="viewcode-block" id="Conversion"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion">[docs]</a><span class="k">class</span> <span class="nc">Conversion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -77,31 +75,31 @@
 <span class="sd">    * Integer element mod N</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.bytes2element"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2element">[docs]</a>    <span class="k">def</span> <span class="nf">bytes2element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">):</span>
+<div class="viewcode-block" id="Conversion.bytes2element"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2element">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">bytes2element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Converts a byte string to a group element&#39;&#39;&#39;</span>
         <span class="k">pass</span></div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.bytes2integer"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2integer">[docs]</a>    <span class="k">def</span> <span class="nf">bytes2integer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">):</span>
+<div class="viewcode-block" id="Conversion.bytes2integer"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2integer">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">bytes2integer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Converts a bytes string to an integer object&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="n">bytestr</span><span class="p">)</span></div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.str2bytes"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.str2bytes">[docs]</a>    <span class="k">def</span> <span class="nf">str2bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strobj</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">strobj</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span></div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.bytes2str"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2str">[docs]</a>    <span class="k">def</span> <span class="nf">bytes2str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteobj</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">byteobj</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
-    </div>
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Conversion.int2bin"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.int2bin">[docs]</a>    <span class="k">def</span> <span class="nf">int2bin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intobj</span><span class="p">):</span>
+<div class="viewcode-block" id="Conversion.str2bytes"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.str2bytes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">str2bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strobj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Bytes</span><span class="p">(</span><span class="n">strobj</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Conversion.bytes2str"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.bytes2str">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">bytes2str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">byteobj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">byteobj</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Conversion.int2bin"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.int2bin">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">int2bin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intobj</span><span class="p">):</span>
         <span class="n">_str</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">intobj</span><span class="p">))</span>
         <span class="n">_array</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">_str</span><span class="p">)):</span>
             <span class="n">_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_str</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> 
-        <span class="k">return</span> <span class="n">_array</span>
-        </div>
-    <span class="nd">@classmethod</span>    
-<div class="viewcode-block" id="Conversion.OS2IP"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.OS2IP">[docs]</a>    <span class="k">def</span> <span class="nf">OS2IP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">,</span> <span class="n">element</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_array</span></div>
+        
+<div class="viewcode-block" id="Conversion.OS2IP"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.OS2IP">[docs]</a>    <span class="nd">@classmethod</span>    
+    <span class="k">def</span> <span class="nf">OS2IP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytestr</span><span class="p">,</span> <span class="n">element</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :Return: A python ``int`` if element is False. An ``integer.Element`` if element is True</span>
 <span class="sd">        </span>
@@ -113,16 +111,16 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">py3</span><span class="p">:</span> <span class="n">byt</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">byt</span><span class="p">)</span>
             <span class="n">val</span> <span class="o">+=</span> <span class="n">byt</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">8</span> <span class="o">*</span><span class="n">i</span><span class="p">)</span>
 
-        <span class="c">#These lines convert val into a binary string of 1&#39;s and 0&#39;s </span>
-        <span class="c">#bstr = bin(val)[2:]   #cut out the 0b header</span>
-        <span class="c">#val = int(bstr, 2)</span>
-        <span class="c">#return val</span>
+        <span class="c1">#These lines convert val into a binary string of 1&#39;s and 0&#39;s </span>
+        <span class="c1">#bstr = bin(val)[2:]   #cut out the 0b header</span>
+        <span class="c1">#val = int(bstr, 2)</span>
+        <span class="c1">#return val</span>
         <span class="k">if</span> <span class="n">element</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">val</span></div>
-    <span class="nd">@classmethod</span>    
-<div class="viewcode-block" id="Conversion.IP2OS"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.IP2OS">[docs]</a>    <span class="k">def</span> <span class="nf">IP2OS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">xLen</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Conversion.IP2OS"><a class="viewcode-back" href="../toolbox/conversion.html#conversion.Conversion.IP2OS">[docs]</a>    <span class="nd">@classmethod</span>    
+    <span class="k">def</span> <span class="nf">IP2OS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">xLen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :Parameters:</span>
 <span class="sd">          - ``number``: is a normal integer, not modular</span>
@@ -136,10 +134,10 @@
             <span class="n">x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">number</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">py3</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="o">==</span> <span class="nb">long</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">py3</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="o">==</span> <span class="n">long</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">number</span>  
 
-        <span class="k">if</span> <span class="n">xLen</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">xLen</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">xLen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">8.0</span><span class="p">))</span>
             
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">xLen</span><span class="p">):</span>
@@ -152,26 +150,23 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -180,14 +175,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

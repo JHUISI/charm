@@ -1,0 +1,202 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>lem_scheme &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pk_vrf" href="pk_vrf.html" />
+    <link rel="prev" title="joye_scheme" href="joye_scheme.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pk_vrf.html" title="pk_vrf"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="joye_scheme.html" title="joye_scheme"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-lem_scheme">
+<span id="lem-scheme"></span><h1>lem_scheme<a class="headerlink" href="#module-lem_scheme" title="Permalink to this headline">¶</a></h1>
+<p>Iraklis Leontiadis, Kaoutar Elkhiyaoui, Refik Molva(Aggregation Scheme)</p>
+<div class="line-block">
+<div class="line">From: “Private and Dynamic Time-Series Data Aggregation with Trust Relaxation” </div>
+<div class="line">Published in: CANS 2014</div>
+<div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2014/256.pdf">http://eprint.iacr.org/2014/256.pdf</a></div>
+</div>
+<p>type:           Plaintext Evaluation of the sum from encrypted values. 
+setting:        Integer</p>
+<p>Authors:    Iraklis Leontiadis
+Date:            2/2015</p>
+<dl class="class">
+<dt id="lem_scheme.Aggregator">
+<em class="property">class </em><code class="descclassname">lem_scheme.</code><code class="descname">Aggregator</code><a class="reference internal" href="../../_modules/lem_scheme.html#Aggregator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.Aggregator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class for computing Pka and generating Ska</p>
+<dl class="method">
+<dt id="lem_scheme.Aggregator.decrypt">
+<code class="descname">decrypt</code><span class="sig-paren">(</span><em>*encarray</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Aggregator.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.Aggregator.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrypting the sum</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="lem_scheme.Collector">
+<em class="property">class </em><code class="descclassname">lem_scheme.</code><code class="descname">Collector</code><span class="sig-paren">(</span><em>*auxarray</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Collector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.Collector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Computes auxt from list of auxiliary information from all users</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="lem_scheme.Users">
+<em class="property">class </em><code class="descclassname">lem_scheme.</code><code class="descname">Users</code><span class="sig-paren">(</span><em>*userdata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Users"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.Users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Computing users secret keys(ski) for users list <a href="#id1"><span class="problematic" id="id2">*</span></a>userdata</p>
+<dl class="method">
+<dt id="lem_scheme.Users.auxiliary">
+<code class="descname">auxiliary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Users.auxiliary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.Users.auxiliary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes auxiliary for all users into a list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lem_scheme.Users.encrypt">
+<code class="descname">encrypt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Users.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.Users.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypts all user data into a list</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="lem_scheme.auxiliaryfunc">
+<code class="descclassname">lem_scheme.</code><code class="descname">auxiliaryfunc</code><span class="sig-paren">(</span><em>b</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#auxiliaryfunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.auxiliaryfunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auxiliary information of one value, where  b=ski</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lem_scheme.egcd">
+<code class="descclassname">lem_scheme.</code><code class="descname">egcd</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#egcd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.egcd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extended Euclidian gcd function between a and b</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lem_scheme.encryptfunc">
+<code class="descclassname">lem_scheme.</code><code class="descname">encryptfunc</code><span class="sig-paren">(</span><em>a</em>, <em>d</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#encryptfunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.encryptfunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encryption of one value, where a=plaintext(number), d=ski</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lem_scheme.hash">
+<code class="descclassname">lem_scheme.</code><code class="descname">hash</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computing hash value of time</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lem_scheme.modinv">
+<code class="descclassname">lem_scheme.</code><code class="descname">modinv</code><span class="sig-paren">(</span><em>a</em>, <em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#modinv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.modinv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finding modulo inverse of a mod m</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lem_scheme.secretkey">
+<code class="descclassname">lem_scheme.</code><code class="descname">secretkey</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#secretkey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lem_scheme.secretkey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generating random secret key smaller than n2</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="joye_scheme.html"
+                        title="previous chapter">joye_scheme</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pk_vrf.html"
+                        title="next chapter">pk_vrf</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/charm/schemes/lem_scheme.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pk_vrf.html" title="pk_vrf"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="joye_scheme.html" title="joye_scheme"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" >Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

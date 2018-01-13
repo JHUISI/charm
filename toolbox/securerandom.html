@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>securerandom &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>securerandom &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sigmaprotocol" href="sigmaprotocol.html" />
     <link rel="prev" title="secretutil" href="secretutil.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,15 +42,15 @@
         <li class="right" >
           <a href="secretutil.html" title="secretutil"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-securerandom">
 <span id="securerandom"></span><h1>securerandom<a class="headerlink" href="#module-securerandom" title="Permalink to this headline">¶</a></h1>
@@ -60,35 +58,35 @@
 :authors: Gary Belvin</p>
 <dl class="class">
 <dt id="securerandom.OpenSSLRand">
-<em class="property">class </em><tt class="descclassname">securerandom.</tt><tt class="descname">OpenSSLRand</tt><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.OpenSSLRand" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><tt class="xref py py-class docutils literal"><span class="pre">securerandom.SecureRandom</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">securerandom.</code><code class="descname">OpenSSLRand</code><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.OpenSSLRand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><code class="xref py py-class docutils literal"><span class="pre">securerandom.SecureRandom</span></code></a></p>
 <p>Uses the OpenSSL PRNG for random bits</p>
 <dl class="method">
 <dt id="securerandom.OpenSSLRand.getRandomBits">
-<tt class="descname">getRandomBits</tt><big>(</big><em>length</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand.getRandomBits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.OpenSSLRand.getRandomBits" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getRandomBits</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand.getRandomBits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.OpenSSLRand.getRandomBits" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="securerandom.OpenSSLRand.getRandomBytes">
-<tt class="descname">getRandomBytes</tt><big>(</big><em>length</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand.getRandomBytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.OpenSSLRand.getRandomBytes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getRandomBytes</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand.getRandomBytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.OpenSSLRand.getRandomBytes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="securerandom.SecureRandom">
-<em class="property">class </em><tt class="descclassname">securerandom.</tt><tt class="descname">SecureRandom</tt><a class="reference internal" href="../_modules/securerandom.html#SecureRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">securerandom.</code><code class="descname">SecureRandom</code><a class="reference internal" href="../_modules/securerandom.html#SecureRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="securerandom.SecureRandom.addSeed">
-<tt class="descname">addSeed</tt><big>(</big><em>seed</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.addSeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom.addSeed" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addSeed</code><span class="sig-paren">(</span><em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.addSeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom.addSeed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add randomness to the generator.  
 Always increases entropy</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="securerandom.SecureRandom.getRandomBytes">
-<tt class="descname">getRandomBytes</tt><big>(</big><em>length</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.getRandomBytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom.getRandomBytes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getRandomBytes</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.getRandomBytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandom.getRandomBytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a random bit string of length bytes</p>
 </dd></dl>
 
@@ -96,36 +94,36 @@ Always increases entropy</p>
 
 <dl class="class">
 <dt id="securerandom.SecureRandomFactory">
-<em class="property">class </em><tt class="descclassname">securerandom.</tt><tt class="descname">SecureRandomFactory</tt><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandomFactory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">securerandom.</code><code class="descname">SecureRandomFactory</code><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandomFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>This class provides a central place to swap out the randomness engine
 used by the charm framework.
-Classes should call <tt class="docutils literal"><span class="pre">rand</span> <span class="pre">=</span> <span class="pre">SecureRandomFactory.getInstance()</span></tt> 
+Classes should call <code class="docutils literal"><span class="pre">rand</span> <span class="pre">=</span> <span class="pre">SecureRandomFactory.getInstance()</span></code> 
 to acquire a randomnesss generator</p>
 <dl class="classmethod">
 <dt id="securerandom.SecureRandomFactory.getInstance">
-<em class="property">classmethod </em><tt class="descname">getInstance</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory.getInstance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandomFactory.getInstance" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">getInstance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory.getInstance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.SecureRandomFactory.getInstance" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="securerandom.WeakRandom">
-<em class="property">class </em><tt class="descclassname">securerandom.</tt><tt class="descname">WeakRandom</tt><a class="reference internal" href="../_modules/securerandom.html#WeakRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><tt class="xref py py-class docutils literal"><span class="pre">securerandom.SecureRandom</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">securerandom.</code><code class="descname">WeakRandom</code><a class="reference internal" href="../_modules/securerandom.html#WeakRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><code class="xref py py-class docutils literal"><span class="pre">securerandom.SecureRandom</span></code></a></p>
 <dl class="method">
 <dt id="securerandom.WeakRandom.addSeed">
-<tt class="descname">addSeed</tt><big>(</big><em>seed</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.addSeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.addSeed" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addSeed</code><span class="sig-paren">(</span><em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.addSeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.addSeed" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="securerandom.WeakRandom.getRandomBytes">
-<tt class="descname">getRandomBytes</tt><big>(</big><em>length</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.getRandomBytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.getRandomBytes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getRandomBytes</code><span class="sig-paren">(</span><em>length</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.getRandomBytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.getRandomBytes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="securerandom.WeakRandom.myrandom">
-<em class="property">classmethod </em><tt class="descname">myrandom</tt><big>(</big><em>length</em>, <em>printable=False</em><big>)</big><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.myrandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.myrandom" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">myrandom</code><span class="sig-paren">(</span><em>length</em>, <em>printable=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.myrandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#securerandom.WeakRandom.myrandom" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method does <strong>NOT</strong> provide cryptographically secure random numbers.
 This should <strong>NOT</strong> be used for production code</p>
 </dd></dl>
@@ -138,7 +136,7 @@ This should <strong>NOT</strong> be used for production code</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="secretutil.html"
@@ -146,29 +144,28 @@ This should <strong>NOT</strong> be used for production code</p>
   <h4>Next topic</h4>
   <p class="topless"><a href="sigmaprotocol.html"
                         title="next chapter">sigmaprotocol</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/securerandom.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/securerandom.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -183,14 +180,14 @@ This should <strong>NOT</strong> be used for production code</p>
         <li class="right" >
           <a href="secretutil.html" title="secretutil"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

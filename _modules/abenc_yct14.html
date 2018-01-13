@@ -1,0 +1,289 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>abenc_yct14 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for abenc_yct14</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Xuanxia Yao, Zhi Chen, Ye Tian</span>
+<span class="sd"> </span>
+<span class="sd">| From: A lightweight attribute-based encryption scheme for the Internet of things</span>
+<span class="sd">| Published in: Future Generation Computer Systems</span>
+<span class="sd">| Available From: http://www.sciencedirect.com/science/article/pii/S0167739X14002039</span>
+<span class="sd">| Notes: </span>
+
+<span class="sd">* type:           key-policy attribute-based encryption (public key)</span>
+<span class="sd">* setting:        No Pairing</span>
+
+<span class="sd">:Authors:    artjomb</span>
+<span class="sd">:Date:       10/2014</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.secretutil</span> <span class="k">import</span> <span class="n">SecretUtil</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.symcrypto</span> <span class="k">import</span> <span class="n">SymmetricCryptoAbstraction</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ABEnc</span> <span class="k">import</span> <span class="n">ABEnc</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.abenc.abenc_lsw08</span> <span class="k">import</span> <span class="n">KPabe</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.pairing</span> <span class="k">import</span> <span class="n">hashPair</span> <span class="k">as</span> <span class="n">extractor</span>
+
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">clock</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+<div class="viewcode-block" id="EKPabe"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_yct14.html#abenc_yct14.EKPabe">[docs]</a><span class="k">class</span> <span class="nc">EKPabe</span><span class="p">(</span><span class="n">ABEnc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup,GT</span>
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;MNT224&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; kpabe = EKPabe(group)</span>
+<span class="sd">    &gt;&gt;&gt; attributes = [ &#39;ONE&#39;, &#39;TWO&#39;, &#39;THREE&#39;, &#39;FOUR&#39; ]</span>
+<span class="sd">    &gt;&gt;&gt; (master_public_key, master_key) = kpabe.setup(attributes)</span>
+<span class="sd">    &gt;&gt;&gt; policy = &#39;(ONE or THREE) and (THREE or TWO)&#39;</span>
+<span class="sd">    &gt;&gt;&gt; secret_key = kpabe.keygen(master_public_key, master_key, policy)</span>
+<span class="sd">    &gt;&gt;&gt; msg = b&quot;Some Random Message&quot;</span>
+<span class="sd">    &gt;&gt;&gt; cipher_text = kpabe.encrypt(master_public_key, msg, attributes)</span>
+<span class="sd">    &gt;&gt;&gt; decrypted_msg = kpabe.decrypt(cipher_text, secret_key)</span>
+<span class="sd">    &gt;&gt;&gt; decrypted_msg == msg</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ABEnc</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">util</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="n">util</span> <span class="o">=</span> <span class="n">SecretUtil</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>        
+
+<div class="viewcode-block" id="EKPabe.setup"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_yct14.html#abenc_yct14.EKPabe.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributes</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributeSecrets</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="n">si</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attributeSecrets</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">si</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">**</span><span class="n">si</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">g</span><span class="o">**</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="c1"># (pk, mk)</span></div>
+    
+<div class="viewcode-block" id="EKPabe.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_yct14.html#abenc_yct14.EKPabe.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">):</span>
+        <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">policy_str</span><span class="p">)</span>
+        <span class="n">attr_list</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
+        
+        <span class="n">s</span> <span class="o">=</span> <span class="n">mk</span>
+        <span class="n">shares</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">calculateSharesDict</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+        
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;policy&#39;</span><span class="p">:</span> <span class="n">policy_str</span><span class="p">,</span> <span class="s1">&#39;Du&#39;</span><span class="p">:</span> <span class="n">d</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">attr_list</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">strip_index</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">shares</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">attributeSecrets</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; d[y] &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">y</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access Policy for key: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">policy</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Attribute list: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">attr_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">D</span></div>
+    
+<div class="viewcode-block" id="EKPabe.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_yct14.html#abenc_yct14.EKPabe.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span> 
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Encryption Algorithm...&#39;</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">);</span>
+        <span class="n">Cs</span> <span class="o">=</span> <span class="n">pk</span> <span class="o">**</span> <span class="n">k</span>
+        
+        <span class="n">Ci</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attr_list</span><span class="p">:</span>
+            <span class="n">Ci</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">**</span> <span class="n">k</span>
+        
+        <span class="n">symcrypt</span> <span class="o">=</span> <span class="n">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="n">extractor</span><span class="p">(</span><span class="n">Cs</span><span class="p">))</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">symcrypt</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="n">C</span><span class="p">,</span> <span class="s1">&#39;Ci&#39;</span><span class="p">:</span> <span class="n">Ci</span><span class="p">,</span> <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="n">attr_list</span> <span class="p">}</span></div>
+    
+<div class="viewcode-block" id="EKPabe.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_yct14.html#abenc_yct14.EKPabe.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">):</span>
+        <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="s1">&#39;policy&#39;</span><span class="p">])</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">C</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">attrs</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getCoefficients</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
+        
+        <span class="n">Z</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">prodT</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attrs</span><span class="p">)):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">()</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">getAttributeAndIndex</span><span class="p">()</span>
+            <span class="n">Z</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="s1">&#39;Ci&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">**</span> <span class="n">D</span><span class="p">[</span><span class="s1">&#39;Du&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">]</span>
+            <span class="n">prodT</span> <span class="o">*=</span> <span class="n">Z</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">**</span> <span class="n">coeff</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+        
+        <span class="n">symcrypt</span> <span class="o">=</span> <span class="n">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="n">extractor</span><span class="p">(</span><span class="n">prodT</span><span class="p">))</span>
+        
+        <span class="k">return</span> <span class="n">symcrypt</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span></div></div>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_yct14.html#abenc_yct14.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+    <span class="n">kpabe</span> <span class="o">=</span> <span class="n">EKPabe</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span> <span class="p">]</span>
+
+    <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+
+    <span class="c1"># policy = &#39;(ONE or THREE) and (THREE or TWO)&#39;</span>
+    <span class="n">policy</span> <span class="o">=</span> <span class="s1">&#39;THREE and (ONE or TWO)&#39;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Some Random Message&quot;</span>
+
+    <span class="n">mykey</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Encrypt under these attributes: &quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+
+    <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="n">mykey</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">rec_msg</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rec_msg=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">rec_msg</span><span class="p">))</span>
+
+    <span class="k">assert</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">rec_msg</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful Decryption!&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="benchmark"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_yct14.html#abenc_yct14.benchmark">[docs]</a><span class="k">def</span> <span class="nf">benchmark</span><span class="p">():</span>
+    <span class="n">groupObj1</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+    <span class="n">groupObj2</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+    <span class="n">ekpabe</span> <span class="o">=</span> <span class="n">EKPabe</span><span class="p">(</span><span class="n">groupObj1</span><span class="p">)</span>
+    <span class="n">kpabe</span> <span class="o">=</span> <span class="n">KPabe</span><span class="p">(</span><span class="n">groupObj2</span><span class="p">)</span>
+    
+    <span class="n">t1_s</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">t1_k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">t1_e</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">t1_d</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">t2_s</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">t2_k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">t2_e</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">t2_d</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span> <span class="p">]</span>
+    <span class="n">policy</span> <span class="o">=</span> <span class="s1">&#39;THREE and (ONE or TWO)&#39;</span>
+    <span class="n">msg1</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Some Random Message&quot;</span>
+    <span class="n">msg2</span> <span class="o">=</span> <span class="n">groupObj2</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">clock</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">epk</span><span class="p">,</span> <span class="n">emk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ekpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="n">t1_s</span> <span class="o">+=</span> <span class="n">clock</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        
+        <span class="n">start</span> <span class="o">=</span> <span class="n">clock</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        <span class="n">t2_s</span> <span class="o">+=</span> <span class="n">clock</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">clock</span><span class="p">()</span>
+        <span class="n">emykey</span> <span class="o">=</span> <span class="n">ekpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">epk</span><span class="p">,</span> <span class="n">emk</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+        <span class="n">t1_k</span> <span class="o">+=</span> <span class="n">clock</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        
+        <span class="n">start</span> <span class="o">=</span> <span class="n">clock</span><span class="p">()</span>
+        <span class="n">mykey</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+        <span class="n">t2_k</span> <span class="o">+=</span> <span class="n">clock</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">clock</span><span class="p">()</span>
+            <span class="n">eciphertext</span> <span class="o">=</span> <span class="n">ekpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">epk</span><span class="p">,</span> <span class="n">msg1</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+            <span class="n">t1_e</span> <span class="o">+=</span> <span class="n">clock</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+            
+            <span class="n">start</span> <span class="o">=</span> <span class="n">clock</span><span class="p">()</span>
+            <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg2</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+            <span class="n">t2_e</span> <span class="o">+=</span> <span class="n">clock</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+            
+            <span class="n">start</span> <span class="o">=</span> <span class="n">clock</span><span class="p">()</span>
+            <span class="n">erec_msg</span> <span class="o">=</span> <span class="n">ekpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">eciphertext</span><span class="p">,</span> <span class="n">emykey</span><span class="p">)</span>
+            <span class="n">t1_d</span> <span class="o">+=</span> <span class="n">clock</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+            
+            <span class="n">start</span> <span class="o">=</span> <span class="n">clock</span><span class="p">()</span>
+            <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="n">mykey</span><span class="p">)</span>
+            <span class="n">t2_d</span> <span class="o">+=</span> <span class="n">clock</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+
+            <span class="k">assert</span> <span class="n">msg1</span> <span class="o">==</span> <span class="n">erec_msg</span>
+            <span class="k">assert</span> <span class="n">msg2</span> <span class="o">==</span> <span class="n">rec_msg</span>
+    
+    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;yct14 s=</span><span class="si">%s</span><span class="s2"> k=</span><span class="si">%s</span><span class="s2"> e=</span><span class="si">%s</span><span class="s2"> d=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t1_s</span><span class="p">,</span> <span class="n">t1_k</span><span class="p">,</span> <span class="n">t1_e</span><span class="p">,</span> <span class="n">t1_d</span><span class="p">))</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;lsw08 s=</span><span class="si">%s</span><span class="s2"> k=</span><span class="si">%s</span><span class="s2"> e=</span><span class="si">%s</span><span class="s2"> d=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t2_s</span><span class="p">,</span> <span class="n">t2_k</span><span class="p">,</span> <span class="n">t2_e</span><span class="p">,</span> <span class="n">t2_d</span><span class="p">))</span></div>
+    
+    <span class="c1"># Result in VM:</span>
+    <span class="c1"># yct14 s=0.1 k=0.02 e=3.44 d=2.91</span>
+    <span class="c1"># lsw08 s=0.42 k=0.41 e=10.32 d=21.25</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># debug = True</span>
+    <span class="c1"># main()</span>
+    <span class="n">benchmark</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

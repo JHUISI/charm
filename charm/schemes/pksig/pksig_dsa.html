@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_dsa &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <title>pksig_dsa &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="pksig_ecdsa" href="pksig_ecdsa.html" />
     <link rel="prev" title="pksig_cyh" href="pksig_cyh.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,21 +42,21 @@
         <li class="right" >
           <a href="pksig_cyh.html" title="pksig_cyh"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-pksig_dsa">
 <span id="pksig-dsa"></span><h1>pksig_dsa<a class="headerlink" href="#module-pksig_dsa" title="Permalink to this headline">¶</a></h1>
 <p>Digital Signature Algorithm (DSA)</p>
 <div class="line-block">
-<div class="line">From: &#8220;NIST proposed in Aug 1991 for use in DSS.&#8221;</div>
+<div class="line">From: “NIST proposed in Aug 1991 for use in DSS.”</div>
 <div class="line">Published in: FIPS 186</div>
 <div class="line">Available from: </div>
 <div class="line">Notes: </div>
@@ -83,14 +81,14 @@
 </table>
 <dl class="class">
 <dt id="pksig_dsa.DSA">
-<em class="property">class </em><tt class="descclassname">pksig_dsa.</tt><tt class="descname">DSA</tt><big>(</big><em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></tt></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span>
+<em class="property">class </em><code class="descclassname">pksig_dsa.</code><code class="descname">DSA</code><span class="sig-paren">(</span><em>p=0</em>, <em>q=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">integer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">78026701315845642650478533423290697952946810503781545303994043249263895825417197979312263873458290625951595165648634453837959641616221499853309829737663096055610272863216947901196216467463121276681626666630641061058671702351757348054165492211737848899078287026481329186785666349501358041565106233731785681339</span><span class="p">)</span>    
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dsa</span> <span class="o">=</span> <span class="n">DSA</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">dsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;hello world test message!!!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;hello world test message!!!&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">dsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 <span class="go">True</span>
@@ -98,17 +96,17 @@
 </div>
 <dl class="method">
 <dt id="pksig_dsa.DSA.keygen">
-<tt class="descname">keygen</tt><big>(</big><em>bits</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.keygen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">keygen</code><span class="sig-paren">(</span><em>bits</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.keygen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_dsa.DSA.sign">
-<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>x</em>, <em>M</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.sign" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sign</code><span class="sig-paren">(</span><em>pk</em>, <em>x</em>, <em>M</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.sign" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_dsa.DSA.verify">
-<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>sig</em>, <em>M</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.verify" title="Permalink to this definition">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>pk</em>, <em>sig</em>, <em>M</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_dsa.html#DSA.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_dsa.DSA.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -119,7 +117,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="pksig_cyh.html"
@@ -127,29 +125,28 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="pksig_ecdsa.html"
                         title="next chapter">pksig_ecdsa</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../../_sources/charm/schemes/pksig/pksig_dsa.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/pksig/pksig_dsa.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -164,14 +161,14 @@
         <li class="right" >
           <a href="pksig_cyh.html" title="pksig_cyh"
              >previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

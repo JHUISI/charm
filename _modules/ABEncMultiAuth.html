@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>ABEncMultiAuth &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>ABEncMultiAuth &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,71 +34,105 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for ABEncMultiAuth</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39; Base class for attribute-based encryption multi-authority</span>
-<span class="sd"> </span>
-<span class="sd"> Notes: This class implements an interface for a standard attribute-based encryption scheme.</span>
-<span class="sd"> </span>
-<span class="sd">A public key attribute-based encryption scheme consists of four algorithms: </span>
-<span class="sd">(setup, authsetup, keygen, encrypt, decrypt).</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.schemebase</span> <span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">from</span> <span class="nn">charm.toolbox.schemebase</span> <span class="k">import</span> <span class="o">*</span>
+
 
 <div class="viewcode-block" id="ABEncMultiAuth"><a class="viewcode-back" href="../toolbox/ABEncMultiAuth.html#ABEncMultiAuth.ABEncMultiAuth">[docs]</a><span class="k">class</span> <span class="nc">ABEncMultiAuth</span><span class="p">(</span><span class="n">SchemeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for attribute-based encryption multi-authority</span>
+
+<span class="sd">     Notes: This class implements an interface for a standard attribute-based encryption scheme.</span>
+
+<span class="sd">    A public key attribute-based encryption scheme consists of four algorithms:</span>
+<span class="sd">    (setup, authsetup, keygen, encrypt, decrypt).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">&#39;ABEncMultiAuth&#39;</span><span class="p">)</span>  
-        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="bp">None</span> 
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;ABEncMultiAuth&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseSecDefs</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="ABEncMultiAuth.setup"><a class="viewcode-back" href="../toolbox/ABEncMultiAuth.html#ABEncMultiAuth.ABEncMultiAuth.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</div>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup this multi-authority attribute based encryption scheme.</span>
+<span class="sd">        :return: The result of the central setup, for example some global parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
 <div class="viewcode-block" id="ABEncMultiAuth.authsetup"><a class="viewcode-back" href="../toolbox/ABEncMultiAuth.html#ABEncMultiAuth.ABEncMultiAuth.authsetup">[docs]</a>    <span class="k">def</span> <span class="nf">authsetup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</div>
-<div class="viewcode-block" id="ABEncMultiAuth.keygen"><a class="viewcode-back" href="../toolbox/ABEncMultiAuth.html#ABEncMultiAuth.ABEncMultiAuth.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</div>
-<div class="viewcode-block" id="ABEncMultiAuth.encrypt"><a class="viewcode-back" href="../toolbox/ABEncMultiAuth.html#ABEncMultiAuth.ABEncMultiAuth.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</div>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup an authority.</span>
+<span class="sd">        :param gp: The global parameters of the scheme.</span>
+<span class="sd">        :param object: Additional required arguments, for example a list of attributes or a name.</span>
+<span class="sd">        :return: The result of the authority setup.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ABEncMultiAuth.keygen"><a class="viewcode-back" href="../toolbox/ABEncMultiAuth.html#ABEncMultiAuth.ABEncMultiAuth.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate user secret keys for attributes from a single authority.</span>
+<span class="sd">        :param gp: The global parameters of the scheme.</span>
+<span class="sd">        :param sk: The secret keys of the attribute authority.</span>
+<span class="sd">        :param gid: Global identifier for the user.</span>
+<span class="sd">        :param object: An attribute, list of attributes or access structure, depending on the scheme.</span>
+<span class="sd">        :return: The secret keys for the user for the given attributes/access structure.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ABEncMultiAuth.encrypt"><a class="viewcode-back" href="../toolbox/ABEncMultiAuth.html#ABEncMultiAuth.ABEncMultiAuth.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Encrypt a message.</span>
+<span class="sd">        :param gp: The global parameters of the scheme.</span>
+<span class="sd">        :param pk: The public keys of all relevant authorities.</span>
+<span class="sd">        :param m: The message to encrypt.</span>
+<span class="sd">        :param object: An access policy or a set of attributes to use.</span>
+<span class="sd">        :return: The encrypted message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
 <div class="viewcode-block" id="ABEncMultiAuth.decrypt"><a class="viewcode-back" href="../toolbox/ABEncMultiAuth.html#ABEncMultiAuth.ABEncMultiAuth.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decrypt a ciphertext.</span>
+<span class="sd">        :param gp: The global parameters of the scheme.</span>
+<span class="sd">        :param sk: The secret keys of the user.</span>
+<span class="sd">        :param ct: The ciphertext to decrypt.</span>
+<span class="sd">        :return: The plaintext.</span>
+<span class="sd">        :raise Exception: Raised when the attributes do not satisfy the access policy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -109,14 +141,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

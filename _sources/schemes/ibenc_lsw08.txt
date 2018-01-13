@@ -1,7 +1,0 @@
-
-ibenc_lsw08
-=========================================
-.. automodule:: ibenc_lsw08
-    :show-inheritance:
-    :members:
-    :undoc-members:

@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_cl03 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>pksig_cl03 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,30 +34,44 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for pksig_cl03</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
-<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">isPrime</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">randomPrime</span><span class="p">,</span><span class="n">randomBits</span>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd"> A Signature Scheme with Efficient Protocols</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;J. Camenisch, A. Lysyanskaya.&quot;</span>
+<span class="sd">| Published in: 2003</span>
+<span class="sd">| Available from: http://cs.brown.edu/~anna/papers/camlys02b.pdf </span>
+<span class="sd">| Notes: Schemes 2.2 (on page 4) and 4 (on page 8). </span>
+
+<span class="sd">* type:           signature</span>
+<span class="sd">* setting:        integer groups </span>
+
+<span class="sd">:Authors:    Christina Garman/Antonio de la Piedra</span>
+<span class="sd">:Date:       11/2013</span>
+<span class="sd"> &#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="k">import</span> <span class="n">PKSig</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">isPrime</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">randomPrime</span><span class="p">,</span><span class="n">randomBits</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
 
 <div class="viewcode-block" id="SHA1"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cl03.html#pksig_cl03.SHA1">[docs]</a><span class="k">def</span> <span class="nf">SHA1</span><span class="p">(</span><span class="n">bytes1</span><span class="p">):</span>
-    <span class="n">s1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;sha1&#39;</span><span class="p">)</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">)</span>
     <span class="n">s1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bytes1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">s1</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
-</div>
+    <span class="k">return</span> <span class="n">s1</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="randomQR"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cl03.html#pksig_cl03.randomQR">[docs]</a><span class="k">def</span> <span class="nf">randomQR</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-</div>
-<span class="n">debug</span><span class="o">=</span><span class="bp">False</span>
+    <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span></div>
+
+<span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
 <div class="viewcode-block" id="Sig_CL03"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cl03.html#pksig_cl03.Sig_CL03">[docs]</a><span class="k">class</span> <span class="nc">Sig_CL03</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; pksig = Sig_CL03() </span>
@@ -69,6 +81,21 @@
 <span class="sd">    &gt;&gt;&gt; msg = integer(SHA1(b&#39;This is the message I want to hash.&#39;))</span>
 <span class="sd">    &gt;&gt;&gt; signature = pksig.sign(public_key, secret_key, msg)</span>
 <span class="sd">    &gt;&gt;&gt; pksig.verify(public_key, msg, signature)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.conversion import Conversion</span>
+<span class="sd">    &gt;&gt;&gt; g  = {}</span>
+<span class="sd">    &gt;&gt;&gt; m = {}</span>
+<span class="sd">    &gt;&gt;&gt; j = 16</span>
+<span class="sd">    &gt;&gt;&gt; for i in range(1, j + 1): g[str(i)] = randomQR(public_key[&#39;N&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; for i in range(1, j + 1): m[str(i)] = integer(SHA1(Conversion.IP2OS(random(public_key[&#39;N&#39;]))))</span>
+<span class="sd">    &gt;&gt;&gt; Cx = 1 % public_key[&#39;N&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; for i in range(1, len(m) + 1): Cx = Cx*(g[str(i)] ** m[str(i)])</span>
+<span class="sd">    &gt;&gt;&gt; pksig = Sig_CL03() </span>
+<span class="sd">    &gt;&gt;&gt; p = integer(21281327767482252741932894893985715222965623124768085901716557791820905647984944443933101657552322341359898014680608292582311911954091137905079983298534519)</span>
+<span class="sd">    &gt;&gt;&gt; q = integer(25806791860198780216123533220157510131833627659100364815258741328806284055493647951841418122944864389129382151632630375439181728665686745203837140362092027)</span>
+<span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = pksig.keygen(1024, p, q)</span>
+<span class="sd">    &gt;&gt;&gt; signature = pksig.signCommit(public_key, secret_key, Cx)</span>
+<span class="sd">    &gt;&gt;&gt; pksig.verifyCommit(public_key, signature, Cx)</span>
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lmin</span><span class="o">=</span><span class="mi">160</span><span class="p">,</span> <span class="n">lin</span><span class="o">=</span><span class="mi">160</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">512</span><span class="p">):</span>
@@ -84,14 +111,14 @@
             <span class="k">while</span><span class="p">(</span><span class="ow">not</span> <span class="n">isPrime</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pprime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
                 <span class="n">pprime</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
             <span class="n">p</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pprime</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
         <span class="k">if</span><span class="p">(</span><span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">qprime</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
             <span class="k">while</span><span class="p">(</span><span class="ow">not</span> <span class="n">isPrime</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">qprime</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
                 <span class="n">qprime</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
             <span class="n">q</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">qprime</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
 
         <span class="n">N</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
 
@@ -99,78 +126,90 @@
         <span class="n">b</span> <span class="o">=</span> <span class="n">randomQR</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">randomQR</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
 
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span> <span class="p">}</span>
-        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;p&#39;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span> <span class="s">&#39;q&#39;</span><span class="p">:</span><span class="n">q</span> <span class="p">}</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span> <span class="p">}</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span><span class="n">p</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">:</span><span class="n">q</span> <span class="p">}</span>
 
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
-    </div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span></div>
+    
 <div class="viewcode-block" id="Sig_CL03.sign"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cl03.html#pksig_cl03.Sig_CL03.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">le</span><span class="p">)</span>
 
         <span class="n">ls</span> <span class="o">=</span> <span class="n">ln</span> <span class="o">+</span> <span class="n">lm</span> <span class="o">+</span> <span class="n">l</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">randomBits</span><span class="p">(</span><span class="n">ls</span><span class="p">))</span>
 
-        <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;p&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;q&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;q&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">e2</span> <span class="o">=</span> <span class="n">e</span> <span class="o">%</span> <span class="n">phi_N</span>
     
-        <span class="n">v</span> <span class="o">=</span> <span class="p">(((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="n">e2</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">(((</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="n">e2</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
 
-        <span class="n">sig</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">:</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;v&#39;</span><span class="p">:</span><span class="n">v</span> <span class="p">}</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span><span class="n">v</span> <span class="p">}</span>
 
-        <span class="k">return</span> <span class="n">sig</span>
-</div>
+        <span class="k">return</span> <span class="n">sig</span></div>
+
 <div class="viewcode-block" id="Sig_CL03.signCommit"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cl03.html#pksig_cl03.Sig_CL03.signCommit">[docs]</a>    <span class="k">def</span> <span class="nf">signCommit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">Cx</span><span class="p">):</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">randomPrime</span><span class="p">(</span><span class="n">le</span><span class="p">)</span>
 
         <span class="n">ls</span> <span class="o">=</span> <span class="n">ln</span> <span class="o">+</span> <span class="n">lm</span> <span class="o">+</span> <span class="n">l</span>
         <span class="n">rprime</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">randomBits</span><span class="p">(</span><span class="n">ls</span><span class="p">))</span>
 
-        <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;p&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s">&#39;q&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;q&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">e2</span> <span class="o">=</span> <span class="n">e</span> <span class="o">%</span> <span class="n">phi_N</span>
     
-        <span class="n">v</span> <span class="o">=</span> <span class="p">(((</span><span class="n">Cx</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">rprime</span><span class="p">)</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="n">e2</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">(((</span><span class="n">Cx</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">rprime</span><span class="p">)</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="p">(</span><span class="n">e2</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
 
-        <span class="n">sig</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span><span class="p">,</span> <span class="s">&#39;rprime&#39;</span><span class="p">:</span><span class="n">rprime</span><span class="p">,</span> <span class="s">&#39;v&#39;</span><span class="p">:</span><span class="n">v</span> <span class="p">}</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;rprime&#39;</span><span class="p">:</span><span class="n">rprime</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span><span class="n">v</span> <span class="p">}</span>
 
-        <span class="k">return</span> <span class="n">sig</span>
-</div>
+        <span class="k">return</span> <span class="n">sig</span></div>
+
 <div class="viewcode-block" id="Sig_CL03.verify"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cl03.html#pksig_cl03.Sig_CL03.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">VERIFY</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">VERIFY</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">lhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
-        <span class="n">rhs</span> <span class="o">=</span> <span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
-
-        <span class="c">#do size check on e</span>
+        <span class="n">lhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">rhs</span> <span class="o">=</span> <span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">m</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">le</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">le</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">if</span><span class="p">(</span><span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="k">return</span> <span class="bp">False</span>
-</pre></div></div></div>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Sig_CL03.verifyCommit"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_cl03.html#pksig_cl03.Sig_CL03.verifyCommit">[docs]</a>    <span class="k">def</span> <span class="nf">verifyCommit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">Cx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">VERIFY</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">lhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">rhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">Cx</span><span class="o">*</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;rprime&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">le</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div></div>
+</pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -179,14 +218,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

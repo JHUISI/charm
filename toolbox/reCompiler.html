@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>reCompiler &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>reCompiler &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="redundancyschemes" href="redundancyschemes.html" />
-    <link rel="prev" title="policytree" href="policytree.html" /> 
+    <link rel="prev" title="PREnc" href="PREnc.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -42,21 +40,21 @@
           <a href="redundancyschemes.html" title="redundancyschemes"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="policytree.html" title="policytree"
+          <a href="PREnc.html" title="PREnc"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-reCompiler">
 <span id="recompiler"></span><h1>reCompiler<a class="headerlink" href="#module-reCompiler" title="Permalink to this headline">¶</a></h1>
-<p>Module re_compile &#8211; compile a regular expression into an FSA</p>
+<p>Module re_compile – compile a regular expression into an FSA</p>
 <div class="section" id="to-do">
 <h2>To Do<a class="headerlink" href="#to-do" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
@@ -71,130 +69,130 @@
 </dl>
 <dl class="class">
 <dt id="reCompiler.CharacterSet">
-<em class="property">class </em><tt class="descclassname">reCompiler.</tt><tt class="descname">CharacterSet</tt><big>(</big><em>ranges</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">reCompiler.</code><code class="descname">CharacterSet</code><span class="sig-paren">(</span><em>ranges</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="attribute">
 <dt id="reCompiler.CharacterSet.ANY">
-<tt class="descname">ANY</tt><em class="property"> = &lt;CharacterSet .&gt;</em><a class="headerlink" href="#reCompiler.CharacterSet.ANY" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ANY</code><em class="property"> = &lt;CharacterSet .&gt;</em><a class="headerlink" href="#reCompiler.CharacterSet.ANY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.CharacterSet.complement">
-<tt class="descname">complement</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.complement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.complement" title="Permalink to this definition">¶</a></dt>
+<code class="descname">complement</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.complement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.complement" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.CharacterSet.convertString">
-<tt class="descname">convertString</tt><big>(</big><em>_str</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.convertString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.convertString" title="Permalink to this definition">¶</a></dt>
+<code class="descname">convertString</code><span class="sig-paren">(</span><em>_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.convertString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.convertString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.CharacterSet.crep">
-<tt class="descname">crep</tt><big>(</big><em>c</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.crep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.crep" title="Permalink to this definition">¶</a></dt>
+<code class="descname">crep</code><span class="sig-paren">(</span><em>c</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.crep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.crep" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.CharacterSet.intersection">
-<tt class="descname">intersection</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.intersection" title="Permalink to this definition">¶</a></dt>
+<code class="descname">intersection</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.intersection" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.CharacterSet.matches">
-<tt class="descname">matches</tt><big>(</big><em>c</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.matches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.matches" title="Permalink to this definition">¶</a></dt>
+<code class="descname">matches</code><span class="sig-paren">(</span><em>c</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.matches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.matches" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.CharacterSet.union">
-<tt class="descname">union</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.union" title="Permalink to this definition">¶</a></dt>
+<code class="descname">union</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#CharacterSet.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.CharacterSet.union" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="reCompiler.RECompiler">
-<em class="property">class </em><tt class="descclassname">reCompiler.</tt><tt class="descname">RECompiler</tt><big>(</big><em>str</em>, <em>recordSourcePositions=0</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#RECompiler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.RECompiler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#reCompiler.SymbolRECompiler" title="reCompiler.SymbolRECompiler"><tt class="xref py py-class docutils literal"><span class="pre">reCompiler.SymbolRECompiler</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">reCompiler.</code><code class="descname">RECompiler</code><span class="sig-paren">(</span><em>str</em>, <em>recordSourcePositions=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#RECompiler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.RECompiler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#reCompiler.SymbolRECompiler" title="reCompiler.SymbolRECompiler"><code class="xref py py-class docutils literal"><span class="pre">reCompiler.SymbolRECompiler</span></code></a></p>
 <dl class="method">
 <dt id="reCompiler.RECompiler.readCSetInnards">
-<tt class="descname">readCSetInnards</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#RECompiler.readCSetInnards"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.RECompiler.readCSetInnards" title="Permalink to this definition">¶</a></dt>
+<code class="descname">readCSetInnards</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#RECompiler.readCSetInnards"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.RECompiler.readCSetInnards" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="reCompiler.SymbolRECompiler">
-<em class="property">class </em><tt class="descclassname">reCompiler.</tt><tt class="descname">SymbolRECompiler</tt><big>(</big><em>str</em>, <em>recordSourcePositions=0</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">reCompiler.</code><code class="descname">SymbolRECompiler</code><span class="sig-paren">(</span><em>str</em>, <em>recordSourcePositions=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="attribute">
 <dt id="reCompiler.SymbolRECompiler.EOF">
-<tt class="descname">EOF</tt><em class="property"> = -1</em><a class="headerlink" href="#reCompiler.SymbolRECompiler.EOF" title="Permalink to this definition">¶</a></dt>
+<code class="descname">EOF</code><em class="property"> = -1</em><a class="headerlink" href="#reCompiler.SymbolRECompiler.EOF" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.compileConjunction">
-<tt class="descname">compileConjunction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.compileConjunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.compileConjunction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">compileConjunction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.compileConjunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.compileConjunction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.compileExpr">
-<tt class="descname">compileExpr</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.compileExpr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.compileExpr" title="Permalink to this definition">¶</a></dt>
+<code class="descname">compileExpr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.compileExpr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.compileExpr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.compileItem">
-<tt class="descname">compileItem</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.compileItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.compileItem" title="Permalink to this definition">¶</a></dt>
+<code class="descname">compileItem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.compileItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.compileItem" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.compileSequence">
-<tt class="descname">compileSequence</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.compileSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.compileSequence" title="Permalink to this definition">¶</a></dt>
+<code class="descname">compileSequence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.compileSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.compileSequence" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.peekChar">
-<tt class="descname">peekChar</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.peekChar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.peekChar" title="Permalink to this definition">¶</a></dt>
+<code class="descname">peekChar</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.peekChar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.peekChar" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.peekToken">
-<tt class="descname">peekToken</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.peekToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.peekToken" title="Permalink to this definition">¶</a></dt>
+<code class="descname">peekToken</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.peekToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.peekToken" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.readChar">
-<tt class="descname">readChar</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.readChar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.readChar" title="Permalink to this definition">¶</a></dt>
+<code class="descname">readChar</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.readChar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.readChar" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.readToken">
-<tt class="descname">readToken</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.readToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.readToken" title="Permalink to this definition">¶</a></dt>
+<code class="descname">readToken</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.readToken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.readToken" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.skipTokens">
-<tt class="descname">skipTokens</tt><big>(</big><em>bag</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.skipTokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.skipTokens" title="Permalink to this definition">¶</a></dt>
+<code class="descname">skipTokens</code><span class="sig-paren">(</span><em>bag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.skipTokens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.skipTokens" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="reCompiler.SymbolRECompiler.toFSA">
-<tt class="descname">toFSA</tt><big>(</big><em>minimize=1</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.toFSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.toFSA" title="Permalink to this definition">¶</a></dt>
+<code class="descname">toFSA</code><span class="sig-paren">(</span><em>minimize=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#SymbolRECompiler.toFSA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.SymbolRECompiler.toFSA" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="reCompiler.compileRE">
-<tt class="descclassname">reCompiler.</tt><tt class="descname">compileRE</tt><big>(</big><em>_str</em>, <em>minimize=1</em>, <em>recordSourcePositions=0</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#compileRE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.compileRE" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">reCompiler.</code><code class="descname">compileRE</code><span class="sig-paren">(</span><em>_str</em>, <em>minimize=1</em>, <em>recordSourcePositions=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#compileRE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.compileRE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="reCompiler.compileSymbolRE">
-<tt class="descclassname">reCompiler.</tt><tt class="descname">compileSymbolRE</tt><big>(</big><em>str</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#compileSymbolRE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.compileSymbolRE" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">reCompiler.</code><code class="descname">compileSymbolRE</code><span class="sig-paren">(</span><em>str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#compileSymbolRE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.compileSymbolRE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="reCompiler.dummy_func">
-<tt class="descclassname">reCompiler.</tt><tt class="descname">dummy_func</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="../_modules/reCompiler.html#dummy_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.dummy_func" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">reCompiler.</code><code class="descname">dummy_func</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/reCompiler.html#dummy_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#reCompiler.dummy_func" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -204,7 +202,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
@@ -215,34 +213,33 @@
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="policytree.html"
-                        title="previous chapter">policytree</a></p>
+  <p class="topless"><a href="PREnc.html"
+                        title="previous chapter">PREnc</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="redundancyschemes.html"
                         title="next chapter">redundancyschemes</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/reCompiler.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/reCompiler.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -255,16 +252,16 @@
           <a href="redundancyschemes.html" title="redundancyschemes"
              >next</a> |</li>
         <li class="right" >
-          <a href="policytree.html" title="policytree"
+          <a href="PREnc.html" title="PREnc"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

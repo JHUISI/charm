@@ -1,0 +1,386 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>abenc_tbpre_lww14 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for abenc_tbpre_lww14</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Qin Liu, Guojun Wang, Jie Wu</span>
+<span class="sd"> </span>
+<span class="sd">| From: Time-based proxy re-encryption scheme for secure data sharing in a cloud environment</span>
+<span class="sd">| Published in: Information Sciences (Volume: 258, year: 2014)</span>
+<span class="sd">| Available From: http://www.sciencedirect.com/science/article/pii/S0020025512006275</span>
+<span class="sd">| Notes: </span>
+
+<span class="sd">* type:      ciphertext-policy attribute-based encryption (public key)</span>
+<span class="sd">* setting:   Pairing</span>
+
+<span class="sd">:Author:	artjomb</span>
+<span class="sd">:Date:		07/2014</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.secretutil</span> <span class="k">import</span> <span class="n">SecretUtil</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">reduce</span>
+
+<span class="c1"># taken from https://gist.github.com/endolith/114336</span>
+<div class="viewcode-block" id="gcd"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.gcd">[docs]</a><span class="k">def</span> <span class="nf">gcd</span><span class="p">(</span><span class="o">*</span><span class="n">numbers</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the greatest common divisor of the given integers&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">fractions</span> <span class="k">import</span> <span class="n">gcd</span>
+    <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="n">gcd</span><span class="p">,</span> <span class="n">numbers</span><span class="p">)</span></div>
+
+<span class="c1"># taken from https://gist.github.com/endolith/114336</span>
+<div class="viewcode-block" id="lcm"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.lcm">[docs]</a><span class="k">def</span> <span class="nf">lcm</span><span class="p">(</span><span class="n">numbers</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return lowest common multiple.&quot;&quot;&quot;</span>    
+    <span class="k">def</span> <span class="nf">lcm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="o">//</span> <span class="n">gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="n">lcm</span><span class="p">,</span> <span class="n">numbers</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TBPRE"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE">[docs]</a><span class="k">class</span> <span class="nc">TBPRE</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">util</span> <span class="o">=</span> <span class="n">SecretUtil</span><span class="p">(</span><span class="n">groupObj</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1">#Create Secret Sharing Scheme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>    <span class="c1">#:Prime order group</span>
+        <span class="c1">#self.users = {}</span>
+        <span class="c1">#self.authorities = {}</span>
+    
+<div class="viewcode-block" id="TBPRE.setup"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributes</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Global Setup (executed by CA)&#39;&#39;&#39;</span>
+        <span class="n">P0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span> <span class="c1"># generator</span>
+        <span class="n">P1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span> <span class="c1"># random element</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">mk0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">mk1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">Q0</span> <span class="o">=</span> <span class="n">P0</span> <span class="o">**</span> <span class="n">mk0</span>
+        <span class="n">SK1</span> <span class="o">=</span> <span class="n">P1</span> <span class="o">**</span> <span class="n">mk0</span>
+        
+        <span class="n">Htemp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">ZR</span><span class="p">)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">ZR</span><span class="p">),</span> <span class="c1"># first convert G1 to str, then hash</span>
+            <span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Htemp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s2">&quot;_attribute&quot;</span><span class="p">),</span>
+            <span class="s1">&#39;sy&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Htemp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s2">&quot;_year&quot;</span><span class="p">),</span>
+            <span class="s1">&#39;sym&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Htemp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s2">&quot;_year_month&quot;</span><span class="p">),</span>
+            <span class="s1">&#39;symd&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Htemp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="s2">&quot;_year_month_day&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+        
+        <span class="n">PK</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;Q0&#39;</span><span class="p">:</span> <span class="n">Q0</span><span class="p">,</span> <span class="s1">&#39;P0&#39;</span><span class="p">:</span> <span class="n">P0</span><span class="p">,</span> <span class="s1">&#39;P1&#39;</span><span class="p">:</span> <span class="n">P1</span> <span class="p">}</span>
+        <span class="n">MK</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;mk0&#39;</span><span class="p">:</span> <span class="n">mk0</span><span class="p">,</span> <span class="s1">&#39;mk1&#39;</span><span class="p">:</span> <span class="n">mk1</span><span class="p">,</span> <span class="s1">&#39;SK1&#39;</span><span class="p">:</span> <span class="n">SK1</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="n">ska</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">PKa</span> <span class="o">=</span> <span class="n">P0</span> <span class="o">**</span> <span class="n">ska</span>
+            <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">PKa</span>
+            <span class="n">MK</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">ska</span>
+        
+        <span class="c1">#self.MK = MK # private</span>
+        <span class="c1">#self.s = s   # sent to cloud service provider</span>
+        <span class="c1">#self.PK = PK # public</span>
+        
+        <span class="k">return</span> <span class="p">(</span><span class="n">MK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TBPRE.registerUser"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.registerUser">[docs]</a>    <span class="k">def</span> <span class="nf">registerUser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Registers a user by id (executed by user)&#39;&#39;&#39;</span>
+        <span class="n">sku</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">PKu</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;P0&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sku</span>
+        <span class="n">mku</span> <span class="o">=</span> <span class="n">H</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">](</span><span class="n">PKu</span><span class="p">)</span>
+        
+        <span class="c1">#self.users[userid] = { &#39;PKu&#39;: PKu, &#39;mku&#39;: mku }</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sku</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;PKu&#39;</span><span class="p">:</span> <span class="n">PKu</span><span class="p">,</span> <span class="s1">&#39;mku&#39;</span><span class="p">:</span> <span class="n">mku</span> <span class="p">})</span> <span class="c1"># (private, public)</span></div>
+    
+<div class="viewcode-block" id="TBPRE.hashDate"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.hashDate">[docs]</a>    <span class="k">def</span> <span class="nf">hashDate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="nb">hash</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;y&#39;</span>
+        <span class="k">if</span> <span class="s2">&quot;year&quot;</span> <span class="ow">in</span> <span class="n">time</span><span class="p">:</span>
+            <span class="nb">hash</span> <span class="o">=</span> <span class="n">H</span><span class="p">[</span><span class="s1">&#39;sy&#39;</span><span class="p">](</span><span class="n">time</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="nb">hash</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: time has to contain at least &#39;year&#39;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s2">&quot;month&quot;</span> <span class="ow">in</span> <span class="n">time</span><span class="p">:</span>
+            <span class="nb">hash</span> <span class="o">=</span> <span class="n">H</span><span class="p">[</span><span class="s1">&#39;sym&#39;</span><span class="p">](</span><span class="n">time</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="nb">hash</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;ym&#39;</span>
+            <span class="k">if</span> <span class="s2">&quot;day&quot;</span> <span class="ow">in</span> <span class="n">time</span><span class="p">:</span>
+                <span class="nb">hash</span> <span class="o">=</span> <span class="n">H</span><span class="p">[</span><span class="s1">&#39;symd&#39;</span><span class="p">](</span><span class="n">time</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="nb">hash</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;ymd&#39;</span>
+        <span class="k">elif</span> <span class="s2">&quot;day&quot;</span> <span class="ow">in</span> <span class="n">time</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: time has to contain &#39;month&#39; if it contains &#39;year&#39;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">,</span> <span class="n">key</span></div>
+    
+<div class="viewcode-block" id="TBPRE.timeSuffices"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.timeSuffices">[docs]</a>    <span class="k">def</span> <span class="nf">timeSuffices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeRange</span><span class="p">,</span> <span class="n">needle</span><span class="p">):</span>
+        <span class="c1"># assumes that the time obj is valid</span>
+        <span class="k">if</span> <span class="n">timeRange</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">needle</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="s1">&#39;month&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">timeRange</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="s1">&#39;month&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">needle</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span> <span class="c1"># Error</span>
+        <span class="k">if</span> <span class="n">timeRange</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">needle</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="s1">&#39;day&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">timeRange</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="s1">&#39;day&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">needle</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span> <span class="c1"># Error</span>
+        <span class="k">return</span> <span class="n">timeRange</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">needle</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="TBPRE.policyTerm"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.policyTerm">[docs]</a>    <span class="k">def</span> <span class="nf">policyTerm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">policy</span><span class="p">):</span>
+        <span class="n">userAttributes</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">term</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">policy</span><span class="p">)),</span> <span class="n">policy</span><span class="p">):</span>
+            <span class="n">notFound</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">termAttr</span> <span class="ow">in</span> <span class="n">term</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">termAttr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">userAttributes</span><span class="p">:</span>
+                    <span class="n">notFound</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">notFound</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">i</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+    
+<div class="viewcode-block" id="TBPRE.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">pubuser</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate user keys for a specific attribute (executed by CA)&#39;&#39;&#39;</span>
+        
+        <span class="nb">hash</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashDate</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hash</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="s1">&#39;SKu&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">user</span><span class="p">[</span><span class="s1">&#39;SKu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;P0&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">MK</span><span class="p">[</span><span class="s1">&#39;mk1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">pubuser</span><span class="p">[</span><span class="s1">&#39;mku&#39;</span><span class="p">])</span>
+        <span class="n">PKat</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">PK</span><span class="p">[</span><span class="s1">&#39;P0&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="nb">hash</span><span class="p">)</span>
+        <span class="n">SKua</span> <span class="o">=</span> <span class="n">MK</span><span class="p">[</span><span class="s1">&#39;SK1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">PKat</span> <span class="o">**</span> <span class="p">(</span><span class="n">MK</span><span class="p">[</span><span class="s1">&#39;mk1&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">pubuser</span><span class="p">[</span><span class="s1">&#39;mku&#39;</span><span class="p">]))</span>
+        
+        <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">user</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">attribute</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]:</span>
+            <span class="n">user</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">user</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">time</span><span class="p">,</span> <span class="n">SKua</span><span class="p">))</span></div>
+    
+<div class="viewcode-block" id="TBPRE.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate the cipher-text from the content(-key) and a policy (executed by the content owner)&#39;&#39;&#39;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">nA</span> <span class="o">=</span> <span class="n">lcm</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">policy</span><span class="p">))</span>
+        <span class="n">U0</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;P0&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">policy</span><span class="p">:</span>
+            <span class="n">Ui</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">term</span><span class="p">:</span>
+                <span class="n">Ui</span> <span class="o">*=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span>
+            <span class="n">U</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Ui</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">F</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">PK</span><span class="p">[</span><span class="s1">&#39;Q0&#39;</span><span class="p">],</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;P1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">nA</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">policy</span><span class="p">,</span> <span class="s1">&#39;U0&#39;</span><span class="p">:</span> <span class="n">U0</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">:</span> <span class="n">U</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="n">V</span><span class="p">,</span> <span class="s1">&#39;nA&#39;</span><span class="p">:</span> <span class="n">nA</span> <span class="p">}</span></div>
+        
+<div class="viewcode-block" id="TBPRE.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">term</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Decrypts the content(-key) from the cipher-text (executed by user/content consumer)&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">term</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">term</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">policyTerm</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">term</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: user attributes don&#39;t satisfy the policy&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="n">sumSK</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">term</span><span class="p">]:</span>
+            <span class="n">foundTimeSlot</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">timeRange</span><span class="p">,</span> <span class="n">SKua</span> <span class="ow">in</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeSuffices</span><span class="p">(</span><span class="n">timeRange</span><span class="p">,</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]):</span>
+                    <span class="n">foundTimeSlot</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">sumSK</span> <span class="o">*=</span> <span class="n">SKua</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">foundTimeSlot</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: could not find time slot in user attribute keys&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        
+        
+        <span class="n">n</span> <span class="o">=</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;nA&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">term</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;Vt&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;U0t&#39;</span><span class="p">],</span> <span class="n">sumSK</span> <span class="o">**</span> <span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;SKu&#39;</span><span class="p">],</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;Ut&#39;</span><span class="p">][</span><span class="s1">&#39;year&#39;</span><span class="p">][</span><span class="n">term</span><span class="p">]</span> <span class="o">**</span> <span class="n">n</span><span class="p">))</span> <span class="c1"># TODO: fix year</span></div>
+    
+<div class="viewcode-block" id="TBPRE.reencrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.TBPRE.reencrypt">[docs]</a>    <span class="k">def</span> <span class="nf">reencrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">currentTime</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Re-encrypts the cipher-text using the current time (executed by cloud service provider)&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;year&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">currentTime</span> <span class="ow">or</span> <span class="s1">&#39;month&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">currentTime</span> <span class="ow">or</span> <span class="s1">&#39;day&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">currentTime</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: pass proper current time containing &#39;year&#39;, &#39;month&#39; and &#39;day&#39;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="n">day</span> <span class="o">=</span> <span class="n">currentTime</span>
+        <span class="n">month</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">day</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">month</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">month</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">year</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span>
+        
+        <span class="n">day</span><span class="p">,</span> <span class="n">daykey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashDate</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">month</span><span class="p">,</span> <span class="n">monthkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashDate</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">year</span><span class="p">,</span> <span class="n">yearkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashDate</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        
+        <span class="n">rs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">U0t</span> <span class="o">=</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;U0&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">PK</span><span class="p">[</span><span class="s1">&#39;P0&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">rs</span><span class="p">)</span>
+        
+        <span class="n">Ut</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;day&#39;</span><span class="p">:</span> <span class="p">[]</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">term</span><span class="p">,</span> <span class="n">Ui</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">],</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;U&#39;</span><span class="p">]):</span>
+            <span class="n">Uit_year</span> <span class="o">=</span> <span class="n">Ui</span>
+            <span class="n">Uit_month</span> <span class="o">=</span> <span class="n">Ui</span>
+            <span class="n">Uit_day</span> <span class="o">=</span> <span class="n">Ui</span>
+            <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">term</span><span class="p">:</span>
+                <span class="n">Uit_year</span> <span class="o">*=</span> <span class="p">(</span><span class="n">PK</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">**</span> <span class="n">rs</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">U0t</span> <span class="o">**</span> <span class="n">year</span><span class="p">)</span>
+                <span class="n">Uit_month</span> <span class="o">*=</span> <span class="p">(</span><span class="n">PK</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">**</span> <span class="n">rs</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">U0t</span> <span class="o">**</span> <span class="n">month</span><span class="p">)</span>
+                <span class="n">Uit_day</span> <span class="o">*=</span> <span class="p">(</span><span class="n">PK</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">**</span> <span class="n">rs</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">U0t</span> <span class="o">**</span> <span class="n">day</span><span class="p">)</span>
+            <span class="n">Ut</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Uit_year</span><span class="p">)</span>
+            <span class="n">Ut</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Uit_month</span><span class="p">)</span>
+            <span class="n">Ut</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Uit_day</span><span class="p">)</span>
+        
+        <span class="n">Vt</span> <span class="o">=</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">PK</span><span class="p">[</span><span class="s1">&#39;Q0&#39;</span><span class="p">],</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;P1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">rs</span> <span class="o">*</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;nA&#39;</span><span class="p">]))</span>
+        
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">],</span> <span class="s1">&#39;U0t&#39;</span><span class="p">:</span> <span class="n">U0t</span><span class="p">,</span> <span class="s1">&#39;Ut&#39;</span><span class="p">:</span> <span class="n">Ut</span><span class="p">,</span> <span class="s1">&#39;Vt&#39;</span><span class="p">:</span> <span class="n">Vt</span><span class="p">,</span> <span class="s1">&#39;nA&#39;</span><span class="p">:</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;nA&#39;</span><span class="p">],</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">currentTime</span> <span class="p">}</span></div></div>
+
+<div class="viewcode-block" id="basicTest"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.basicTest">[docs]</a><span class="k">def</span> <span class="nf">basicTest</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RUN basicTest&quot;</span><span class="p">)</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">tbpre</span> <span class="o">=</span> <span class="n">TBPRE</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ONE&quot;</span><span class="p">,</span> <span class="s2">&quot;TWO&quot;</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">,</span> <span class="s2">&quot;FOUR&quot;</span><span class="p">]</span>
+    <span class="n">MK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    
+    <span class="n">users</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># public</span>
+    
+    <span class="n">alice</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;alice&#39;</span> <span class="p">}</span>
+    <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;sku&#39;</span><span class="p">],</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">registerUser</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+    <span class="n">alice2</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;alice2&#39;</span> <span class="p">}</span>
+    <span class="n">alice2</span><span class="p">[</span><span class="s1">&#39;sku&#39;</span><span class="p">],</span> <span class="n">users</span><span class="p">[</span><span class="n">alice2</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">registerUser</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+    
+    <span class="n">year</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="s2">&quot;2014&quot;</span> <span class="p">}</span>
+    <span class="n">pastYear</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="s2">&quot;2013&quot;</span> <span class="p">}</span>
+    
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">tbpre</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">MK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">alice</span><span class="p">,</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]],</span> <span class="n">attr</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span>
+        <span class="n">tbpre</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">MK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">alice2</span><span class="p">,</span> <span class="n">users</span><span class="p">[</span><span class="n">alice2</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]],</span> <span class="n">attr</span><span class="p">,</span> <span class="n">pastYear</span><span class="p">)</span>
+    
+    <span class="n">k</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    
+    <span class="n">policy</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span><span class="p">]]</span> <span class="c1"># [[&#39;ONE&#39; and &#39;THREE&#39;] or [&#39;TWO&#39; and &#39;FOUR&#39;]]</span>
+    <span class="n">currentDate</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="s2">&quot;2014&quot;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">:</span> <span class="s2">&quot;15&quot;</span> <span class="p">}</span>
+    
+    <span class="n">CT</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">CTt</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">reencrypt</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">currentDate</span><span class="p">)</span>
+    <span class="n">PT</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CTt</span><span class="p">,</span> <span class="n">alice</span><span class="p">)</span>
+    
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="n">PT</span><span class="p">,</span> <span class="s1">&#39;FAILED DECRYPTION! 1&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SUCCESSFUL DECRYPTION 1&#39;</span><span class="p">)</span>
+    
+    <span class="n">PT2</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CTt</span><span class="p">,</span> <span class="n">alice2</span><span class="p">)</span>
+    
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">PT2</span><span class="p">,</span> <span class="s1">&#39;SUCCESSFUL DECRYPTION! 2&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;DECRYPTION correctly failed&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="basicTest2"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.basicTest2">[docs]</a><span class="k">def</span> <span class="nf">basicTest2</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Month-based attributes are used&#39;&#39;&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RUN basicTest2&quot;</span><span class="p">)</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">tbpre</span> <span class="o">=</span> <span class="n">TBPRE</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ONE&quot;</span><span class="p">,</span> <span class="s2">&quot;TWO&quot;</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">,</span> <span class="s2">&quot;FOUR&quot;</span><span class="p">]</span>
+    <span class="n">MK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    
+    <span class="n">users</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># public</span>
+    
+    <span class="n">alice</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;alice&#39;</span> <span class="p">}</span>
+    <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;sku&#39;</span><span class="p">],</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">registerUser</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+    
+    <span class="n">year</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="s2">&quot;2014&quot;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="s1">&#39;2&#39;</span> <span class="p">}</span>
+    
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">tbpre</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">MK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">alice</span><span class="p">,</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]],</span> <span class="n">attr</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span>
+    
+    <span class="n">k</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    
+    <span class="n">policy</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span><span class="p">]]</span> <span class="c1"># [[&#39;ONE&#39; and &#39;THREE&#39;] or [&#39;TWO&#39; and &#39;FOUR&#39;]]</span>
+    <span class="n">currentDate</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="s2">&quot;2014&quot;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">:</span> <span class="s2">&quot;15&quot;</span> <span class="p">}</span>
+    
+    <span class="n">CT</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">CTt</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">reencrypt</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">currentDate</span><span class="p">)</span>
+    <span class="n">PT</span> <span class="o">=</span> <span class="n">tbpre</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CTt</span><span class="p">,</span> <span class="n">alice</span><span class="p">)</span>
+    
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="n">PT</span><span class="p">,</span> <span class="s1">&#39;FAILED DECRYPTION!&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SUCCESSFUL DECRYPTION&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.test">[docs]</a><span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="c1"># print 1, lcm(1, 2)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">lcm</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">basicTest</span><span class="p">()</span>
+    <span class="c1"># basicTest2()</span>
+    <span class="c1"># test()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>integergroup &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>integergroup &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="iterate" href="iterate.html" />
     <link rel="prev" title="IBSig" href="IBSig.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,323 +42,323 @@
         <li class="right" >
           <a href="IBSig.html" title="IBSig"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-integergroup">
 <span id="integergroup"></span><h1>integergroup<a class="headerlink" href="#module-integergroup" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="integergroup.IntegerGroup">
-<em class="property">class </em><tt class="descclassname">integergroup.</tt><tt class="descname">IntegerGroup</tt><big>(</big><em>start=0</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">integergroup.</code><code class="descname">IntegerGroup</code><span class="sig-paren">(</span><em>start=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="integergroup.IntegerGroup.EndBenchmark">
-<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">EndBenchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>ends an ongoing benchmark</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.GetBenchmark">
-<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetBenchmark</code><span class="sig-paren">(</span><em>option</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves benchmark results for any of these options: 
 RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.GetGeneralBenchmarks">
-<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetGeneralBenchmarks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves benchmark count for all group operations</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.InitBenchmark">
-<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">InitBenchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>initiates the benchmark state</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.StartBenchmark">
-<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">StartBenchmark</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>starts the benchmark with any of these options: 
 RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.bitsize">
-<tt class="descname">bitsize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.bitsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.bitsize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bitsize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.bitsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.bitsize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.decode">
-<tt class="descname">decode</tt><big>(</big><em>element</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.decode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.deserialize">
-<tt class="descname">deserialize</tt><big>(</big><em>bytes_object</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.deserialize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>bytes_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.deserialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.encode">
-<tt class="descname">encode</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.encode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encode</code><span class="sig-paren">(</span><em>M</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.encode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.groupOrder">
-<tt class="descname">groupOrder</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.groupOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.groupOrder" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupOrder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.groupOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.groupOrder" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.groupSetting">
-<tt class="descname">groupSetting</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.groupSetting" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupSetting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.groupSetting" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.groupType">
-<tt class="descname">groupType</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.groupType" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.groupType" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.hash">
-<tt class="descname">hash</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.hash" title="Permalink to this definition">¶</a></dt>
+<code class="descname">hash</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.hash" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.isMember">
-<tt class="descname">isMember</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.isMember"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.isMember" title="Permalink to this definition">¶</a></dt>
+<code class="descname">isMember</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.isMember"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.isMember" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.paramgen">
-<tt class="descname">paramgen</tt><big>(</big><em>bits</em>, <em>r=2</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.paramgen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">paramgen</code><span class="sig-paren">(</span><em>bits</em>, <em>r=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.paramgen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.random">
-<tt class="descname">random</tt><big>(</big><em>max=0</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.random" title="Permalink to this definition">¶</a></dt>
+<code class="descname">random</code><span class="sig-paren">(</span><em>max=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.random" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.randomGen">
-<tt class="descname">randomGen</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.randomGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.randomGen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">randomGen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.randomGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.randomGen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.serialize">
-<tt class="descname">serialize</tt><big>(</big><em>object</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.serialize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.serialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroup.setparam">
-<tt class="descname">setparam</tt><big>(</big><em>p</em>, <em>q</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.setparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.setparam" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setparam</code><span class="sig-paren">(</span><em>p</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroup.setparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroup.setparam" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="integergroup.IntegerGroupQ">
-<em class="property">class </em><tt class="descclassname">integergroup.</tt><tt class="descname">IntegerGroupQ</tt><big>(</big><em>start=0</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">integergroup.</code><code class="descname">IntegerGroupQ</code><span class="sig-paren">(</span><em>start=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.EndBenchmark">
-<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">EndBenchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.EndBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>ends an ongoing benchmark</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.GetBenchmark">
-<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetBenchmark</code><span class="sig-paren">(</span><em>option</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.GetBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves benchmark results for any of these options: 
 RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.GetGeneralBenchmarks">
-<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetGeneralBenchmarks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves benchmark count for all group operations</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.InitBenchmark">
-<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">InitBenchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.InitBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>initiates the benchmark state</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.StartBenchmark">
-<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">StartBenchmark</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.StartBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>starts the benchmark with any of these options: 
 RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.decode">
-<tt class="descname">decode</tt><big>(</big><em>element</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.decode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.deserialize">
-<tt class="descname">deserialize</tt><big>(</big><em>bytes_object</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.deserialize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>bytes_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.deserialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.encode">
-<tt class="descname">encode</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.encode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encode</code><span class="sig-paren">(</span><em>M</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.encode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.groupOrder">
-<tt class="descname">groupOrder</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.groupOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.groupOrder" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupOrder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.groupOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.groupOrder" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.groupSetting">
-<tt class="descname">groupSetting</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.groupSetting" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupSetting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.groupSetting" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.groupType">
-<tt class="descname">groupType</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.groupType" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.groupType" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.hash">
-<tt class="descname">hash</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.hash" title="Permalink to this definition">¶</a></dt>
+<code class="descname">hash</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.hash" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.isMember">
-<tt class="descname">isMember</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.isMember"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.isMember" title="Permalink to this definition">¶</a></dt>
+<code class="descname">isMember</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.isMember"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.isMember" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.messageSize">
-<tt class="descname">messageSize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.messageSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.messageSize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">messageSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.messageSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.messageSize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.paramgen">
-<tt class="descname">paramgen</tt><big>(</big><em>bits</em>, <em>r=2</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.paramgen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">paramgen</code><span class="sig-paren">(</span><em>bits</em>, <em>r=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.paramgen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.random">
-<tt class="descname">random</tt><big>(</big><em>max=0</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.random" title="Permalink to this definition">¶</a></dt>
+<code class="descname">random</code><span class="sig-paren">(</span><em>max=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.random" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.randomG">
-<tt class="descname">randomG</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.randomG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.randomG" title="Permalink to this definition">¶</a></dt>
+<code class="descname">randomG</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.randomG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.randomG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.randomGen">
-<tt class="descname">randomGen</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.randomGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.randomGen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">randomGen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.randomGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.randomGen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.serialize">
-<tt class="descname">serialize</tt><big>(</big><em>object</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.serialize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.serialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.IntegerGroupQ.setparam">
-<tt class="descname">setparam</tt><big>(</big><em>p</em>, <em>q</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.setparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.setparam" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setparam</code><span class="sig-paren">(</span><em>p</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#IntegerGroupQ.setparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.IntegerGroupQ.setparam" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="integergroup.RSAGroup">
-<em class="property">class </em><tt class="descclassname">integergroup.</tt><tt class="descname">RSAGroup</tt><a class="reference internal" href="../_modules/integergroup.html#RSAGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">integergroup.</code><code class="descname">RSAGroup</code><a class="reference internal" href="../_modules/integergroup.html#RSAGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="integergroup.RSAGroup.EndBenchmark">
-<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">EndBenchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>ends an ongoing benchmark</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.GetBenchmark">
-<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetBenchmark</code><span class="sig-paren">(</span><em>option</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves benchmark results for any of these options: 
 RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.GetGeneralBenchmarks">
-<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetGeneralBenchmarks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves benchmark count for all group operations</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.InitBenchmark">
-<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">InitBenchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>initiates the benchmark state</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.StartBenchmark">
-<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">StartBenchmark</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>starts the benchmark with any of these options: 
 RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.decode">
-<tt class="descname">decode</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.decode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.deserialize">
-<tt class="descname">deserialize</tt><big>(</big><em>bytes_object</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.deserialize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>bytes_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.deserialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.encode">
-<tt class="descname">encode</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.encode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encode</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.encode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.groupOrder">
-<tt class="descname">groupOrder</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.groupOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.groupOrder" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupOrder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.groupOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.groupOrder" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.groupSetting">
-<tt class="descname">groupSetting</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.groupSetting" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupSetting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.groupSetting" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.groupType">
-<tt class="descname">groupType</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.groupType" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.groupType" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.paramgen">
-<tt class="descname">paramgen</tt><big>(</big><em>secparam</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.paramgen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">paramgen</code><span class="sig-paren">(</span><em>secparam</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.paramgen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.random">
-<tt class="descname">random</tt><big>(</big><em>max=0</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.random" title="Permalink to this definition">¶</a></dt>
+<code class="descname">random</code><span class="sig-paren">(</span><em>max=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.random" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.serialize">
-<tt class="descname">serialize</tt><big>(</big><em>object</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.serialize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.serialize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="integergroup.RSAGroup.setparam">
-<tt class="descname">setparam</tt><big>(</big><em>p</em>, <em>q</em><big>)</big><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.setparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.setparam" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setparam</code><span class="sig-paren">(</span><em>p</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/integergroup.html#RSAGroup.setparam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#integergroup.RSAGroup.setparam" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -371,7 +369,7 @@ RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="IBSig.html"
@@ -379,29 +377,28 @@ RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
   <h4>Next topic</h4>
   <p class="topless"><a href="iterate.html"
                         title="next chapter">iterate</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/integergroup.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/integergroup.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -416,14 +413,14 @@ RealTime, CpuTime, Mul, Div, Add, Sub, Exp</p>
         <li class="right" >
           <a href="IBSig.html" title="IBSig"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

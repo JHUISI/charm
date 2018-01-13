@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>ecgroup &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>ecgroup &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="enum" href="enum.html" />
     <link rel="prev" title="eccurve" href="eccurve.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,143 +42,143 @@
         <li class="right" >
           <a href="eccurve.html" title="eccurve"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-ecgroup">
 <span id="ecgroup"></span><h1>ecgroup<a class="headerlink" href="#module-ecgroup" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="ecgroup.ECGroup">
-<em class="property">class </em><tt class="descclassname">ecgroup.</tt><tt class="descname">ECGroup</tt><big>(</big><em>builtin_cv</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">ecgroup.</code><code class="descname">ECGroup</code><span class="sig-paren">(</span><em>builtin_cv</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="ecgroup.ECGroup.EndBenchmark">
-<tt class="descname">EndBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">EndBenchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.EndBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.EndBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>ends an ongoing benchmark</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.GetBenchmark">
-<tt class="descname">GetBenchmark</tt><big>(</big><em>option</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetBenchmark</code><span class="sig-paren">(</span><em>option</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves benchmark results for any of these options: 
 RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.GetGeneralBenchmarks">
-<tt class="descname">GetGeneralBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetGeneralBenchmarks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetGeneralBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetGeneralBenchmarks" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves benchmark count for all group operations</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.GetGranularBenchmarks">
-<tt class="descname">GetGranularBenchmarks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetGranularBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetGranularBenchmarks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">GetGranularBenchmarks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetGranularBenchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.GetGranularBenchmarks" title="Permalink to this definition">¶</a></dt>
 <dd><p>retrieves group operation count per type: ZR and G</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.InitBenchmark">
-<tt class="descname">InitBenchmark</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">InitBenchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.InitBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.InitBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>initiates the benchmark state</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.StartBenchmark">
-<tt class="descname">StartBenchmark</tt><big>(</big><em>options</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
+<code class="descname">StartBenchmark</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.StartBenchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.StartBenchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>starts the benchmark with any of these options: 
 RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.bitsize">
-<tt class="descname">bitsize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.bitsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.bitsize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bitsize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.bitsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.bitsize" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the bitsize for encoding messages in the group</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.coordinates">
-<tt class="descname">coordinates</tt><big>(</big><em>point</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">coordinates</code><span class="sig-paren">(</span><em>point</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the X and Y coordinates of an EC point</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.debug">
-<tt class="descname">debug</tt><big>(</big><em>data</em>, <em>prefix=None</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.debug" title="Permalink to this definition">¶</a></dt>
+<code class="descname">debug</code><span class="sig-paren">(</span><em>data</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.debug" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.decode">
-<tt class="descname">decode</tt><big>(</big><em>msg_bytes</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><em>msg_bytes</em>, <em>include_ctr=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>decode a group element into a string</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.deserialize">
-<tt class="descname">deserialize</tt><big>(</big><em>bytes_object</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.deserialize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>bytes_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.deserialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>deserializes into a pairing object</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.encode">
-<tt class="descname">encode</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.encode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encode</code><span class="sig-paren">(</span><em>message</em>, <em>include_ctr=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>encode arbitrary string as a group element. Max size is dependent on the EC group order</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.groupSetting">
-<tt class="descname">groupSetting</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.groupSetting" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupSetting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.groupSetting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.groupSetting" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.groupType">
-<tt class="descname">groupType</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.groupType" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.groupType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.groupType" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.hash">
-<tt class="descname">hash</tt><big>(</big><em>args</em>, <em>target_type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.hash" title="Permalink to this definition">¶</a></dt>
+<code class="descname">hash</code><span class="sig-paren">(</span><em>args</em>, <em>target_type=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.hash" title="Permalink to this definition">¶</a></dt>
 <dd><p>hashes objects into ZR or G</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.init">
-<tt class="descname">init</tt><big>(</big><em>_type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.init" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init</code><span class="sig-paren">(</span><em>_type=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>initializes an object with a specified type and value</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.order">
-<tt class="descname">order</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.order" title="Permalink to this definition">¶</a></dt>
+<code class="descname">order</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.order" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the order of the group</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.paramgen">
-<tt class="descname">paramgen</tt><big>(</big><em>secparam</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.paramgen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">paramgen</code><span class="sig-paren">(</span><em>secparam</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.paramgen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.random">
-<tt class="descname">random</tt><big>(</big><em>_type=0</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.random" title="Permalink to this definition">¶</a></dt>
+<code class="descname">random</code><span class="sig-paren">(</span><em>_type=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.random" title="Permalink to this definition">¶</a></dt>
 <dd><p>selects a random element in ZR or G</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.serialize">
-<tt class="descname">serialize</tt><big>(</big><em>object</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.serialize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.serialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>serializes a pairing object into bytes</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ecgroup.ECGroup.zr">
-<tt class="descname">zr</tt><big>(</big><em>point</em><big>)</big><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.zr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.zr" title="Permalink to this definition">¶</a></dt>
+<code class="descname">zr</code><span class="sig-paren">(</span><em>point</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.zr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ecgroup.ECGroup.zr" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the X coordinate only</p>
 </dd></dl>
 
@@ -192,7 +190,7 @@ RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="eccurve.html"
@@ -200,29 +198,28 @@ RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
   <h4>Next topic</h4>
   <p class="topless"><a href="enum.html"
                         title="next chapter">enum</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/ecgroup.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/ecgroup.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -237,14 +234,14 @@ RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
         <li class="right" >
           <a href="eccurve.html" title="eccurve"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>DFA &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>DFA &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="eccurve" href="eccurve.html" />
     <link rel="prev" title="conversion" href="conversion.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,45 +42,45 @@
         <li class="right" >
           <a href="conversion.html" title="conversion"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-DFA">
 <span id="dfa"></span><h1>DFA<a class="headerlink" href="#module-DFA" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="DFA.DFA">
-<em class="property">class </em><tt class="descclassname">DFA.</tt><tt class="descname">DFA</tt><big>(</big><em>regex</em>, <em>alphabet</em><big>)</big><a class="reference internal" href="../_modules/DFA.html#DFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">DFA.</code><code class="descname">DFA</code><span class="sig-paren">(</span><em>regex</em>, <em>alphabet</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/DFA.html#DFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="DFA.DFA.accept">
-<tt class="descname">accept</tt><big>(</big><em>M</em>, <em>s</em><big>)</big><a class="reference internal" href="../_modules/DFA.html#DFA.accept"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.accept" title="Permalink to this definition">¶</a></dt>
+<code class="descname">accept</code><span class="sig-paren">(</span><em>M</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/DFA.html#DFA.accept"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.accept" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="DFA.DFA.constructDFA">
-<tt class="descname">constructDFA</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/DFA.html#DFA.constructDFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.constructDFA" title="Permalink to this definition">¶</a></dt>
+<code class="descname">constructDFA</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/DFA.html#DFA.constructDFA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.constructDFA" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="DFA.DFA.getAcceptState">
-<tt class="descname">getAcceptState</tt><big>(</big><em>transitions</em><big>)</big><a class="reference internal" href="../_modules/DFA.html#DFA.getAcceptState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.getAcceptState" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getAcceptState</code><span class="sig-paren">(</span><em>transitions</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/DFA.html#DFA.getAcceptState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.getAcceptState" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="DFA.DFA.getSymbols">
-<tt class="descname">getSymbols</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="../_modules/DFA.html#DFA.getSymbols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.getSymbols" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getSymbols</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/DFA.html#DFA.getSymbols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.getSymbols" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="DFA.DFA.getTransitions">
-<tt class="descname">getTransitions</tt><big>(</big><em>M</em>, <em>s</em><big>)</big><a class="reference internal" href="../_modules/DFA.html#DFA.getTransitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.getTransitions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getTransitions</code><span class="sig-paren">(</span><em>M</em>, <em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/DFA.html#DFA.getTransitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#DFA.DFA.getTransitions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -93,7 +91,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="conversion.html"
@@ -101,29 +99,28 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="eccurve.html"
                         title="next chapter">eccurve</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/DFA.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/DFA.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -138,14 +135,14 @@
         <li class="right" >
           <a href="conversion.html" title="conversion"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

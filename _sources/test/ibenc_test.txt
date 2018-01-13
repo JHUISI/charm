@@ -1,7 +1,0 @@
-
-ibenc_test
-=========================================
-.. automodule:: ibenc_test
-    :show-inheritance:
-    :members:
-    :undoc-members:
