@@ -24,6 +24,7 @@ Toolbox Classes
    toolbox/integergroup
    toolbox/iterate
    toolbox/matrixops
+   toolbox/msp
    toolbox/node
    toolbox/paddingschemes
    toolbox/pairingcurves
@@ -31,6 +32,7 @@ Toolbox Classes
    toolbox/PKEnc
    toolbox/PKSig
    toolbox/policytree
+   toolbox/PREnc
    toolbox/reCompiler
    toolbox/redundancyschemes
    toolbox/schemebase
