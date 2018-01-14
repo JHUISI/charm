@@ -1,0 +1,182 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pkenc_gm82 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pkenc_gm82</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Goldwasser-Micali Public Key Encryption Scheme (Quadratic Residuosity problem)</span>
+
+
+<span class="sd">| From: &quot;S. Goldwasser, S. Micali: Probabilistic encryption and how to play</span>
+<span class="sd">|        mental poker keeping secret all partial information&quot;</span>
+<span class="sd">| Published in: 14th Symposium on Theory of Computing (1982)</span>
+<span class="sd">| Available from: http://groups.csail.mit.edu/cis/pubs/shafi/1982-stoc.pdf</span>
+<span class="sd">| Notes:</span>
+
+<span class="sd">* type:          encryption (public key)</span>
+<span class="sd">* setting:       Integer</span>
+<span class="sd">* assumption:    Quadratic Residuosity</span>
+
+<span class="sd">:Authors: Guillermo Ramos</span>
+<span class="sd">:Date: 01/2015</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">legendre</span><span class="p">,</span> <span class="n">gcd</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">RSAGroup</span><span class="p">,</span> <span class="n">integer</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKEnc</span> <span class="k">import</span> <span class="n">PKEnc</span>
+
+<span class="c1"># Upper bound to the number of rounds the keygen is able to make</span>
+<span class="c1"># to search for a quadratic non-residue</span>
+<span class="n">maxtimes</span> <span class="o">=</span> <span class="mi">30</span>
+
+<span class="c1"># Is x a quadratic residue of N = p1*p2?</span>
+<div class="viewcode-block" id="isResidue"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_gm82.html#pkenc_gm82.isResidue">[docs]</a><span class="k">def</span> <span class="nf">isResidue</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">legendre</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">legendre</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+<span class="c1"># Goldwasser-Micali cryptosystem</span>
+<div class="viewcode-block" id="GM82"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_gm82.html#pkenc_gm82.GM82">[docs]</a><span class="k">class</span> <span class="nc">GM82</span><span class="p">(</span><span class="n">PKEnc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; gm82 = GM82()</span>
+<span class="sd">    &gt;&gt;&gt; (pk, sk) = gm82.keygen(512)</span>
+<span class="sd">    &gt;&gt;&gt; zero = gm82.encrypt(pk, 0)</span>
+<span class="sd">    &gt;&gt;&gt; one = gm82.encrypt(pk, 1)</span>
+<span class="sd">    &gt;&gt;&gt; gm82.decrypt(sk, zero)</span>
+<span class="sd">    0</span>
+<span class="sd">    &gt;&gt;&gt; gm82.decrypt(sk, one)</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; gm82.decrypt(sk, gm82.xor(pk, zero, zero))</span>
+<span class="sd">    0</span>
+<span class="sd">    &gt;&gt;&gt; gm82.decrypt(sk, gm82.xor(pk, zero, one))</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; gm82.decrypt(sk, gm82.xor(pk, one, zero))</span>
+<span class="sd">    1</span>
+<span class="sd">    &gt;&gt;&gt; gm82.decrypt(sk, gm82.xor(pk, one, one))</span>
+<span class="sd">    0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">PKEnc</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GM82.keygen"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_gm82.html#pkenc_gm82.GM82.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secparam</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+
+        <span class="c1"># Find a random quadratic non-residue in the group</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">times</span> <span class="o">&lt;</span> <span class="n">maxtimes</span> <span class="ow">and</span> <span class="n">isResidue</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">q</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">times</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># If we are not able to find a quadratic non-residue after &#39;maxtimes&#39;</span>
+        <span class="c1"># trials, abort and output error</span>
+        <span class="k">if</span> <span class="n">times</span> <span class="o">==</span> <span class="n">maxtimes</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: non-residue not found after </span><span class="si">{}</span><span class="s2"> trials.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GM82.encrypt"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_gm82.html#pkenc_gm82.GM82.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="n">pk</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">gcd</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">%</span> <span class="n">n</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span> <span class="o">%</span> <span class="n">n</span></div>
+
+<div class="viewcode-block" id="GM82.decrypt"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_gm82.html#pkenc_gm82.GM82.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="n">sk</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">isResidue</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="k">else</span> <span class="mi">1</span></div>
+
+    <span class="c1"># Homomorphic XOR over ciphertexts</span>
+<div class="viewcode-block" id="GM82.xor"><a class="viewcode-back" href="../charm/schemes/pkenc/pkenc_gm82.html#pkenc_gm82.GM82.xor">[docs]</a>    <span class="k">def</span> <span class="nf">xor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">pk</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">c1</span> <span class="o">*</span> <span class="n">c2</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

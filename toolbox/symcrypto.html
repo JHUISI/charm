@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>symcrypto &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>symcrypto &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="xmlserialize" href="xmlserialize.html" />
     <link rel="prev" title="specialprimes" href="specialprimes.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,98 +42,206 @@
         <li class="right" >
           <a href="specialprimes.html" title="specialprimes"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-symcrypto">
 <span id="symcrypto"></span><h1>symcrypto<a class="headerlink" href="#module-symcrypto" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="symcrypto.AuthenticatedCryptoAbstraction">
-<em class="property">class </em><tt class="descclassname">symcrypto.</tt><tt class="descname">AuthenticatedCryptoAbstraction</tt><big>(</big><em>key</em>, <em>alg=0</em>, <em>mode=2</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#symcrypto.SymmetricCryptoAbstraction" title="symcrypto.SymmetricCryptoAbstraction"><tt class="xref py py-class docutils literal"><span class="pre">symcrypto.SymmetricCryptoAbstraction</span></tt></a></p>
+<em class="property">class </em><code class="descclassname">symcrypto.</code><code class="descname">AuthenticatedCryptoAbstraction</code><span class="sig-paren">(</span><em>key</em>, <em>alg=0</em>, <em>mode=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#symcrypto.SymmetricCryptoAbstraction" title="symcrypto.SymmetricCryptoAbstraction"><code class="xref py py-class docutils literal"><span class="pre">symcrypto.SymmetricCryptoAbstraction</span></code></a></p>
+<p>Implements Authenticated Encryption with Associated Data (AEAD) abstraction. The associated data is optional, and this version is backwards compatible
+with the same class without the associated data option.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">sha256</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">charm.toolbox.symcrypto</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span> <span class="o">=</span> <span class="n">sha256</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;shameful secret key&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span> <span class="o">=</span> <span class="n">charm</span><span class="o">.</span><span class="n">toolbox</span><span class="o">.</span><span class="n">symcrypto</span><span class="o">.</span><span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="s1">&#39;My age is 42.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+<span class="go">b&#39;My age is 42.&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext2</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;My age is 42.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext2</span><span class="p">)</span>
+<span class="go">b&#39;My age is 42.&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertextAssociatedData</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="s1">&#39;Some network PDU.&#39;</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertextAssociatedData</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;./charm/toolbox/symcrypto.py&quot;</span>, line <span class="m">233</span>, in <span class="n">decrypt</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mac. Your data was tampered with or your key is wrong&quot;</span><span class="p">)</span>
+<span class="gr">ValueError</span>: <span class="n">Invalid mac. Your data was tampered with or your key is wrong</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertextAssociatedData</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="s1">&#39;wrong data&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;./charm/toolbox/symcrypto.py&quot;</span>, line <span class="m">233</span>, in <span class="n">decrypt</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mac. Your data was tampered with or your key is wrong&quot;</span><span class="p">)</span>
+<span class="gr">ValueError</span>: <span class="n">Invalid mac. Your data was tampered with or your key is wrong</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertextAssociatedData</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="go">b&#39;Some network PDU.&#39;</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
 <dl class="method">
 <dt id="symcrypto.AuthenticatedCryptoAbstraction.decrypt">
-<tt class="descname">decrypt</tt><big>(</big><em>cipherText</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction.decrypt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">decrypt</code><span class="sig-paren">(</span><em>cipherText</em>, <em>associatedData=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrypts a ciphertext in AEAD mode (Authenticated Encryption with Associated Data) using the superclass symmetric encryption parameters.
+The MAC is computed with both the ciphertext and associated data (and other cryptosystem parameters), but the associated data is not encrypted, nor
+available within the ciphertext structure.</p>
+<dl class="docutils">
+<dt>ciphertext <span class="classifier-delimiter">:</span> <span class="classifier">str or byte str</span></dt>
+<dd>The message to be decrypted.</dd>
+<dt>associatedData <span class="classifier-delimiter">:</span> <span class="classifier">str or byte str, optional</span></dt>
+<dd>Associated data that will be MACed together with the ciphertext and algorithm. This associated text must be in plaintext.</dd>
+</dl>
+<dl class="docutils">
+<dt>byte str</dt>
+<dd>The decrypted plaintext, if the ciphertext was successfuly authenticated. Raise exception otherwise.</dd>
+</dl>
+<dl class="docutils">
+<dt>ValueError</dt>
+<dd>If the MAC is invalid.</dd>
+</dl>
+<p>The IV is included in the computation of the MAC. In fact, all cipher parameters are included: the encryption function returns a JSON object from
+a dictionary composed of the cipher parameters (e.g., algorithm, mode, IV), and the ciphertext. The MAC function uses the whole JSON object/string
+to compute the MAC, prepended with the HMAC algorithm + associatedData.</p>
+<p>The MAC key is computed as sha2(b’Poor Mans Key Extractor” + key).</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="symcrypto.AuthenticatedCryptoAbstraction.encrypt">
-<tt class="descname">encrypt</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction.encrypt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">encrypt</code><span class="sig-paren">(</span><em>msg</em>, <em>associatedData=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypts a message in AEAD mode (Authenticated Encryption with Associated Data) using the superclass symmetric encryption parameters.
+The MAC is computed with both the ciphertext and associated data (and other cryptosystem parameters), but the associated data is not encrypted, nor
+saved within the ciphertext structure.</p>
+<dl class="docutils">
+<dt>msg <span class="classifier-delimiter">:</span> <span class="classifier">str or byte str</span></dt>
+<dd>The message to be encrypted.</dd>
+<dt>associatedData <span class="classifier-delimiter">:</span> <span class="classifier">str or byte str, optional</span></dt>
+<dd>Associated data that will be MACed together with the ciphertext and algorithm; the associated data will not be encrypted.</dd>
+</dl>
+<dl class="docutils">
+<dt>dict</dt>
+<dd><dl class="first last docutils">
+<dt>Dictionary structure containing:</dt>
+<dd><dl class="first docutils">
+<dt>msg: {‘ALG’: symmetric cryptosystem.</dt>
+<dd><blockquote class="first">
+<div>‘MODE’: symmetric encryption mode.
+‘IV’: the IV for the encryption algorithm.
+‘CipherText’: the padded ciphertext (padding according to PKCS 7).</div></blockquote>
+<p class="last">}</p>
+</dd>
+</dl>
+<p class="last">“alg”: The HMAC algorithm.
+“digest”: The MAC computed as MAC = HMAC(key, alg + associatedData + msg)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>The IV is included in the computation of the MAC. In fact, all cipher parameters are included: the encryption function returns a JSON object from
+a dictionary composed of the cipher parameters (e.g., algorithm, mode, IV), and the ciphertext. The MAC function uses the whole JSON object/string
+to compute the MAC, prepended with the HMAC algorithm + associatedData.</p>
+<p>The MAC key is computed as sha2(b’Poor Mans Key Extractor” + key).</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="symcrypto.MessageAuthenticator">
-<em class="property">class </em><tt class="descclassname">symcrypto.</tt><tt class="descname">MessageAuthenticator</tt><big>(</big><em>key</em>, <em>alg='HMAC_SHA1'</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">symcrypto.</code><code class="descname">MessageAuthenticator</code><span class="sig-paren">(</span><em>key</em>, <em>alg='HMAC_SHA2'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Abstraction for constructing and verifying authenticated messages</p>
 <blockquote>
-<div>A large number of the schemes can only encrypt group elements 
+<div>A large number of the schemes can only encrypt group elements
 and do not provide an efficient mechanism for encoding byte in
-those elements. As such we don&#8217;t pick a symmetric key and encrypt 
+those elements. As such we don’t pick a symmetric key and encrypt
 it asymmetrically. Rather, we hash a random group element to get the
 symmetric key.</div></blockquote>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.core.math.pairing</span> <span class="kn">import</span> <span class="n">hashPair</span> <span class="k">as</span> <span class="n">extractor</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">extract_key</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">key</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">extractor</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">AuthenticatedMessage</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s">&#39;Hello World&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">extract_key</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AuthenticatedMessage</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s1">&#39;Hello World&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">AuthenticatedMessage</span><span class="p">)</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <dl class="method">
 <dt id="symcrypto.MessageAuthenticator.mac">
-<tt class="descname">mac</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator.mac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator.mac" title="Permalink to this definition">¶</a></dt>
-<dd><p>authenticates a message</p>
+<code class="descname">mac</code><span class="sig-paren">(</span><em>msg</em>, <em>associatedData=b''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator.mac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator.mac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Authenticates (MAC) a message. The MAC is computed as:
+MAC = HMAC(key, algorithm + associatedData + message).</p>
+<dl class="docutils">
+<dt>msg <span class="classifier-delimiter">:</span> <span class="classifier">str or byte str</span></dt>
+<dd>The message serving as input to the HMAC algorithm, in addition to the HMAC algorithm and associated data.</dd>
+<dt>associatedData <span class="classifier-delimiter">:</span> <span class="classifier">str or byte str, optional</span></dt>
+<dd>Associated data that will be MACed together with the ciphertext and algorithm; the associated data will not be encrypted.</dd>
+</dl>
+<dl class="docutils">
+<dt>dict</dt>
+<dd>Dictionary composed of the MAC algorithm, the MACed message (or ciphertext), and the digest computed by MACing HMAC_algorithm + associatedData + msg.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="symcrypto.MessageAuthenticator.verify">
-<tt class="descname">verify</tt><big>(</big><em>msgAndDigest</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator.verify" title="Permalink to this definition">¶</a></dt>
-<dd><p>verifies the result returned by mac</p>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>msgAndDigest</em>, <em>associatedData=b''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies whether the MAC digest from input ciphertext and digest matches the computed one over ciphertext and associated data.</p>
+<dl class="docutils">
+<dt>msgAndDigest <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>Dictionary composed of the MAC algorithm, the MACed message (or ciphertext), and the digest computed by MACing HMAC_algorithm + associatedData + msg.
+It is the format generated by the mac() function within this class.</dd>
+<dt>associatedData <span class="classifier-delimiter">:</span> <span class="classifier">str or byte str, optional</span></dt>
+<dd>Associated data that will be MACed together with the ciphertext and algorithm; the associated data will not be encrypted.</dd>
+</dl>
+<dl class="docutils">
+<dt>bool</dt>
+<dd>True if the digests match, False otherwise.</dd>
+</dl>
+<dl class="docutils">
+<dt>ValueError</dt>
+<dd>If the HMAC algorithm is not supported.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="symcrypto.SymmetricCryptoAbstraction">
-<em class="property">class </em><tt class="descclassname">symcrypto.</tt><tt class="descname">SymmetricCryptoAbstraction</tt><big>(</big><em>key</em>, <em>alg=0</em>, <em>mode=2</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">symcrypto.</code><code class="descname">SymmetricCryptoAbstraction</code><span class="sig-paren">(</span><em>key</em>, <em>alg=0</em>, <em>mode=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Abstraction for symmetric encryption and decryption of data.
 Ideally provide an INDCCA2 secure symmetric container for arbitrary data.
 Currently only supports primitives that JSON can encode and decode.</p>
-<p>A large number of the schemes can only encrypt group elements 
+<p>A large number of the schemes can only encrypt group elements
 and do not provide an efficient mechanism for encoding byte in
-those elements. As such we don&#8217;t pick a symmetric key and encrypt 
+those elements. As such we don’t pick a symmetric key and encrypt
 it asymmetrically. Rather, we hash a random group element to get the
 symmetric key.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.core.math.pairing</span> <span class="kn">import</span> <span class="n">hashPair</span> <span class="k">as</span> <span class="n">extractor</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="n">extractor</span><span class="p">(</span><span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">b</span><span class="s">&quot;Friendly Fire Isn&#39;t&quot;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">extract_key</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="n">extract_key</span><span class="p">(</span><span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Friendly Fire Isn&#39;t&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
 <span class="go">b&quot;Friendly Fire Isn&#39;t&quot;</span>
 </pre></div>
 </div>
 <dl class="method">
 <dt id="symcrypto.SymmetricCryptoAbstraction.decrypt">
-<tt class="descname">decrypt</tt><big>(</big><em>cipherText</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction.decrypt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decrypt</code><span class="sig-paren">(</span><em>cipherText</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction.decrypt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="symcrypto.SymmetricCryptoAbstraction.encrypt">
-<tt class="descname">encrypt</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction.encrypt" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encrypt</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction.encrypt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -146,7 +252,7 @@ symmetric key.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="specialprimes.html"
@@ -154,29 +260,28 @@ symmetric key.</p>
   <h4>Next topic</h4>
   <p class="topless"><a href="xmlserialize.html"
                         title="next chapter">xmlserialize</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/symcrypto.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/symcrypto.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -191,14 +296,14 @@ symmetric key.</p>
         <li class="right" >
           <a href="specialprimes.html" title="specialprimes"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

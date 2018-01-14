@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_waters09 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <title>pksig_waters09 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
-    <link rel="next" title="pkenc_cs98" href="../pkenc/pkenc_cs98.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Scheme Test Code" href="../../../test_schemes.html" />
     <link rel="prev" title="pksig_waters05" href="pksig_waters05.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -39,26 +37,26 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../pkenc/pkenc_cs98.html" title="pkenc_cs98"
+          <a href="../../../test_schemes.html" title="Scheme Test Code"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="pksig_waters05.html" title="pksig_waters05"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-pksig_waters09">
 <span id="pksig-waters09"></span><h1>pksig_waters09<a class="headerlink" href="#module-pksig_waters09" title="Permalink to this headline">¶</a></h1>
 <p>Brent Waters (Pairing-based)</p>
 <div class="line-block">
-<div class="line">From: &#8220;Dual System ENcryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions&#8221;</div>
+<div class="line">From: “Dual System ENcryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions”</div>
 <div class="line">Published in: CRYPTO 2009</div>
 <div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2009/385.pdf">http://eprint.iacr.org/2009/385.pdf</a></div>
 <div class="line">Notes: </div>
@@ -83,12 +81,12 @@
 </table>
 <dl class="class">
 <dt id="pksig_waters09.IBEWaters09">
-<em class="property">class </em><tt class="descclassname">pksig_waters09.</tt><tt class="descname">IBEWaters09</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_waters09.html#IBEWaters09"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.IBEWaters09" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.IBEnc.IBEnc</span></tt></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+<em class="property">class </em><code class="descclassname">pksig_waters09.</code><code class="descname">IBEWaters09</code><span class="sig-paren">(</span><em>groupObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_waters09.html#IBEWaters09"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.IBEWaters09" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.IBEnc.IBEnc</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ibe</span> <span class="o">=</span> <span class="n">IBEWaters09</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;plese sign this message!!!!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;plese sign this message!!!!&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 <span class="go">True</span>
@@ -96,24 +94,24 @@
 </div>
 <dl class="method">
 <dt id="pksig_waters09.IBEWaters09.keygen">
-<tt class="descname">keygen</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_waters09.html#IBEWaters09.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.IBEWaters09.keygen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">keygen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_waters09.html#IBEWaters09.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.IBEWaters09.keygen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_waters09.IBEWaters09.sign">
-<tt class="descname">sign</tt><big>(</big><em>mpk</em>, <em>msk</em>, <em>m</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_waters09.html#IBEWaters09.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.IBEWaters09.sign" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sign</code><span class="sig-paren">(</span><em>mpk</em>, <em>msk</em>, <em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_waters09.html#IBEWaters09.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.IBEWaters09.sign" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_waters09.IBEWaters09.verify">
-<tt class="descname">verify</tt><big>(</big><em>mpk</em>, <em>sigma</em>, <em>m</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_waters09.html#IBEWaters09.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.IBEWaters09.verify" title="Permalink to this definition">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>mpk</em>, <em>sigma</em>, <em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_waters09.html#IBEWaters09.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.IBEWaters09.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="pksig_waters09.main">
-<tt class="descclassname">pksig_waters09.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_waters09.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pksig_waters09.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_waters09.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_waters09.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -122,37 +120,36 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="pksig_waters05.html"
                         title="previous chapter">pksig_waters05</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../pkenc/pkenc_cs98.html"
-                        title="next chapter">pkenc_cs98</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../../_sources/charm/schemes/pksig/pksig_waters09.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <p class="topless"><a href="../../../test_schemes.html"
+                        title="next chapter">Scheme Test Code</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/pksig/pksig_waters09.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -162,19 +159,19 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../pkenc/pkenc_cs98.html" title="pkenc_cs98"
+          <a href="../../../test_schemes.html" title="Scheme Test Code"
              >next</a> |</li>
         <li class="right" >
           <a href="pksig_waters05.html" title="pksig_waters05"
              >previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

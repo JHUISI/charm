@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_bls04 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <title>pksig_bls04 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="pksig_boyen" href="pksig_boyen.html" />
-    <link rel="prev" title="Implemented Schemes" href="../../../schemes.html" /> 
+    <link rel="prev" title="pkenc_rsa" href="../pkenc/pkenc_rsa.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -42,23 +40,23 @@
           <a href="pksig_boyen.html" title="pksig_boyen"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../../../schemes.html" title="Implemented Schemes"
+          <a href="../pkenc/pkenc_rsa.html" title="pkenc_rsa"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-pksig_bls04">
 <span id="pksig-bls04"></span><h1>pksig_bls04<a class="headerlink" href="#module-pksig_bls04" title="Permalink to this headline">¶</a></h1>
 <p>:Boneh-Lynn-Shacham Identity Based Signature</p>
 <div class="line-block">
-<div class="line">From: &#8220;D. Boneh, B. Lynn, H. Shacham Short Signatures from the Weil Pairing&#8221;</div>
+<div class="line">From: “D. Boneh, B. Lynn, H. Shacham Short Signatures from the Weil Pairing”</div>
 <div class="line">Published in: Journal of Cryptology 2004</div>
 <div class="line">Available from: <a class="reference external" href="http://">http://</a></div>
 <div class="line">Notes: This is the IBE (2-level HIBE) implementation of the HIBE scheme BB_2.</div>
@@ -83,43 +81,43 @@
 </table>
 <dl class="class">
 <dt id="pksig_bls04.BLS01">
-<em class="property">class </em><tt class="descclassname">pksig_bls04.</tt><tt class="descname">BLS01</tt><big>(</big><em>groupObj</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.IBSig.IBSig</span></tt></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">messages</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;a&#39;</span><span class="p">:</span><span class="s">&quot;hello world!!!&quot;</span> <span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span><span class="s">&quot;test message&quot;</span> <span class="p">}</span>
+<em class="property">class </em><code class="descclassname">pksig_bls04.</code><code class="descname">BLS01</code><span class="sig-paren">(</span><em>groupObj</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.IBSig.IBSig</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">messages</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="s2">&quot;hello world!!!&quot;</span> <span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="s2">&quot;test message&quot;</span> <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ib</span> <span class="o">=</span> <span class="n">BLS01</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">ib</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">ib</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">secret_key</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">],</span> <span class="n">messages</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">ib</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">secret_key</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">messages</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ib</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">messages</span><span class="p">)</span> 
 <span class="go">True</span>
 </pre></div>
 </div>
 <dl class="method">
 <dt id="pksig_bls04.BLS01.dump">
-<tt class="descname">dump</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01.dump" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dump</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01.dump" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_bls04.BLS01.keygen">
-<tt class="descname">keygen</tt><big>(</big><em>secparam=None</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01.keygen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">keygen</code><span class="sig-paren">(</span><em>secparam=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01.keygen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_bls04.BLS01.sign">
-<tt class="descname">sign</tt><big>(</big><em>x</em>, <em>message</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01.sign" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sign</code><span class="sig-paren">(</span><em>x</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01.sign" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_bls04.BLS01.verify">
-<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>sig</em>, <em>message</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01.verify" title="Permalink to this definition">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>pk</em>, <em>sig</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.BLS01.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="pksig_bls04.main">
-<tt class="descclassname">pksig_bls04.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../../../_modules/pksig_bls04.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pksig_bls04.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_bls04.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -128,37 +126,36 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../../../schemes.html"
-                        title="previous chapter">Implemented Schemes</a></p>
+  <p class="topless"><a href="../pkenc/pkenc_rsa.html"
+                        title="previous chapter">pkenc_rsa</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="pksig_boyen.html"
                         title="next chapter">pksig_boyen</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../../_sources/charm/schemes/pksig/pksig_bls04.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/pksig/pksig_bls04.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -171,16 +168,16 @@
           <a href="pksig_boyen.html" title="pksig_boyen"
              >next</a> |</li>
         <li class="right" >
-          <a href="../../../schemes.html" title="Implemented Schemes"
+          <a href="../pkenc/pkenc_rsa.html" title="pkenc_rsa"
              >previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

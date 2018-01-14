@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>chamhash_rsa_hw09 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <title>chamhash_rsa_hw09 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../schemes.html" />
-    <link rel="next" title="dabe_aw11" href="dabe_aw11.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="encap_bchk05" href="encap_bchk05.html" />
     <link rel="prev" title="chamhash_adm05" href="chamhash_adm05.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -39,20 +37,20 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="dabe_aw11.html" title="dabe_aw11"
+          <a href="encap_bchk05.html" title="encap_bchk05"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="chamhash_adm05.html" title="chamhash_adm05"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-chamhash_rsa_hw09">
 <span id="chamhash-rsa-hw09"></span><h1>chamhash_rsa_hw09<a class="headerlink" href="#module-chamhash_rsa_hw09" title="Permalink to this headline">¶</a></h1>
@@ -60,7 +58,7 @@
 based on the scheme of Ateneise and de Medeiros</p>
 <blockquote>
 <div><div class="line-block">
-<div class="line">From: &#8220;S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions&#8221;, Appendix A.</div>
+<div class="line">From: “S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions”, Appendix A.</div>
 <div class="line">Published in: Eurocrypt 2009</div>
 <div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2009/028.pdf">http://eprint.iacr.org/2009/028.pdf</a></div>
 <div class="line">Notes: </div>
@@ -87,14 +85,14 @@ based on the scheme of Ateneise and de Medeiros</p>
 </table>
 <dl class="class">
 <dt id="chamhash_rsa_hw09.ChamHash_HW09">
-<em class="property">class </em><tt class="descclassname">chamhash_rsa_hw09.</tt><tt class="descname">ChamHash_HW09</tt><a class="reference internal" href="../../_modules/chamhash_rsa_hw09.html#ChamHash_HW09"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.Hash.ChamHash</span></tt></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span>
+<em class="property">class </em><code class="descclassname">chamhash_rsa_hw09.</code><code class="descname">ChamHash_HW09</code><a class="reference internal" href="../../_modules/chamhash_rsa_hw09.html#ChamHash_HW09"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.Hash.ChamHash</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">integer</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">164960892556379843852747960442703555069442262500242170785496141408191025653791149960117681934982863436763270287998062485836533436731979391762052869620652382502450810563192532079839617163226459506619269739544815249458016088505187490329968102214003929285843634017082702266003694786919671197914296386150563930299</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">82480446278189921926373980221351777534721131250121085392748070704095512826895574980058840967491431718381635143999031242918266718365989695881026434810326191251225405281596266039919808581613229753309634869772407624729008044252593745164984051107001964642921817008541351133001847393459835598957148193075281965149</span><span class="p">)</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chamHash</span> <span class="o">=</span> <span class="n">ChamHash_HW09</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;Hello world this is the message!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Hello world this is the message!&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">hash1</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">hash2</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hash1</span> <span class="o">==</span> <span class="n">hash2</span>
@@ -103,12 +101,12 @@ based on the scheme of Ateneise and de Medeiros</p>
 </div>
 <dl class="method">
 <dt id="chamhash_rsa_hw09.ChamHash_HW09.hash">
-<tt class="descname">hash</tt><big>(</big><em>pk</em>, <em>message</em>, <em>r=0</em><big>)</big><a class="reference internal" href="../../_modules/chamhash_rsa_hw09.html#ChamHash_HW09.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09.hash" title="Permalink to this definition">¶</a></dt>
+<code class="descname">hash</code><span class="sig-paren">(</span><em>pk</em>, <em>message</em>, <em>r=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chamhash_rsa_hw09.html#ChamHash_HW09.hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09.hash" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="chamhash_rsa_hw09.ChamHash_HW09.paramgen">
-<tt class="descname">paramgen</tt><big>(</big><em>secparam</em>, <em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../../_modules/chamhash_rsa_hw09.html#ChamHash_HW09.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09.paramgen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">paramgen</code><span class="sig-paren">(</span><em>secparam</em>, <em>p=0</em>, <em>q=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chamhash_rsa_hw09.html#ChamHash_HW09.paramgen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#chamhash_rsa_hw09.ChamHash_HW09.paramgen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -119,37 +117,36 @@ based on the scheme of Ateneise and de Medeiros</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="chamhash_adm05.html"
                         title="previous chapter">chamhash_adm05</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="dabe_aw11.html"
-                        title="next chapter">dabe_aw11</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../_sources/charm/schemes/chamhash_rsa_hw09.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <p class="topless"><a href="encap_bchk05.html"
+                        title="next chapter">encap_bchk05</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/charm/schemes/chamhash_rsa_hw09.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -159,19 +156,19 @@ based on the scheme of Ateneise and de Medeiros</p>
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="dabe_aw11.html" title="dabe_aw11"
+          <a href="encap_bchk05.html" title="encap_bchk05"
              >next</a> |</li>
         <li class="right" >
           <a href="chamhash_adm05.html" title="chamhash_adm05"
              >previous</a> |</li>
-        <li><a href="../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

@@ -1,0 +1,353 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>protocol_a01 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for protocol_a01</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">:Blind Signature Scheme</span>
+<span class="sd"> </span>
+<span class="sd">| From: &quot;M. Abe A Secure Three-move Blind Signature Scheme for Polynomially </span>
+<span class="sd">| 	Many Signatures&quot;</span>
+<span class="sd">| Published in: EUROCRYPT 2001</span>
+<span class="sd">| Available from: http://www.iacr.org/archive/eurocrypt2001/20450135.pdf</span>
+
+<span class="sd">* type:           signature </span>
+<span class="sd">* setting:        integer groups</span>
+
+<span class="sd">:Authors:    Antonio de la Piedra</span>
+<span class="sd">:Date:       12/2013</span>
+<span class="sd"> &#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">integer</span><span class="p">,</span> <span class="n">IntegerGroupQ</span><span class="p">,</span> <span class="n">randomBits</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.conversion</span> <span class="k">import</span> <span class="n">Conversion</span>
+<span class="kn">from</span> <span class="nn">charm.core.engine.protocol</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="k">import</span> <span class="n">socket</span><span class="p">,</span><span class="n">AF_INET</span><span class="p">,</span><span class="n">SOCK_STREAM</span><span class="p">,</span><span class="n">SOL_SOCKET</span><span class="p">,</span><span class="n">SO_REUSEADDR</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">party</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;Signer&#39;</span><span class="p">,</span> <span class="s1">&#39;User&#39;</span><span class="p">)</span>
+<span class="n">SIGNER</span><span class="p">,</span> <span class="n">USER</span> <span class="o">=</span> <span class="n">party</span><span class="o">.</span><span class="n">Signer</span><span class="p">,</span> <span class="n">party</span><span class="o">.</span><span class="n">User</span>
+<span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">8082</span>
+
+<div class="viewcode-block" id="SHA1"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.SHA1">[docs]</a><span class="k">def</span> <span class="nf">SHA1</span><span class="p">(</span><span class="n">bytes1</span><span class="p">):</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">)</span>
+    <span class="n">s1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bytes1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s1</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span></div>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+<div class="viewcode-block" id="Asig"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig">[docs]</a><span class="k">class</span> <span class="nc">Asig</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>        
+
+        <span class="n">signer_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">signer_state1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">signer_state3</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">signer_state5</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">signer_state7</span> <span class="p">}</span>
+        <span class="n">user_states</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">user_state2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">user_state4</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">user_state6</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">user_state8</span> <span class="p">}</span>
+
+        <span class="n">signer_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span><span class="mi">7</span> <span class="p">}</span>
+        <span class="n">user_trans</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="mi">8</span> <span class="p">}</span>
+
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SIGNER</span><span class="p">,</span> <span class="n">signer_states</span><span class="p">,</span> <span class="n">signer_trans</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">addPartyType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">USER</span><span class="p">,</span> <span class="n">user_states</span><span class="p">,</span> <span class="n">user_trans</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setSubclassVars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">)</span> 
+                        
+        <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mi">2</span>
+              
+        <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">secparam</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">p</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">q</span>
+           
+<div class="viewcode-block" id="Asig.signer_state1"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig.signer_state1">[docs]</a>    <span class="k">def</span> <span class="nf">signer_state1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SIGNER state #1&quot;</span><span class="p">)</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
+        <span class="n">z</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">randomGen</span><span class="p">()</span>
+        
+        <span class="n">y</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span> 
+
+        <span class="n">hs1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">)</span>
+        <span class="n">hs1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">p</span><span class="p">)))</span>
+        <span class="n">hs1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">q</span><span class="p">)))</span>
+        <span class="n">hs1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">g</span><span class="p">)))</span>
+        <span class="n">hs1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">h</span><span class="p">)))</span>
+        <span class="n">hs1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
+        
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">hs1</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">msg</span> <span class="o">**</span> <span class="p">((</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">q</span><span class="p">))</span> <span class="o">%</span> <span class="n">p</span>
+                                
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span><span class="n">h</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span><span class="n">z</span>  <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Asig.user_state2"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig.user_state2">[docs]</a>    <span class="k">def</span> <span class="nf">user_state2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;USER state #2&quot;</span><span class="p">)</span>
+        
+        <span class="n">g</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
+                
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span><span class="n">y</span> <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Asig.signer_state3"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig.signer_state3">[docs]</a>    <span class="k">def</span> <span class="nf">signer_state3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SIGNER state #3&quot;</span><span class="p">)</span>
+
+        <span class="n">rnd</span> <span class="o">=</span> <span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">randomBits</span><span class="p">(</span><span class="mi">80</span><span class="p">)))</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">SHA1</span><span class="p">(</span><span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">rnd</span><span class="p">)))</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="p">(</span><span class="n">msg</span> <span class="o">**</span> <span class="p">((</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">q</span><span class="p">))</span> <span class="o">%</span> <span class="n">p</span>
+                        
+        <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span> <span class="p">,</span><span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">])</span>
+        
+        <span class="n">z2</span> <span class="o">=</span> <span class="n">z</span><span class="o">/</span><span class="n">z1</span>
+        
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
+        <span class="n">s1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>                
+        <span class="n">s2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">u</span>
+        
+        <span class="n">b1</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">s1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">z1</span> <span class="o">**</span> <span class="n">d</span><span class="p">)</span>         
+        <span class="n">b2</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">**</span> <span class="n">s2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">z2</span> <span class="o">**</span> <span class="n">d</span><span class="p">)</span> 
+        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">u</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;s1&#39;</span><span class="p">,</span> <span class="n">s1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;s2&#39;</span><span class="p">,</span> <span class="n">s2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;rnd&#39;</span><span class="p">:</span><span class="n">rnd</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b1&#39;</span><span class="p">:</span><span class="n">b1</span><span class="p">,</span> <span class="s1">&#39;b2&#39;</span><span class="p">:</span><span class="n">b2</span>  <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Asig.user_state4"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig.user_state4">[docs]</a>    <span class="k">def</span> <span class="nf">user_state4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;USER state #4&quot;</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span> <span class="p">,</span><span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">])</span>
+        
+        <span class="n">rnd</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rnd&#39;</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b1&#39;</span><span class="p">)</span>
+        <span class="n">b2</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b2&#39;</span><span class="p">)</span>
+        
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">SHA1</span><span class="p">(</span><span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">rnd</span><span class="p">)))</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="p">(</span><span class="n">msg</span> <span class="o">**</span> <span class="p">((</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">q</span><span class="p">))</span> <span class="o">%</span> <span class="n">p</span>
+
+        <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        
+        <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+        <span class="n">t1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
+        <span class="n">t2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
+        <span class="n">t3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
+        <span class="n">t4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
+        <span class="n">t5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>        
+
+        <span class="n">zeta</span> <span class="o">=</span> <span class="n">z</span> <span class="o">**</span> <span class="n">gamma</span>
+        <span class="n">zeta1</span> <span class="o">=</span> <span class="n">z1</span> <span class="o">**</span> <span class="n">gamma</span>
+        <span class="n">zeta2</span> <span class="o">=</span> <span class="n">zeta</span><span class="o">/</span><span class="n">zeta1</span>
+                                                         
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">t1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">**</span> <span class="n">t2</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="n">beta1</span> <span class="o">=</span> <span class="p">(</span><span class="n">b1</span> <span class="o">**</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">t3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">zeta1</span> <span class="o">**</span> <span class="n">t4</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="n">beta2</span> <span class="o">=</span> <span class="p">(</span><span class="n">b2</span> <span class="o">**</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">h</span> <span class="o">**</span> <span class="n">t5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">zeta2</span> <span class="o">**</span> <span class="n">t4</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>        
+        <span class="n">eta</span> <span class="o">=</span> <span class="n">z</span> <span class="o">**</span> <span class="n">tau</span>
+                
+        <span class="n">epsilon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="n">zeta1</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta1</span><span class="p">,</span> <span class="n">beta2</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="s2">&quot;msg&quot;</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">epsilon</span> <span class="o">-</span> <span class="n">t2</span> <span class="o">-</span> <span class="n">t4</span>
+                
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;z1&#39;</span><span class="p">,</span> <span class="n">z1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;zeta&#39;</span><span class="p">,</span> <span class="n">zeta</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="n">zeta1</span><span class="p">))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="n">zeta2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;beta1&#39;</span><span class="p">,</span> <span class="n">beta1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;beta2&#39;</span><span class="p">,</span> <span class="n">beta2</span><span class="p">))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;t1&#39;</span><span class="p">,</span> <span class="n">t1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;t2&#39;</span><span class="p">,</span> <span class="n">t2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;t3&#39;</span><span class="p">,</span> <span class="n">t3</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;t4&#39;</span><span class="p">,</span> <span class="n">t4</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;t5&#39;</span><span class="p">,</span> <span class="n">t5</span><span class="p">))</span>
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="n">gamma</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;tau&#39;</span><span class="p">,</span> <span class="n">tau</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;eta&#39;</span><span class="p">,</span> <span class="n">eta</span><span class="p">))</span>
+
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>        
+
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span> <span class="p">}</span>        </div>
+        
+<div class="viewcode-block" id="Asig.signer_state5"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig.signer_state5">[docs]</a>    <span class="k">def</span> <span class="nf">signer_state5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SIGNER state #5&quot;</span><span class="p">)</span>
+
+        <span class="n">e</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">])</span>
+        
+        <span class="n">c</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">d</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">c</span><span class="o">*</span><span class="n">x</span>
+                
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span><span class="n">r</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="n">c</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span><span class="n">d</span> <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Asig.user_state6"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig.user_state6">[docs]</a>    <span class="k">def</span> <span class="nf">user_state6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;USER state #6&quot;</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span><span class="n">r</span> <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Asig.signer_state7"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig.signer_state7">[docs]</a>    <span class="k">def</span> <span class="nf">signer_state7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SIGNER state #7&quot;</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;s1&#39;</span><span class="p">,</span> <span class="s1">&#39;s2&#39;</span><span class="p">])</span>
+                        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;s1&#39;</span><span class="p">:</span><span class="n">s1</span><span class="p">,</span> <span class="s1">&#39;s2&#39;</span><span class="p">:</span><span class="n">s2</span> <span class="p">}</span></div>
+
+<div class="viewcode-block" id="Asig.user_state8"><a class="viewcode-back" href="../charm/schemes/protocol_a01.html#protocol_a01.Asig.user_state8">[docs]</a>    <span class="k">def</span> <span class="nf">user_state8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;USER state #8&quot;</span><span class="p">)</span>
+
+        <span class="n">s1</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;s1&#39;</span><span class="p">)</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;s2&#39;</span><span class="p">)</span>
+        
+        <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">])</span>
+
+        <span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta1</span><span class="p">,</span> <span class="n">beta2</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="s1">&#39;beta1&#39;</span><span class="p">,</span> <span class="s1">&#39;beta2&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">])</span>
+        <span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="n">zeta1</span><span class="p">,</span> <span class="n">zeta2</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">z1</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;zeta&#39;</span><span class="p">,</span> <span class="s1">&#39;zeta1&#39;</span><span class="p">,</span> <span class="s1">&#39;zeta2&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;z1&#39;</span><span class="p">])</span>
+        <span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t3</span><span class="p">,</span> <span class="n">t4</span><span class="p">,</span> <span class="n">t5</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;t1&#39;</span><span class="p">,</span> <span class="s1">&#39;t2&#39;</span><span class="p">,</span> <span class="s1">&#39;t3&#39;</span><span class="p">,</span> <span class="s1">&#39;t4&#39;</span><span class="p">,</span> <span class="s1">&#39;t5&#39;</span><span class="p">])</span>
+        <span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span> <span class="o">=</span> <span class="n">Protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s1">&#39;tau&#39;</span><span class="p">,</span> <span class="s1">&#39;eta&#39;</span><span class="p">])</span>
+        
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">t1</span>
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="n">t2</span>
+        
+        <span class="n">sigma1</span> <span class="o">=</span> <span class="p">(</span><span class="n">gamma</span><span class="o">*</span><span class="n">s1</span><span class="p">)</span> <span class="o">+</span> <span class="n">t3</span>
+        <span class="n">sigma2</span> <span class="o">=</span> <span class="p">(</span><span class="n">gamma</span><span class="o">*</span><span class="n">s2</span><span class="p">)</span> <span class="o">+</span> <span class="n">t5</span>
+        
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">d</span> <span class="o">+</span> <span class="n">t4</span>
+
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">tau</span> <span class="o">-</span> <span class="p">(</span><span class="n">delta</span> <span class="o">*</span> <span class="n">gamma</span><span class="p">)</span>
+
+        <span class="c1"># Verification</span>
+
+        <span class="n">tmp1</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">rho</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">**</span> <span class="n">omega</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="n">tmp2</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">sigma1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">zeta1</span> <span class="o">**</span> <span class="n">delta</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="n">tmp3</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">**</span> <span class="n">sigma2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">zeta2</span> <span class="o">**</span> <span class="n">delta</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="n">tmp4</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span> <span class="o">**</span> <span class="n">mu</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">zeta</span> <span class="o">**</span> <span class="n">delta</span><span class="p">)</span> <span class="o">%</span> <span class="n">p</span>
+        
+        <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="n">omega</span> <span class="o">+</span> <span class="n">delta</span><span class="p">)</span> <span class="o">%</span> <span class="n">q</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="n">zeta1</span><span class="p">,</span> <span class="n">tmp1</span><span class="p">,</span> <span class="n">tmp2</span><span class="p">,</span> <span class="n">tmp3</span><span class="p">,</span> <span class="n">tmp4</span><span class="p">,</span> <span class="s2">&quot;msg&quot;</span><span class="p">)</span>        
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Verification OK:&quot;</span><span class="p">,</span> <span class="n">p1</span> <span class="o">==</span> <span class="n">p2</span><span class="p">)</span>
+        
+        <span class="n">Protocol</span><span class="o">.</span><span class="n">setState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div></div>
+         
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">156053402631691285300957066846581395905893621007563090607988086498527791650834395958624527746916581251903190331297268907675919283232442999706619659475326192111220545726433895802392432934926242553363253333261282122117343404703514696108330984423475697798156574052962658373571332699002716083130212467463571362679</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">78026701315845642650478533423290697952946810503781545303994043249263895825417197979312263873458290625951595165648634453837959641616221499853309829737663096055610272863216947901196216467463121276681626666630641061058671702351757348054165492211737848899078287026481329186785666349501358041565106233731785681339</span><span class="p">)</span>
+
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">()</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">Asig</span><span class="p">(</span><span class="n">groupObj</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-s&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Operating as signer...&quot;</span><span class="p">)</span>
+        <span class="n">svr</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_REUSEADDR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">svr</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">svr_sock</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">svr</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Connected by &quot;</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s2">&quot;signer&quot;</span><span class="p">,</span> <span class="n">SIGNER</span><span class="p">,</span> <span class="n">svr_sock</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-u&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Operating as user...&quot;</span><span class="p">)</span>
+        <span class="n">clt</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+        <span class="n">clt</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_sock</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">USER</span><span class="p">,</span> <span class="n">clt</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage: </span><span class="si">%s</span><span class="s2"> [-s or -u]&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span><span class="n">_name</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="n">_type</span><span class="p">,</span> <span class="s1">&#39;socket&#39;</span><span class="p">:</span><span class="n">_sock</span><span class="p">}</span> <span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

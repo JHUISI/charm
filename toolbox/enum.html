@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>enum &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>enum &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="FSA" href="FSA.html" />
     <link rel="prev" title="ecgroup" href="ecgroup.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,22 +42,83 @@
         <li class="right" >
           <a href="ecgroup.html" title="ecgroup"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-enum">
 <span id="enum"></span><h1>enum<a class="headerlink" href="#module-enum" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="class">
+<dt id="enum.EnumMeta">
+<em class="property">class </em><code class="descclassname">enum.</code><code class="descname">EnumMeta</code><a class="reference internal" href="../_modules/enum.html#EnumMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#enum.EnumMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
+<p>Metaclass for Enum</p>
+</dd></dl>
+
+<dl class="class">
 <dt id="enum.Enum">
-<tt class="descclassname">enum.</tt><tt class="descname">Enum</tt><big>(</big><em>*names</em><big>)</big><a class="reference internal" href="../_modules/enum.html#Enum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#enum.Enum" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">enum.</code><code class="descname">Enum</code><a class="reference internal" href="../_modules/enum.html#Enum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#enum.Enum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Generic enumeration.</p>
+<p>Derive from this class to define new enumerations.</p>
+<dl class="attribute">
+<dt id="enum.Enum.name">
+<code class="descname">name</code><a class="headerlink" href="#enum.Enum.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the Enum member.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="enum.Enum.value">
+<code class="descname">value</code><a class="headerlink" href="#enum.Enum.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the Enum member.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="enum.IntEnum">
+<em class="property">class </em><code class="descclassname">enum.</code><code class="descname">IntEnum</code><a class="reference internal" href="../_modules/enum.html#IntEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#enum.IntEnum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">int</span></code>, <a class="reference internal" href="#enum.Enum" title="enum.Enum"><code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></a></p>
+<p>Enum where members are also (and must be) ints</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="enum.Flag">
+<em class="property">class </em><code class="descclassname">enum.</code><code class="descname">Flag</code><a class="reference internal" href="../_modules/enum.html#Flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#enum.Flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#enum.Enum" title="enum.Enum"><code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></a></p>
+<p>Support for flags</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="enum.IntFlag">
+<em class="property">class </em><code class="descclassname">enum.</code><code class="descname">IntFlag</code><a class="reference internal" href="../_modules/enum.html#IntFlag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#enum.IntFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">int</span></code>, <a class="reference internal" href="#enum.Flag" title="enum.Flag"><code class="xref py py-class docutils literal"><span class="pre">enum.Flag</span></code></a></p>
+<p>Support for integer-based Flags</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="enum.auto">
+<em class="property">class </em><code class="descclassname">enum.</code><code class="descname">auto</code><a class="reference internal" href="../_modules/enum.html#auto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#enum.auto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Instances are replaced with an appropriate value in Enum class suites.</p>
+<dl class="attribute">
+<dt id="enum.auto.value">
+<code class="descname">value</code><em class="property"> = &lt;object object&gt;</em><a class="headerlink" href="#enum.auto.value" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="enum.unique">
+<code class="descclassname">enum.</code><code class="descname">unique</code><span class="sig-paren">(</span><em>enumeration</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/enum.html#unique"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#enum.unique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class decorator for enumerations ensuring unique member values.</p>
+</dd></dl>
 
 </div>
 
@@ -67,7 +126,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="ecgroup.html"
@@ -75,29 +134,28 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="FSA.html"
                         title="next chapter">FSA</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/enum.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/enum.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -112,14 +170,14 @@
         <li class="right" >
           <a href="ecgroup.html" title="ecgroup"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

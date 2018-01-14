@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>xmlserialize &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>xmlserialize &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,24 +34,24 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for xmlserialize</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="kn">import</span> <span class="n">IntegerGroup</span>
-<span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="kn">import</span> <span class="n">bytesToObject</span><span class="p">,</span><span class="n">objectToBytes</span>
-<span class="kn">from</span> <span class="nn">xml.dom.minidom</span> <span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="k">import</span> <span class="n">ECGroup</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">IntegerGroup</span>
+<span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="k">import</span> <span class="n">bytesToObject</span><span class="p">,</span><span class="n">objectToBytes</span>
+<span class="kn">from</span> <span class="nn">xml.dom.minidom</span> <span class="k">import</span> <span class="o">*</span>
 
-<div class="viewcode-block" id="writeToXML"><a class="viewcode-back" href="../toolbox/xmlserialize.html#xmlserialize.writeToXML">[docs]</a><span class="k">def</span> <span class="nf">writeToXML</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="writeToXML"><a class="viewcode-back" href="../toolbox/xmlserialize.html#xmlserialize.writeToXML">[docs]</a><span class="k">def</span> <span class="nf">writeToXML</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Output</span>
 <span class="sd">&lt;?xml version=&quot;1.0&quot; ?&gt;</span>
 <span class="sd">&lt;charm&gt;</span>
@@ -64,81 +62,81 @@
 <span class="sd">  &lt;/group&gt;</span>
 <span class="sd">&lt;/charm&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>    
-    <span class="c"># Create the minidom document</span>
+    <span class="c1"># Create the minidom document</span>
     <span class="n">doc</span> <span class="o">=</span> <span class="n">Document</span><span class="p">()</span>
 
-    <span class="c"># Create the &lt;wml&gt; base element</span>
-    <span class="n">charm</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">&quot;charm&quot;</span><span class="p">)</span>
+    <span class="c1"># Create the &lt;wml&gt; base element</span>
+    <span class="n">charm</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s2">&quot;charm&quot;</span><span class="p">)</span>
     <span class="n">doc</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">charm</span><span class="p">)</span>
 
-    <span class="c"># Create the main &lt;card&gt; element</span>
-    <span class="n">maingroup</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">&quot;group&quot;</span><span class="p">)</span>
-    <span class="c"># make this programmatic</span>
+    <span class="c1"># Create the main &lt;card&gt; element</span>
+    <span class="n">maingroup</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
+    <span class="c1"># make this programmatic</span>
     <span class="n">setting</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">groupSetting</span><span class="p">()</span>
     <span class="n">param</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">groupType</span><span class="p">()</span>
     
-    <span class="n">maingroup</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s">&quot;setting&quot;</span><span class="p">,</span> <span class="n">setting</span><span class="p">)</span>
-    <span class="n">maingroup</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s">&quot;param&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+    <span class="n">maingroup</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;setting&quot;</span><span class="p">,</span> <span class="n">setting</span><span class="p">)</span>
+    <span class="n">maingroup</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;param&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
     <span class="n">charm</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">maingroup</span><span class="p">)</span>
 
-    <span class="c"># Create a &lt;p&gt; element</span>
+    <span class="c1"># Create a &lt;p&gt; element</span>
     <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-        <span class="n">paragraph0</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
-        <span class="n">paragraph0</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">paragraph0</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+        <span class="n">paragraph0</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="n">maingroup</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">paragraph0</span><span class="p">)</span>
         
-    <span class="n">paragraph1</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s">&quot;object&quot;</span><span class="p">)</span>
+    <span class="n">paragraph1</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createElement</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
     <span class="n">maingroup</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">paragraph1</span><span class="p">)</span>
 
-    <span class="c"># Give the &lt;p&gt; elemenet some text</span>
-<span class="c">#    ptext = doc.createTextNode(&quot;This is a test!&quot;)</span>
+    <span class="c1"># Give the &lt;p&gt; elemenet some text</span>
+<span class="c1">#    ptext = doc.createTextNode(&quot;This is a test!&quot;)</span>
     <span class="n">serializedObject</span> <span class="o">=</span> <span class="n">objectToBytes</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">)</span>
-    <span class="n">ptext</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createTextNode</span><span class="p">(</span><span class="nb">bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">serializedObject</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span><span class="p">))</span>
+    <span class="n">ptext</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">createTextNode</span><span class="p">(</span><span class="nb">bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">serializedObject</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
     <span class="n">paragraph1</span><span class="o">.</span><span class="n">appendChild</span><span class="p">(</span><span class="n">ptext</span><span class="p">)</span>
     
-    <span class="c"># Print our newly created XML</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="s">&quot;  &quot;</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="s">&quot;  &quot;</span><span class="p">)</span>
-</div>
+    <span class="c1"># Print our newly created XML</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="s2">&quot;  &quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="s2">&quot;  &quot;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="getText"><a class="viewcode-back" href="../toolbox/xmlserialize.html#xmlserialize.getText">[docs]</a><span class="k">def</span> <span class="nf">getText</span><span class="p">(</span><span class="n">nodelist</span><span class="p">):</span>
     <span class="n">rc</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodelist</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">nodeType</span> <span class="o">==</span> <span class="n">node</span><span class="o">.</span><span class="n">TEXT_NODE</span><span class="p">:</span>
             <span class="n">rc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s">&#39;utf8&#39;</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="parseFromXML"><a class="viewcode-back" href="../toolbox/xmlserialize.html#xmlserialize.parseFromXML">[docs]</a><span class="k">def</span> <span class="nf">parseFromXML</span><span class="p">(</span><span class="n">xmlObjectString</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">xmlObjectString</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">,</span> <span class="s">&quot;Invalid type for XML object&quot;</span>
-    <span class="n">dom</span> <span class="o">=</span> <span class="n">parseString</span><span class="p">(</span><span class="n">xmlObjectString</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">dom</span><span class="o">.</span><span class="n">documentElement</span><span class="o">.</span><span class="n">tagName</span> <span class="o">==</span> <span class="s">&quot;charm&quot;</span><span class="p">,</span> <span class="s">&quot;Not a Charm element&quot;</span>    
-<span class="c">#    print(dom.toprettyxml(indent=&quot;  &quot;))</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s1">&#39;utf8&#39;</span><span class="p">)</span></div>
 
-    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;group&quot;</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">groupObj</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">,</span> <span class="s">&quot;Error: could not find group tag.&quot;</span>
+<div class="viewcode-block" id="parseFromXML"><a class="viewcode-back" href="../toolbox/xmlserialize.html#xmlserialize.parseFromXML">[docs]</a><span class="k">def</span> <span class="nf">parseFromXML</span><span class="p">(</span><span class="n">xmlObjectString</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">xmlObjectString</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Invalid type for XML object&quot;</span>
+    <span class="n">dom</span> <span class="o">=</span> <span class="n">parseString</span><span class="p">(</span><span class="n">xmlObjectString</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">dom</span><span class="o">.</span><span class="n">documentElement</span><span class="o">.</span><span class="n">tagName</span> <span class="o">==</span> <span class="s2">&quot;charm&quot;</span><span class="p">,</span> <span class="s2">&quot;Not a Charm element&quot;</span>    
+<span class="c1">#    print(dom.toprettyxml(indent=&quot;  &quot;))</span>
+
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">groupObj</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Error: could not find group tag.&quot;</span>
     <span class="n">groupObj</span> <span class="o">=</span> <span class="n">groupObj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">charmObj1</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;object&quot;</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">charmObj1</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">,</span> <span class="s">&quot;Error: could not find object tag.&quot;</span>
+    <span class="n">charmObj1</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">charmObj1</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Error: could not find object tag.&quot;</span>
     <span class="n">charmObj1</span> <span class="o">=</span> <span class="n">charmObj1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     
     <span class="n">structure</span> <span class="o">=</span> <span class="p">{}</span>       
-    <span class="n">setting</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">(</span><span class="s">&quot;setting&quot;</span><span class="p">)</span>
-    <span class="n">param</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">(</span><span class="s">&quot;param&quot;</span><span class="p">)</span>
+    <span class="n">setting</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">(</span><span class="s2">&quot;setting&quot;</span><span class="p">)</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">(</span><span class="s2">&quot;param&quot;</span><span class="p">)</span>
     
-    <span class="n">charmObj2</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
-    <span class="n">structure</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="k">if</span> <span class="n">charmObj2</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span> 
-        <span class="n">charmObj2</span> <span class="o">=</span> <span class="n">charmObj2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># what is this useful for?</span>
-        <span class="n">structure</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">charmObj2</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">)</span>
+    <span class="n">charmObj2</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+    <span class="n">structure</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">charmObj2</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="n">charmObj2</span> <span class="o">=</span> <span class="n">charmObj2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># what is this useful for?</span>
+        <span class="n">structure</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">charmObj2</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
     
     <span class="n">bytesObj</span> <span class="o">=</span> <span class="n">getText</span><span class="p">(</span><span class="n">charmObj1</span><span class="o">.</span><span class="n">childNodes</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     
-    <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="s">&#39;pairing&#39;</span> <span class="ow">and</span> <span class="n">group</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;pairing&#39;</span> <span class="ow">and</span> <span class="n">group</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">structure</span><span class="p">[</span><span class="s">&#39;setting&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;elliptic_curve&#39;</span> <span class="ow">and</span> <span class="n">group</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">structure</span><span class="p">[</span><span class="s1">&#39;setting&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;elliptic_curve&#39;</span> <span class="ow">and</span> <span class="n">group</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">structure</span><span class="p">[</span><span class="s">&#39;setting&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;integer&#39;</span><span class="p">:</span>
-        <span class="c"># TODO: this is a special case</span>
+    <span class="k">elif</span> <span class="n">structure</span><span class="p">[</span><span class="s1">&#39;setting&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;integer&#39;</span><span class="p">:</span>
+        <span class="c1"># TODO: this is a special case</span>
         <span class="k">pass</span> 
     <span class="k">return</span> <span class="n">bytesToObject</span><span class="p">(</span><span class="n">bytesObj</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span></div>
 </pre></div>
@@ -146,26 +144,23 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -174,14 +169,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

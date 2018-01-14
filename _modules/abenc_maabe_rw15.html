@@ -1,0 +1,319 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>abenc_maabe_rw15 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for abenc_maabe_rw15</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Rouselakis - Waters Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption</span>
+
+<span class="sd">| From:             Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption</span>
+<span class="sd">| Published in:     Financial Crypto 2015</span>
+<span class="sd">| Available from:   http://eprint.iacr.org/2015/016.pdf</span>
+<span class="sd">| Notes:            Implementation based on implementation (maabe_rw12.py)</span>
+<span class="sd">                    which cah be found here: https://sites.google.com/site/yannisrouselakis/rwabe</span>
+
+<span class="sd">* type:          attribute-based encryption (public key)</span>
+<span class="sd">* setting:       bilinear pairing group of prime order</span>
+<span class="sd">* assumption:    complex q-type assumption</span>
+
+<span class="sd">:Authors:		Yannis Rouselakis</span>
+<span class="sd">:Date:      	11/12</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.secretutil</span> <span class="k">import</span> <span class="n">SecretUtil</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ABEncMultiAuth</span> <span class="k">import</span> <span class="n">ABEncMultiAuth</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="merge_dicts"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.merge_dicts">[docs]</a><span class="k">def</span> <span class="nf">merge_dicts</span><span class="p">(</span><span class="o">*</span><span class="n">dict_args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given any number of dicts, shallow copy and merge into a new dict,</span>
+<span class="sd">    precedence goes to key value pairs in latter dicts.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">dictionary</span> <span class="ow">in</span> <span class="n">dict_args</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="MaabeRW15"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.MaabeRW15">[docs]</a><span class="k">class</span> <span class="nc">MaabeRW15</span><span class="p">(</span><span class="n">ABEncMultiAuth</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption</span>
+<span class="sd">    Rouselakis - Waters</span>
+
+<span class="sd">    &gt;&gt;&gt; group = PairingGroup(&#39;SS512&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; maabe = MaabeRW15(group)</span>
+<span class="sd">    &gt;&gt;&gt; public_parameters = maabe.setup()</span>
+
+<span class="sd">        Setup the attribute authorities</span>
+<span class="sd">    &gt;&gt;&gt; attributes1 = [&#39;ONE&#39;, &#39;TWO&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; attributes2 = [&#39;THREE&#39;, &#39;FOUR&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; (public_key1, secret_key1) = maabe.authsetup(public_parameters, &#39;UT&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; (public_key2, secret_key2) = maabe.authsetup(public_parameters, &#39;OU&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; public_keys = {&#39;UT&#39;: public_key1, &#39;OU&#39;: public_key2}</span>
+
+<span class="sd">        Setup a user and give him some keys</span>
+<span class="sd">    &gt;&gt;&gt; gid = &quot;bob&quot;</span>
+<span class="sd">    &gt;&gt;&gt; user_attributes1 = [&#39;STUDENT@UT&#39;, &#39;PHD@UT&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; user_attributes2 = [&#39;STUDENT@OU&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; user_keys1 = maabe.multiple_attributes_keygen(public_parameters, secret_key1, gid, user_attributes1)</span>
+<span class="sd">    &gt;&gt;&gt; user_keys2 = maabe.multiple_attributes_keygen(public_parameters, secret_key2, gid, user_attributes2)</span>
+<span class="sd">    &gt;&gt;&gt; user_keys = {&#39;GID&#39;: gid, &#39;keys&#39;: merge_dicts(user_keys1, user_keys2)}</span>
+
+<span class="sd">        Create a random message</span>
+<span class="sd">    &gt;&gt;&gt; message = group.random(GT)</span>
+
+<span class="sd">        Encrypt the message</span>
+<span class="sd">    &gt;&gt;&gt; access_policy = &#39;(STUDENT@UT or PROFESSOR@OU) and (STUDENT@UT or MASTERS@OU)&#39;</span>
+<span class="sd">    &gt;&gt;&gt; cipher_text = maabe.encrypt(public_parameters, public_keys, message, access_policy)</span>
+
+<span class="sd">        Decrypt the message</span>
+<span class="sd">    &gt;&gt;&gt; decrypted_message = maabe.decrypt(public_parameters, user_keys, cipher_text)</span>
+<span class="sd">    &gt;&gt;&gt; decrypted_message == message</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ABEncMultiAuth</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">util</span> <span class="o">=</span> <span class="n">SecretUtil</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MaabeRW15.setup"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.MaabeRW15.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">egg</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">G2</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">G2</span><span class="p">)</span>
+        <span class="n">gp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g1&#39;</span><span class="p">:</span> <span class="n">g1</span><span class="p">,</span> <span class="s1">&#39;g2&#39;</span><span class="p">:</span> <span class="n">g2</span><span class="p">,</span> <span class="s1">&#39;egg&#39;</span><span class="p">:</span> <span class="n">egg</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="n">H</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">:</span> <span class="n">F</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setup&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">gp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">gp</span></div>
+
+<div class="viewcode-block" id="MaabeRW15.unpack_attribute"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.MaabeRW15.unpack_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">unpack_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Unpacks an attribute in attribute name, authority name and index</span>
+<span class="sd">        :param attribute: The attribute to unpack</span>
+<span class="sd">        :return: The attribute name, authority name and the attribute index, if present.</span>
+
+<span class="sd">        &gt;&gt;&gt; group = PairingGroup(&#39;SS512&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; maabe = MaabeRW15(group)</span>
+<span class="sd">        &gt;&gt;&gt; maabe.unpack_attribute(&#39;STUDENT@UT&#39;)</span>
+<span class="sd">        (&#39;STUDENT&#39;, &#39;UT&#39;, None)</span>
+<span class="sd">        &gt;&gt;&gt; maabe.unpack_attribute(&#39;STUDENT@UT_2&#39;)</span>
+<span class="sd">        (&#39;STUDENT&#39;, &#39;UT&#39;, &#39;2&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[@_]&quot;</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;No @ char in [attribute@authority] name&quot;</span>
+        <span class="k">return</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">None</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MaabeRW15.authsetup"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.MaabeRW15.authsetup">[docs]</a>    <span class="k">def</span> <span class="nf">authsetup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup an attribute authority.</span>
+<span class="sd">        :param gp: The global parameters</span>
+<span class="sd">        :param name: The name of the authority</span>
+<span class="sd">        :return: The public and private key of the authority</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">egga</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;egg&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">alpha</span>
+        <span class="n">gy</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">y</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;egga&#39;</span><span class="p">:</span> <span class="n">egga</span><span class="p">,</span> <span class="s1">&#39;gy&#39;</span><span class="p">:</span> <span class="n">gy</span><span class="p">}</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Authsetup: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">pk</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">sk</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span></div>
+
+<div class="viewcode-block" id="MaabeRW15.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.MaabeRW15.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a user secret key for the attribute.</span>
+<span class="sd">        :param gp: The global parameters.</span>
+<span class="sd">        :param sk: The secret key of the attribute authority.</span>
+<span class="sd">        :param gid: The global user identifier.</span>
+<span class="sd">        :param attribute: The attribute.</span>
+<span class="sd">        :return: The secret key for the attribute for the user with identifier gid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">auth</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unpack_attribute</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;Attribute </span><span class="si">%s</span><span class="s2"> does not belong to authority </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;g2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">](</span><span class="n">gid</span><span class="p">)</span> <span class="o">**</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;F&#39;</span><span class="p">](</span><span class="n">attribute</span><span class="p">)</span> <span class="o">**</span> <span class="n">t</span>
+        <span class="n">KP</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Keygen&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User: </span><span class="si">%s</span><span class="s2">, Attribute: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">attribute</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">({</span><span class="s1">&#39;K&#39;</span><span class="p">:</span> <span class="n">K</span><span class="p">,</span> <span class="s1">&#39;KP&#39;</span><span class="p">:</span> <span class="n">KP</span><span class="p">})</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;K&#39;</span><span class="p">:</span> <span class="n">K</span><span class="p">,</span> <span class="s1">&#39;KP&#39;</span><span class="p">:</span> <span class="n">KP</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="MaabeRW15.multiple_attributes_keygen"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.MaabeRW15.multiple_attributes_keygen">[docs]</a>    <span class="k">def</span> <span class="nf">multiple_attributes_keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">attributes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a dictionary of secret keys for a user for a list of attributes.</span>
+<span class="sd">        :param gp: The global parameters.</span>
+<span class="sd">        :param sk: The secret key of the attribute authority.</span>
+<span class="sd">        :param gid: The global user identifier.</span>
+<span class="sd">        :param attributes: The list of attributes.</span>
+<span class="sd">        :return: A dictionary with attribute names as keys, and secret keys for the attributes as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">uk</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="n">uk</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">uk</span></div>
+
+<div class="viewcode-block" id="MaabeRW15.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.MaabeRW15.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">pks</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Encrypt a message under an access policy</span>
+<span class="sd">        :param gp: The global parameters.</span>
+<span class="sd">        :param pks: The public keys of the relevant attribute authorities, as dict from authority name to public key.</span>
+<span class="sd">        :param message: The message to encrypt.</span>
+<span class="sd">        :param policy_str: The access policy to use.</span>
+<span class="sd">        :return: The encrypted message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>  <span class="c1"># secret to be shared</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># 0 to be shared</span>
+
+        <span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">policy_str</span><span class="p">)</span>
+        <span class="n">attribute_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
+
+        <span class="n">secret_shares</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">calculateSharesDict</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>  <span class="c1"># These are correctly set to be exponents in Z_p</span>
+        <span class="n">zero_shares</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">calculateSharesDict</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+
+        <span class="n">C0</span> <span class="o">=</span> <span class="n">message</span> <span class="o">*</span> <span class="p">(</span><span class="n">gp</span><span class="p">[</span><span class="s1">&#39;egg&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">C1</span><span class="p">,</span> <span class="n">C2</span><span class="p">,</span> <span class="n">C3</span><span class="p">,</span> <span class="n">C4</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">attribute_list</span><span class="p">:</span>
+            <span class="n">attribute_name</span><span class="p">,</span> <span class="n">auth</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unpack_attribute</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">@</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">auth</span><span class="p">)</span>
+            <span class="n">tx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">C1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;egg&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">secret_shares</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">pks</span><span class="p">[</span><span class="n">auth</span><span class="p">][</span><span class="s1">&#39;egga&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">tx</span>
+            <span class="n">C2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">tx</span><span class="p">)</span>
+            <span class="n">C3</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pks</span><span class="p">[</span><span class="n">auth</span><span class="p">][</span><span class="s1">&#39;gy&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">tx</span> <span class="o">*</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">zero_shares</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">C4</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;F&#39;</span><span class="p">](</span><span class="n">attr</span><span class="p">)</span> <span class="o">**</span> <span class="n">tx</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Encrypt&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">({</span><span class="s1">&#39;policy&#39;</span><span class="p">:</span> <span class="n">policy_str</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">:</span> <span class="n">C0</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">:</span> <span class="n">C1</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span> <span class="n">C2</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span> <span class="n">C3</span><span class="p">,</span> <span class="s1">&#39;C4&#39;</span><span class="p">:</span> <span class="n">C4</span><span class="p">})</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;policy&#39;</span><span class="p">:</span> <span class="n">policy_str</span><span class="p">,</span> <span class="s1">&#39;C0&#39;</span><span class="p">:</span> <span class="n">C0</span><span class="p">,</span> <span class="s1">&#39;C1&#39;</span><span class="p">:</span> <span class="n">C1</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span> <span class="n">C2</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span> <span class="n">C3</span><span class="p">,</span> <span class="s1">&#39;C4&#39;</span><span class="p">:</span> <span class="n">C4</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="MaabeRW15.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_maabe_rw15.html#abenc_maabe_rw15.MaabeRW15.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gp</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decrypt the ciphertext using the secret keys of the user.</span>
+<span class="sd">        :param gp: The global parameters.</span>
+<span class="sd">        :param sk: The secret keys of the user.</span>
+<span class="sd">        :param ct: The ciphertext to decrypt.</span>
+<span class="sd">        :return: The decrypted message.</span>
+<span class="sd">        :raise Exception: When the access policy can not be satisfied with the user&#39;s attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s1">&#39;policy&#39;</span><span class="p">])</span>
+        <span class="n">coefficients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">getCoefficients</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
+        <span class="n">pruned_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pruned_list</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;You don&#39;t have the required attributes for decryption!&quot;</span><span class="p">)</span>
+
+        <span class="n">B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pruned_list</span><span class="p">)):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">pruned_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">()</span>  <span class="c1"># without the underscore</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">pruned_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">getAttributeAndIndex</span><span class="p">()</span>  <span class="c1"># with the underscore</span>
+            <span class="n">B</span> <span class="o">*=</span> <span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s1">&#39;C2&#39;</span><span class="p">][</span><span class="n">y</span><span class="p">],</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;K&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">][</span><span class="n">y</span><span class="p">],</span> <span class="n">gp</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">](</span><span class="n">sk</span><span class="p">[</span><span class="s1">&#39;GID&#39;</span><span class="p">]))</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span>
+                <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;KP&#39;</span><span class="p">],</span> <span class="n">ct</span><span class="p">[</span><span class="s1">&#39;C4&#39;</span><span class="p">][</span><span class="n">y</span><span class="p">]))</span> <span class="o">**</span> <span class="n">coefficients</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Decrypt&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SK:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">sk</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Decrypted Message:&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="s1">&#39;C0&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">B</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ct</span><span class="p">[</span><span class="s1">&#39;C0&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">B</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="kn">import</span> <span class="nn">doctest</span>
+
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

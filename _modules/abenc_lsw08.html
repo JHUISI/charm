@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>abenc_lsw08 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>abenc_lsw08 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,18 +34,18 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for abenc_lsw08</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)</span>
 <span class="sd"> </span>
 <span class="sd">| From: &quot;Revocation Systems with Very Small Private Keys&quot;, Large Universe Construction</span>
@@ -62,11 +60,11 @@
 <span class="sd">:Date:            12/2010</span>
 <span class="sd">&#39;&#39;&#39;</span>
 
-<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.secretutil</span> <span class="kn">import</span> <span class="n">SecretUtil</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.ABEnc</span> <span class="kn">import</span> <span class="n">ABEnc</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.secretutil</span> <span class="k">import</span> <span class="n">SecretUtil</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ABEnc</span> <span class="k">import</span> <span class="n">ABEnc</span>
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
 <div class="viewcode-block" id="KPabe"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_lsw08.html#abenc_lsw08.KPabe">[docs]</a><span class="k">class</span> <span class="nc">KPabe</span><span class="p">(</span><span class="n">ABEnc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup,GT</span>
@@ -83,63 +81,63 @@
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-        <span class="n">ABEnc</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ABEnc</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">global</span> <span class="n">group</span><span class="p">,</span> <span class="n">util</span>
         <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
         <span class="n">util</span> <span class="o">=</span> <span class="n">SecretUtil</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>        
 
 <div class="viewcode-block" id="KPabe.setup"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_lsw08.html#abenc_lsw08.KPabe.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c"># pick random exponents</span>
+        <span class="c1"># pick random exponents</span>
         <span class="n">alpha1</span><span class="p">,</span> <span class="n">alpha2</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
         
         <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha1</span> <span class="o">*</span> <span class="n">alpha2</span>
-        <span class="n">g_G1</span><span class="p">,</span> <span class="n">g_G2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span> <span class="c"># PK 1,2        </span>
-        <span class="n">h_G1</span><span class="p">,</span> <span class="n">h_G2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span> <span class="c"># PK 3</span>
+        <span class="n">g_G1</span><span class="p">,</span> <span class="n">g_G2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span> <span class="c1"># PK 1,2        </span>
+        <span class="n">h_G1</span><span class="p">,</span> <span class="n">h_G2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span> <span class="c1"># PK 3</span>
         <span class="n">g1b</span> <span class="o">=</span> <span class="n">g_G1</span> <span class="o">**</span> <span class="n">b</span>        
         <span class="n">e_gg_alpha</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g_G1</span><span class="p">,</span><span class="n">g_G2</span><span class="p">)</span> <span class="o">**</span> <span class="n">alpha</span>
         
-        <span class="c">#public parameters # &#39;g_G2^b&#39;:(g_G2 ** b), &#39;g_G2^b2&#39;:g_G2 ** (b * b),</span>
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g_G1&#39;</span><span class="p">:</span><span class="n">g_G1</span><span class="p">,</span> <span class="s">&#39;g_G2&#39;</span><span class="p">:</span><span class="n">g_G2</span><span class="p">,</span> <span class="s">&#39;g_G1_b&#39;</span><span class="p">:</span><span class="n">g1b</span><span class="p">,</span>
-              <span class="s">&#39;g_G1_b2&#39;</span><span class="p">:</span><span class="n">g1b</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s">&#39;h_G1_b&#39;</span><span class="p">:</span><span class="n">h_G1</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s">&#39;e(gg)_alpha&#39;</span><span class="p">:</span><span class="n">e_gg_alpha</span> <span class="p">}</span>
-        <span class="c">#secret parameters</span>
-        <span class="n">mk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;alpha1&#39;</span><span class="p">:</span><span class="n">alpha1</span><span class="p">,</span> <span class="s">&#39;alpha2&#39;</span><span class="p">:</span><span class="n">alpha2</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s">&#39;h_G1&#39;</span><span class="p">:</span><span class="n">h_G1</span><span class="p">,</span> <span class="s">&#39;h_G2&#39;</span><span class="p">:</span><span class="n">h_G2</span> <span class="p">}</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span>
-    </div>
+        <span class="c1">#public parameters # &#39;g_G2^b&#39;:(g_G2 ** b), &#39;g_G2^b2&#39;:g_G2 ** (b * b),</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;g_G1&#39;</span><span class="p">:</span><span class="n">g_G1</span><span class="p">,</span> <span class="s1">&#39;g_G2&#39;</span><span class="p">:</span><span class="n">g_G2</span><span class="p">,</span> <span class="s1">&#39;g_G1_b&#39;</span><span class="p">:</span><span class="n">g1b</span><span class="p">,</span>
+              <span class="s1">&#39;g_G1_b2&#39;</span><span class="p">:</span><span class="n">g1b</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s1">&#39;h_G1_b&#39;</span><span class="p">:</span><span class="n">h_G1</span> <span class="o">**</span> <span class="n">b</span><span class="p">,</span> <span class="s1">&#39;e(gg)_alpha&#39;</span><span class="p">:</span><span class="n">e_gg_alpha</span> <span class="p">}</span>
+        <span class="c1">#secret parameters</span>
+        <span class="n">mk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;alpha1&#39;</span><span class="p">:</span><span class="n">alpha1</span><span class="p">,</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">:</span><span class="n">alpha2</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;h_G1&#39;</span><span class="p">:</span><span class="n">h_G1</span><span class="p">,</span> <span class="s1">&#39;h_G2&#39;</span><span class="p">:</span><span class="n">h_G2</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span></div>
+    
 <div class="viewcode-block" id="KPabe.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_lsw08.html#abenc_lsw08.KPabe.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">policy_str</span><span class="p">)</span>
         <span class="n">attr_list</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
         
-        <span class="n">s</span> <span class="o">=</span> <span class="n">mk</span><span class="p">[</span><span class="s">&#39;alpha1&#39;</span><span class="p">];</span> <span class="n">secret</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">mk</span><span class="p">[</span><span class="s1">&#39;alpha1&#39;</span><span class="p">];</span> <span class="n">secret</span> <span class="o">=</span> <span class="n">s</span>
         <span class="n">shares</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">calculateSharesDict</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
         
-        <span class="n">D</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;policy&#39;</span><span class="p">:</span> <span class="n">policy_str</span> <span class="p">}</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;policy&#39;</span><span class="p">:</span> <span class="n">policy_str</span> <span class="p">}</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">attr_list</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">strip_index</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">d</span> <span class="o">=</span> <span class="p">[];</span> <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">negatedAttr</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c"># meaning positive</span>
-                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g_G1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">mk</span><span class="p">[</span><span class="s">&#39;alpha2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">shares</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span> <span class="o">*</span> <span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">r</span><span class="p">))</span>   <span class="c"># compute D1 for attribute x</span>
-                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g_G2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">))</span>  <span class="c"># compute D2 for attribute x</span>
-            <span class="c">#else:</span>
-                <span class="c">#d.append((pk[&#39;g2_G1&#39;] ** shares[x]) * (pk[&#39;g_G1_b2&#39;] ** r)) # compute D3</span>
-                <span class="c">#d.append((pk[&#39;g_G1_b&#39;] ** (r * group.hash(x))) * (pk[&#39;h_G1&#39;] ** r)) # compute D4</span>
-                <span class="c">#d.append(pk[&#39;g_G1&#39;] ** -r) # compute D5</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">negatedAttr</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c1"># meaning positive</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g_G1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">mk</span><span class="p">[</span><span class="s1">&#39;alpha2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">shares</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span> <span class="o">*</span> <span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">r</span><span class="p">))</span>   <span class="c1"># compute D1 for attribute x</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g_G2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">))</span>  <span class="c1"># compute D2 for attribute x</span>
+            <span class="c1">#else:</span>
+                <span class="c1">#d.append((pk[&#39;g2_G1&#39;] ** shares[x]) * (pk[&#39;g_G1_b2&#39;] ** r)) # compute D3</span>
+                <span class="c1">#d.append((pk[&#39;g_G1_b&#39;] ** (r * group.hash(x))) * (pk[&#39;h_G1&#39;] ** r)) # compute D4</span>
+                <span class="c1">#d.append(pk[&#39;g_G1&#39;] ** -r) # compute D5</span>
             <span class="n">D</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Access Policy for key: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">policy</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Attribute list: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">attr_list</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">D</span>
-    </div>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access Policy for key: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">policy</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Attribute list: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">attr_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">D</span></div>
+    
 <div class="viewcode-block" id="KPabe.negatedAttr"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_lsw08.html#abenc_lsw08.KPabe.negatedAttr">[docs]</a>    <span class="k">def</span> <span class="nf">negatedAttr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span> <span class="n">attr</span> <span class="o">=</span> <span class="n">attribute</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span> <span class="n">attr</span> <span class="o">=</span> <span class="n">attribute</span>
-        <span class="k">if</span> <span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;!&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Checking... =&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">False</span>    
-    </div>
+        <span class="k">if</span> <span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;!&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Checking... =&gt; </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>    </div>
+    
 <div class="viewcode-block" id="KPabe.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_lsw08.html#abenc_lsw08.KPabe.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>   
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&#39;Encryption Algorithm...&#39;</span><span class="p">)</span>    
-        <span class="c"># s will hold secret</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Encryption Algorithm...&#39;</span><span class="p">)</span>    
+        <span class="c1"># s will hold secret</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">();</span> <span class="n">sx</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attr_list</span><span class="p">)):</span>
@@ -147,22 +145,22 @@
             <span class="n">sx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="n">sx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             
         <span class="n">E3</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c">#E4, E5 = {}, {}</span>
+        <span class="c1">#E4, E5 = {}, {}</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attr_list</span><span class="p">)):</span>
             <span class="n">attr</span> <span class="o">=</span> <span class="n">attr_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">E3</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">s</span>
-            <span class="c">#E4[attr] = pk[&#39;g_G1_b&#39;] ** sx[i]</span>
-            <span class="c">#E5[attr] = (pk[&#39;g_G1_b2&#39;] ** (sx[i] * group.hash(attr))) * (pk[&#39;h_G1_b&#39;] ** sx[i])</span>
+            <span class="c1">#E4[attr] = pk[&#39;g_G1_b&#39;] ** sx[i]</span>
+            <span class="c1">#E5[attr] = (pk[&#39;g_G1_b2&#39;] ** (sx[i] * group.hash(attr))) * (pk[&#39;h_G1_b&#39;] ** sx[i])</span>
         
-        <span class="n">E1</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;e(gg)_alpha&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span> <span class="o">*</span> <span class="n">M</span>
-        <span class="n">E2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g_G2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;E1&#39;</span><span class="p">:</span><span class="n">E1</span><span class="p">,</span> <span class="s">&#39;E2&#39;</span><span class="p">:</span><span class="n">E2</span><span class="p">,</span> <span class="s">&#39;E3&#39;</span><span class="p">:</span><span class="n">E3</span><span class="p">,</span> <span class="s">&#39;attributes&#39;</span><span class="p">:</span><span class="n">attr_list</span> <span class="p">}</span>
-    </div>
+        <span class="n">E1</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;e(gg)_alpha&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">)</span> <span class="o">*</span> <span class="n">M</span>
+        <span class="n">E2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g_G2&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;E1&#39;</span><span class="p">:</span><span class="n">E1</span><span class="p">,</span> <span class="s1">&#39;E2&#39;</span><span class="p">:</span><span class="n">E2</span><span class="p">,</span> <span class="s1">&#39;E3&#39;</span><span class="p">:</span><span class="n">E3</span><span class="p">,</span> <span class="s1">&#39;attributes&#39;</span><span class="p">:</span><span class="n">attr_list</span> <span class="p">}</span></div>
+    
 <div class="viewcode-block" id="KPabe.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_lsw08.html#abenc_lsw08.KPabe.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">D</span><span class="p">):</span>
-        <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="s">&#39;policy&#39;</span><span class="p">])</span>
-        <span class="n">attrs</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">E</span><span class="p">[</span><span class="s">&#39;attributes&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">attrs</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">False</span>              
+        <span class="n">policy</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="s1">&#39;policy&#39;</span><span class="p">])</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">E</span><span class="p">[</span><span class="s1">&#39;attributes&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">attrs</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>              
         <span class="n">coeff</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">getCoefficients</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
         
         <span class="n">Z</span> <span class="o">=</span> <span class="p">{};</span> <span class="n">prodT</span> <span class="o">=</span> <span class="mi">1</span>
@@ -170,60 +168,57 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">()</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">getAttributeAndIndex</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">negatedAttr</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-                 <span class="n">Z</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">E</span><span class="p">[</span><span class="s">&#39;E2&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">E</span><span class="p">[</span><span class="s">&#39;E3&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">],</span> <span class="n">D</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                 <span class="n">Z</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">D</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">E</span><span class="p">[</span><span class="s1">&#39;E2&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">E</span><span class="p">[</span><span class="s1">&#39;E3&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">],</span> <span class="n">D</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
                  <span class="n">prodT</span> <span class="o">*=</span> <span class="n">Z</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="o">**</span> <span class="n">coeff</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> 
        
-        <span class="k">return</span> <span class="n">E</span><span class="p">[</span><span class="s">&#39;E1&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">prodT</span> 
-</div></div>
+        <span class="k">return</span> <span class="n">E</span><span class="p">[</span><span class="s1">&#39;E1&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">prodT</span> </div></div>
+
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_lsw08.html#abenc_lsw08.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;MNT224&#39;</span><span class="p">)</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
     <span class="n">kpabe</span> <span class="o">=</span> <span class="n">KPabe</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
 
     <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
-    <span class="n">policy</span> <span class="o">=</span> <span class="s">&#39;(ONE or THREE) and (THREE or TWO)&#39;</span>
-    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;ONE&#39;</span><span class="p">,</span> <span class="s">&#39;TWO&#39;</span><span class="p">,</span> <span class="s">&#39;THREE&#39;</span><span class="p">,</span> <span class="s">&#39;FOUR&#39;</span> <span class="p">]</span>
+    <span class="n">policy</span> <span class="o">=</span> <span class="s1">&#39;(ONE or THREE) and (THREE or TWO)&#39;</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span> <span class="p">]</span>
     <span class="n">msg</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
 
     <span class="n">mykey</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Encrypt under these attributes: &quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Encrypt under these attributes: &quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
     <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
 
     <span class="n">rec_msg</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="n">mykey</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">rec_msg</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Decryption!&quot;</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful Decryption!&quot;</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -232,14 +227,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

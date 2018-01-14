@@ -1,0 +1,178 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>protocol_ao00 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="protocol_cns07" href="protocol_cns07.html" />
+    <link rel="prev" title="protocol_a01" href="protocol_a01.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="protocol_cns07.html" title="protocol_cns07"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="protocol_a01.html" title="protocol_a01"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-protocol_ao00">
+<span id="protocol-ao00"></span><h1>protocol_ao00<a class="headerlink" href="#module-protocol_ao00" title="Permalink to this headline">¶</a></h1>
+<p>:Partially Blind Signature Scheme</p>
+<div class="line-block">
+<div class="line">From: “M. Abe, T. Okamoto Provably Secure Partially Blind Signatures”</div>
+<div class="line">Published in: CRYPTO 2000</div>
+<div class="line">Available from: <a class="reference external" href="http://www.iacr.org/archive/crypto2000/18800272/18800272.pdf">http://www.iacr.org/archive/crypto2000/18800272/18800272.pdf</a></div>
+</div>
+<ul class="simple">
+<li>type:           signature (partially blind)</li>
+<li>setting:        integer groups</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Antonio de la Piedra</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">12/2013</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="protocol_ao00.AOSig">
+<em class="property">class </em><code class="descclassname">protocol_ao00.</code><code class="descname">AOSig</code><span class="sig-paren">(</span><em>groupObj</em>, <em>p=0</em>, <em>q=0</em>, <em>secparam=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_ao00.html#AOSig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_ao00.AOSig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.core.engine.protocol.Protocol</span></code></p>
+<dl class="method">
+<dt id="protocol_ao00.AOSig.signer_state1">
+<code class="descname">signer_state1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_ao00.html#AOSig.signer_state1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_ao00.AOSig.signer_state1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocol_ao00.AOSig.signer_state3">
+<code class="descname">signer_state3</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_ao00.html#AOSig.signer_state3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_ao00.AOSig.signer_state3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocol_ao00.AOSig.signer_state5">
+<code class="descname">signer_state5</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_ao00.html#AOSig.signer_state5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_ao00.AOSig.signer_state5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocol_ao00.AOSig.user_state2">
+<code class="descname">user_state2</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_ao00.html#AOSig.user_state2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_ao00.AOSig.user_state2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocol_ao00.AOSig.user_state4">
+<code class="descname">user_state4</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_ao00.html#AOSig.user_state4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_ao00.AOSig.user_state4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocol_ao00.AOSig.user_state6">
+<code class="descname">user_state6</code><span class="sig-paren">(</span><em>input</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_ao00.html#AOSig.user_state6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_ao00.AOSig.user_state6" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="protocol_ao00.SHA2">
+<code class="descclassname">protocol_ao00.</code><code class="descname">SHA2</code><span class="sig-paren">(</span><em>bytes1</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_ao00.html#SHA2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol_ao00.SHA2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="protocol_a01.html"
+                        title="previous chapter">protocol_a01</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="protocol_cns07.html"
+                        title="next chapter">protocol_cns07</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/charm/schemes/protocol_ao00.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="protocol_cns07.html" title="protocol_cns07"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="protocol_a01.html" title="protocol_a01"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../schemes.html" >Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

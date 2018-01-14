@@ -1,0 +1,330 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ac17 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for ac17</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Shashank Agrawal, Melissa Chase</span>
+
+<span class="sd">| From: &quot;FAME: Fast Attribute-based Message Encryption&quot;</span>
+<span class="sd">| Published in: 2017</span>
+<span class="sd">| Available from: https://eprint.iacr.org/2017/807</span>
+<span class="sd">| Notes: Implemented the scheme in Section 3</span>
+<span class="sd">| Security Assumption: a variant of k-linear, k&gt;=2</span>
+<span class="sd">|</span>
+<span class="sd">| type:           ciphertext-policy attribute-based encryption</span>
+<span class="sd">| setting:        Pairing</span>
+
+<span class="sd">:Authors:         Shashank Agrawal</span>
+<span class="sd">:Date:            05/2016</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">ZR</span><span class="p">,</span> <span class="n">G1</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span> <span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ABEnc</span> <span class="k">import</span> <span class="n">ABEnc</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.msp</span> <span class="k">import</span> <span class="n">MSP</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="AC17CPABE"><a class="viewcode-back" href="../charm/schemes/abenc/ac17.html#ac17.AC17CPABE">[docs]</a><span class="k">class</span> <span class="nc">AC17CPABE</span><span class="p">(</span><span class="n">ABEnc</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_obj</span><span class="p">,</span> <span class="n">assump_size</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">ABEnc</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group_obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">=</span> <span class="n">assump_size</span>  <span class="c1"># size of linear assumption, at least 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">util</span> <span class="o">=</span> <span class="n">MSP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AC17CPABE.setup"><a class="viewcode-back" href="../charm/schemes/abenc/ac17.html#ac17.AC17CPABE.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates public key and master secret key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Setup algorithm:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># generate two instances of the k-linear assumption</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">))</span>
+            <span class="n">B</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">))</span>  <span class="c1"># note that A, B are vectors here</span>
+
+        <span class="c1"># vector</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">k</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">))</span>
+
+        <span class="c1"># pick a random element from the two source groups and pair them</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+        <span class="n">e_gh</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># now compute various parts of the public parameters</span>
+
+        <span class="c1"># compute the [A]_2 term</span>
+        <span class="n">h_A</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">h_A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span> <span class="o">**</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">h_A</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># compute the e([k]_1, [A]_2) term</span>
+        <span class="n">g_k</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">g_k</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">e_gh_kA</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">e_gh_kA</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e_gh</span> <span class="o">**</span> <span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">k</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">]))</span>
+
+        <span class="c1"># the public key</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;h_A&#39;</span><span class="p">:</span> <span class="n">h_A</span><span class="p">,</span> <span class="s1">&#39;e_gh_kA&#39;</span><span class="p">:</span> <span class="n">e_gh_kA</span><span class="p">}</span>
+
+        <span class="c1"># the master secret key</span>
+        <span class="n">msk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="n">g</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s1">&#39;g_k&#39;</span><span class="p">:</span> <span class="n">g_k</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">A</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="n">B</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">pk</span><span class="p">,</span> <span class="n">msk</span></div>
+
+<div class="viewcode-block" id="AC17CPABE.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/ac17.html#ac17.AC17CPABE.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">attr_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a key for a list of attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Key generation algorithm:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># pick randomness</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">rand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rand</span><span class="p">)</span>
+            <span class="nb">sum</span> <span class="o">+=</span> <span class="n">rand</span>
+
+        <span class="c1"># compute the [Br]_2 term</span>
+
+        <span class="c1"># first compute just Br as it will be used later too</span>
+        <span class="n">Br</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">Br</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msk</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">Br</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+
+        <span class="c1"># now compute [Br]_2</span>
+        <span class="n">K_0</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">K_0</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msk</span><span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">Br</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="c1"># compute [W_1 Br]_1, ...</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">msk</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">msk</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attr_list</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sigma_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+                <span class="n">prod</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">a_t</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">input_for_hash</span> <span class="o">=</span> <span class="n">attr</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                    <span class="n">prod</span> <span class="o">*=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">input_for_hash</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">Br</span><span class="p">[</span><span class="n">l</span><span class="p">]</span><span class="o">/</span><span class="n">a_t</span><span class="p">))</span>
+                <span class="n">prod</span> <span class="o">*=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="p">(</span><span class="n">sigma_attr</span><span class="o">/</span><span class="n">a_t</span><span class="p">))</span>
+                <span class="n">key</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+            <span class="n">key</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">sigma_attr</span><span class="p">))</span>
+            <span class="n">K</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+
+        <span class="c1"># compute [k + VBr]_1</span>
+        <span class="n">Kp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">g_k</span> <span class="o">=</span> <span class="n">msk</span><span class="p">[</span><span class="s1">&#39;g_k&#39;</span><span class="p">]</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">prod</span> <span class="o">=</span> <span class="n">g_k</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+            <span class="n">a_t</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">input_for_hash</span> <span class="o">=</span> <span class="s1">&#39;01&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                <span class="n">prod</span> <span class="o">*=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">input_for_hash</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">Br</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">/</span> <span class="n">a_t</span><span class="p">))</span>
+            <span class="n">prod</span> <span class="o">*=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">/</span> <span class="n">a_t</span><span class="p">))</span>
+            <span class="n">Kp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+        <span class="n">Kp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g_k</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">sigma</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;attr_list&#39;</span><span class="p">:</span> <span class="n">attr_list</span><span class="p">,</span> <span class="s1">&#39;K_0&#39;</span><span class="p">:</span> <span class="n">K_0</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">:</span> <span class="n">K</span><span class="p">,</span> <span class="s1">&#39;Kp&#39;</span><span class="p">:</span> <span class="n">Kp</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="AC17CPABE.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/ac17.html#ac17.AC17CPABE.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Encrypt a message msg under a policy string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Encryption algorithm:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">policy_str</span><span class="p">)</span>
+        <span class="n">mono_span_prog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">convert_policy_to_msp</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
+        <span class="n">num_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">len_longest_row</span>
+
+        <span class="c1"># pick randomness</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">rand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rand</span><span class="p">)</span>
+            <span class="nb">sum</span> <span class="o">+=</span> <span class="n">rand</span>
+
+        <span class="c1"># compute the [As]_2 term</span>
+        <span class="n">C_0</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">h_A</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;h_A&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">C_0</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h_A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">C_0</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h_A</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">]</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">)</span>
+
+        <span class="c1"># compute the [(V^T As||U^T_2 As||...) M^T_i + W^T_i As]_1 terms</span>
+
+        <span class="c1"># pre-compute hashes</span>
+        <span class="n">hash_table</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">input_for_hash1</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">input_for_hash2</span> <span class="o">=</span> <span class="n">input_for_hash1</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+                    <span class="n">input_for_hash3</span> <span class="o">=</span> <span class="n">input_for_hash2</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                    <span class="n">hashed_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">input_for_hash3</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span>
+                    <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hashed_value</span><span class="p">)</span>
+                    <span class="c1"># if debug: print (&#39;Hash of&#39;, i+2, &#39;,&#39;, j2, &#39;,&#39;, j1, &#39;is&#39;, hashed_value)</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">hash_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">mono_span_prog</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ct</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">attr_stripped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">strip_index</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>  <span class="c1"># no need, re-use not allowed</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">prod</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+                    <span class="n">input_for_hash</span> <span class="o">=</span> <span class="n">attr_stripped</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                    <span class="n">prod1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">input_for_hash</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">):</span>
+                        <span class="c1"># input_for_hash = &#39;0&#39; + str(j+1) + str(l) + str(t)</span>
+                        <span class="n">prod1</span> <span class="o">*=</span> <span class="p">(</span><span class="n">hash_table</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">l</span><span class="p">][</span><span class="n">t</span><span class="p">]</span> <span class="o">**</span> <span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">prod</span> <span class="o">*=</span> <span class="p">(</span><span class="n">prod1</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+                <span class="n">ct</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ct</span>
+
+        <span class="c1"># compute the e(g, h)^(k^T As) . m term</span>
+        <span class="n">Cp</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span><span class="p">):</span>
+            <span class="n">Cp</span> <span class="o">=</span> <span class="n">Cp</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;e_gh_kA&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">Cp</span> <span class="o">=</span> <span class="n">Cp</span> <span class="o">*</span> <span class="n">msg</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;policy&#39;</span><span class="p">:</span> <span class="n">policy</span><span class="p">,</span> <span class="s1">&#39;C_0&#39;</span><span class="p">:</span> <span class="n">C_0</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="n">C</span><span class="p">,</span> <span class="s1">&#39;Cp&#39;</span><span class="p">:</span> <span class="n">Cp</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="AC17CPABE.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/ac17.html#ac17.AC17CPABE.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">ctxt</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decrypt ciphertext ctxt with key key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Decryption algorithm:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">ctxt</span><span class="p">[</span><span class="s1">&#39;policy&#39;</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="s1">&#39;attr_list&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Policy not satisfied.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">prod1_GT</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">prod2_GT</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assump_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">prod_H</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">prod_G</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                <span class="n">attr</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">getAttributeAndIndex</span><span class="p">()</span>
+                <span class="n">attr_stripped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">strip_index</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>  <span class="c1"># no need, re-use not allowed</span>
+                <span class="c1"># prod_H *= key[&#39;K&#39;][attr_stripped][i] ** coeff[attr]</span>
+                <span class="c1"># prod_G *= ctxt[&#39;C&#39;][attr][i] ** coeff[attr]</span>
+                <span class="n">prod_H</span> <span class="o">*=</span> <span class="n">key</span><span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">][</span><span class="n">attr_stripped</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">prod_G</span> <span class="o">*=</span> <span class="n">ctxt</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="n">attr</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">prod1_GT</span> <span class="o">*=</span> <span class="n">pair</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="s1">&#39;Kp&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">prod_H</span><span class="p">,</span> <span class="n">ctxt</span><span class="p">[</span><span class="s1">&#39;C_0&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">prod2_GT</span> <span class="o">*=</span> <span class="n">pair</span><span class="p">(</span><span class="n">prod_G</span><span class="p">,</span> <span class="n">key</span><span class="p">[</span><span class="s1">&#39;K_0&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">ctxt</span><span class="p">[</span><span class="s1">&#39;Cp&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">prod2_GT</span> <span class="o">/</span> <span class="n">prod1_GT</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

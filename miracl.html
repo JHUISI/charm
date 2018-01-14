@@ -1,32 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Building MIRACL for Charm &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <title>Building MIRACL for Charm &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" /> 
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -35,42 +34,42 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Charm-Crypto 0.50 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="building-miracl-for-charm">
 <span id="charm-with-miracl"></span><h1>Building MIRACL for Charm<a class="headerlink" href="#building-miracl-for-charm" title="Permalink to this headline">¶</a></h1>
-<p>The first step is to obtain the MIRACL library source from <a class="reference external" href="http://www.certivox.com/miracl/">http://www.certivox.com/miracl/</a>. Currently, our pairing base module works with version 5.5.4 (released on 02/08/11). If you&#8217;re interested in using it for academic purposes, then you are not required to purchase a license. Otherwise, you will have to purchase a MIRACL license since it is not under an open source license. With that said, we provide instructions for how to compile MIRACL and the charm pairing module.</p>
+<p>The first step is to obtain the MIRACL library source from <a class="reference external" href="http://www.certivox.com/miracl/">http://www.certivox.com/miracl/</a>. Currently, our pairing base module works with version 5.5.4 (released on 02/08/11). If you’re interested in using it for academic purposes, then you are not required to purchase a license. Otherwise, you will have to purchase a MIRACL license since it is not under an open source license. With that said, we provide instructions for how to compile MIRACL and the charm pairing module.</p>
 <blockquote>
 <div><ol class="arabic">
 <li><dl class="first docutils">
-<dt>Unzip the MIRACL-master.zip in the <tt class="docutils literal"><span class="pre">charm/charm/core/math/pairing/miracl/</span></tt></dt>
-<dd><p class="first last"><tt class="docutils literal"><span class="pre">unzip</span> <span class="pre">-j</span> <span class="pre">-aa</span> <span class="pre">-L</span> <span class="pre">MIRACL-master.zip</span></tt></p>
+<dt>Unzip the MIRACL-master.zip in the <code class="docutils literal"><span class="pre">charm/charm/core/math/pairing/miracl/</span></code></dt>
+<dd><p class="first last"><code class="docutils literal"><span class="pre">unzip</span> <span class="pre">-j</span> <span class="pre">-aa</span> <span class="pre">-L</span> <span class="pre">MIRACL-master.zip</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>Change directories into the <tt class="docutils literal"><span class="pre">miracl</span></tt> dir and build the library using the provided compile script. Note that this script can build specific curves supported in the MIRACL library. These include <tt class="docutils literal"><span class="pre">ss</span></tt> for supersingular curves, <tt class="docutils literal"><span class="pre">mnt</span></tt> for MNT curves and <tt class="docutils literal"><span class="pre">bn</span></tt> for Barreto-Naehrig curves. This command may require super-user privileges to install on your system.</dt>
-<dd><p class="first last"><tt class="docutils literal"><span class="pre">sh</span> <span class="pre">compile_miracl.sh</span> <span class="pre">bn</span></tt></p>
+<dt>Change directories into the <code class="docutils literal"><span class="pre">miracl</span></code> dir and build the library using the provided compile script. Note that this script can build specific curves supported in the MIRACL library. These include <code class="docutils literal"><span class="pre">ss</span></code> for supersingular curves, <code class="docutils literal"><span class="pre">mnt</span></code> for MNT curves and <code class="docutils literal"><span class="pre">bn</span></code> for Barreto-Naehrig curves. This command may require super-user privileges to install on your system.</dt>
+<dd><p class="first last"><code class="docutils literal"><span class="pre">sh</span> <span class="pre">compile_miracl.sh</span> <span class="pre">bn</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>If there are no errors during MIRACL compile/install, you may run configure at the top-level source dir and enable use of MIRACL with a specific curve. Unfortunately, we can only support one curve at run-time which is a mild inconvenience and requires re-running configure to switch to another curve.</dt>
-<dd><p class="first last"><tt class="docutils literal"><span class="pre">./configure.sh</span> <span class="pre">--enable-pairing-miracl=bn</span></tt></p>
+<dd><p class="first last"><code class="docutils literal"><span class="pre">./configure.sh</span> <span class="pre">--enable-pairing-miracl=bn</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>You may build and install Charm as usual. These commands may or may not require super-user privileges depending on your environment.</dt>
-<dd><p class="first"><tt class="docutils literal"><span class="pre">make</span></tt></p>
-<p class="last"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">install</span></tt></p>
+<dd><p class="first"><code class="docutils literal"><span class="pre">make</span></code></p>
+<p class="last"><code class="docutils literal"><span class="pre">sudo</span> <span class="pre">make</span> <span class="pre">install</span></code></p>
 </dd>
 </dl>
 </li>
@@ -82,31 +81,30 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/miracl.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/miracl.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -115,13 +113,13 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Charm-Crypto 0.50 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

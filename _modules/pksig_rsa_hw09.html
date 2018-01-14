@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_rsa_hw09 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>pksig_rsa_hw09 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,18 +34,18 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for pksig_rsa_hw09</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Hohenberger-Waters Stateful Signatures (RSA-based)</span>
 <span class="sd"> </span>
 <span class="sd"> | From: &quot;S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions&quot;, Section 3.</span>
@@ -64,24 +62,24 @@
 <span class="sd">:Status:    Needs Improvement.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">randomBits</span><span class="p">,</span><span class="n">isPrime</span><span class="p">,</span><span class="n">gcd</span><span class="p">,</span><span class="n">bitsize</span><span class="p">,</span><span class="n">serialize</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
-<span class="kn">from</span> <span class="nn">charm.schemes.chamhash_rsa_hw09</span> <span class="kn">import</span> <span class="n">ChamHash_HW09</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.conversion</span> <span class="kn">import</span> <span class="n">Conversion</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.specialprimes</span> <span class="kn">import</span> <span class="n">BlumWilliamsInteger</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">random</span><span class="p">,</span><span class="n">randomBits</span><span class="p">,</span><span class="n">isPrime</span><span class="p">,</span><span class="n">gcd</span><span class="p">,</span><span class="n">bitsize</span><span class="p">,</span><span class="n">serialize</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="k">import</span> <span class="n">PKSig</span>
+<span class="kn">from</span> <span class="nn">charm.schemes.chamhash_rsa_hw09</span> <span class="k">import</span> <span class="n">ChamHash_HW09</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.conversion</span> <span class="k">import</span> <span class="n">Conversion</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.specialprimes</span> <span class="k">import</span> <span class="n">BlumWilliamsInteger</span>
 <span class="kn">import</span> <span class="nn">hmac</span><span class="o">,</span> <span class="nn">hashlib</span><span class="o">,</span> <span class="nn">math</span>
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="SHA1"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.SHA1">[docs]</a><span class="k">def</span> <span class="nf">SHA1</span><span class="p">(</span><span class="n">bytes1</span><span class="p">):</span>
-  <span class="n">s1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s">&#39;sha1&#39;</span><span class="p">)</span>
+  <span class="n">s1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;sha1&#39;</span><span class="p">)</span>
   <span class="n">s1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bytes1</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">s1</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">s1</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span></div>
 
-</div>
+
 <div class="viewcode-block" id="randomQR"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.randomQR">[docs]</a><span class="k">def</span> <span class="nf">randomQR</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-    </div>
+    <span class="k">return</span> <span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span></div>
+    
 <div class="viewcode-block" id="LogFunction"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.LogFunction">[docs]</a><span class="k">class</span> <span class="nc">LogFunction</span><span class="p">:</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">base</span>
@@ -97,20 +95,20 @@
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
       <span class="k">pass</span>
   
-  <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Prf.keygen"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.keygen">[docs]</a>  <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="n">randomBits</span><span class="p">(</span><span class="n">bits</span><span class="p">))</span>
-</div>
-  <span class="nd">@classmethod</span>  
-<div class="viewcode-block" id="Prf.eval"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.eval">[docs]</a>  <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">input1</span><span class="p">):</span> 
+<div class="viewcode-block" id="Prf.keygen"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.keygen">[docs]</a>  <span class="nd">@classmethod</span>
+  <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bits</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">integer</span><span class="p">(</span><span class="n">randomBits</span><span class="p">(</span><span class="n">bits</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Prf.eval"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf.eval">[docs]</a>  <span class="nd">@classmethod</span>  
+  <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">input1</span><span class="p">):</span> 
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">:</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">serialize</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">b</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">serialize</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">serialize</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">k</span><span class="p">)),</span> <span class="n">b</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">serialize</span><span class="p">(</span><span class="n">integer</span><span class="p">(</span><span class="n">k</span><span class="p">)),</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">)</span>
     
     <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">input1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">bytes2integer</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span>
-</div></div>
+    <span class="k">return</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">bytes2integer</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">())</span></div></div>
+
 <div class="viewcode-block" id="BlumIntegerSquareRoot"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.BlumIntegerSquareRoot">[docs]</a><span class="k">class</span> <span class="nc">BlumIntegerSquareRoot</span><span class="p">:</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">raisedToThePower</span> <span class="o">=</span> <span class="mi">1</span>
@@ -122,13 +120,13 @@
     <span class="n">result</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">modularInt</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">repeat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raisedToThePower</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">**</span> <span class="p">(((</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span><span class="o">/</span><span class="mi">8</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">result</span>
-</div>
+    <span class="k">return</span> <span class="n">result</span></div>
+
   <span class="k">def</span> <span class="nf">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">power</span><span class="p">):</span>
     <span class="n">exp</span> <span class="o">=</span> <span class="n">BlumIntegerSquareRoot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
     <span class="n">exp</span><span class="o">.</span><span class="n">raisedToThePower</span> <span class="o">=</span> <span class="n">power</span>
-    <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">power</span><span class="p">)</span>
-</div>
+    <span class="k">return</span> <span class="n">exp</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">power</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Sig_RSA_Stateless_HW09"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09">[docs]</a><span class="k">class</span> <span class="nc">Sig_RSA_Stateless_HW09</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	This scheme is probablistic and thus time consuming, so we skip it</span>
@@ -150,39 +148,39 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ChameleonHash</span> <span class="o">=</span> <span class="n">CH</span><span class="p">()</span>
         
 <div class="viewcode-block" id="Sig_RSA_Stateless_HW09.keygen"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyLength</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="c"># Generate a Blum-Williams integer N of &#39;key_length&#39; bits with factorization p,q</span>
+        <span class="c1"># Generate a Blum-Williams integer N of &#39;key_length&#39; bits with factorization p,q</span>
         <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BWInt</span><span class="o">.</span><span class="n">generatePrimes</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">keyLength</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
-        <span class="c"># Generate random u,h \in QR_N and a random c \in {0,1}^|N|</span>
+        <span class="c1"># Generate random u,h \in QR_N and a random c \in {0,1}^|N|</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
         <span class="n">u</span> <span class="o">=</span> <span class="n">randomQR</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
         <span class="n">h</span> <span class="o">=</span> <span class="n">randomQR</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
-        <span class="n">c</span> <span class="o">=</span> <span class="n">randomBits</span><span class="p">(</span><span class="n">keyLength</span><span class="p">)</span><span class="c">#PRNG_generate_bits(key_length)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">randomBits</span><span class="p">(</span><span class="n">keyLength</span><span class="p">)</span><span class="c1">#PRNG_generate_bits(key_length)</span>
 
         <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Prf</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">keyLength</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="mi">0</span>
     
-        <span class="c"># Generate the Chameleon hash parameters.  We do not need the secret params.</span>
+        <span class="c1"># Generate the Chameleon hash parameters.  We do not need the secret params.</span>
         <span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">secret</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ChameleonHash</span><span class="o">.</span><span class="n">paramgen</span><span class="p">(</span><span class="n">keyLength</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">);</span>
     
-        <span class="c"># Assemble the public and secret keys</span>
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;length&#39;</span><span class="p">:</span> <span class="n">keyLength</span><span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span> <span class="s">&#39;u&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">,</span> <span class="s">&#39;h&#39;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s">&#39;K&#39;</span><span class="p">:</span> <span class="n">K</span><span class="p">,</span> <span class="s">&#39;L&#39;</span><span class="p">:</span> <span class="n">L</span> <span class="p">}</span>
-        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;p&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span> <span class="p">}</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">);</span>
-    </div>
+        <span class="c1"># Assemble the public and secret keys</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="n">keyLength</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">:</span> <span class="n">K</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">:</span> <span class="n">L</span> <span class="p">}</span>
+        <span class="n">sk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">);</span></div>
+    
 <div class="viewcode-block" id="Sig_RSA_Stateless_HW09.sign"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Sign...&quot;</span><span class="p">)</span>
-        <span class="n">L</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">keyLength</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;K&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;length&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
-        <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;p&#39;</span><span class="p">],</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;q&#39;</span><span class="p">]</span>
-        <span class="c"># Use internal state counter if none was provided</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sign...&quot;</span><span class="p">)</span>
+        <span class="n">L</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">keyLength</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+        <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">],</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;q&#39;</span><span class="p">]</span>
+        <span class="c1"># Use internal state counter if none was provided</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
           <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span>
           <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">+=</span> <span class="mi">1</span>
           <span class="n">s</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="c"># Hash the message using the chameleon hash under params L to obtain (x, r)</span>
+        <span class="c1"># Hash the message using the chameleon hash under params L to obtain (x, r)</span>
         <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ChameleonHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">message</span><span class="p">);</span>
-        <span class="c"># Compute e = H_k(s) and check whether it&#39;s prime. If not, increment s and repeat.</span>
+        <span class="c1"># Compute e = H_k(s) and check whether it&#39;s prime. If not, increment s and repeat.</span>
         <span class="n">phi_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HW_hash</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">keyLength</span><span class="p">)</span>
         <span class="n">e1</span> <span class="o">=</span> <span class="n">e</span> <span class="o">%</span> <span class="n">phi_N</span>
@@ -195,84 +193,81 @@
             <span class="n">e2</span> <span class="o">=</span> <span class="n">e</span> <span class="o">%</span> <span class="n">N</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">e1</span>
 
-        <span class="c"># Compute B = SQRT(u^x * h)^ceil(log_2(s)) mod N</span>
-        <span class="c"># Note that SQRT requires the factorization p, q</span>
+        <span class="c1"># Compute B = SQRT(u^x * h)^ceil(log_2(s)) mod N</span>
+        <span class="c1"># Note that SQRT requires the factorization p, q</span>
         <span class="n">temp</span> <span class="o">=</span> <span class="p">((</span><span class="n">u</span> <span class="o">**</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">%</span> <span class="n">N</span>
         <span class="n">power</span> <span class="o">=</span> <span class="p">((((</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span><span class="o">/</span><span class="mi">8</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">2</span><span class="p">](</span><span class="n">s</span><span class="p">)))</span>
         <span class="n">B</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">**</span> <span class="n">power</span>
         <span class="n">sigma1</span> <span class="o">=</span> <span class="p">(</span><span class="n">B</span> <span class="o">**</span> <span class="p">(</span><span class="n">e</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">%</span> <span class="n">N</span>
 
-        <span class="c"># Update internal state counter and return sig = (sigma1, r, s)</span>
+        <span class="c1"># Update internal state counter and return sig = (sigma1, r, s)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">s</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s">&#39;sigma1&#39;</span><span class="p">:</span><span class="n">sigma1</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span> <span class="s">&#39;s&#39;</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span> <span class="s">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;sigma1&#39;</span><span class="p">:</span><span class="n">sigma1</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">:</span><span class="n">e</span> <span class="p">}</span></div>
 
-</div>
+
 <div class="viewcode-block" id="Sig_RSA_Stateless_HW09.verify"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">VERIFY</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="p">)</span>
-        <span class="n">sigma1</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;sigma1&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s">&#39;e&#39;</span><span class="p">]</span>
-        <span class="n">K</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">keyLength</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;K&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;c&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;length&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;h&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">VERIFY</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">sigma1</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;sigma1&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">],</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span>
+        <span class="n">K</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">keyLength</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
     
-        <span class="c"># Make sure that 0 &lt; s &lt; 2^{keylength/2}, else reject the signature</span>
+        <span class="c1"># Make sure that 0 &lt; s &lt; 2^{keylength/2}, else reject the signature</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="n">s</span> <span class="ow">and</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">keyLength</span><span class="o">/</span><span class="mi">2</span><span class="p">))):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="c"># Compute e = H_k(s) and reject the signature if it&#39;s not prime</span>
+        <span class="c1"># Compute e = H_k(s) and reject the signature if it&#39;s not prime</span>
         <span class="n">ei</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">HW_hash</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">keyLength</span><span class="p">)</span> <span class="o">%</span> <span class="n">N</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">ei</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;ei not prime&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ei not prime&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
         
-        <span class="c"># Compute Y = sigma1^{2*ceil(log2(s))}</span>
+        <span class="c1"># Compute Y = sigma1^{2*ceil(log2(s))}</span>
         <span class="n">s1</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">2</span><span class="p">](</span><span class="n">s</span><span class="p">))))</span>
         <span class="n">Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">sigma1</span> <span class="o">**</span> <span class="n">s1</span><span class="p">)</span> <span class="o">%</span> <span class="n">N</span>
         
-        <span class="c"># Hash the mesage using the chameleon hash with fixed randomness r</span>
+        <span class="c1"># Hash the mesage using the chameleon hash with fixed randomness r</span>
         <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ChameleonHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
 
         <span class="n">lhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">Y</span> <span class="o">**</span> <span class="n">ei</span><span class="p">)</span> <span class="o">%</span> <span class="n">N</span>
         <span class="n">rhs</span> <span class="o">=</span> <span class="p">((</span><span class="n">u</span> <span class="o">**</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">%</span> <span class="n">N</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;lhs =&gt;&quot;</span><span class="p">,</span> <span class="n">lhs</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;rhs =&gt;&quot;</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
-        <span class="c"># Verify that Y^e = (u^x h) mod N.  If so, accept the signature</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;lhs =&gt;&quot;</span><span class="p">,</span> <span class="n">lhs</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rhs =&gt;&quot;</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
+        <span class="c1"># Verify that Y^e = (u^x h) mod N.  If so, accept the signature</span>
         <span class="k">if</span> <span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">True</span>
-        <span class="c"># Default: reject the signature</span>
-        <span class="k">return</span> <span class="bp">False</span>
-    </div>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># Default: reject the signature</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+    
 <div class="viewcode-block" id="Sig_RSA_Stateless_HW09.HW_hash"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash">[docs]</a>    <span class="k">def</span> <span class="nf">HW_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">keyLen</span><span class="p">):</span>
         <span class="n">C</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
         <span class="n">input_size</span> <span class="o">=</span> <span class="n">bitsize</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
         <span class="n">input_b</span> <span class="o">=</span> <span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
-        <span class="c"># Return c XOR PRF(k, input), where the output of PRF is keyLength bits</span>
+        <span class="c1"># Return c XOR PRF(k, input), where the output of PRF is keyLength bits</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">C</span> <span class="o">^</span> <span class="bp">self</span><span class="o">.</span><span class="n">Prf</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_b</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-        </div></div>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+        
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -281,14 +276,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

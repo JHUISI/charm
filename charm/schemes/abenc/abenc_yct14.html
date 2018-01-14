@@ -1,0 +1,188 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>abenc_yct14 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ac17" href="ac17.html" />
+    <link rel="prev" title="abenc_waters09" href="abenc_waters09.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ac17.html" title="ac17"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="abenc_waters09.html" title="abenc_waters09"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-abenc_yct14">
+<span id="abenc-yct14"></span><h1>abenc_yct14<a class="headerlink" href="#module-abenc_yct14" title="Permalink to this headline">¶</a></h1>
+<p>Xuanxia Yao, Zhi Chen, Ye Tian</p>
+<div class="line-block">
+<div class="line">From: A lightweight attribute-based encryption scheme for the Internet of things</div>
+<div class="line">Published in: Future Generation Computer Systems</div>
+<div class="line">Available From: <a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S0167739X14002039">http://www.sciencedirect.com/science/article/pii/S0167739X14002039</a></div>
+<div class="line">Notes: </div>
+</div>
+<ul class="simple">
+<li>type:           key-policy attribute-based encryption (public key)</li>
+<li>setting:        No Pairing</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">artjomb</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">10/2014</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="abenc_yct14.EKPabe">
+<em class="property">class </em><code class="descclassname">abenc_yct14.</code><code class="descname">EKPabe</code><span class="sig-paren">(</span><em>groupObj</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_yct14.html#EKPabe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_yct14.EKPabe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.ABEnc.ABEnc</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kpabe</span> <span class="o">=</span> <span class="n">EKPabe</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="s1">&#39;(ONE or THREE) and (THREE or TWO)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Some Random Message&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">cipher_text</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="abenc_yct14.EKPabe.decrypt">
+<code class="descname">decrypt</code><span class="sig-paren">(</span><em>C</em>, <em>D</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_yct14.html#EKPabe.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_yct14.EKPabe.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_yct14.EKPabe.encrypt">
+<code class="descname">encrypt</code><span class="sig-paren">(</span><em>pk</em>, <em>M</em>, <em>attr_list</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_yct14.html#EKPabe.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_yct14.EKPabe.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_yct14.EKPabe.keygen">
+<code class="descname">keygen</code><span class="sig-paren">(</span><em>pk</em>, <em>mk</em>, <em>policy_str</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_yct14.html#EKPabe.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_yct14.EKPabe.keygen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="abenc_yct14.EKPabe.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_yct14.html#EKPabe.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_yct14.EKPabe.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="abenc_yct14.benchmark">
+<code class="descclassname">abenc_yct14.</code><code class="descname">benchmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_yct14.html#benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_yct14.benchmark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="abenc_yct14.main">
+<code class="descclassname">abenc_yct14.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_yct14.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abenc_yct14.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="abenc_waters09.html"
+                        title="previous chapter">abenc_waters09</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ac17.html"
+                        title="next chapter">ac17</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/abenc/abenc_yct14.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ac17.html" title="ac17"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="abenc_waters09.html" title="abenc_waters09"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_waters05 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>pksig_waters05 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,18 +34,18 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for pksig_waters05</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;David Naccache based Identity-Based Encryption</span>
+<span></span><span class="sd">&#39;&#39;&#39;David Naccache based Identity-Based Encryption</span>
 <span class="sd"> </span>
 <span class="sd">| From: &quot;David Naccache Secure and Practical Identity-Based Encryption Section 4&quot;</span>
 <span class="sd">| Available from: http://eprint.iacr.org/2005/369.pdf</span>
@@ -69,13 +67,13 @@
 <span class="sd">all together, I compute the exponent first and then do one exponential operation</span>
 <span class="sd">&#39;&#39;&#39;</span> 
 
-<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="kn">import</span> <span class="n">PKSig</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.hash_module</span> <span class="kn">import</span> <span class="n">Waters</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.PKSig</span> <span class="k">import</span> <span class="n">PKSig</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.hash_module</span> <span class="k">import</span> <span class="n">Waters</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
 <div class="viewcode-block" id="IBE_N04_Sig"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_waters05.html#pksig_waters05.IBE_N04_Sig">[docs]</a><span class="k">class</span> <span class="nc">IBE_N04_Sig</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup</span>
@@ -83,7 +81,7 @@
 <span class="sd">    &gt;&gt;&gt; waters = Waters(group)</span>
 <span class="sd">    &gt;&gt;&gt; ibe = IBE_N04_Sig(group)</span>
 <span class="sd">    &gt;&gt;&gt; (public_key, secret_key) = ibe.keygen()</span>
-<span class="sd">    &gt;&gt;&gt; ID = &quot;bob@mail.com&quot;</span>
+<span class="sd">    &gt;&gt;&gt; ID = &quot;bob@example.com&quot;</span>
 <span class="sd">    &gt;&gt;&gt; msg = waters.hash(&quot;This is a test.&quot;)    </span>
 <span class="sd">    &gt;&gt;&gt; signature = ibe.sign(public_key, secret_key, msg)</span>
 <span class="sd">    &gt;&gt;&gt; ibe.verify(public_key, msg, signature)</span>
@@ -91,25 +89,27 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="sd">&quot;&quot;&quot;Implementation of David Naccahe Identity Based Encryption&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
-        <span class="n">PKSig</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="c">#PKSig.setProperty(self, secdef=&#39;IND_ID_CPA&#39;, assumption=&#39;DBDH&#39;, secmodel=&#39;Standard&#39;)</span>
-        <span class="c">#, other={&#39;id&#39;:ZR}</span>
-        <span class="c">#message_space=[GT, &#39;KEM&#39;]</span>
+        <span class="n">PKSig</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1">#PKSig.setProperty(self, secdef=&#39;IND_ID_CPA&#39;, assumption=&#39;DBDH&#39;, secmodel=&#39;Standard&#39;)</span>
+        <span class="c1">#, other={&#39;id&#39;:ZR}</span>
+        <span class="c1">#message_space=[GT, &#39;KEM&#39;]</span>
         <span class="k">global</span> <span class="n">group</span> 
         <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>        
         
 <div class="viewcode-block" id="IBE_N04_Sig.keygen"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_waters05.html#pksig_waters05.IBE_N04_Sig.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;l is the security parameter</span>
-<span class="sd">        with l = 32, and the hash function at 160 bits = n * l with n = 5&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;l is the security parameter</span>
+<span class="sd">        with l = 32, and the hash function at 256 bits = n * l with n = 8&quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">waters</span>
-        <span class="n">sha1_func</span><span class="p">,</span> <span class="n">sha1_len</span> <span class="o">=</span> <span class="s">&#39;sha1&#39;</span><span class="p">,</span> <span class="mi">20</span>
-        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>      <span class="c"># generator for group G of prime order p</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>      <span class="c1"># generator for group G of prime order p</span>
         
-        <span class="n">hLen</span> <span class="o">=</span> <span class="n">sha1_len</span> <span class="o">*</span> <span class="mi">8</span>
+        <span class="c1">#hLen = sha1_len * 8</span>
+        <span class="c1">#int(math.floor(hLen / l))</span>
+        <span class="n">sha2_byte_len</span> <span class="o">=</span> <span class="mi">32</span>
+        <span class="n">hLen</span> <span class="o">=</span> <span class="n">sha2_byte_len</span> <span class="o">*</span> <span class="mi">8</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">hLen</span> <span class="o">/</span> <span class="n">l</span><span class="p">))</span>
-        <span class="n">waters</span> <span class="o">=</span> <span class="n">Waters</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">sha1_func</span><span class="p">)</span>
+        <span class="n">waters</span> <span class="o">=</span> <span class="n">Waters</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="s1">&#39;sha256&#39;</span><span class="p">)</span>
         
-        <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>  <span class="c">#from Zp</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>  <span class="c1">#from Zp</span>
         <span class="n">g2</span>    <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">alpha</span>      
         <span class="n">g1</span>    <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>   
         <span class="n">u</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
@@ -117,81 +117,77 @@
         <span class="n">U_z</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
         <span class="n">U</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span> <span class="o">**</span> <span class="n">x</span>  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">U_z</span><span class="p">]</span>
         
-        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s">&#39;g2&#39;</span><span class="p">:</span> <span class="n">g2</span><span class="p">,</span> <span class="s">&#39;uPrime&#39;</span><span class="p">:</span><span class="n">uprime</span><span class="p">,</span> <span class="s">&#39;U&#39;</span><span class="p">:</span> <span class="n">U</span><span class="p">,</span>
-              <span class="s">&#39;n&#39;</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="s">&#39;l&#39;</span><span class="p">:</span><span class="n">l</span><span class="p">,</span> <span class="s">&#39;egg&#39;</span><span class="p">:</span> <span class="n">pair</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span> <span class="p">}</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s1">&#39;g1&#39;</span><span class="p">:</span><span class="n">g1</span><span class="p">,</span> <span class="s1">&#39;g2&#39;</span><span class="p">:</span> <span class="n">g2</span><span class="p">,</span> <span class="s1">&#39;uPrime&#39;</span><span class="p">:</span><span class="n">uprime</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">:</span> <span class="n">U</span><span class="p">,</span>
+              <span class="s1">&#39;n&#39;</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span><span class="n">l</span><span class="p">,</span> <span class="s1">&#39;egg&#39;</span><span class="p">:</span> <span class="n">pair</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">)</span> <span class="p">}</span>
         
-        <span class="n">mk</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;g1^alpha&#39;</span><span class="p">:</span><span class="n">g1</span> <span class="o">**</span> <span class="n">alpha</span><span class="p">,</span> <span class="s">&#39;U_z&#39;</span><span class="p">:</span><span class="n">U_z</span><span class="p">,</span> <span class="s">&#39;u&#39;</span><span class="p">:</span><span class="n">u</span><span class="p">}</span> <span class="c">#master secret</span>
+        <span class="n">mk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g1^alpha&#39;</span><span class="p">:</span><span class="n">g1</span> <span class="o">**</span> <span class="n">alpha</span><span class="p">,</span> <span class="s1">&#39;U_z&#39;</span><span class="p">:</span><span class="n">U_z</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span><span class="n">u</span><span class="p">}</span> <span class="c1">#master secret</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> 
-            <span class="k">print</span><span class="p">(</span><span class="n">mk</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">mk</span><span class="p">)</span>
         
-        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span>
-    </div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">mk</span><span class="p">)</span></div>
+    
 <div class="viewcode-block" id="IBE_N04_Sig.sign"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_waters05.html#pksig_waters05.IBE_N04_Sig.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;v = (v1, .., vn) is an identity&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;v = (v1, .., vn) is an identity&quot;&quot;&quot;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-        <span class="n">u</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;u&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]):</span>
-            <span class="n">u</span> <span class="o">+=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;U_z&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]):</span>
+            <span class="n">u</span> <span class="o">+=</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;U_z&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             
-        <span class="n">d1</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s">&#39;g1^alpha&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">r</span><span class="p">))</span>
-        <span class="n">d2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;d1&#39;</span><span class="p">:</span> <span class="n">d1</span><span class="p">,</span> <span class="s">&#39;d2&#39;</span><span class="p">:</span><span class="n">d2</span><span class="p">}</span>
-</div>
-<div class="viewcode-block" id="IBE_N04_Sig.verify"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_waters05.html#pksig_waters05.IBE_N04_Sig.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
-        <span class="n">c3</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;uPrime&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s">&#39;n&#39;</span><span class="p">]):</span>
-            <span class="n">c3</span> <span class="o">*=</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;U&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        
-        <span class="k">return</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;egg&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;d1&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s">&#39;d2&#39;</span><span class="p">],</span> <span class="n">c3</span><span class="p">))</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">sk</span><span class="p">[</span><span class="s1">&#39;g1^alpha&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">r</span><span class="p">))</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;d1&#39;</span><span class="p">:</span> <span class="n">d1</span><span class="p">,</span> <span class="s1">&#39;d2&#39;</span><span class="p">:</span><span class="n">d2</span><span class="p">}</span></div>
 
-</div></div>
+<div class="viewcode-block" id="IBE_N04_Sig.verify"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_waters05.html#pksig_waters05.IBE_N04_Sig.verify">[docs]</a>    <span class="k">def</span> <span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+        <span class="n">c3</span> <span class="o">=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;uPrime&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]):</span>
+            <span class="n">c3</span> <span class="o">*=</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;U&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">**</span> <span class="n">msg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        
+        <span class="k">return</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;egg&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;d1&#39;</span><span class="p">],</span> <span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">pair</span><span class="p">(</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;d2&#39;</span><span class="p">],</span> <span class="n">c3</span><span class="p">))</span></div></div>
+
+
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../charm/schemes/pksig/pksig_waters05.html#pksig_waters05.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
     <span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_N04_Sig</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
     <span class="n">waters</span> <span class="o">=</span> <span class="n">Waters</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
     <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
 
-    <span class="c"># represents public identity</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="s">&quot;bob@mail.com&quot;</span>
-    <span class="n">msg</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s">&quot;This is a test.&quot;</span><span class="p">)</span>    
+    <span class="c1"># represents public identity</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="s2">&quot;bob@example.com&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">&quot;This is a test.&quot;</span><span class="p">)</span>    
     <span class="n">sig</span> <span class="o">=</span> <span class="n">ibe</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;original msg =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;msg =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;sig =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">sig</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;original msg =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">M</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;msg =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">sig</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s">&quot;Failed verification!&quot;</span>
-    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Successful Verification!!! msg =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">assert</span> <span class="n">ibe</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sig</span><span class="p">),</span> <span class="s2">&quot;Failed verification!&quot;</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successful Verification!!! msg =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">debug</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">main</span><span class="p">()</span>
-    
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -200,14 +196,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

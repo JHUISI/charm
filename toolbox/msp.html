@@ -1,0 +1,179 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>msp &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="node" href="node.html" />
+    <link rel="prev" title="matrixops" href="matrixops.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="node.html" title="node"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="matrixops.html" title="matrixops"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-msp">
+<span id="msp"></span><h1>msp<a class="headerlink" href="#module-msp" title="Permalink to this headline">¶</a></h1>
+<p>This class is adapted from the SecretUtil class in charm/toolbox/secretutil.py.
+It provides the following methods:
+- createPolicy: convert a Boolean formula encoded as a string into a policy represented like a tree;
+- convertPolicyToMSP: convert a policy into a monotone span program (MSP);
+- getCoefficients: given a policy, returns a coefficient for every attribute;
+- strip_index: remove the index from an attribute (i.e., x_y -&gt; x);
+- prune: determine whether a given set of attributes satisfies the policy</p>
+<blockquote>
+<div>(returns false if it doesn’t, otherwise a good enough subset of attributes);</div></blockquote>
+<ul class="simple">
+<li>getAttributeList: retrieve the attributes that occur in a policy tree in order (left to right).</li>
+</ul>
+<dl class="class">
+<dt id="msp.MSP">
+<em class="property">class </em><code class="descclassname">msp.</code><code class="descname">MSP</code><span class="sig-paren">(</span><em>groupObj</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#msp.MSP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="msp.MSP.convert_policy_to_msp">
+<code class="descname">convert_policy_to_msp</code><span class="sig-paren">(</span><em>tree</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.convert_policy_to_msp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#msp.MSP.convert_policy_to_msp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a policy into a monotone span program (MSP)
+represented by a dictionary with (attribute, row) pairs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="msp.MSP.createPolicy">
+<code class="descname">createPolicy</code><span class="sig-paren">(</span><em>policy_string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.createPolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#msp.MSP.createPolicy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a Boolean formula represented as a string into a policy represented like a tree.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="msp.MSP.getAttributeList">
+<code class="descname">getAttributeList</code><span class="sig-paren">(</span><em>Node</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.getAttributeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#msp.MSP.getAttributeList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the attributes that occur in a policy tree in order (left to right).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="msp.MSP.getCoefficients">
+<code class="descname">getCoefficients</code><span class="sig-paren">(</span><em>tree</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.getCoefficients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#msp.MSP.getCoefficients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a policy, returns a coefficient for every attribute.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="msp.MSP.prune">
+<code class="descname">prune</code><span class="sig-paren">(</span><em>policy</em>, <em>attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.prune"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#msp.MSP.prune" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether a given set of attributes satisfies the policy
+(returns false if it doesn’t, otherwise a good enough subset of attributes).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="msp.MSP.recoverCoefficients">
+<code class="descname">recoverCoefficients</code><span class="sig-paren">(</span><em>list</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.recoverCoefficients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#msp.MSP.recoverCoefficients" title="Permalink to this definition">¶</a></dt>
+<dd><p>recovers the coefficients over a binary tree.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="msp.MSP.strip_index">
+<code class="descname">strip_index</code><span class="sig-paren">(</span><em>node_str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.strip_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#msp.MSP.strip_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the index from an attribute (i.e., x_y -&gt; x).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="matrixops.html"
+                        title="previous chapter">matrixops</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="node.html"
+                        title="next chapter">node</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/msp.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="node.html" title="node"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="matrixops.html" title="matrixops"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

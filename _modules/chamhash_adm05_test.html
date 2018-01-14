@@ -1,0 +1,117 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>chamhash_adm05_test &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for chamhash_adm05_test</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">charm.schemes.chamhash_adm05</span> <span class="k">import</span> <span class="n">ChamHash_Adm05</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.integergroup</span> <span class="k">import</span> <span class="n">integer</span>
+
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="ChamHash_Adm05Test"><a class="viewcode-back" href="../test/chamhash_adm05_test.html#chamhash_adm05_test.ChamHash_Adm05Test">[docs]</a><span class="k">class</span> <span class="nc">ChamHash_Adm05Test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="ChamHash_Adm05Test.testChamHash_Adm05"><a class="viewcode-back" href="../test/chamhash_adm05_test.html#chamhash_adm05_test.ChamHash_Adm05Test.testChamHash_Adm05">[docs]</a>    <span class="k">def</span> <span class="nf">testChamHash_Adm05</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># fixed params for unit tests</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">141660875619984104245410764464185421040193281776686085728248762539241852738181649330509191671665849071206347515263344232662465937366909502530516774705282764748558934610432918614104329009095808618770549804432868118610669336907161081169097403439689930233383598055540343198389409225338204714777812724565461351567</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">70830437809992052122705382232092710520096640888343042864124381269620926369090824665254595835832924535603173757631672116331232968683454751265258387352641382374279467305216459307052164504547904309385274902216434059305334668453580540584548701719844965116691799027770171599194704612669102357388906362282730675783</span><span class="p">)</span>
+        <span class="n">chamHash</span> <span class="o">=</span> <span class="n">ChamHash_Adm05</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="c1">#TODO: how long is paramgen supposed to take?</span>
+        <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">paramgen</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pk =&gt; &quot;</span><span class="p">,</span> <span class="n">pk</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sk =&gt; &quot;</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Hello world this is the message!&quot;</span>
+        <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hash...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig =&gt;&quot;</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">h1</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">s1</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sig 2 =&gt;&quot;</span><span class="p">,</span> <span class="n">h1</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">h</span> <span class="o">==</span> <span class="n">h1</span><span class="p">,</span> <span class="s2">&quot;Signature failed!!!&quot;</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Signature generated correctly!!!&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

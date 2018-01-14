@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>ABEncMultiAuth &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>ABEncMultiAuth &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="bitstring" href="bitstring.html" />
     <link rel="prev" title="ABEnc" href="ABEnc.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,51 +42,75 @@
         <li class="right" >
           <a href="ABEnc.html" title="ABEnc"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-ABEncMultiAuth">
 <span id="abencmultiauth"></span><h1>ABEncMultiAuth<a class="headerlink" href="#module-ABEncMultiAuth" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ABEncMultiAuth.ABEncMultiAuth">
+<em class="property">class </em><code class="descclassname">ABEncMultiAuth.</code><code class="descname">ABEncMultiAuth</code><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.schemebase.SchemeBase</span></code></p>
 <p>Base class for attribute-based encryption multi-authority</p>
 <blockquote>
 <div>Notes: This class implements an interface for a standard attribute-based encryption scheme.</div></blockquote>
-<p>A public key attribute-based encryption scheme consists of four algorithms: 
+<p>A public key attribute-based encryption scheme consists of four algorithms:
 (setup, authsetup, keygen, encrypt, decrypt).</p>
-<dl class="class">
-<dt id="ABEncMultiAuth.ABEncMultiAuth">
-<em class="property">class </em><tt class="descclassname">ABEncMultiAuth.</tt><tt class="descname">ABEncMultiAuth</tt><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.schemebase.SchemeBase</span></tt></p>
 <dl class="method">
 <dt id="ABEncMultiAuth.ABEncMultiAuth.authsetup">
-<tt class="descname">authsetup</tt><big>(</big><em>gp</em>, <em>object</em><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.authsetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.authsetup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">authsetup</code><span class="sig-paren">(</span><em>gp</em>, <em>object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.authsetup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.authsetup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup an authority.
+:param gp: The global parameters of the scheme.
+:param object: Additional required arguments, for example a list of attributes or a name.
+:return: The result of the authority setup.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ABEncMultiAuth.ABEncMultiAuth.decrypt">
-<tt class="descname">decrypt</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>ct</em><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.decrypt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">decrypt</code><span class="sig-paren">(</span><em>gp</em>, <em>sk</em>, <em>ct</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrypt a ciphertext.
+:param gp: The global parameters of the scheme.
+:param sk: The secret keys of the user.
+:param ct: The ciphertext to decrypt.
+:return: The plaintext.
+:raise Exception: Raised when the attributes do not satisfy the access policy.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ABEncMultiAuth.ABEncMultiAuth.encrypt">
-<tt class="descname">encrypt</tt><big>(</big><em>pk</em>, <em>gp</em>, <em>M</em>, <em>object</em><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.encrypt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">encrypt</code><span class="sig-paren">(</span><em>gp</em>, <em>pk</em>, <em>m</em>, <em>object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypt a message.
+:param gp: The global parameters of the scheme.
+:param pk: The public keys of all relevant authorities.
+:param m: The message to encrypt.
+:param object: An access policy or a set of attributes to use.
+:return: The encrypted message.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ABEncMultiAuth.ABEncMultiAuth.keygen">
-<tt class="descname">keygen</tt><big>(</big><em>gp</em>, <em>sk</em>, <em>gid</em><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.keygen" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">keygen</code><span class="sig-paren">(</span><em>gp</em>, <em>sk</em>, <em>gid</em>, <em>object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.keygen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate user secret keys for attributes from a single authority.
+:param gp: The global parameters of the scheme.
+:param sk: The secret keys of the attribute authority.
+:param gid: Global identifier for the user.
+:param object: An attribute, list of attributes or access structure, depending on the scheme.
+:return: The secret keys for the user for the given attributes/access structure.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="ABEncMultiAuth.ABEncMultiAuth.setup">
-<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.setup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ABEncMultiAuth.html#ABEncMultiAuth.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ABEncMultiAuth.ABEncMultiAuth.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup this multi-authority attribute based encryption scheme.
+:return: The result of the central setup, for example some global parameters.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -98,7 +120,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="ABEnc.html"
@@ -106,29 +128,28 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="bitstring.html"
                         title="next chapter">bitstring</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/ABEncMultiAuth.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/ABEncMultiAuth.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -143,14 +164,14 @@
         <li class="right" >
           <a href="ABEnc.html" title="ABEnc"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

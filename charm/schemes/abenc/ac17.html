@@ -1,0 +1,168 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ac17 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="bsw07" href="bsw07.html" />
+    <link rel="prev" title="abenc_yct14" href="abenc_yct14.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bsw07.html" title="bsw07"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="abenc_yct14.html" title="abenc_yct14"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-ac17">
+<span id="ac17"></span><h1>ac17<a class="headerlink" href="#module-ac17" title="Permalink to this headline">¶</a></h1>
+<p>Shashank Agrawal, Melissa Chase</p>
+<div class="line-block">
+<div class="line">From: “FAME: Fast Attribute-based Message Encryption”</div>
+<div class="line">Published in: 2017</div>
+<div class="line">Available from: <a class="reference external" href="https://eprint.iacr.org/2017/807">https://eprint.iacr.org/2017/807</a></div>
+<div class="line">Notes: Implemented the scheme in Section 3</div>
+<div class="line">Security Assumption: a variant of k-linear, k&gt;=2</div>
+<div class="line"><br /></div>
+<div class="line">type:           ciphertext-policy attribute-based encryption</div>
+<div class="line">setting:        Pairing</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Shashank Agrawal</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">05/2016</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="ac17.AC17CPABE">
+<em class="property">class </em><code class="descclassname">ac17.</code><code class="descname">AC17CPABE</code><span class="sig-paren">(</span><em>group_obj</em>, <em>assump_size</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/ac17.html#AC17CPABE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ac17.AC17CPABE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.ABEnc.ABEnc</span></code></p>
+<dl class="method">
+<dt id="ac17.AC17CPABE.decrypt">
+<code class="descname">decrypt</code><span class="sig-paren">(</span><em>pk</em>, <em>ctxt</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/ac17.html#AC17CPABE.decrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ac17.AC17CPABE.decrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrypt ciphertext ctxt with key key.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ac17.AC17CPABE.encrypt">
+<code class="descname">encrypt</code><span class="sig-paren">(</span><em>pk</em>, <em>msg</em>, <em>policy_str</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/ac17.html#AC17CPABE.encrypt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ac17.AC17CPABE.encrypt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypt a message msg under a policy string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ac17.AC17CPABE.keygen">
+<code class="descname">keygen</code><span class="sig-paren">(</span><em>pk</em>, <em>msk</em>, <em>attr_list</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/ac17.html#AC17CPABE.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ac17.AC17CPABE.keygen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a key for a list of attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ac17.AC17CPABE.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/ac17.html#AC17CPABE.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ac17.AC17CPABE.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates public key and master secret key.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="abenc_yct14.html"
+                        title="previous chapter">abenc_yct14</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="bsw07.html"
+                        title="next chapter">bsw07</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/abenc/ac17.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="bsw07.html" title="bsw07"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="abenc_yct14.html" title="abenc_yct14"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

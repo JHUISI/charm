@@ -1,33 +1,31 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pre_mg07 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>pre_mg07 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Module code" href="index.html" /> 
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -36,18 +34,18 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for pre_mg07</h1><div class="highlight"><pre>
-<span class="sd">&#39;&#39;&#39;</span>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Identity-Based Proxy Re-Encryption</span>
 
 <span class="sd">| From: &quot;M. Green, G. Ateniese Identity-Based Proxy Re-Encryption&quot;, Section 4.3.</span>
@@ -60,12 +58,12 @@
 <span class="sd">:Authors:    N. Fotiou</span>
 <span class="sd">:Date:       11/2012</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="kn">import</span> <span class="n">pc_element</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
-<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="kn">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">bitsize</span><span class="p">,</span> <span class="n">int2Bytes</span><span class="p">,</span> <span class="n">randomBits</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.hash_module</span> <span class="kn">import</span> <span class="n">Hash</span>
-<span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">pc_element</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">bitsize</span><span class="p">,</span> <span class="n">int2Bytes</span><span class="p">,</span> <span class="n">randomBits</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.hash_module</span> <span class="k">import</span> <span class="n">Hash</span>
+<span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="k">import</span> <span class="n">objectToBytes</span>
 
-<span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
 <div class="viewcode-block" id="PreGA"><a class="viewcode-back" href="../charm/schemes/pre_mg07.html#pre_mg07.PreGA">[docs]</a><span class="k">class</span> <span class="nc">PreGA</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &gt;&gt;&gt; from charm.toolbox.pairinggroup import PairingGroup,pc_element  </span>
@@ -88,131 +86,129 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
         <span class="k">global</span> <span class="n">group</span><span class="p">,</span><span class="n">h</span>
         <span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">Hash</span><span class="p">(</span><span class="s">&#39;sha1&#39;</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">Hash</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="c1"># use the default</span>
         
 <div class="viewcode-block" id="PreGA.setup"><a class="viewcode-back" href="../charm/schemes/pre_mg07.html#pre_mg07.PreGA.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span> 
         <span class="n">g</span> <span class="o">=</span>  <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
-        <span class="c"># choose H1-H6 hash functions</span>
-        <span class="n">msk</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;s&#39;</span><span class="p">:</span><span class="n">s</span> <span class="p">}</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s">&#39;g_s&#39;</span><span class="p">:</span><span class="n">g</span><span class="o">**</span><span class="n">s</span><span class="p">}</span>
+        <span class="c1"># choose H1-H6 hash functions</span>
+        <span class="n">msk</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span><span class="n">s</span> <span class="p">}</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="s1">&#39;g_s&#39;</span><span class="p">:</span><span class="n">g</span><span class="o">**</span><span class="n">s</span><span class="p">}</span>
         <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Public parameters...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Public parameters...&quot;</span><span class="p">)</span>
             <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Master secret key...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Master secret key...&quot;</span><span class="p">)</span>
             <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msk</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="PreGA.keyGen"><a class="viewcode-back" href="../charm/schemes/pre_mg07.html#pre_mg07.PreGA.keyGen">[docs]</a>    <span class="k">def</span> <span class="nf">keyGen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span><span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">msk</span><span class="p">[</span><span class="s">&#39;s&#39;</span><span class="p">]</span>
-        <span class="n">skid</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;skid&#39;</span><span class="p">:</span><span class="n">k</span> <span class="p">}</span>        
+        <span class="n">k</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span><span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">msk</span><span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">]</span>
+        <span class="n">skid</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;skid&#39;</span><span class="p">:</span><span class="n">k</span> <span class="p">}</span>        
         <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Key for id =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">ID</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Key for id =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">ID</span><span class="p">)</span>
             <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">skid</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">skid</span>
-</div>
+        <span class="k">return</span> <span class="n">skid</span></div>
+
 <div class="viewcode-block" id="PreGA.encrypt"><a class="viewcode-back" href="../charm/schemes/pre_mg07.html#pre_mg07.PreGA.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
         <span class="n">enc_M</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">bitsize</span><span class="p">(</span><span class="n">enc_M</span><span class="p">)</span><span class="o">/</span><span class="mi">8</span> <span class="o">&gt;</span> <span class="n">group</span><span class="o">.</span><span class="n">messageSize</span><span class="p">():</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Message cannot be encoded.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Message cannot be encoded.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">hashToZr</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span><span class="n">M</span><span class="p">)</span>
-        <span class="n">A</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span> 
-        <span class="n">B</span> <span class="o">=</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;g_s&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span> 
+        <span class="n">B</span> <span class="o">=</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;g_s&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
         <span class="n">C</span> <span class="o">=</span> <span class="n">enc_M</span> <span class="o">^</span> <span class="n">h</span><span class="o">.</span><span class="n">hashToZn</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>      
-        <span class="n">C_</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">,</span> <span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">B</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">C</span><span class="p">}</span>
+        <span class="n">C_</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="n">A</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span><span class="n">B</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span><span class="n">C</span><span class="p">}</span>
         <span class="n">S</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">ID</span><span class="p">,</span> <span class="n">C_</span><span class="p">),</span><span class="n">G1</span><span class="p">)</span> <span class="o">**</span> <span class="n">r</span>        
-        <span class="n">ciphertext</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">C_</span><span class="p">}</span>           
+        <span class="n">ciphertext</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;S&#39;</span><span class="p">:</span><span class="n">S</span><span class="p">,</span><span class="s1">&#39;C&#39;</span><span class="p">:</span><span class="n">C_</span><span class="p">}</span>           
         <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Encrypt...&#39;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;r =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">r</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;sigma =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sigma</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;enc_M =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">enc_M</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Encrypt...&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;r =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">r</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sigma =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;enc_M =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">enc_M</span><span class="p">)</span>
             <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ciphertext</span>
-        </div>
+        <span class="k">return</span> <span class="n">ciphertext</span></div>
+        
 <div class="viewcode-block" id="PreGA.decryptFirstLevel"><a class="viewcode-back" href="../charm/schemes/pre_mg07.html#pre_mg07.PreGA.decryptFirstLevel">[docs]</a>    <span class="k">def</span> <span class="nf">decryptFirstLevel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">skid</span><span class="p">,</span> <span class="n">cid</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
-        <span class="n">H</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">ID</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">]),</span> <span class="n">G1</span><span class="p">)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">ID</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]),</span> <span class="n">G1</span><span class="p">)</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-        <span class="n">sigma</span> <span class="o">=</span>  <span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;B&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="n">skid</span><span class="p">[</span><span class="s">&#39;skid&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span> <span class="o">**</span> <span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="n">pair</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">]))</span>
-        <span class="n">m</span> <span class="o">=</span>  <span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;C&#39;</span><span class="p">]</span> <span class="o">^</span> <span class="n">h</span><span class="o">.</span><span class="n">hashToZn</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">=</span>  <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;B&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;A&#39;</span><span class="p">],</span> <span class="n">skid</span><span class="p">[</span><span class="s1">&#39;skid&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span> <span class="o">**</span> <span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="n">pair</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">]))</span>
+        <span class="n">m</span> <span class="o">=</span>  <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">^</span> <span class="n">h</span><span class="o">.</span><span class="n">hashToZn</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">hashToZr</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span><span class="n">m</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">H</span><span class="o">**</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;A&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Decryption Failed&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">None</span> 
+        <span class="k">if</span> <span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">H</span><span class="o">**</span><span class="n">r</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;A&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Decryption Failed&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span> 
         <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Decrypting...&#39;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;H =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">H</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;t =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;r =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">r</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;sigma =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sigma</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">int2Bytes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">int2Bytes</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-    </div>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Decrypting...&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;H =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">H</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;t =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;r =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">r</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sigma =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">int2Bytes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">int2Bytes</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
+    
 <div class="viewcode-block" id="PreGA.rkGen"><a class="viewcode-back" href="../charm/schemes/pre_mg07.html#pre_mg07.PreGA.rkGen">[docs]</a>    <span class="k">def</span> <span class="nf">rkGen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">skid</span><span class="p">,</span> <span class="n">IDsrc</span><span class="p">,</span> <span class="n">IDdest</span><span class="p">):</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">randomBits</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">secparam</span><span class="p">))</span>
-        <span class="n">K</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">skid</span><span class="p">[</span><span class="s">&#39;skid&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">IDdest</span><span class="p">,</span> <span class="n">G1</span><span class="p">))</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">skid</span><span class="p">[</span><span class="s1">&#39;skid&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">IDdest</span><span class="p">,</span> <span class="n">G1</span><span class="p">))</span>
         <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">Re-encryption key for id1 =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39; to id2 =&gt; &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">IDsrc</span><span class="p">,</span><span class="n">IDdest</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Re-encryption key for id1 =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39; to id2 =&gt; &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">IDsrc</span><span class="p">,</span><span class="n">IDdest</span><span class="p">))</span>
             <span class="n">group</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">skid</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;N =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">N</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;K =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">K</span><span class="p">)</span>
-        <span class="k">return</span>  <span class="p">{</span><span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">:</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">IDsrc</span><span class="p">,</span> <span class="n">IDdest</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">G1</span><span class="p">)</span> <span class="o">*</span> <span class="n">skid</span><span class="p">[</span><span class="s">&#39;skid&#39;</span><span class="p">]}</span>
-        </div>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;N =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">N</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;K =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">K</span><span class="p">)</span>
+        <span class="k">return</span>  <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">IDsrc</span><span class="p">,</span> <span class="n">IDdest</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">G1</span><span class="p">)</span> <span class="o">*</span> <span class="n">skid</span><span class="p">[</span><span class="s1">&#39;skid&#39;</span><span class="p">]}</span></div>
+        
 <div class="viewcode-block" id="PreGA.reEncrypt"><a class="viewcode-back" href="../charm/schemes/pre_mg07.html#pre_mg07.PreGA.reEncrypt">[docs]</a>    <span class="k">def</span> <span class="nf">reEncrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">IDsrc</span><span class="p">,</span> <span class="n">rk</span><span class="p">,</span> <span class="n">cid</span><span class="p">):</span>
-        <span class="n">H</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">IDsrc</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">]),</span> <span class="n">G1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pair</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">],</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">pair</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;A&#39;</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Re-encryption Failed&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">None</span>                
+        <span class="n">H</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">IDsrc</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]),</span> <span class="n">G1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pair</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">],</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="n">pair</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;A&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Re-encryption Failed&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>                
         <span class="n">t</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
-        <span class="n">B_</span> <span class="o">=</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;B&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="n">rk</span><span class="p">[</span><span class="s">&#39;R&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span> <span class="o">**</span> <span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="n">pair</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;S&#39;</span><span class="p">]))</span>
+        <span class="n">B_</span> <span class="o">=</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;B&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">pair</span><span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;A&#39;</span><span class="p">],</span> <span class="n">rk</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span> <span class="o">**</span> <span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="n">pair</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">]))</span>
         <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Re-ncrypt...&#39;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;H =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">H</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;t =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;B</span><span class="se">\&#39;</span><span class="s"> =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">B_</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;A&#39;</span><span class="p">:</span><span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="s">&#39;B&#39;</span><span class="p">:</span><span class="n">B_</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span><span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">][</span><span class="s">&#39;C&#39;</span><span class="p">],</span> <span class="s">&#39;IDsrc&#39;</span><span class="p">:</span><span class="n">IDsrc</span><span class="p">,</span> <span class="s">&#39;N&#39;</span><span class="p">:</span><span class="n">rk</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]}</span>
-        </div>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Re-ncrypt...&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;H =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">H</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;t =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;B</span><span class="se">\&#39;</span><span class="s1"> =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">B_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">:</span><span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;A&#39;</span><span class="p">],</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span><span class="n">B_</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span><span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;IDsrc&#39;</span><span class="p">:</span><span class="n">IDsrc</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span><span class="n">rk</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]}</span></div>
+        
 <div class="viewcode-block" id="PreGA.decryptSecondLevel"><a class="viewcode-back" href="../charm/schemes/pre_mg07.html#pre_mg07.PreGA.decryptSecondLevel">[docs]</a>    <span class="k">def</span> <span class="nf">decryptSecondLevel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">skid</span><span class="p">,</span> <span class="n">IDsrc</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">cid</span><span class="p">):</span>
-        <span class="n">K</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">IDsrc</span><span class="p">,</span> <span class="n">G1</span><span class="p">),</span> <span class="n">skid</span><span class="p">[</span><span class="s">&#39;skid&#39;</span><span class="p">])</span>
-        <span class="n">sigma</span> <span class="o">=</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">IDsrc</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;N&#39;</span><span class="p">]),</span> <span class="n">G1</span><span class="p">))</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">cid</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">]</span> <span class="o">^</span> <span class="n">h</span><span class="o">.</span><span class="n">hashToZn</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">IDsrc</span><span class="p">,</span> <span class="n">G1</span><span class="p">),</span> <span class="n">skid</span><span class="p">[</span><span class="s1">&#39;skid&#39;</span><span class="p">])</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">],</span> <span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">IDsrc</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]),</span> <span class="n">G1</span><span class="p">))</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">cid</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">^</span> <span class="n">h</span><span class="o">.</span><span class="n">hashToZn</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">hashToZr</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span><span class="n">m</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="k">print</span><span class="p">(</span><span class="s">&quot;Decryption second level Failed&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">None</span> 
+        <span class="k">if</span> <span class="p">(</span><span class="n">cid</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Decryption second level Failed&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span> 
         <span class="k">if</span><span class="p">(</span><span class="n">debug</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">Decrypting Second Level...&#39;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;K =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">K</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&#39;sigma =&gt; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sigma</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">int2Bytes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span> 
-        <span class="k">return</span> <span class="n">int2Bytes</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> 
-</pre></div></div></div>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Decrypting Second Level...&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;K =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">K</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sigma =&gt; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">int2Bytes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span> 
+        <span class="k">return</span> <span class="n">int2Bytes</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> </div></div>
+
+</pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -221,14 +217,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

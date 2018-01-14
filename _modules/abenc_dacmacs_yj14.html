@@ -1,0 +1,379 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>abenc_dacmacs_yj14 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.50',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for abenc_dacmacs_yj14</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Kan Yang, Xiaohua Jia </span>
+<span class="sd"> </span>
+<span class="sd">| From: DAC-MACS: Effective Data Access Control for Multi-Authority Cloud Storage Systems </span>
+<span class="sd">| Published in:  Security for Cloud Storage Systems  - SpringerBriefs in Computer Science 2014</span>
+<span class="sd">| Available From: http://link.springer.com/chapter/10.1007/978-1-4614-7873-7_4</span>
+<span class="sd">| Notes: </span>
+
+<span class="sd">* type:           ciphertext-policy attribute-based encryption (public key)</span>
+<span class="sd">* setting:        Pairing</span>
+
+<span class="sd">:Authors:   artjomb</span>
+<span class="sd">:Date:      07/2014</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">charm.toolbox.pairinggroup</span> <span class="k">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.secretutil</span> <span class="k">import</span> <span class="n">SecretUtil</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ABEncMultiAuth</span> <span class="k">import</span> <span class="n">ABEncMultiAuth</span>
+
+<div class="viewcode-block" id="DACMACS"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS">[docs]</a><span class="k">class</span> <span class="nc">DACMACS</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">util</span> <span class="o">=</span> <span class="n">SecretUtil</span><span class="p">(</span><span class="n">groupObj</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1">#Create Secret Sharing Scheme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>    <span class="c1">#:Prime order group</span>
+    
+<div class="viewcode-block" id="DACMACS.setup"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Global Setup (executed by CA)&#39;&#39;&#39;</span>
+        <span class="c1">#:In global setup, a bilinear group G of prime order p is chosen</span>
+        <span class="c1">#:The global public parameters, GP and p, and a generator g of G. A random oracle H maps global identities GID to elements of G</span>
+    
+        <span class="c1">#:group contains </span>
+        <span class="c1">#:the prime order p is contained somewhere within the group object</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="c1">#: The oracle that maps global identities GID onto elements of G</span>
+        <span class="c1">#:H = lambda str: g** group.hash(str)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">G1</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">g_a</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">a</span>
+        <span class="n">GPP</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="n">g</span><span class="p">,</span> <span class="s1">&#39;g_a&#39;</span><span class="p">:</span> <span class="n">g_a</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="n">H</span><span class="p">}</span>
+        <span class="n">GMK</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">a</span><span class="p">}</span>
+        
+        <span class="k">return</span> <span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">GMK</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DACMACS.registerUser"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.registerUser">[docs]</a>    <span class="k">def</span> <span class="nf">registerUser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GPP</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate user keys (executed by the user).&#39;&#39;&#39;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">g_u</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">u</span>
+        <span class="n">g_z</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">z</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">((</span><span class="n">g_u</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="p">{</span> <span class="s1">&#39;g_z&#39;</span><span class="p">:</span> <span class="n">g_z</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">u</span> <span class="p">})</span> <span class="c1"># (private, public)</span></div>
+    
+<div class="viewcode-block" id="DACMACS.setupAuthority"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.setupAuthority">[docs]</a>    <span class="k">def</span> <span class="nf">setupAuthority</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GPP</span><span class="p">,</span> <span class="n">authorityid</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">authorities</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate attribute authority keys (executed by attribute authority)&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">authorityid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">authorities</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">SK</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">:</span> <span class="n">beta</span><span class="p">,</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="n">gamma</span><span class="p">}</span>
+            <span class="n">PK</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;e_alpha&#39;</span><span class="p">:</span> <span class="n">pair</span><span class="p">(</span><span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">],</span> <span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="n">alpha</span><span class="p">,</span>
+                <span class="s1">&#39;g_beta_inv&#39;</span><span class="p">:</span> <span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">beta</span><span class="p">),</span>
+                <span class="s1">&#39;g_beta_gamma&#39;</span><span class="p">:</span> <span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">gamma</span><span class="o">/</span><span class="n">beta</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="n">authAttrs</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">authorities</span><span class="p">[</span><span class="n">authorityid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">SK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">authAttrs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">SK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">authAttrs</span> <span class="o">=</span> <span class="n">authorities</span><span class="p">[</span><span class="n">authorityid</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="n">authAttrs</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">versionKey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="c1"># random or really &#39;choose&#39; ?</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">](</span><span class="n">attrib</span><span class="p">)</span>
+            <span class="n">pk</span> <span class="o">=</span> <span class="p">((</span><span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">versionKey</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">**</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]</span>
+            <span class="n">authAttrs</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;VK&#39;</span><span class="p">:</span> <span class="n">versionKey</span><span class="p">,</span> <span class="c1">#secret</span>
+                <span class="s1">&#39;PK&#39;</span><span class="p">:</span> <span class="n">pk</span><span class="p">,</span> <span class="c1">#public</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">SK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">authAttrs</span><span class="p">)</span></div>
+     
+<div class="viewcode-block" id="DACMACS.keygen"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.keygen">[docs]</a>    <span class="k">def</span> <span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GPP</span><span class="p">,</span> <span class="n">authority</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">userObj</span><span class="p">,</span> <span class="n">USK</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate user keys for a specific attribute (executed on attribute authority)&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;t&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">userObj</span><span class="p">:</span>
+            <span class="n">userObj</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="c1">#private to AA</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">userObj</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+        
+        <span class="n">ASK</span><span class="p">,</span> <span class="n">APK</span><span class="p">,</span> <span class="n">authAttrs</span> <span class="o">=</span> <span class="n">authority</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">userObj</span>
+        <span class="k">if</span> <span class="n">USK</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">USK</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="s1">&#39;K&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">USK</span> <span class="ow">or</span> <span class="s1">&#39;L&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">USK</span> <span class="ow">or</span> <span class="s1">&#39;R&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">USK</span> <span class="ow">or</span> <span class="s1">&#39;AK&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">USK</span><span class="p">:</span>
+            <span class="n">USK</span><span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;g_z&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">])</span> <span class="o">*</span> \
+                <span class="p">(</span><span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g_a&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">])</span> <span class="o">*</span> \
+                <span class="p">(</span><span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g_a&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]))</span>
+            <span class="n">USK</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;g_z&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">USK</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g_a&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">t</span>
+            <span class="n">USK</span><span class="p">[</span><span class="s1">&#39;AK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">AK</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="s1">&#39;g_z&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">authAttrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">][</span><span class="s1">&#39;PK&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]))</span>
+        <span class="n">USK</span><span class="p">[</span><span class="s1">&#39;AK&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">AK</span>
+        <span class="k">return</span> <span class="n">USK</span></div>
+    
+<div class="viewcode-block" id="DACMACS.encrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.encrypt">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GPP</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">authority</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate the cipher-text from the content(-key) and a policy (executed by the content owner)&#39;&#39;&#39;</span>
+        <span class="c1">#GPP are global parameters</span>
+        <span class="c1">#k is the content key (group element based on AES key)</span>
+        <span class="c1">#policy_str is the policy string</span>
+        <span class="c1">#authority is the authority tuple</span>
+        
+        <span class="n">_</span><span class="p">,</span> <span class="n">APK</span><span class="p">,</span> <span class="n">authAttrs</span> <span class="o">=</span> <span class="n">authority</span>
+        
+        <span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">policy_str</span><span class="p">)</span>
+        <span class="n">secret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">shares</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">calculateSharesList</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+        <span class="n">shares</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getAttributeAndIndex</span><span class="p">(),</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">shares</span><span class="p">])</span>
+        
+        <span class="n">C1</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="n">APK</span><span class="p">[</span><span class="s1">&#39;e_alpha&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">secret</span><span class="p">)</span>
+        <span class="n">C2</span> <span class="o">=</span> <span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">secret</span>
+        <span class="n">C3</span> <span class="o">=</span> <span class="n">APK</span><span class="p">[</span><span class="s1">&#39;g_beta_inv&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">secret</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">DS</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">s_share</span> <span class="ow">in</span> <span class="n">shares</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">k_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">strip_index</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+            <span class="n">r_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">attrPK</span> <span class="o">=</span> <span class="n">authAttrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+            <span class="n">C</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g_a&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s_share</span><span class="p">)</span> <span class="o">*</span> <span class="o">~</span><span class="p">(</span><span class="n">attrPK</span><span class="p">[</span><span class="s1">&#39;PK&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r_i</span><span class="p">)</span>
+            <span class="n">D</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">APK</span><span class="p">[</span><span class="s1">&#39;g_beta_inv&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r_i</span>
+            <span class="n">DS</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">APK</span><span class="p">[</span><span class="s1">&#39;g_beta_gamma&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">r_i</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;C1&#39;</span><span class="p">:</span> <span class="n">C1</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span> <span class="n">C2</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span> <span class="n">C3</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="n">C</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">D</span><span class="p">,</span> <span class="s1">&#39;DS&#39;</span><span class="p">:</span> <span class="n">DS</span><span class="p">,</span> <span class="s1">&#39;policy&#39;</span><span class="p">:</span> <span class="n">policy_str</span><span class="p">}</span></div>
+    
+<div class="viewcode-block" id="DACMACS.generateTK"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.generateTK">[docs]</a>    <span class="k">def</span> <span class="nf">generateTK</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GPP</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">UASK</span><span class="p">,</span> <span class="n">g_u</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generates a token using the user&#39;s attribute secret keys to offload the decryption process (executed by cloud provider)&#39;&#39;&#39;</span>
+        <span class="n">usr_attribs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">UASK</span><span class="p">[</span><span class="s1">&#39;AK&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">policy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">createPolicy</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;policy&#39;</span><span class="p">])</span>
+        <span class="n">pruned</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">prune</span><span class="p">(</span><span class="n">policy</span><span class="p">,</span> <span class="n">usr_attribs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pruned</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">getCoefficients</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
+        
+        <span class="n">dividend</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C2&#39;</span><span class="p">],</span> <span class="n">UASK</span><span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="o">~</span><span class="n">pair</span><span class="p">(</span><span class="n">UASK</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">],</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">])</span>
+        <span class="n">n_a</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">divisor</span> <span class="o">=</span> <span class="mi">1</span>
+        
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">pruned</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">attr</span><span class="o">.</span><span class="n">getAttributeAndIndex</span><span class="p">()</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">attr</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">()</span>
+            <span class="n">temp</span> <span class="o">=</span> \
+                <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="n">y</span><span class="p">],</span> <span class="n">g_u</span><span class="p">)</span> <span class="o">*</span> \
+                <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">][</span><span class="n">y</span><span class="p">],</span> <span class="n">UASK</span><span class="p">[</span><span class="s1">&#39;AK&#39;</span><span class="p">][</span><span class="n">y</span><span class="p">])</span> <span class="o">*</span> \
+                <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;DS&#39;</span><span class="p">][</span><span class="n">y</span><span class="p">],</span> <span class="n">UASK</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">])</span>
+            <span class="n">divisor</span> <span class="o">*=</span> <span class="n">temp</span> <span class="o">**</span> <span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_a</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dividend</span> <span class="o">/</span> <span class="n">divisor</span></div>
+    
+<div class="viewcode-block" id="DACMACS.decrypt"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.decrypt">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">TK</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Decrypts the content(-key) from the cipher-text using the token and the user secret key (executed by user/content consumer)&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">TK</span> <span class="o">**</span> <span class="n">z</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="DACMACS.ukeygen"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.ukeygen">[docs]</a>    <span class="k">def</span> <span class="nf">ukeygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GPP</span><span class="p">,</span> <span class="n">authority</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">userObj</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate update keys for users and cloud provider (executed by attribute authority?)&#39;&#39;&#39;</span>
+        <span class="n">ASK</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">authAttrs</span> <span class="o">=</span> <span class="n">authority</span>
+        <span class="n">oldVersionKey</span> <span class="o">=</span> <span class="n">authAttrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">][</span><span class="s1">&#39;VK&#39;</span><span class="p">]</span>
+        <span class="n">newVersionKey</span> <span class="o">=</span> <span class="n">oldVersionKey</span>
+        <span class="k">while</span> <span class="n">oldVersionKey</span> <span class="o">==</span> <span class="n">newVersionKey</span><span class="p">:</span>
+            <span class="n">newVersionKey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+        <span class="n">authAttrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">][</span><span class="s1">&#39;VK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newVersionKey</span>
+        
+        <span class="n">u</span> <span class="o">=</span> <span class="n">userObj</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+        
+        <span class="n">AUK</span> <span class="o">=</span> <span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">newVersionKey</span> <span class="o">-</span> <span class="n">oldVersionKey</span><span class="p">)</span>
+        <span class="n">KUK</span> <span class="o">=</span> <span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">AUK</span><span class="p">)</span>
+        <span class="n">CUK</span> <span class="o">=</span> <span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">AUK</span> <span class="o">/</span> <span class="n">ASK</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]</span>
+        
+        <span class="n">authAttrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">][</span><span class="s1">&#39;PK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">authAttrs</span><span class="p">[</span><span class="n">attribute</span><span class="p">][</span><span class="s1">&#39;PK&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">GPP</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">AUK</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;KUK&#39;</span><span class="p">:</span> <span class="n">KUK</span><span class="p">,</span> <span class="s1">&#39;CUK&#39;</span><span class="p">:</span> <span class="n">CUK</span> <span class="p">}</span></div>
+    
+<div class="viewcode-block" id="DACMACS.skupdate"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.skupdate">[docs]</a>    <span class="k">def</span> <span class="nf">skupdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">USK</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">KUK</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Updates the user attribute secret key for the specified attribute (executed by non-revoked user)&#39;&#39;&#39;</span>
+        <span class="n">USK</span><span class="p">[</span><span class="s1">&#39;AK&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">USK</span><span class="p">[</span><span class="s1">&#39;AK&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">*</span> <span class="n">KUK</span></div>
+    
+<div class="viewcode-block" id="DACMACS.ctupdate"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.DACMACS.ctupdate">[docs]</a>    <span class="k">def</span> <span class="nf">ctupdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GPP</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">CUK</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Updates the cipher-text using the update key, because of the revoked attribute (executed by cloud provider)&#39;&#39;&#39;</span>
+        <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;DS&#39;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">**</span> <span class="n">CUK</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="basicTest"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.basicTest">[docs]</a><span class="k">def</span> <span class="nf">basicTest</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RUN basicTest&quot;</span><span class="p">)</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">dac</span> <span class="o">=</span> <span class="n">DACMACS</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="n">GPP</span><span class="p">,</span> <span class="n">GMK</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        
+    <span class="n">users</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># public user data</span>
+    <span class="n">authorities</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="n">authorityAttributes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ONE&quot;</span><span class="p">,</span> <span class="s2">&quot;TWO&quot;</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">,</span> <span class="s2">&quot;FOUR&quot;</span><span class="p">]</span>
+    <span class="n">authority1</span> <span class="o">=</span> <span class="s2">&quot;authority1&quot;</span>
+    
+    <span class="n">dac</span><span class="o">.</span><span class="n">setupAuthority</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">authority1</span><span class="p">,</span> <span class="n">authorityAttributes</span><span class="p">,</span> <span class="n">authorities</span><span class="p">)</span>
+    
+    <span class="n">alice</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;alice&#39;</span><span class="p">,</span> <span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;keys&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
+    <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">],</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">registerUser</span><span class="p">(</span><span class="n">GPP</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">authorityAttributes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">dac</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">authorities</span><span class="p">[</span><span class="n">authority1</span><span class="p">],</span> <span class="n">attr</span><span class="p">,</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]],</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">])</span>
+    
+    <span class="n">k</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    
+    <span class="n">policy_str</span> <span class="o">=</span> <span class="s1">&#39;((ONE or THREE) and (TWO or FOUR))&#39;</span>
+    
+    <span class="n">CT</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">authorities</span><span class="p">[</span><span class="n">authority1</span><span class="p">])</span>
+    
+    <span class="n">TK</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">generateTK</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">],</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="n">PT</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">TK</span><span class="p">,</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># print &quot;k&quot;, k</span>
+    <span class="c1"># print &quot;PT&quot;, PT</span>
+    
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="n">PT</span><span class="p">,</span> <span class="s1">&#39;FAILED DECRYPTION!&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SUCCESSFUL DECRYPTION&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="revokedTest"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.revokedTest">[docs]</a><span class="k">def</span> <span class="nf">revokedTest</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RUN revokedTest&quot;</span><span class="p">)</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">dac</span> <span class="o">=</span> <span class="n">DACMACS</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
+    <span class="n">GPP</span><span class="p">,</span> <span class="n">GMK</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    
+    <span class="n">users</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># public user data</span>
+    <span class="n">authorities</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="n">authorityAttributes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ONE&quot;</span><span class="p">,</span> <span class="s2">&quot;TWO&quot;</span><span class="p">,</span> <span class="s2">&quot;THREE&quot;</span><span class="p">,</span> <span class="s2">&quot;FOUR&quot;</span><span class="p">]</span>
+    <span class="n">authority1</span> <span class="o">=</span> <span class="s2">&quot;authority1&quot;</span>
+    
+    <span class="n">dac</span><span class="o">.</span><span class="n">setupAuthority</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">authority1</span><span class="p">,</span> <span class="n">authorityAttributes</span><span class="p">,</span> <span class="n">authorities</span><span class="p">)</span>
+    
+    <span class="n">alice</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;alice&#39;</span><span class="p">,</span> <span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;keys&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
+    <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">],</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">registerUser</span><span class="p">(</span><span class="n">GPP</span><span class="p">)</span>
+    
+    <span class="n">bob</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;bob&#39;</span><span class="p">,</span> <span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;keys&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
+    <span class="n">bob</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">],</span> <span class="n">users</span><span class="p">[</span><span class="n">bob</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">registerUser</span><span class="p">(</span><span class="n">GPP</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">authorityAttributes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">dac</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">authorities</span><span class="p">[</span><span class="n">authority1</span><span class="p">],</span> <span class="n">attr</span><span class="p">,</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]],</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">])</span>
+        <span class="n">dac</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">authorities</span><span class="p">[</span><span class="n">authority1</span><span class="p">],</span> <span class="n">attr</span><span class="p">,</span> <span class="n">users</span><span class="p">[</span><span class="n">bob</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]],</span> <span class="n">bob</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">])</span>
+    
+    <span class="n">k</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    
+    <span class="n">policy_str</span> <span class="o">=</span> <span class="s1">&#39;((ONE or THREE) and (TWO or FOUR))&#39;</span>
+    
+    <span class="n">CT</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">authorities</span><span class="p">[</span><span class="n">authority1</span><span class="p">])</span>
+    
+    <span class="n">TK1a</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">generateTK</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">],</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">PT1a</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">TK1a</span><span class="p">,</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">TK1b</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">generateTK</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">bob</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">],</span> <span class="n">bob</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">PT1b</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">TK1b</span><span class="p">,</span> <span class="n">bob</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="n">PT1a</span><span class="p">,</span> <span class="s1">&#39;FAILED DECRYPTION (1a)!&#39;</span>
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="n">PT1b</span><span class="p">,</span> <span class="s1">&#39;FAILED DECRYPTION (1b)!&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SUCCESSFUL DECRYPTION 1&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># revoke bob on &quot;ONE&quot;</span>
+    <span class="n">attribute</span> <span class="o">=</span> <span class="s2">&quot;ONE&quot;</span>
+    <span class="n">UK</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">ukeygen</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">authorities</span><span class="p">[</span><span class="n">authority1</span><span class="p">],</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">users</span><span class="p">[</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]])</span>
+    <span class="n">dac</span><span class="o">.</span><span class="n">skupdate</span><span class="p">(</span><span class="n">alice</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">],</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">UK</span><span class="p">[</span><span class="s1">&#39;KUK&#39;</span><span class="p">])</span>
+    <span class="n">dac</span><span class="o">.</span><span class="n">ctupdate</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">UK</span><span class="p">[</span><span class="s1">&#39;CUK&#39;</span><span class="p">])</span>
+    
+    <span class="n">TK2a</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">generateTK</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">],</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">PT2a</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">TK2a</span><span class="p">,</span> <span class="n">alice</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">TK2b</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">generateTK</span><span class="p">(</span><span class="n">GPP</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">bob</span><span class="p">[</span><span class="s1">&#39;authoritySecretKeys&#39;</span><span class="p">],</span> <span class="n">bob</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">PT2b</span> <span class="o">=</span> <span class="n">dac</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">TK2b</span><span class="p">,</span> <span class="n">bob</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="n">PT2a</span><span class="p">,</span> <span class="s1">&#39;FAILED DECRYPTION (2a)!&#39;</span>
+    <span class="k">assert</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">PT2b</span><span class="p">,</span> <span class="s1">&#39;SUCCESSFUL DECRYPTION (2b)!&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SUCCESSFUL DECRYPTION 2&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html#abenc_dacmacs_yj14.test">[docs]</a><span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span></div>
+    <span class="c1"># k = groupObj.random()</span>
+    <span class="c1">#print &quot;k&quot;, k, ~k, k * ~k</span>
+    <span class="c1"># g = groupObj.random(G1)</span>
+    <span class="c1"># print &quot;g&quot;, g, pair(g, g)</span>
+    <span class="c1"># gt = groupObj.random(GT)</span>
+    <span class="c1"># print &quot;gt&quot;, gt</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">basicTest</span><span class="p">()</span>
+    <span class="n">revokedTest</span><span class="p">()</span>
+    <span class="c1"># test()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>paddingschemes &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <title>paddingschemes &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../index.html" />
-    <link rel="up" title="Toolbox Classes" href="../toolbox.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pairingcurves" href="pairingcurves.html" />
     <link rel="prev" title="node" href="node.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,31 +42,31 @@
         <li class="right" >
           <a href="node.html" title="node"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" accesskey="U">Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-paddingschemes">
 <span id="paddingschemes"></span><h1>paddingschemes<a class="headerlink" href="#module-paddingschemes" title="Permalink to this headline">¶</a></h1>
 <p>A collection of encryption and signature padding schemes</p>
 <dl class="function">
 <dt id="paddingschemes.MGF1">
-<tt class="descclassname">paddingschemes.</tt><tt class="descname">MGF1</tt><big>(</big><em>seed</em>, <em>maskBytes</em>, <em>hashFn</em>, <em>hLen</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#MGF1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.MGF1" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">paddingschemes.</code><code class="descname">MGF1</code><span class="sig-paren">(</span><em>seed</em>, <em>maskBytes</em>, <em>hashFn</em>, <em>hLen</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#MGF1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.MGF1" title="Permalink to this definition">¶</a></dt>
 <dd><p>MGF1 Mask Generation Function</p>
 <p>Implemented according to PKCS #1 specification, see appendix B.2.1:</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first last simple">
-<li><tt class="docutils literal"><span class="pre">hLen</span></tt>: is the output length of the hash function</li>
-<li><tt class="docutils literal"><span class="pre">maskBytes</span></tt>: the number of mask bytes to return</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">hLen</span></code>: is the output length of the hash function</li>
+<li><code class="docutils literal"><span class="pre">maskBytes</span></code>: the number of mask bytes to return</li>
 </ul>
 </td>
 </tr>
@@ -78,13 +76,13 @@
 
 <dl class="class">
 <dt id="paddingschemes.OAEPEncryptionPadding">
-<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">OAEPEncryptionPadding</tt><big>(</big><em>_hash_type='sha1'</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">paddingschemes.</code><code class="descname">OAEPEncryptionPadding</code><span class="sig-paren">(</span><em>_hash_type='sha1'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Authors :</th><td class="field-body">Gary Belvin</td>
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Gary Belvin</td>
 </tr>
 </tbody>
 </table>
@@ -93,17 +91,17 @@
 Implemented according to PKCS#1 v2.1 Section 7 <a class="reference external" href="ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf">ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf</a></p>
 <dl class="method">
 <dt id="paddingschemes.OAEPEncryptionPadding.decode">
-<tt class="descname">decode</tt><big>(</big><em>encMessage</em>, <em>label=''</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><em>encMessage</em>, <em>label=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding.decode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="paddingschemes.OAEPEncryptionPadding.encode">
-<tt class="descname">encode</tt><big>(</big><em>message</em>, <em>emLen</em>, <em>label=''</em>, <em>seed=None</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding.encode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encode</code><span class="sig-paren">(</span><em>message</em>, <em>emLen</em>, <em>label=''</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding.encode" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return :</th><td class="field-body">a Bytes object</td>
+<tr class="field-odd field"><th class="field-name">Return:</th><td class="field-body">a Bytes object</td>
 </tr>
 </tbody>
 </table>
@@ -113,29 +111,29 @@ Implemented according to PKCS#1 v2.1 Section 7 <a class="reference external" hre
 
 <dl class="class">
 <dt id="paddingschemes.PKCS7Padding">
-<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">PKCS7Padding</tt><big>(</big><em>block_size=16</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">paddingschemes.</code><code class="descname">PKCS7Padding</code><span class="sig-paren">(</span><em>block_size=16</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="paddingschemes.PKCS7Padding.decode">
-<tt class="descname">decode</tt><big>(</big><em>_bytes</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><em>_bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding.decode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="paddingschemes.PKCS7Padding.encode">
-<tt class="descname">encode</tt><big>(</big><em>_bytes</em>, <em>block_size=16</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding.encode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encode</code><span class="sig-paren">(</span><em>_bytes</em>, <em>block_size=16</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding.encode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="paddingschemes.PSSPadding">
-<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">PSSPadding</tt><big>(</big><em>_hash_type='sha1'</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">paddingschemes.</code><code class="descname">PSSPadding</code><span class="sig-paren">(</span><em>_hash_type='sha1'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Authors :</th><td class="field-body">Gary Belvin</td>
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Gary Belvin</td>
 </tr>
 </tbody>
 </table>
@@ -144,26 +142,26 @@ Implemented according to PKCS#1 v2.1 Section 7 <a class="reference external" hre
 Implemented according to section 8 of <a class="reference external" href="ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf">ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf</a>.</p>
 <dl class="method">
 <dt id="paddingschemes.PSSPadding.encode">
-<tt class="descname">encode</tt><big>(</big><em>M</em>, <em>emBits=None</em>, <em>salt=None</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding.encode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encode</code><span class="sig-paren">(</span><em>M</em>, <em>emBits=None</em>, <em>salt=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encodes a message with PSS padding
 emLen will be set to the minimum allowed length if not explicitly set</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="paddingschemes.PSSPadding.verify">
-<tt class="descname">verify</tt><big>(</big><em>M</em>, <em>EM</em>, <em>emBits=None</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding.verify" title="Permalink to this definition">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>M</em>, <em>EM</em>, <em>emBits=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.PSSPadding.verify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verifies that EM is a correct encoding for M</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li>M - the message to verify</li>
 <li>EM - the encoded message</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return :</th><td class="field-body"><p class="first last">true for &#8216;consistent&#8217; or false for &#8216;inconsistent&#8217;</p>
+<tr class="field-even field"><th class="field-name">Return:</th><td class="field-body"><p class="first last">true for ‘consistent’ or false for ‘inconsistent’</p>
 </td>
 </tr>
 </tbody>
@@ -174,33 +172,33 @@ emLen will be set to the minimum allowed length if not explicitly set</p>
 
 <dl class="class">
 <dt id="paddingschemes.SAEPEncryptionPadding">
-<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">SAEPEncryptionPadding</tt><big>(</big><em>_hash_type='sha384'</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">paddingschemes.</code><code class="descname">SAEPEncryptionPadding</code><span class="sig-paren">(</span><em>_hash_type='sha384'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Authors :</th><td class="field-body">Christina Garman</td>
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Christina Garman</td>
 </tr>
 </tbody>
 </table>
 <p>SAEPEncryptionPadding</p>
 <dl class="method">
 <dt id="paddingschemes.SAEPEncryptionPadding.decode">
-<tt class="descname">decode</tt><big>(</big><em>encMessage</em>, <em>n</em>, <em>s0</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding.decode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decode</code><span class="sig-paren">(</span><em>encMessage</em>, <em>n</em>, <em>s0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding.decode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="paddingschemes.SAEPEncryptionPadding.encode">
-<tt class="descname">encode</tt><big>(</big><em>message</em>, <em>n</em>, <em>s0</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding.encode" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encode</code><span class="sig-paren">(</span><em>message</em>, <em>n</em>, <em>s0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding.encode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="paddingschemes.hashFunc">
-<em class="property">class </em><tt class="descclassname">paddingschemes.</tt><tt class="descname">hashFunc</tt><big>(</big><em>_hash_type=None</em><big>)</big><a class="reference internal" href="../_modules/paddingschemes.html#hashFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.hashFunc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">paddingschemes.</code><code class="descname">hashFunc</code><span class="sig-paren">(</span><em>_hash_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#hashFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#paddingschemes.hashFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 </dd></dl>
 
 </div>
@@ -209,7 +207,7 @@ emLen will be set to the minimum allowed length if not explicitly set</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="node.html"
@@ -217,29 +215,28 @@ emLen will be set to the minimum allowed length if not explicitly set</p>
   <h4>Next topic</h4>
   <p class="topless"><a href="pairingcurves.html"
                         title="next chapter">pairingcurves</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/toolbox/paddingschemes.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/toolbox/paddingschemes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -254,14 +251,14 @@ emLen will be set to the minimum allowed length if not explicitly set</p>
         <li class="right" >
           <a href="node.html" title="node"
              >previous</a> |</li>
-        <li><a href="../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../toolbox.html" >Toolbox Classes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../toolbox.html" >Toolbox Classes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

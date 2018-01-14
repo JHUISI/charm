@@ -1,35 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pksig_rsa_hw09 &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <title>pksig_rsa_hw09 &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="../../../index.html" />
-    <link rel="up" title="Implemented Schemes" href="../../../schemes.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="pksig_schnorr91" href="pksig_schnorr91.html" />
     <link rel="prev" title="pksig_hw" href="pksig_hw.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -44,22 +42,22 @@
         <li class="right" >
           <a href="pksig_hw.html" title="pksig_hw"
              accesskey="P">previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" accesskey="U">Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="module-pksig_rsa_hw09">
 <span id="pksig-rsa-hw09"></span><h1>pksig_rsa_hw09<a class="headerlink" href="#module-pksig_rsa_hw09" title="Permalink to this headline">¶</a></h1>
 <p>Hohenberger-Waters Stateful Signatures (RSA-based)</p>
 <blockquote>
 <div><div class="line-block">
-<div class="line">From: &#8220;S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions&#8221;, Section 3.</div>
+<div class="line">From: “S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions”, Section 3.</div>
 <div class="line">Published in: Eurocrypt 2009</div>
 <div class="line">Available from: <a class="reference external" href="http://eprint.iacr.org/2009/028.pdf">http://eprint.iacr.org/2009/028.pdf</a></div>
 <div class="line">Notes: </div>
@@ -84,55 +82,55 @@
 </table>
 <dl class="class">
 <dt id="pksig_rsa_hw09.BlumIntegerSquareRoot">
-<em class="property">class </em><tt class="descclassname">pksig_rsa_hw09.</tt><tt class="descname">BlumIntegerSquareRoot</tt><big>(</big><em>p</em>, <em>q</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#BlumIntegerSquareRoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.BlumIntegerSquareRoot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">pksig_rsa_hw09.</code><code class="descname">BlumIntegerSquareRoot</code><span class="sig-paren">(</span><em>p</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#BlumIntegerSquareRoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.BlumIntegerSquareRoot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="pksig_rsa_hw09.BlumIntegerSquareRoot.pow">
-<tt class="descname">pow</tt><big>(</big><em>modularInt</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#BlumIntegerSquareRoot.pow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.BlumIntegerSquareRoot.pow" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pow</code><span class="sig-paren">(</span><em>modularInt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#BlumIntegerSquareRoot.pow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.BlumIntegerSquareRoot.pow" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="pksig_rsa_hw09.LogFunction">
-<em class="property">class </em><tt class="descclassname">pksig_rsa_hw09.</tt><tt class="descname">LogFunction</tt><big>(</big><em>base=10</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#LogFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.LogFunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">pksig_rsa_hw09.</code><code class="descname">LogFunction</code><span class="sig-paren">(</span><em>base=10</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#LogFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.LogFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="class">
 <dt id="pksig_rsa_hw09.Prf">
-<em class="property">class </em><tt class="descclassname">pksig_rsa_hw09.</tt><tt class="descname">Prf</tt><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<em class="property">class </em><code class="descclassname">pksig_rsa_hw09.</code><code class="descname">Prf</code><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="classmethod">
 <dt id="pksig_rsa_hw09.Prf.eval">
-<em class="property">classmethod </em><tt class="descname">eval</tt><big>(</big><em>k</em>, <em>input1</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf.eval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf.eval" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">eval</code><span class="sig-paren">(</span><em>k</em>, <em>input1</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf.eval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf.eval" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="pksig_rsa_hw09.Prf.keygen">
-<em class="property">classmethod </em><tt class="descname">keygen</tt><big>(</big><em>bits</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf.keygen" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">keygen</code><span class="sig-paren">(</span><em>bits</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf.keygen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="pksig_rsa_hw09.SHA1">
-<tt class="descclassname">pksig_rsa_hw09.</tt><tt class="descname">SHA1</tt><big>(</big><em>bytes1</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#SHA1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.SHA1" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pksig_rsa_hw09.</code><code class="descname">SHA1</code><span class="sig-paren">(</span><em>bytes1</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#SHA1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.SHA1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
 <dt id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09">
-<em class="property">class </em><tt class="descclassname">pksig_rsa_hw09.</tt><tt class="descname">Sig_RSA_Stateless_HW09</tt><big>(</big><em>CH=&lt;class 'charm.schemes.chamhash_rsa_hw09.ChamHash_HW09'&gt;</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></tt></p>
+<em class="property">class </em><code class="descclassname">pksig_rsa_hw09.</code><code class="descname">Sig_RSA_Stateless_HW09</code><span class="sig-paren">(</span><em>CH=&lt;class 'charm.schemes.chamhash_rsa_hw09.ChamHash_HW09'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">charm.toolbox.PKSig.PKSig</span></code></p>
 <blockquote>
 <div>This scheme is probablistic and thus time consuming, so we skip it
 when running doctests.</div></blockquote>
 <p>#doctest: +SKIP</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span> <span class="o">=</span> <span class="n">Sig_RSA_Stateless_HW09</span><span class="p">()</span> 
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span> <span class="o">=</span> <span class="n">Sig_RSA_Stateless_HW09</span><span class="p">()</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207</span><span class="p">)</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543</span><span class="p">)</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">SHA1</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;this is the message I want to sign.&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">SHA1</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;this is the message I want to sign.&#39;</span><span class="p">)</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span> 
 <span class="go">True</span>
@@ -140,29 +138,29 @@ when running doctests.</div></blockquote>
 </div>
 <dl class="method">
 <dt id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash">
-<tt class="descname">HW_hash</tt><big>(</big><em>key</em>, <em>c</em>, <em>input</em>, <em>keyLen</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.HW_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash" title="Permalink to this definition">¶</a></dt>
+<code class="descname">HW_hash</code><span class="sig-paren">(</span><em>key</em>, <em>c</em>, <em>input</em>, <em>keyLen</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.HW_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen">
-<tt class="descname">keygen</tt><big>(</big><em>keyLength=1024</em>, <em>p=0</em>, <em>q=0</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen" title="Permalink to this definition">¶</a></dt>
+<code class="descname">keygen</code><span class="sig-paren">(</span><em>keyLength=1024</em>, <em>p=0</em>, <em>q=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.keygen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign">
-<tt class="descname">sign</tt><big>(</big><em>pk</em>, <em>sk</em>, <em>message</em>, <em>s=0</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign" title="Permalink to this definition">¶</a></dt>
+<code class="descname">sign</code><span class="sig-paren">(</span><em>pk</em>, <em>sk</em>, <em>message</em>, <em>s=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify">
-<tt class="descname">verify</tt><big>(</big><em>pk</em>, <em>message</em>, <em>sig</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify" title="Permalink to this definition">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><em>pk</em>, <em>message</em>, <em>sig</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="pksig_rsa_hw09.randomQR">
-<tt class="descclassname">pksig_rsa_hw09.</tt><tt class="descname">randomQR</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#randomQR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.randomQR" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pksig_rsa_hw09.</code><code class="descname">randomQR</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#randomQR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pksig_rsa_hw09.randomQR" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -171,7 +169,7 @@ when running doctests.</div></blockquote>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="pksig_hw.html"
@@ -179,29 +177,28 @@ when running doctests.</div></blockquote>
   <h4>Next topic</h4>
   <p class="topless"><a href="pksig_schnorr91.html"
                         title="next chapter">pksig_schnorr91</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../../../_sources/charm/schemes/pksig/pksig_rsa_hw09.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/charm/schemes/pksig/pksig_rsa_hw09.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -216,14 +213,14 @@ when running doctests.</div></blockquote>
         <li class="right" >
           <a href="pksig_hw.html" title="pksig_hw"
              >previous</a> |</li>
-        <li><a href="../../../index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li>
-          <li><a href="../../../schemes.html" >Implemented Schemes</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Charm-Crypto 0.50 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../schemes.html" >Implemented Schemes</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

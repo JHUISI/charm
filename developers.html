@@ -1,34 +1,33 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>For App Developers &mdash; Charm-Crypto 0.43b documentation</title>
-    
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <title>For App Developers &#8212; Charm-Crypto 0.50 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.43b',
+        VERSION:     '0.50',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Charm-Crypto 0.43b documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Implemented Schemes" href="schemes.html" />
     <link rel="prev" title="For Cryptographers" href="cryptographers.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -43,69 +42,70 @@
         <li class="right" >
           <a href="cryptographers.html" title="For Cryptographers"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Charm-Crypto 0.50 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="for-app-developers">
 <h1>For App Developers<a class="headerlink" href="#for-app-developers" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="installation-and-dependencies">
 <h2>Installation and dependencies<a class="headerlink" href="#installation-and-dependencies" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference internal" href="install_source.html#platform-install-manual"><em>Platform Install Manual</em></a> for installation instructions.</p>
+<p>See <a class="reference internal" href="install_source.html#platform-install-manual"><span class="std std-ref">Platform Install Manual</span></a> for installation instructions.</p>
 </div>
 <div class="section" id="using-a-scheme">
 <h2>Using a Scheme<a class="headerlink" href="#using-a-scheme" title="Permalink to this headline">¶</a></h2>
-<p>To use any of our existing schemes in your application, each scheme includes a <tt class="docutils literal"><span class="pre">main</span></tt> routine that runs through every alorithm (with sample inputs) defined for that scheme. Thus, the <tt class="docutils literal"><span class="pre">main</span></tt> function provides a test that the scheme works in addition to demonstrate how to use it. For example, below is an example of how to instantiate the Cramer-Shoup scheme from above within your application:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_cs98</span> <span class="kn">import</span> <span class="n">CS98</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="kn">import</span> <span class="n">prime192v1</span>
-<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="kn">import</span> <span class="n">ECGroup</span>
+<p>To use any of our existing schemes in your application, each scheme includes a <code class="docutils literal"><span class="pre">main</span></code> routine that runs through every alorithm (with sample inputs) defined for that scheme. Thus, the <code class="docutils literal"><span class="pre">main</span></code> function provides a test that the scheme works in addition to demonstrate how to use it. For example, below is an example of how to instantiate the Cramer-Shoup scheme from above within your application:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.schemes.pkenc.pkenc_cs98</span> <span class="k">import</span> <span class="n">CS98</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.eccurve</span> <span class="k">import</span> <span class="n">prime192v1</span>
+<span class="kn">from</span> <span class="nn">charm.toolbox.ecgroup</span> <span class="k">import</span> <span class="n">ECGroup</span>
 
 <span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v1</span><span class="p">)</span>
 <span class="n">pkenc</span> <span class="o">=</span> <span class="n">CS98</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>
 
 <span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
 
-<span class="n">M</span> <span class="o">=</span> <span class="n">b</span><span class="s">&#39;Hello World!&#39;</span>
+<span class="n">M</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;Hello World!&#39;</span>
 <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
 
 <span class="n">message</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>For a full list of schemes that are available to you, see the <a class="reference internal" href="schemes.html#schemes"><em>Implemented Schemes</em></a> section.</p>
+<p>For a full list of schemes that are available to you, see the <a class="reference internal" href="schemes.html#schemes"><span class="std std-ref">Implemented Schemes</span></a> section.</p>
 </div>
 <div class="section" id="using-serialization-api">
 <h2>Using serialization API<a class="headerlink" href="#using-serialization-api" title="Permalink to this headline">¶</a></h2>
-<p>To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects embedded in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc) which are <tt class="docutils literal"><span class="pre">objectToBytes()</span></tt> and <tt class="docutils literal"><span class="pre">bytesToObject()</span></tt> from the <tt class="docutils literal"><span class="pre">charm.core.engine.util</span></tt> package. These functions provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object.
+<p>To support serialization of key material and ciphertexts, we provide two high-level API calls to serialize charm objects embedded in arbitrary python structures (e.g., lists, tuples, or dictionaries, etc) which are <code class="docutils literal"><span class="pre">objectToBytes()</span></code> and <code class="docutils literal"><span class="pre">bytesToObject()</span></code> from the <code class="docutils literal"><span class="pre">charm.core.engine.util</span></code> package. These functions provide the necessary functionality for converting keys and ciphertexts to base 64 encoded strings. Both calls require the object to be serialized/deserialized and a class that defines the serialize and deserialize methods such as the group object.
 We also show below how to customize our serialization routines:</p>
-<p>Here is an example of how to use the API with any of the supported group objects (<tt class="docutils literal"><span class="pre">integergroup</span></tt>, <tt class="docutils literal"><span class="pre">pairinggroup</span></tt> or <tt class="docutils literal"><span class="pre">ecgroup</span></tt>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
+<p>Here is an example of how to use the API with any of the supported group objects (<code class="docutils literal"><span class="pre">integergroup</span></code>, <code class="docutils literal"><span class="pre">pairinggroup</span></code> or <code class="docutils literal"><span class="pre">ecgroup</span></code>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="k">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
 
 <span class="n">pk_bytes</span> <span class="o">=</span> <span class="n">objectToBytes</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
 
 <span class="n">orig_pk</span> <span class="o">=</span> <span class="n">bytesToObject</span><span class="p">(</span><span class="n">pk_bytes</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If you would like to define your own custom serialization routine in conjunction with our API, the following example works for schemes based on the <tt class="docutils literal"><span class="pre">integergroup</span></tt> which in some cases do not utilize a group object:</p>
-<div class="highlight-python"><pre>from charm.core.math.integer import integer,serialize,deserialize
+<p>If you would like to define your own custom serialization routine in conjunction with our API, the following example works for schemes based on the <code class="docutils literal"><span class="pre">integergroup</span></code> which in some cases do not utilize a group object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.core.math.integer</span> <span class="k">import</span> <span class="n">integer</span><span class="p">,</span><span class="n">serialize</span><span class="p">,</span><span class="n">deserialize</span>
 
-class mySerializeAPI:
-        def __init__(self)
-                ...
+<span class="k">class</span> <span class="nc">mySerializeAPI</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="o">...</span>
 
-        def serialize(self, charm_object):
-            assert type(charm_object) == integer, &quot;required type is integer, not: &quot;, type(charm_object)
-            return serialize(charm_object)
+        <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">charm_object</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">charm_object</span><span class="p">)</span> <span class="o">==</span> <span class="n">integer</span><span class="p">,</span> <span class="s2">&quot;required type is integer, not: &quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">charm_object</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">serialize</span><span class="p">(</span><span class="n">charm_object</span><span class="p">)</span>
 
-        def deserialize(self, object):
-            assert type(object) == bytes, &quot;required type is bytes, not: &quot;, type(object)
-            return deserialize(object)</pre>
+        <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">,</span> <span class="s2">&quot;required type is bytes, not: &quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">deserialize</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">charm.core.engine.util</span> <span class="k">import</span> <span class="n">objectToBytes</span><span class="p">,</span><span class="n">bytesToObject</span>
 
 <span class="n">serObject</span> <span class="o">=</span> <span class="n">mySerializeAPI</span><span class="p">()</span>
 
@@ -118,7 +118,7 @@ class mySerializeAPI:
 <div class="section" id="using-charm-in-c-c-apps">
 <h2>Using Charm in C/C++ Apps<a class="headerlink" href="#using-charm-in-c-c-apps" title="Permalink to this headline">¶</a></h2>
 <p>To make Charm easy to use conveniently with C/C++ applications, we have provided a C interface to encapsulate the details. While this feature is still in development, here is a code snippet that shows how to utilize a Charm scheme in C:</p>
-<div class="highlight-python"><pre>/* Charm C interface header */
+<div class="highlight-default"><div class="highlight"><pre><span></span>/* Charm C interface header */
 #include &quot;charm_embed_api.h&quot;
 
 Charm_t *module, *group, *class;
@@ -161,9 +161,10 @@ Free(msg);
 Free(msg2);
 /* tear down the environment */
 CleanupCharm();
-....</pre>
+....
+</pre></div>
 </div>
-<p>The rest of the example can be found in <tt class="docutils literal"><span class="pre">test.c</span></tt> in the <tt class="docutils literal"><span class="pre">embed</span></tt> dir of Charm source.</p>
+<p>The rest of the example can be found in <code class="docutils literal"><span class="pre">test.c</span></code> in the <code class="docutils literal"><span class="pre">embed</span></code> dir of Charm source.</p>
 <p>Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at <a class="reference external" href="mailto:support&#37;&#52;&#48;charm-crypto&#46;com">support<span>&#64;</span>charm-crypto<span>&#46;</span>com</a>.</p>
 </div>
 </div>
@@ -172,7 +173,7 @@ CleanupCharm();
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -191,29 +192,28 @@ CleanupCharm();
   <h4>Next topic</h4>
   <p class="topless"><a href="schemes.html"
                         title="next chapter">Implemented Schemes</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/developers.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/developers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -228,13 +228,13 @@ CleanupCharm();
         <li class="right" >
           <a href="cryptographers.html" title="For Cryptographers"
              >previous</a> |</li>
-        <li><a href="index.html">Charm-Crypto 0.43b documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Charm-Crypto 0.50 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Jul 16, 2013.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013, Johns Hopkins University ISI.
+      Last updated on Jan 13, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>
