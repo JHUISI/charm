@@ -82,8 +82,8 @@ class MessageAuthenticator(object):
         """
         if msgAndDigest['alg'] != self._algorithm:
             raise ValueError("Currently only HMAC_SHA2 is supported as an algorithm")
-        expected = bytes(self.mac(msgAndDigest['msg'], associatedData=associatedData)['digest'], 'utf-8')
-        received = bytes(msgAndDigest['digest'], 'utf-8')
+        expected = bytes(self.mac(msgAndDigest['msg'], associatedData=associatedData)['digest'])
+        received = bytes(msgAndDigest['digest'])
         # we compare the hash instead of the direct value to avoid a timing attack
         return sha2(expected).digest() == sha2(received).digest()
 
