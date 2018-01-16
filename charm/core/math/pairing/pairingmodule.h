@@ -41,9 +41,9 @@
 #include <fcntl.h>
 #include "benchmarkmodule.h"
 #include "base64.h"
-#include "openssl/objects.h"
-#include "openssl/rand.h"
-#include "openssl/sha.h"
+#include <openssl/objects.h>
+#include <openssl/rand.h>
+#include <openssl/sha.h>
 #ifdef BENCHMARK_ENABLED
 #include "benchmark_util.h"
 #endif
@@ -110,20 +110,20 @@ typedef struct {
 	int group_init;
 	uint8_t hash_id[ID_LEN+1];
 #ifdef BENCHMARK_ENABLED
-	Operations *gBench;
-    Benchmark *dBench;
-	uint8_t bench_id[ID_LEN+1];
+  Operations *gBench;
+  Benchmark *dBench;
+  uint8_t bench_id[ID_LEN+1];
 #endif
 } Pairing;
 
 typedef struct {
-    PyObject_HEAD
-	Pairing *pairing;
-	element_t e;
-	GroupType element_type;
-    int elem_initialized;
-	element_pp_t e_pp;
-    int elem_initPP;
+  PyObject_HEAD
+  Pairing *pairing;
+  element_t e;
+  GroupType element_type;
+  int elem_initialized;
+  element_pp_t e_pp;
+  int elem_initPP;
 } Element;
 
 #define Check_Elements(o1, o2)  PyElement_Check(o1) && PyElement_Check(o2)

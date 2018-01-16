@@ -219,8 +219,47 @@ The steps for building in linux this way are:
         3. And finally we must rebuild the searchpath for libraries
                 sudo ldconfig
 
+[Creating a .deb]
+If you want to create a .deb binary from the charm source, there are a
+couple more steps. The following was tested in Ubuntu 16.04 (x86_64).
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+        1. Git
+                sudo apt-get install git
+        2. m4
+                sudo apt-get install m4
+        3. Python 3
+                sudo apt-get install python3
+        4. Header files/static library
+                sudo apt-get install python3-dev
+        5. libssl-dev (only necessary if you did not install Python 3)
+                sudo apt-get install libssl-dev
+        6. Additional packages related to packaging for .deb
+                sudo apt-get install python3-all-dev debhelper python3-pip
+        7. The stdeb python package, installed via pip
+                pip3 install stdeb
+        8. Verify that *all* of the dependencies at the top of the
+            document are satisfied. Not doing this may result in strange
+            bugs while compiling the .deb from source.
+
+2. Now we need to obtain a copy of Charm:
+	git clone git://github.com/JHUISI/charm.git
+
+3. Next, we will install Charm. Navigate to the Charm directory.
+        1. We must first run the configuration script:
+                sudo bash ./configure.sh                * Bash to avoid unexpected operator error.
+        2. Now we will build and install Charm:
+                sudo make
+                sudo make install
+        3. And finally we must rebuild the searchpath for libraries
+                sudo ldconfig
+
+4. Finally, we will build the installer. Navigate to the installers/deb.installer directory, and at a shell prompt run
+    sudo python3 create_deb.py      * use python instead of python3 to make a 2.7 binary
+
+5. Install the created .deb file.
 
 
+    
 BUILDING IN WINDOWS
 ------------------------
 

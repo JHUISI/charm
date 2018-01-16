@@ -298,9 +298,52 @@ PyObject *Retrieve_result(Benchmark *self, char *option) {
 	return result;
 }
 
+#if PY_MAJOR_VERSION >= 3
+PyTypeObject BenchmarkType = {
+  PyVarObject_HEAD_INIT(NULL, 0)
+  "profile.Benchmark",       /*tp_name*/
+  sizeof(Benchmark),         /*tp_basicsize*/
+  0,                         /*tp_itemsize*/
+  (destructor)Benchmark_dealloc, /*tp_dealloc*/
+  0,                         /*tp_print*/
+  0,                         /*tp_getattr*/
+  0,                         /*tp_setattr*/
+  0,                /*tp_reserved*/
+  0, /*tp_repr*/
+  0,               /*tp_as_number*/
+  0,                         /*tp_as_sequence*/
+  0,                         /*tp_as_mapping*/
+  0,   /*tp_hash */
+  0,                         /*tp_call*/
+  0, /*tp_str*/
+  0,                         /*tp_getattro*/
+  0,                         /*tp_setattro*/
+  0,                         /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  "Benchmark objects",           /* tp_doc */
+  0,                   /* tp_traverse */
+  0,                   /* tp_clear */
+  0,          /* tp_richcompare */
+  0,                   /* tp_weaklistoffset */
+  0,                   /* tp_iter */
+  0,                   /* tp_iternext */
+  0,             /* tp_methods */
+  0,             /* tp_members */
+  0,                         /* tp_getset */
+  0,                         /* tp_base */
+  0,                         /* tp_dict */
+  0,                         /* tp_descr_get */
+  0,                         /* tp_descr_set */
+  0,                         /* tp_dictoffset */
+  (initproc)Benchmark_init,      /* tp_init */
+  0,                         /* tp_alloc */
+  Benchmark_new,                 /* tp_new */
+};
+
+#else
 PyTypeObject BenchmarkType = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	"profile.Benchmark",             /*tp_name*/
+	"profile.Benchmark",       /*tp_name*/
 	sizeof(Benchmark),         /*tp_basicsize*/
 	0,                         /*tp_itemsize*/
 	(destructor)Benchmark_dealloc, /*tp_dealloc*/
@@ -338,6 +381,7 @@ PyTypeObject BenchmarkType = {
 	0,                         /* tp_alloc */
 	Benchmark_new,                 /* tp_new */
 };
+#endif
 
 struct module_state {
 	PyObject *error;
@@ -392,9 +436,9 @@ void initbenchmark(void) 		{
 	if(PyType_Ready(&BenchmarkType) < 0) INITERROR;
 
 #if PY_MAJOR_VERSION >= 3
-    module = PyModule_Create(&moduledef);
+  module = PyModule_Create(&moduledef);
 #else
-	module = Py_InitModule("benchmark", module_methods);
+  module = Py_InitModule("benchmark", module_methods);
 #endif
 	if(module == NULL) INITERROR;
 
@@ -413,7 +457,9 @@ void initbenchmark(void) 		{
 	PyBenchmark_API[PyBenchmark_Clear]  = (void *)PyClearBenchmark;
 
 	api_object = (PyObject *) PyCapsule_New((void *) PyBenchmark_API,BENCHMARK_MOD_NAME, NULL);
-	if(api_object != NULL) PyModule_AddObject(module, "_C_API", api_object);
+	if(api_object != NULL) {
+	  PyModule_AddObject(module, "_C_API", api_object);
+	}
 
 	Py_INCREF(&BenchmarkType);
 	PyModule_AddObject(module, "Benchmark", (PyObject *) &BenchmarkType);

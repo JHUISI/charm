@@ -10,6 +10,7 @@ Users:
 .. toctree::
    :maxdepth: 1
    
+   updates_050
    updates
    install_source 
    mobile

@@ -66,7 +66,7 @@ static Benchmark *tmpBench;
 	  return Py_NotImplemented; }	\
 
 
-inline size_t size(mpz_t n) {
+static inline size_t size(mpz_t n) {
 	return mpz_sizeinbase(n, 2);
 }
 
@@ -116,59 +116,34 @@ void longObjToMPZ(mpz_t m, PyObject * o) {
 //}
 
 PyObject *bnToLongObj(BIGNUM *m) {
-	PyLongObject *v = NULL;
-	BN_ULONG t;
-	int bits = BN_num_bits(m), i = 0;
-	int ndigits = (bits + PyLong_SHIFT - 1) / PyLong_SHIFT;
-	int digitsleft = ndigits;
-	int bitsleft = bits;
-
-	v = _PyLong_New(ndigits);
-	if (v != NULL) {
-		digit *p = v->ob_digit;
-		for(i = 0; i < m->dmax; i++) {
-			t = m->d[i];
-			*p++ = (digit)(t & PyLong_MASK);
-			i++;
-			digitsleft--;
-			bitsleft -= PyLong_SHIFT;
-		}
-	}
-
-	return (PyObject *) v;
+	return PyLong_FromString(BN_bn2hex(m), NULL, 16);
 }
 
 int bnToMPZ(BIGNUM *p, mpz_t m) {
-	int size;
-	if (!BN_is_negative(p))
-		size = p->top;
-	else
-		size = -(p->top);
-
-	if(BN_BITS2 == GMP_NUMB_BITS) {
-		// expand the mpz_t type
-		if(!_mpz_realloc(m, size))
-			return FALSE;
-		memcpy(&m->_mp_d[0], &p->d[0], size * sizeof(p->d[0]));
-		m->_mp_size = size;
+	size_t count = BN_num_bytes(p);
+	unsigned char* tmp = malloc(count);
+	if(!tmp) {
+		return FALSE;
 	}
+	BN_bn2bin(p, tmp);
+	mpz_import(m, count, 1, 1, 0, 0, tmp);
+	if(BN_is_negative(p)) {
+		mpz_neg(m, m);
+	}
+	free(tmp);
 
 	return TRUE;
 }
 
 // generate a BN from an mpz_t type
 int mpzToBN(mpz_t m, BIGNUM *b) {
-	int size = (m->_mp_size >= 0) ? m->_mp_size : -m->_mp_size;
+	void (*freefunc) (void *, size_t);
+	mp_get_memory_functions (NULL, NULL, &freefunc);
 
-	// make sure mpz will fit into BN
-	if(BN_BITS2 == GMP_NUMB_BITS) {
-		BN_zero(b);
-		if(bn_expand2(b, size) == NULL)
-			return FALSE;
-		b->top = size;
-		memcpy(&b->d[0], &m->_mp_d[0], size * sizeof(b->d[0]));
-		bn_correct_top(b);
-	}
+	size_t count;
+	unsigned char* bytes = mpz_export (NULL, &count, 1, 1, 0, 0, m);
+	BN_bin2bn(bytes, count, b);
+	freefunc(bytes, count);
 
 	debug("Original input m => ");
 	print_mpz(m, 10);
@@ -2082,6 +2057,78 @@ static PyObject *Integer_xor(PyObject *self, PyObject *other) {
 #ifdef BENCHMARK_ENABLED
 #define BenchmarkIdentifier 	3
 
+#if defined(__APPLE__)
+// benchmark new
+PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  Benchmark *self;
+  self = (Benchmark *)type->tp_alloc(type, 0);
+  if(self != NULL) {
+    self->bench_initialized = FALSE;
+    self->bench_inprogress = FALSE;  // false until we StartBenchmark( ... )
+    self->op_add = self->op_sub = self->op_mult = 0;
+    self->op_div = self->op_exp = self->op_pair = 0;
+    self->cpu_time_ms = self->real_time_ms = 0.0;
+    self->cpu_option = self->real_option = FALSE;
+    debug("Creating new benchmark object.\n");
+  }
+  return (PyObject *) self;
+}
+
+// benchmark init
+int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds)
+{
+  return 0;
+}
+// benchmark dealloc
+void Benchmark_dealloc(Benchmark *self) {
+  debug("Releasing benchmark object.\n");
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+PyTypeObject BenchmarkType = {
+  PyVarObject_HEAD_INIT(NULL, 0)
+  "profile.Benchmark",       /*tp_name*/
+  sizeof(Benchmark),         /*tp_basicsize*/
+  0,                         /*tp_itemsize*/
+  (destructor)Benchmark_dealloc, /*tp_dealloc*/
+  0,                         /*tp_print*/
+  0,                         /*tp_getattr*/
+  0,                         /*tp_setattr*/
+  0,                /*tp_reserved*/
+  0, /*tp_repr*/
+  0,               /*tp_as_number*/
+  0,                         /*tp_as_sequence*/
+  0,                         /*tp_as_mapping*/
+  0,   /*tp_hash */
+  0,                         /*tp_call*/
+  0, /*tp_str*/
+  0,                         /*tp_getattro*/
+  0,                         /*tp_setattro*/
+  0,                         /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  "Benchmark objects",           /* tp_doc */
+  0,                   /* tp_traverse */
+  0,                   /* tp_clear */
+  0,          /* tp_richcompare */
+  0,                   /* tp_weaklistoffset */
+  0,                   /* tp_iter */
+  0,                   /* tp_iternext */
+  0,             /* tp_methods */
+  0,             /* tp_members */
+  0,                         /* tp_getset */
+  0,                         /* tp_base */
+  0,                         /* tp_dict */
+  0,                         /* tp_descr_get */
+  0,                         /* tp_descr_set */
+  0,                         /* tp_dictoffset */
+  (initproc)Benchmark_init,      /* tp_init */
+  0,                         /* tp_alloc */
+  Benchmark_new,                 /* tp_new */
+};
+
+#endif
+
 PyObject *InitBenchmark(PyObject *self, PyObject *args) {
 	Benchmark *b = GETSTATE(self)->dBench;
 	if(b == NULL) {
@@ -2400,14 +2447,16 @@ PyMethodDef module_methods[] = {
 #if PY_MAJOR_VERSION >= 3
 static int int_traverse(PyObject *m, visitproc visit, void *arg) {
 	Py_VISIT(GETSTATE(m)->error);
+#if defined(BENCHMARK_ENABLED)
 	Py_VISIT(GETSTATE(m)->dBench);
+#endif
 	return 0;
 }
 
 static int int_clear(PyObject *m) {
-	Py_CLEAR(GETSTATE(m)->error);
-    Py_XDECREF(IntegerError);
-#ifdef BENCHMARK_ENABLED
+  Py_CLEAR(GETSTATE(m)->error);
+  Py_XDECREF(IntegerError);
+#if defined(BENCHMARK_ENABLED)
 	//printf("int_clear: Refcnt dBench = '%i'\n", (int) Py_REFCNT(GETSTATE(m)->dBench));
 	Py_CLEAR(GETSTATE(m)->dBench);
 #endif
@@ -2445,7 +2494,6 @@ void initinteger(void) {
 #ifdef BENCHMARK_ENABLED
     if(import_benchmark() < 0)
     	CLEAN_EXIT;
-
     if(PyType_Ready(&BenchmarkType) < 0)
     	INITERROR;
 #endif
@@ -2489,9 +2537,9 @@ LEAVE:
 	if (PyErr_Occurred()) {
 		printf("ERROR: module load failed!\n");
 		PyErr_Clear();
-        if(m!=NULL){
-		    Py_XDECREF(m);
-        }
+    if(m!=NULL) {
+      Py_XDECREF(m);
+    }
 		INITERROR;
    }
 

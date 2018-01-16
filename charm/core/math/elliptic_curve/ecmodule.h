@@ -39,13 +39,13 @@
 #include "base64.h"
 
 /* Openssl header files */
-#include "openssl/ec.h"
-#include "openssl/err.h"
-#include "openssl/obj_mac.h"
-#include "openssl/objects.h"
-#include "openssl/rand.h"
-#include "openssl/bn.h"
-#include "openssl/sha.h"
+#include <openssl/ec.h>
+#include <openssl/err.h>
+#include <openssl/obj_mac.h>
+#include <openssl/objects.h>
+#include <openssl/rand.h>
+#include <openssl/bn.h>
+#include <openssl/sha.h>
 #ifdef BENCHMARK_ENABLED
 #include "benchmark_util.h"
 #endif

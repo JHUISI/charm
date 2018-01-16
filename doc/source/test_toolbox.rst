@@ -8,6 +8,7 @@ Toolbox Test Code
    :maxdepth: 1
 
    test/conversion_test
+   test/ecgroup_test
    test/paddingschemes_test
    test/secretshare_test
    test/symcrypto_test

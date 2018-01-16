@@ -17,6 +17,7 @@ charm/config.py
 **__pycache__
 .project
 .pydevproject
+.DS_Store
 
 
 *.py[cod]

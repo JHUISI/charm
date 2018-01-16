@@ -37,18 +37,18 @@ if(PyBytes_Check(obj)) { a = PyBytes_AsString(obj); } \
 else if(PyUnicode_Check(obj)) { tmp_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AsString(tmp_obj); }	\
 else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
 
-	#define _PyUnicode_FromFormat PyUnicode_FromFormat
-	#define _PyUnicode_FromString PyUnicode_FromString
+  #define _PyUnicode_FromFormat PyUnicode_FromFormat
+  #define _PyUnicode_FromString PyUnicode_FromString
 #else
 	/* python 2.x definitions */
-	#define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
-	#define ConvertToInt(o) PyInt_AsLong(o)
-	#define PyToLongObj(o) PyInt_FromSize_t(o)
-	#define _PyUnicode_FromFormat PyString_FromFormat
-    #define _PyUnicode_FromString PyString_FromString
-	/* treat everything as string in 2.x */
-	#define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
-	#define PyBytes_ToString2(a, obj, tmpObj) a = PyString_AsString(obj);
+  #define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
+  #define ConvertToInt(o) PyInt_AsLong(o)
+  #define PyToLongObj(o) PyInt_FromSize_t(o)
+  #define _PyUnicode_FromFormat PyString_FromFormat
+  #define _PyUnicode_FromString PyString_FromString
+  /* treat everything as string in 2.x */
+  #define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
+  #define PyBytes_ToString2(a, obj, tmpObj) a = PyString_AsString(obj);
 
 #endif
 
@@ -93,6 +93,7 @@ typedef struct {
 PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 void Benchmark_dealloc(Benchmark *self);
 int Benchmark_init(Benchmark *self, PyObject *args, PyObject *kwds);
+
 PyObject *Benchmark_print(Benchmark *self);
 PyObject *GetResults(Benchmark *self);
 PyObject *GetResultsWithPair(Benchmark *self);
@@ -148,8 +149,9 @@ static void **PyBenchmark_API;
 
 static int import_benchmark(void)
 {
-	PyBenchmark_API = (void **) PyCapsule_Import(BENCHMARK_MOD_NAME, 1);
-	return (PyBenchmark_API != NULL) ? 0 : -1;
+	// PyBenchmark_API = (void **) PyCapsule_Import(BENCHMARK_MOD_NAME, 1);
+  PyBenchmark_API = (void **) PyCapsule_Import(BENCHMARK_MOD_NAME, 0); // 0 = enable tracing
+  return (PyBenchmark_API != NULL) ? 0 : -1;
 }
 
 #endif

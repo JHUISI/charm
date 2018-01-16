@@ -7,14 +7,10 @@ Scheme Test Code
 .. toctree::
    :maxdepth: 1
 
-   test/abenc_test
-   test/chamhash_test
-   test/commit_test
-   test/dabenc_test
+   test/chamhash_adm05_test
+   test/chamhash_rsa_hw09_test
+   test/dabe_aw11_test
    test/encap_bchk05_test
-   test/grpsig_test
-   test/hibenc_test
-   test/ibenc_test
    test/pk_vrf_test
    test/pkenc_test
    test/pksig_test

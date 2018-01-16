@@ -1318,7 +1318,8 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
                 printf_buffer_as_hex((uint8_t *) input, len);
                 encObj = createNewPoint(G, gobj);
                 BN_bin2bn((const uint8_t *) input, len, x);
-                BN_init(y);
+                BN_free(y);
+                y = BN_new();
                 // Uncomment for debugging purposes
                 //char *xstr = BN_bn2dec(x);
                 //debug("gen x => %s\n", xstr);
@@ -1839,8 +1840,8 @@ static int ec_traverse(PyObject *m, visitproc visit, void *arg) {
 }
 
 static int ec_clear(PyObject *m) {
-	Py_CLEAR(GETSTATE(m)->error);
-    Py_XDECREF(PyECErrorObject);
+  Py_CLEAR(GETSTATE(m)->error);
+  Py_XDECREF(PyECErrorObject);
 	return 0;
 }
 
@@ -1918,9 +1919,9 @@ void initelliptic_curve(void) 		{
 
 LEAVE:
 	if (PyErr_Occurred()) {
-		PyErr_Clear();
-        Py_XDECREF(m);
-	    INITERROR;
+    PyErr_Clear();
+    Py_XDECREF(m);
+    INITERROR;
 	}
 
 #if PY_MAJOR_VERSION >= 3

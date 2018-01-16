@@ -6,17 +6,18 @@ before_install:
 # Make sure python development tools are installed
 - sudo apt-get install -y python-dev python-setuptools
 # Install GMP
-- sudo apt-get install -y libgmp10 libgmp-dev libgmp3c2
+- sudo apt-get install -y libgmp10 libgmp-dev
 # Install PBC
-- wget http://voltar.org/pbcfiles/libpbc0_0.5.12_amd64.deb
-- wget http://voltar.org/pbcfiles/libpbc-dev_0.5.12_amd64.deb
-- sudo dpkg -i libpbc0_0.5.12_amd64.deb
-- sudo dpkg -i libpbc-dev_0.5.12_amd64.deb
+#- wget http://voltar.org/pbcfiles/libpbc0_0.5.12_amd64.deb
+#- wget http://voltar.org/pbcfiles/libpbc-dev_0.5.12_amd64.deb
+#- sudo dpkg -i libpbc0_0.5.12_amd64.deb
+#- sudo dpkg -i libpbc-dev_0.5.12_amd64.deb
 # Install OpenSSL
 - sudo apt-get install -y openssl
 install:
 - pip install -r requirements.txt
 - ./configure.sh
+- cd ./deps/pbc && make && sudo ldconfig && cd -
 - make
 - make install
 script:
