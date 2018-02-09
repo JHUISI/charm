@@ -39,9 +39,9 @@ class MessageAuthenticator(object):
 
         Parameters
         ----------
-        msg : str or byte str
+        msg : str
             The message serving as input to the HMAC algorithm, in addition to the HMAC algorithm and associated data.
-        associatedData : str or byte str, optional
+        associatedData : str, optional
             Associated data that will be MACed together with the ciphertext and algorithm; the associated data will not be encrypted.
 
         Returns
@@ -49,13 +49,13 @@ class MessageAuthenticator(object):
         dict
             Dictionary composed of the MAC algorithm, the MACed message (or ciphertext), and the digest computed by MACing HMAC_algorithm + associatedData + msg.
         """
-        # Ensure the associated data is in byte format, convert if necessary.
+        # Ensure the associated data is in byte format, convert if necessary. Really does nothing in python 2.x.
         if type(associatedData) != bytes :
-            associatedData = bytes(associatedData, "utf-8")
+            associatedData = bytes(associatedData)
         return {
                 "alg": self._algorithm,
                 "msg": msg,
-                "digest": hmac.new(self._key, bytes(self._algorithm, "utf-8") + associatedData + bytes(msg, "utf-8"), digestmod=sha2).hexdigest()
+                "digest": hmac.new(self._key, self._algorithm + associatedData + msg, digestmod=sha2).hexdigest()
                }
 
     def verify(self, msgAndDigest, associatedData=b''):
@@ -82,8 +82,8 @@ class MessageAuthenticator(object):
         """
         if msgAndDigest['alg'] != self._algorithm:
             raise ValueError("Currently only HMAC_SHA2 is supported as an algorithm")
-        expected = bytes(self.mac(msgAndDigest['msg'], associatedData=associatedData)['digest'], 'utf-8')
-        received = bytes(msgAndDigest['digest'], 'utf-8')
+        expected = bytes(self.mac(msgAndDigest['msg'], associatedData=associatedData)['digest'])
+        received = bytes(msgAndDigest['digest'])
         # we compare the hash instead of the direct value to avoid a timing attack
         return sha2(expected).digest() == sha2(received).digest()
 
@@ -102,9 +102,9 @@ class SymmetricCryptoAbstraction(object):
     >>> from charm.toolbox.pairinggroup import PairingGroup,GT,extract_key
     >>> groupObj = PairingGroup('SS512')
     >>> a = SymmetricCryptoAbstraction(extract_key(groupObj.random(GT)))
-    >>> ct = a.encrypt(b"Friendly Fire Isn't")
+    >>> ct = a.encrypt("Friendly Fire Isn't")
     >>> a.decrypt(ct)
-    b"Friendly Fire Isn't"
+    "Friendly Fire Isn't"
     """
 
     def __init__(self, key, alg = AES, mode = MODE_CBC):
@@ -134,12 +134,12 @@ class SymmetricCryptoAbstraction(object):
         return self.__encode_decode(data, lambda x: b64encode(x).decode('utf-8'))
 
     def _decode(self, data):
-        return self.__encode_decode(data, lambda x: b64decode(bytes(x, 'utf-8')))
+        return self.__encode_decode(data, lambda x: b64decode(x))
 
     def encrypt(self, message):
         #This should be removed when all crypto functions deal with bytes"
         if type(message) != bytes :
-            message = bytes(message, "utf-8")
+            message = bytes(message)
         ct = self._encrypt(message)
         #JSON strings cannot have binary data in them, so we must base64 encode cipher
         cte = json.dumps(self._encode(ct))
@@ -174,15 +174,12 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
     --------
     >>> from hashlib import sha256
     >>> import charm.toolbox.symcrypto
-    >>> key = sha256(b'shameful secret key').digest()
+    >>> key = sha256('shameful secret key').digest()
     >>> cipher = charm.toolbox.symcrypto.AuthenticatedCryptoAbstraction(key)
     >>> ciphertext = cipher.encrypt('My age is 42.')
     >>> cipher.decrypt(ciphertext)
-    b'My age is 42.'
-    >>> ciphertext2 = cipher.encrypt(b'My age is 42.')
-    >>> cipher.decrypt(ciphertext2)
-    b'My age is 42.'
-    >>> ad = b'\x10\x11\x11\x11'
+    'My age is 42.'
+    >>> ad = '\x10\x11\x11\x11'
     >>> ciphertextAssociatedData = cipher.encrypt('Some network PDU.', associatedData=ad)
     >>> cipher.decrypt(ciphertextAssociatedData)
     Traceback (most recent call last):
@@ -196,11 +193,11 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
       File "./charm/toolbox/symcrypto.py", line 233, in decrypt
         raise ValueError("Invalid mac. Your data was tampered with or your key is wrong")
     ValueError: Invalid mac. Your data was tampered with or your key is wrong
-    >>> cipher.decrypt(ciphertextAssociatedData, associatedData=b'\x10\x11\x11\x11')
-    b'Some network PDU.'
+    >>> cipher.decrypt(ciphertextAssociatedData, associatedData='\x10\x11\x11\x11')
+    'Some network PDU.'
     >>>
     """
-    def encrypt(self, msg, associatedData=''):
+    def encrypt(self, msg, associatedData=b''):
         """
         Encrypts a message in AEAD mode (Authenticated Encryption with Associated Data) using the superclass symmetric encryption parameters.
         The MAC is computed with both the ciphertext and associated data (and other cryptosystem parameters), but the associated data is not encrypted, nor

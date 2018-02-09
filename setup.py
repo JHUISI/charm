@@ -87,10 +87,11 @@ else:
     except IOError as e:
         print("Warning, using default config vaules.")
         print("You probably want to run ./configure.sh first.")
-        opt = {'PAIR_MOD':'yes',
-                'USE_PBC':'yes',
-                'INT_MOD':'yes',
-                'ECC_MOD':'yes'
+        opt = {'PAIR_MOD'       :'yes',
+                'USE_PBC'       :'yes',
+                'INT_MOD'       :'yes',
+                'ECC_MOD'       :'yes',
+                'BUILD_ANDROID' :'no'
                 }
 
 core_path = 'charm/core/'
@@ -146,6 +147,18 @@ else:
 
 _charm_version = opt.get('VERSION')
 lib_config_file = 'charm/config.py'
+# add option for building on android
+lang="c"  
+linkargs=[]
+libdirs=[]
+
+if opt.get('BUILD_ANDROID')=='yes':
+    from py4a import patch_distutils
+    patch_distutils()
+    
+    linkargs=["--sysroot="+os.environ.get("SYSROOT")]
+    libdirs=[os.environ.get("NDK")+"/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi"]
+
 inc_dirs = [s[2:] for s in opt.get('CHARM_CFLAGS').split() if s.startswith('-I')]
 library_dirs = [s[2:] for s in opt.get('LDFLAGS').split() if s.startswith('-L')]
 runtime_library_dirs = [s[11:] for s in opt.get('LDFLAGS').split()
@@ -158,8 +171,10 @@ if opt.get('PAIR_MOD') == 'yes':
                                             benchmark_path] + inc_dirs,
                             sources = [math_path+'pairing/pairingmodule.c', 
                                         utils_path+'base64.c'],
-                            libraries=['pbc', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
-                            library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
+                            extra_link_args=linkargs,
+                            library_dirs=libdirs,
+                            language=lang,
+                            libraries=['pbc', 'gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
 
     elif opt.get('USE_RELIC') == 'yes':
         # check if RELIC lib has been built. if not, bail
@@ -188,9 +203,11 @@ if opt.get('PAIR_MOD') == 'yes':
                                             benchmark_path, miracl_inc],
                             sources = [math_path + 'pairing/miracl/pairingmodule2.c',
                                         math_path + 'pairing/miracl/miracl_interface2.cc'],
-                            libraries=['gmp', 'crypto', 'stdc++'], define_macros=_macros, undef_macros=_undef_macro,
-                            extra_objects=[miracl_lib], extra_compile_args=None,
-                            library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
+                            libraries=['gmp','crypto','stdc++'], define_macros=_macros, undef_macros=_undef_macro,
+                            extra_link_args=linkargs,
+                            library_dirs=libdirs,
+                            language='c++',
+                            extra_objects=[miracl_lib], extra_compile_args=None)
 
     _ext_modules.append(pairing_module)
    
@@ -200,9 +217,11 @@ if opt.get('INT_MOD') == 'yes':
                             include_dirs = [utils_path,
                                             benchmark_path] + inc_dirs,
                             sources = [math_path + 'integer/integermodule.c', 
-                                        utils_path + 'base64.c'], 
-                            libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
-                            library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
+                                        utils_path + 'base64.c'],
+                            extra_link_args=linkargs,
+                            library_dirs=libdirs,
+                            language=lang,
+                            libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
    _ext_modules.append(integer_module)
    
 if opt.get('ECC_MOD') == 'yes':
@@ -211,28 +230,39 @@ if opt.get('ECC_MOD') == 'yes':
                 include_dirs = [utils_path,
                                 benchmark_path] + inc_dirs,
 				sources = [math_path + 'elliptic_curve/ecmodule.c',
-                            utils_path + 'base64.c'], 
-				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
-                library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
+                            utils_path + 'base64.c'],
+                extra_link_args=linkargs,
+                            library_dirs=libdirs,
+                            language=lang,
+				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro)
    _ext_modules.append(ecc_module)
 
-benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
+benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'],extra_link_args=linkargs , language=lang ,library_dirs=libdirs)
 
-cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [cryptobase_path + 'cryptobasemodule.c'])
+cryptobase = Extension(crypto_prefix+'.cryptobase', sources = [cryptobase_path + 'cryptobasemodule.c'],extra_link_args=linkargs,language=lang, library_dirs=libdirs)
 
 aes = Extension(crypto_prefix + '.AES',
                     include_dirs = [cryptobase_path],
+                    extra_link_args=linkargs,
+                    library_dirs=libdirs,
+                            language=lang,
                     sources = [crypto_path + 'AES/AES.c'])
 
 des  = Extension(crypto_prefix + '.DES',
                     include_dirs = [cryptobase_path + 'libtom/',
                                     cryptobase_path],
+                    extra_link_args=linkargs,
+                    library_dirs=libdirs,
+                            language=lang,
                     sources = [crypto_path + 'DES/DES.c'])
 
 des3  = Extension(crypto_prefix + '.DES3',
                     include_dirs = [cryptobase_path + 'libtom/',
                                     cryptobase_path,
                                     crypto_path + 'DES/'], 
+                    extra_link_args=linkargs,
+                    library_dirs=libdirs,
+                            language=lang,
                     sources = [crypto_path + 'DES3/DES3.c'])
 
 _ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
@@ -252,7 +282,7 @@ setup(name = 'Charm-Crypto',
 	author_email = "ayo.akinyele@charm-crypto.com",
 	url = "http://charm-crypto.io/",
     install_requires = ['setuptools',
-                        'pyparsing >= 1.5.5'],
+                        'pyparsing >= 1.5.5, <=1.5.7'],
     tests_require=['pytest'],
 	packages = ['charm',
                     'charm.core',

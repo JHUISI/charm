@@ -12,7 +12,7 @@ Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            12/2010
 '''
-
+from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEnc import ABEnc
@@ -69,7 +69,7 @@ class KPabe(ABEnc):
             y = util.strip_index(x)
             d = []; r = group.random(ZR)
             if not self.negatedAttr(x): # meaning positive
-                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(y, G1) ** r))   # compute D1 for attribute x
+                d.append((pk['g_G1'] ** (mk['alpha2'] * shares[x])) * (group.hash(unicode(y), G1) ** r))   # compute D1 for attribute x
                 d.append((pk['g_G2'] ** r))  # compute D2 for attribute x
             #else:
                 #d.append((pk['g2_G1'] ** shares[x]) * (pk['g_G1_b2'] ** r)) # compute D3
@@ -78,10 +78,11 @@ class KPabe(ABEnc):
             D[x] = d
         if debug: print("Access Policy for key: %s" % policy)
         if debug: print("Attribute list: %s" % attr_list)
+        D['policy'] = unicode(policy_str)
         return D
     
     def negatedAttr(self, attribute):
-        if type(attribute) != str: attr = attribute.getAttribute()
+        if type(attribute) not in [str, unicode]: attr = attribute.getAttribute()
         else: attr = attribute
         if attr[0] == '!':
             if debug: print("Checking... => %s" % attr[0])
@@ -101,10 +102,12 @@ class KPabe(ABEnc):
         #E4, E5 = {}, {}
         for i in range(len(attr_list)):
             attr = attr_list[i]
-            E3[attr] = group.hash(attr, G1) ** s
+            E3[attr] = group.hash(unicode(attr), G1) ** s
             #E4[attr] = pk['g_G1_b'] ** sx[i]
             #E5[attr] = (pk['g_G1_b2'] ** (sx[i] * group.hash(attr))) * (pk['h_G1_b'] ** sx[i])
-        
+
+        attr_list = [unicode(a) for a in attr_list]
+            
         E1 = (pk['e(gg)_alpha'] ** s) * M
         E2 = pk['g_G2'] ** s
         return {'E1':E1, 'E2':E2, 'E3':E3, 'attributes':attr_list }

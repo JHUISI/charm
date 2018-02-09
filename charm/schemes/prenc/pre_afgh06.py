@@ -8,7 +8,7 @@ AFGH Proxy Re-Encryption
 * setting:        Pairing groups (Type 1 "symmetric")
 * assumption:     eDBDH (Extended Decisional Bilinear DH)
 * to-do:          first-level encryption & second-level decryption
-:Authors:    D. Nuñez
+:Authors:    D. Nunez
 :Date:       04/2016
 '''
 

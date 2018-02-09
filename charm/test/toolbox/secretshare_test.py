@@ -17,7 +17,7 @@ class SecretShareTest(unittest.TestCase):
 
           K = shares[0]
           if debug: print('\nOriginal secret: %s' % K)
-          y = {group.init(ZR, 1):shares[1], group.init(ZR, 2):shares[2], group.init(ZR, 3):shares[3]}
+          y = {group.init(ZR, long(1)):shares[1], group.init(ZR, long(2)):shares[2], group.init(ZR, long(3)):shares[3]}
 
           secret = s.recoverSecret(y)
 

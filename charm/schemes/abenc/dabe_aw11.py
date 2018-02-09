@@ -101,6 +101,7 @@ class Dabe(ABEncMultiAuth):
             print("Key gen for %s on %s" % (gid, i))
             print("H(GID): '%s'" % h)
             print("K = g^alpha_i * H(GID) ^ y_i: %s" % K)
+
         return None
 
     def encrypt(self, gp, pk, M, policy_str):

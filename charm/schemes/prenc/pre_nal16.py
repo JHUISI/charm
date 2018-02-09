@@ -8,7 +8,7 @@ NAL16 Proxy Re-Encryption
 * setting:        Pairing groups (Type 1 "symmetric")
 * assumption:     3-wDBDHI (3-weak Decisional Bilinear DH Inversion)
 * to-do:          first-level encryption & second-level decryption, type annotations
-:Authors:    D. Nuñez
+:Authors:    D. Nunez
 :Date:       04/2016
 '''
 

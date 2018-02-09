@@ -149,7 +149,7 @@ class Sig_RSA_Stateless_HW09(PKSig):
         # Compute B = SQRT(u^x * h)^ceil(log_2(s)) mod N
         # Note that SQRT requires the factorization p, q
         temp = ((u ** x) * h) % N
-        power = ((((p-1)*(q-1))+4)/8) ** (math.ceil(log[2](s)))
+        power = ((((p-1)*(q-1))+4)/8) ** int(math.ceil(log[2](s)))
         B = temp ** power
         sigma1 = (B ** (e ** -1)) % N
 
@@ -164,7 +164,7 @@ class Sig_RSA_Stateless_HW09(PKSig):
         K, L, c, keyLength, u, h, N = pk['K'], pk['L'], pk['c'], pk['length'], pk['u'], pk['h'], pk['N']
     
         # Make sure that 0 < s < 2^{keylength/2}, else reject the signature
-        if not (0 < s and s < (2 ** (keyLength/2))):
+        if not (0 < s and s < (2 ** int(keyLength/2))):
             return False
 
         # Compute e = H_k(s) and reject the signature if it's not prime
@@ -174,7 +174,7 @@ class Sig_RSA_Stateless_HW09(PKSig):
             return False
         
         # Compute Y = sigma1^{2*ceil(log2(s))}
-        s1 = integer(2 ** (math.ceil(log[2](s))))
+        s1 = integer(2 ** int(math.ceil(log[2](s))))
         Y = (sigma1 ** s1) % N
         
         # Hash the mesage using the chameleon hash with fixed randomness r

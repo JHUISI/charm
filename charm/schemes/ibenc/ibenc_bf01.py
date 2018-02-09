@@ -26,10 +26,10 @@ class IBE_BonehFranklin(IBEnc):
     >>> (master_public_key, master_secret_key) = ibe.setup()
     >>> ID = 'user@email.com'
     >>> private_key = ibe.extract(master_secret_key, ID)
-    >>> msg = b"hello world!!!!!"
+    >>> msg = "hello world!!!!!"
     >>> cipher_text = ibe.encrypt(master_public_key, ID, msg)
     >>> ibe.decrypt(master_public_key, private_key, cipher_text)
-    b'hello world!!!!!'
+    'hello world!!!!!'
     """
     def __init__(self, groupObj):
         IBEnc.__init__(self)

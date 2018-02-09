@@ -12,6 +12,7 @@ Pascal Paillier (Public-Key)
 :Authors:    J Ayo Akinyele
 :Date:       4/2011 (updated 2/2016)
 '''
+from __future__ import print_function
 from charm.toolbox.integergroup import lcm,integer,toInt
 from charm.toolbox.PKEnc import PKEnc
 

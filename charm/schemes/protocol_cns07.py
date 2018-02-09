@@ -52,7 +52,7 @@ class ObliviousTransfer(Protocol):
         if messages != None:
             self.M, self.sig = [], []
             for i in range(0, len(messages)):
-                self.M.append( bytes(messages[i], 'utf8') )
+                self.M.append(messages[i])
                 print("bytes =>", self.M[i],", message =>", messages[i])                
 #                self.M.append(self.group.hash(messages[i], ZR))
 #                self.sig.append(messages[i])

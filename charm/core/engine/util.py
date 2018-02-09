@@ -1,8 +1,3 @@
-"""
-The serialization API supports the following datatypes: dict, list, str, bytes, int, float, and whatever is supported by group.serialize and group.deserialize
-
-"""
-
 from __future__ import print_function
 import io, pickle
 import json, zlib
@@ -11,6 +6,8 @@ from charm.toolbox.bitstring import *
 
 def serializeDict(Object, group):
     bytes_object = {}
+    if not hasattr(group, 'serialize'):
+        return None
     if isinstance(Object, dict):
         for i in Object.keys():
             bytes_object[i]=serializeObject(Object[i],group)
@@ -22,18 +19,25 @@ def serializeList(Object, group):
         bytes_object_.append(serializeObject(i,group))
     return bytes_object_
 
-def serializeObject(Objects, group):
-    assert hasattr(group, 'serialize'), "group does not have serialize method"
+def serializeTuple(Object, group):
+    bytes_object_ = []
+    for i in Object:
+        bytes_object_.append(serializeObject(i,group))
+    return tuple(bytes_object_)
 
+
+def serializeObject(Objects, group):
     if type(Objects) == dict: 
        return serializeDict(Objects, group)
-    elif type(Objects) in [list,tuple]:
+    elif type(Objects) == list:
         return serializeList(Objects, group)
+    elif type(Objects) == tuple:
+        return serializeTuple(Objects, group)
     elif type(Objects) == str:
         return 'str:'+Objects
-    elif type(Objects) == bytes:
-        return 'bytes:'+Objects.decode('UTF-8')
-    elif type(Objects) in [int,float]: 
+    elif type(Objects) == unicode:
+        return 'uni:'+Objects
+    elif type(Objects) in [bytes,str,unicode,int,float]: 
        return Objects
     else:
         return group.serialize(Objects)
@@ -41,6 +45,9 @@ def serializeObject(Objects, group):
 
 def deserializeDict(Object, group):
     bytes_object = {}
+    if not hasattr(group, 'deserialize'):
+       return None
+
     for i in Object.keys():
         bytes_object[i] = deserializeObject(Object[i], group)
     return bytes_object
@@ -58,28 +65,26 @@ def deserializeTuple(Object, group):
     return tuple(_bytes_object)
 
 def deserializeObject(Objects, group):
-    assert hasattr(group, 'deserialize'), "group does not have deserialize method"
-
     if type(Objects) == dict: 
        return deserializeDict(Objects, group)
     elif type(Objects) == list:
         return deserializeList(Objects, group)
     elif type(Objects) == tuple:
         return deserializeTuple(Objects, group)
-    elif type(Objects) == str:
+    elif type(Objects) in [str,unicode]:
         tmp=Objects.split(':',1)
         (t,obj)=(tmp[0],tmp[1])
         if t=='str':
             return str(obj)
-        elif t=='bytes':
-            return getBytes(obj)
-    elif type(Objects) == bytes:
-        return group.deserialize(Objects)
+        elif t=='uni':
+            return unicode(obj)
+        else:
+            return group.deserialize(bytes(Objects))
     else:
         return Objects
     
 def pickleObject(Object):
-    valid_types = [bytes, dict, list, str, int]    
+    valid_types = [bytes, dict, list, str, int, unicode]    
     file = io.BytesIO()
     # check that dictionary is all bytes (if not, return None)
     if isinstance(Object, dict):
@@ -97,6 +102,8 @@ def pickleObject(Object):
 def unpickleObject(Object):
     if type(Object) == str:
        byte_object = Object
+    elif type(Object) == unicode:
+       byte_object = unicode(Object)
     else:
        return None
     decoded = b64decode(byte_object)
@@ -109,16 +116,12 @@ def unpickleObject(Object):
 def to_json(object):
     if isinstance(object, bytes):
         return {'__class__': 'bytes', '__value__': list(object) }
-    elif isinstance(object, tuple):
-        return {'__class__': 'tuple', '__value__': list(object) }
     return TypeError(repr(python_ob) + " is not JSON serializable")
 
 def from_json(json_object):
     if '__class__' in json_object:
         if json_object['__class__'] == 'bytes':
             return bytes(json_object['__value__'])
-        elif json_object['__class__'] == 'tuple':
-            return tuple(json_object['__value__'])
     return json_object
 
 # Two new API calls to simplify serializing to a blob of bytes

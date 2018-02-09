@@ -7,7 +7,7 @@ BBS Proxy Re-Encryption
 * properties:     CPA-secure, bidirectional, multihop, not collusion-resistant, interactive, transitive
 * setting:        DDH-hard EC groups of prime order (F_p) or Integer Groups
 * assumption:     DDH
-:Authors:    D. Nuñez (dnunez@lcc.uma.es)
+:Authors:    D. Nunez (dnunez@lcc.uma.es)
 :Date:       04/2016
 '''
 

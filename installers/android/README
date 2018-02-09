@@ -1,0 +1,30 @@
+This directory contains scripts to assist in cross compiling charm for android.
+
+First, create an empty directory to work in. This will be refered to as $BD.
+This directory will be refered to as $SCRIPTS
+Into this directory, download and decrompress charm and its dependencies. The folder should contain the following subdirectories
+
+android-ndk-r8e (http://developer.android.com/tools/sdk/ndk/index.html)
+android-sdk-linux (http://developer.android.com/sdk/index.html)
+android-python27 (http://code.google.com/p/android-python27/source/checkout)
+gmp (http://gmplib.org/#DOWNLOAD) - use 6.0.0a, since 5.1.3 has serious 14x performance regression (5.0.2 is only 6% slower but was tested/compiled with --disable-assembly as per upstream)
+pbc (http://crypto.stanford.edu/pbc/download.html) - use version 0.5.14, earlier versions crash when embedded in multi-threaded applications
+charm (http://www.charm-crypto.com/Main.html)
+python-lib (from the PY4A project) (https://code.google.com/p/python-for-android/)
+
+Replace the config.sub and config.guess files in the gmp and pbc directories with the ones from this folder.
+
+At the beginning of each script is a definition for the $BD variable. Either set these to the path of the directory you just created, or set BD to said directory in your shell
+
+To build the dependencies:
+cd $BD/android-python27 && $SCRIPTS/python.sh
+cd $BD/gmp && $SCRIPTS/gmp.sh
+cd $BD/pbc && $SCRIPTS/pbc.sh
+cd $BD/charm && $SCRIPTS/charm.sh
+
+Finnally, to package charm into a zip, run:
+cd $BD && $SCRIPTS/collect.sh
+
+This will create a file at $BD/out/python_27.zip. This zip contains the cross compile python, charm, and dependencies.
+
+Manually copy the pyparsing.py file into the resulting .zip file (inside the site-packages folder)

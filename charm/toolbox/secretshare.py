@@ -2,15 +2,20 @@
 from charm.toolbox.pairinggroup import PairingGroup,ZR,order
 
 class SecretShare:
-    def __init__(self, element, verbose_status=True):
+    def __init__(self, element, verbose_status=False):
         self.elem = element
         self.verbose = verbose_status
         
     def P(self, coeff, x):
-        share = 0
+        share = self.elem.init(ZR, 0)
+#        share = 0
+#        x = self.elem.init(ZR, x)
+#        if(type(x) == int):
+#            x = self.elem.init(ZR, long(x))
         # evaluate polynomial
         for i in range(0, len(coeff)):
-            share += (coeff[i] * (x ** i))
+            i2 = self.elem.init(ZR, long(i))
+            share += (coeff[i] * (x ** long(i)))
         return share
 
     def genShares(self, secret, k=0, n=0, q=None, x_points=None):
@@ -46,7 +51,8 @@ class SecretShare:
     def recoverCoefficients(self, list):
         coeff = {}
         for i in list:
-            result = 1
+            result = self.elem.init(ZR, long(1))
+#            result = 1
             for j in list:
                 if not (i == j):
                     # lagrange basis poly
@@ -73,7 +79,8 @@ class SecretShare:
         if self.verbose: print(list)
         coeff = self.recoverCoefficients(list)
         if self.verbose: print("coefficients: ", coeff)
-        secret = 0
+        secret = self.elem.init(ZR, 0)
+#        secret = 0
         for i in list:
             secret += (coeff[i] * shares[i])
 
