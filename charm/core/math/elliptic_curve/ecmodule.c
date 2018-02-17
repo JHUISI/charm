@@ -63,21 +63,28 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 }
 
 void setBigNum(PyLongObject *obj, BIGNUM **value) {
-	mpz_t tmp;
-	mpz_init(tmp);
-	// convert long object into an mpz_t type
-	longObjToMPZ(tmp, obj);
-	// now convert tmp into a decimal string
-	size_t tmp_len = mpz_sizeinbase(tmp, BASE_DEC) + 2;
-	char *tmp_str = (char *) malloc(tmp_len);
-	tmp_str = mpz_get_str(tmp_str, BASE_DEC, tmp);
-	debug("Element => '%s'\n", tmp_str);
-	//debug("Order of Element => '%zd'\n", tmp_len);
+  mpz_t tmp;
+  mpz_init(tmp);
+  // convert long object into an mpz_t type
+#if PY_MAJOR_VERSION < 3
+  PyObject *longObj2 = PyNumber_Long(obj);
+  longObjToMPZ(tmp, (PyLongObject *) longObj2);
+  Py_DECREF(longObj2);
+#else
+  /* for Python 3.x */
+  longObjToMPZ(tmp, (PyLongObject *) obj);
+#endif
+  // now convert tmp into a decimal string
+  size_t tmp_len = mpz_sizeinbase(tmp, BASE_DEC) + 2;
+  char *tmp_str = (char *) malloc(tmp_len);
+  tmp_str = mpz_get_str(tmp_str, BASE_DEC, tmp);
+  debug("Element => '%s'\n", tmp_str);
+  //debug("Order of Element => '%zd'\n", tmp_len);
 
-	// use BN_* to set decimal to BIGNUM
-	BN_dec2bn(value, (const char *) tmp_str);
-	free(tmp_str);
-	mpz_clear(tmp);
+  // use BN_* to set decimal to BIGNUM
+  BN_dec2bn(value, (const char *) tmp_str);
+  free(tmp_str);
+  mpz_clear(tmp);
 }
 
 /*!
