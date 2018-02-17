@@ -31,8 +31,10 @@ class ECGroup():
     def groupType(self): 
         return self.param
 
-    def init(self, _type=ZR):
-        """initializes an object with a specified type and value"""        
+    def init(self, _type=ZR, value=None):
+        """initializes an object with a specified type and value"""
+        if value is not None:
+            return init(self.ec_group, _type, value)
         return init(self.ec_group, _type)
     
     def random(self, _type=ZR):

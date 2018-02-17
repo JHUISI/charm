@@ -248,89 +248,92 @@ PyObject *ECGroup_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
 int ECGroup_init(ECGroup *self, PyObject *args, PyObject *kwds)
 {
-	PyObject *pObj = NULL, *aObj = NULL, *bObj = NULL;
-	char *params = NULL, *param_string = NULL;
-	int pf_len, ps_len, nid;
-    static char *kwlist[] = {"params", "param_string", "p", "a", "b", "nid", NULL};
+  PyObject *pObj = NULL, *aObj = NULL, *bObj = NULL;
+  char *params = NULL, *param_string = NULL;
+  int pf_len, ps_len, nid;
+  static char *kwlist[] = {"params", "param_string", "p", "a", "b", "nid", NULL};
 
-    if (! PyArg_ParseTupleAndKeywords(args, kwds, "|s#s#OOOi", kwlist,
-                                      &params, &pf_len, &param_string, &ps_len,
-									  &pObj, &aObj, &bObj, &nid)) {
+  if (! PyArg_ParseTupleAndKeywords(args, kwds, "|s#s#OOOi", kwlist,
+                                   &params, &pf_len, &param_string, &ps_len,
+                                   &pObj, &aObj, &bObj, &nid)) {
+    return -1;
+  }
+
+  debug("initializing object...\n");
+  if(pObj && aObj && bObj && !params && !param_string && !nid) {
+    // p, a, and b curve parameters are set...
+    if(!PyLong_Check(pObj) || !PyLong_Check(aObj) || !PyLong_Check(bObj))
+    {
+      return -1;
+    }
+
+    BIGNUM *p,*a,*b;
+    p = BN_new();
+    setBigNum((PyLongObject *) pObj, &p);
+
+    // make sure p is prime then continue loading a and b parameters for EC
+    if(BN_is_prime_ex(p, BN_prime_checks, self->ctx, NULL) != 1) {
+      debug("p is not prime.\n");
+      BN_free(p);
+      PyErr_SetString(PyECErrorObject, "p must be a prime integer.");
+      return -1;
+    }
+
+    a = BN_new();
+    b = BN_new();
+    setBigNum((PyLongObject *) aObj, &a);
+    setBigNum((PyLongObject *) bObj, &b);
+    debug("p (bn) is now '%s'\n", BN_bn2dec(p));
+    debug("a (bn) is now '%s'\n", BN_bn2dec(a));
+    debug("b (bn) is now '%s'\n", BN_bn2dec(b));
+    // now we can instantiate the ec_group
+    self->ec_group = EC_GROUP_new_curve_GFp(p, a, b, self->ctx);
+    if(!self->ec_group) {
+      EC_GROUP_free(self->ec_group);
+      PyErr_SetString(PyECErrorObject, "could not initialize ec group.");
+      BN_free(p);
+      BN_free(a);
+      BN_free(b);
+      return -1;
+    }
+    BN_free(p);
+    BN_free(a);
+    BN_free(b);
+    debug("Now, we're finished.\n");
+  }
+  // check if builtin curve specified.
+  else if(nid > 0 && !pObj && !aObj && !bObj && !params && !param_string) {
+    debug("nid => %d == %s...\n", nid, OBJ_nid2sn(nid));
+    self->ec_group = EC_GROUP_new_by_curve_name(nid);
+    if(self->ec_group == NULL) {
+      EC_GROUP_free(self->ec_group);
+      printf("could not find curve: error code = %s.", OBJ_nid2sn(nid));
+      PyErr_SetString(PyECErrorObject, "can't find specified curve.");
+      return -1;
+    }
+#ifdef DEBUG
+		printf("OK!\n");
+#endif
+    debug("ec group check...\n");
+    if(!EC_GROUP_check(self->ec_group, self->ctx)) {
+        EC_GROUP_free(self->ec_group);
+        PyErr_SetString(PyECErrorObject, "group check failed, try another curve.");
         return -1;
-	}
-
-    debug("initializing object...\n");
-    if(pObj && aObj && bObj && !params && !param_string && !nid) {
-    	// p, a, and b curve parameters are set...
-    	if(!PyLong_Check(pObj) || !PyLong_Check(aObj) || !PyLong_Check(bObj)) { return -1; }
-
-    	BIGNUM *p,*a,*b;
-    	p = BN_new();
-    	setBigNum((PyLongObject *) pObj, &p);
-
-    	// make sure p is prime then continue loading a and b parameters for EC
-    	if(BN_is_prime_ex(p, BN_prime_checks, self->ctx, NULL) != 1) {
-    		debug("p is not prime.\n");
-    		BN_free(p);
-    		PyErr_SetString(PyECErrorObject, "p must be a prime integer.");
-    		return -1;
-    	}
-
-    	a = BN_new();
-    	b = BN_new();
-		setBigNum((PyLongObject *) aObj, &a);
-		setBigNum((PyLongObject *) bObj, &b);
-		debug("p (bn) is now '%s'\n", BN_bn2dec(p));
-		debug("a (bn) is now '%s'\n", BN_bn2dec(a));
-		debug("b (bn) is now '%s'\n", BN_bn2dec(b));
-    	// now we can instantiate the ec_group
-    	self->ec_group = EC_GROUP_new_curve_GFp(p, a, b, self->ctx);
-    	if(!self->ec_group) {
-    		EC_GROUP_free(self->ec_group);
-    		PyErr_SetString(PyECErrorObject, "could not initialize ec group.");
-    		BN_free(p);
-    		BN_free(a);
-    		BN_free(b);
-    		return -1;
-    	}
-    	BN_free(p);
-    	BN_free(a);
-    	BN_free(b);
-    	debug("Now, we're finished.\n");
     }
-    // check if builtin curve specified.
-    else if(nid > 0 && !pObj && !aObj && !bObj && !params && !param_string) {
-    	debug("nid => %d == %s...\n", nid, OBJ_nid2sn(nid));
-    	self->ec_group = EC_GROUP_new_by_curve_name(nid);
-    	if(self->ec_group == NULL) {
-    		EC_GROUP_free(self->ec_group);
-    		printf("could not find curve: error code = %s.", OBJ_nid2sn(nid));
-    		PyErr_SetString(PyECErrorObject, "can't find specified curve.");
-    		return -1;
-    	}
+    self->nid = nid;
 #ifdef DEBUG
 		printf("OK!\n");
 #endif
-    	debug("ec group check...\n");
-		if(!EC_GROUP_check(self->ec_group, self->ctx)) {
-    		EC_GROUP_free(self->ec_group);
-    		PyErr_SetString(PyECErrorObject, "group check failed, try another curve.");
-    		return -1;
-		}
-		self->nid = nid;
-#ifdef DEBUG
-		printf("OK!\n");
-#endif
-    }
-    else {
-		PyErr_SetString(PyECErrorObject, "invalid input. try again.");
-		return -1;
-    }
+  }
+  else {
+    PyErr_SetString(PyECErrorObject, "invalid input. try again.");
+    return -1;
+  }
 
-	// obtain the order of the elliptic curve and store in group object
-	EC_GROUP_get_order(self->ec_group, self->order, self->ctx);
-	self->group_init = TRUE;
-    return 0;
+  // obtain the order of the elliptic curve and store in group object
+  EC_GROUP_get_order(self->ec_group, self->order, self->ctx);
+  self->group_init = TRUE;
+  return 0;
 }
 
 PyObject *ECElement_call(ECElement *intObject, PyObject *args, PyObject *kwds) {
@@ -352,65 +355,77 @@ PyObject *ECGroup_print(ECGroup *self) {
 	char *bstr = BN_bn2dec(b);
 	PyObject *strObj = PyUnicode_FromFormat("Curve '%s' => y^2 = x^3 + a*x + b  (mod p):\np = %s\na = %s\nb = %s", id, (const char *) pstr,
 											(const char *) astr, (const char *) bstr);
-	OPENSSL_free(pstr); OPENSSL_free(astr); OPENSSL_free(bstr);
-	BN_free(p); BN_free(a); BN_free(b);
+	OPENSSL_free(pstr);
+	OPENSSL_free(astr);
+	OPENSSL_free(bstr);
+	BN_free(p);
+	BN_free(a);
+	BN_free(b);
 	return strObj;
 }
 
 PyObject *ECElement_print(ECElement *self) {
-	if(self->type == ZR) {
-		if(!self->point_init)
-			return PyUnicode_FromString("");
-		char *Zstr = BN_bn2dec(self->elemZ);
-		PyObject *strObj = PyUnicode_FromString((const char *) Zstr);
-		OPENSSL_free(Zstr);
-		return strObj;
-	}
-	else if(self->type == G) {
-		if(!self->point_init)
-			return PyUnicode_FromString("");
-		VERIFY_GROUP(self->group);
+  if(self->type == ZR) {
+    if(!self->point_init)
+      return PyUnicode_FromString("");
+    char *Zstr = BN_bn2dec(self->elemZ);
+    PyObject *strObj = PyUnicode_FromString((const char *) Zstr);
+    OPENSSL_free(Zstr);
+    return strObj;
+  }
+  else if(self->type == G) {
+    if(!self->point_init)
+      return PyUnicode_FromString("");
+    VERIFY_GROUP(self->group);
 
-		BIGNUM *x = BN_new(), *y = BN_new();
-		EC_POINT_get_affine_coordinates_GFp(self->group->ec_group, self->P, x, y, self->group->ctx);
-		char *xstr = BN_bn2dec(x);
-		char *ystr = BN_bn2dec(y);
-		//debug("P -> x = %s\n", xstr);
-		//debug("P -> y = %s\n", ystr);
-		PyObject *strObj = PyUnicode_FromFormat("[%s, %s]", (const char *)xstr, (const char *)ystr);
-		OPENSSL_free(xstr);
-		OPENSSL_free(ystr);
-		BN_free(x);
-		BN_free(y);
-		return strObj;
-	}
+    BIGNUM *x = BN_new(), *y = BN_new();
+    EC_POINT_get_affine_coordinates_GFp(self->group->ec_group, self->P, x, y, self->group->ctx);
+    char *xstr = BN_bn2dec(x);
+    char *ystr = BN_bn2dec(y);
+    //debug("P -> x = %s\n", xstr);
+    //debug("P -> y = %s\n", ystr);
+    PyObject *strObj = PyUnicode_FromFormat("[%s, %s]", (const char *)xstr, (const char *)ystr);
+    OPENSSL_free(xstr);
+    OPENSSL_free(ystr);
+    BN_free(x);
+    BN_free(y);
+    return strObj;
+  }
 
-	return (PyObject *) PyUnicode_FromString("");
+  return (PyObject *) PyUnicode_FromString("");
 }
 
 PyObject *ECE_init(ECElement *self, PyObject *args) {
-	GroupType type = NONE_G;
-	ECElement *obj;
-	ECGroup *gobj = NULL;
+  GroupType type = NONE_G;
+  ECElement *obj;
+  ECGroup *gobj = NULL;
+  PyObject *long_obj = NULL;
 
-	if(PyArg_ParseTuple(args, "Oi", &gobj, &type)) {
-		VERIFY_GROUP(gobj);
+  if(PyArg_ParseTuple(args, "Oi|O", &gobj, &type, &long_obj)) {
+    VERIFY_GROUP(gobj);
 
-		if(type == G) {
-			debug("init element in group G.\n");
-			obj = createNewPoint(G, gobj); // ->group, gobj->ctx);
-			return (PyObject *) obj;
-		}
-		else if(type == ZR) {
-			debug("init element of ZR.\n");
-			obj = createNewPoint(ZR, gobj); // ->group, gobj->ctx);
-			return (PyObject *) obj;
-		}
-		else {
-			EXIT_IF(TRUE, "invalid type selected.");
-		}
-	}
-	EXIT_IF(TRUE, "invalid argument.");
+    if(type == G) {
+      debug("init element in group G.\n");
+      obj = createNewPoint(G, gobj);
+      return (PyObject *) obj;
+    }
+    else if(type == ZR) {
+      debug("init element of ZR.\n");
+      obj = createNewPoint(ZR, gobj);
+      if(long_obj != NULL) {
+        if (_PyLong_Check(long_obj)) {
+          setBigNum((PyLongObject *) long_obj, &obj->elemZ);
+        } else {
+          EXIT_IF(TRUE, "expecting a number (int or long)");
+        }
+      }
+      return (PyObject *) obj;
+    }
+    else {
+      EXIT_IF(TRUE, "invalid type selected.");
+    }
+  }
+  EXIT_IF(TRUE, "invalid argument.");
 }
 
 PyObject *ECE_random(ECElement *self, PyObject *args)
