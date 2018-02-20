@@ -53,7 +53,48 @@
             
   <div class="section" id="changes-in-v0-50">
 <h1>Changes in v0.50<a class="headerlink" href="#changes-in-v0-50" title="Permalink to this headline">¶</a></h1>
-<p>TODO</p>
+<ul class="simple">
+<li>error handling updates to base modules</li>
+<li>CL03: length of e is now verified, verifyCommit() and header added</li>
+<li>SHA1(m_i) for doctest (verifyCommit) added</li>
+<li>added implementation of private aggregate of time series data by Marc Joye et al.</li>
+<li>added Abe’s blind signature scheme [AO00, A01]</li>
+<li>updated to install file for windows and nsis script.</li>
+<li>fixed typo in protocol_a00.py and protocol_ao00.py</li>
+<li>added hibenc_lew11.py</li>
+<li>added Goldwasser-Micali pkenc scheme</li>
+<li>added Leontiadis-Elkhyiaoui-Molva scheme</li>
+<li>added four more ABE schemes</li>
+<li>re-added Time-based proxy re-encryption scheme implementation for py3</li>
+<li>added non-monotonic CP-ABE scheme by Yamada, Attrapadung, Hanaoka, Kunihiro</li>
+<li>update libtomcrypt headers to v1.17</li>
+<li>fix configure.sh: detect python better. thanks to Neal H. Walfield</li>
+<li>fix decrypt error when plaintext=0 for Paillier scheme. Closes #97</li>
+<li>added BBS98 proxy re-encryption scheme</li>
+<li>added omplementation of AFGH06 scheme</li>
+<li>interface for Proxy Re-Encryption schemes (charm.toolbox.PREnc)</li>
+<li>adapted BBS98 to PREnc interface</li>
+<li>added first NAL16 scheme</li>
+<li>added NAL16b (CCA_21 version of NAL16a)</li>
+<li>added scheme from Rouselakis and Waters (maabe_rw12.py)</li>
+<li>added hash support to wrapped pbc ecc elements (pairingmodule.c)</li>
+<li>added support for uncompressed curves elements (de)serialization.</li>
+<li>improved arguments management in (de)serialize methods of the c pairingmodule.</li>
+<li>improved error management in deserialize c pairingmodule</li>
+<li>improved error management in pairing product routine of pairinggroup.c</li>
+<li>improved error handling for initialize and initPP, new preproc attribute.</li>
+<li>changed hash function from sha1 to sha256 everywhere appropriate</li>
+<li>simplified encode/decode of messages in ECGroups. Squashed some bugs related to BN_bin2bn/BN_bn2bin</li>
+<li>updated configure.sh to support ARM (android, raspberry pi, include armv7l support)</li>
+<li>renamed sha1 to sha2 and update version to v0.5</li>
+<li>added py2.7 compatibility for pairing group serialize/deserialize</li>
+<li>added Dockerfile to document installation process</li>
+<li>fixed compilation errors with OpenSSL 1.1.0 caused by API change</li>
+<li>ciphertext-policy ABE schemes implemented under asymmetric pairing groups. Any policy represented as a monotone span program can be handled.</li>
+<li>added support for Mac OS X 10.11+</li>
+<li>added documentation</li>
+<li>scheme contributions, bug fixes and/or various improvements from &#64;adelapie, &#64;leontiad, &#64;nikosft, &#64;0xwille, &#64;artjomb, &#64;cygnusv, &#64;lferr, &#64;denniss17, &#64;locksmithone, &#64;leafac, &#64;ElectroSuccess, &#64;sagrawal87. Thanks to all!</li>
+</ul>
 </div>
 
 
@@ -109,7 +150,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2013, Johns Hopkins University ISI.
-      Last updated on Feb 06, 2018.
+      Last updated on Feb 20, 2018.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
