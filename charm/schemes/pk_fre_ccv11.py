@@ -31,7 +31,7 @@ class InputEnc:
         i_sk = { 'a':a }
         return (i_pk, i_sk)
         
-    def encrypt(self, i_pk, i, M : G1):
+    def encrypt(self, i_pk, i, M):
         if i > i_pk['d'] or i < 0: 
             print("i not in d. try again!")
             return None        
@@ -49,7 +49,7 @@ class InputEnc:
 #        pi = proof(C, D, Cpr, Dpr) # group.hash((C, D, Cpr, Dpr), ZR)
         return (E, Epr, pi)
     
-    def decrypt(self, i_sk, ct, M : [G1]):
+    def decrypt(self, i_sk, ct, M):
         E, Epr, pi = ct
         C, D = E['C'], E['D']
         a = i_sk['a']
