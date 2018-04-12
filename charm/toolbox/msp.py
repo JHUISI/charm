@@ -25,9 +25,9 @@ class MSP:
          Convert a Boolean formula represented as a string into a policy represented like a tree.
         """
 
-        assert type(policy_string) in [str, unicode], "invalid type for policy_string"
-        if(type(policy_string) == str):
-            policy_string = unicode(policy_string)
+        assert type(policy_string) in [bytes, str], "invalid type for policy_string"
+        if type(policy_string) == bytes:
+            policy_string = policy_string.decode('utf-8')
         parser = PolicyParser()
         policy_obj = parser.parse(policy_string)
         _dictCount, _dictLabel = {}, {}
