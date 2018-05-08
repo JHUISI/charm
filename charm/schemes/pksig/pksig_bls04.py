@@ -12,11 +12,14 @@
 :Authors:    J. Ayo Akinyele
 :Date:       1/2011
  '''
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
+from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, pair
 from charm.core.engine.util import objectToBytes
 from charm.toolbox.IBSig import *
 
+
 debug = False
+
+
 class BLS01(IBSig):
     """
     >>> from charm.toolbox.pairinggroup import PairingGroup
@@ -55,6 +58,7 @@ class BLS01(IBSig):
             return True  
         return False 
 
+
 def main():
     groupObj = PairingGroup('MNT224')
     
@@ -69,7 +73,8 @@ def main():
     if debug: print("Signature: '%s'" % sig)     
     assert bls.verify(pk, sig, m), "Failure!!!"
     if debug: print('SUCCESS!!!')
-    
+
+
 if __name__ == "__main__":
     debug = True
     main()

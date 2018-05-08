@@ -136,6 +136,7 @@ def egcd(a, b):
     gcd = b
     return gcd, x, y
 
+
 def modinv(a, m):
     '''
         Finding modulo inverse of a mod m
