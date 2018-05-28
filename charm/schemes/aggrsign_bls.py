@@ -1,3 +1,15 @@
+''' BLS Multi-Signatures
+
+ | From: "Dan Boneh, Manu Drijvers, Gregory Neven. BLS Multi-Signatures With Public-Key Aggregation".
+ | Available from: https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html
+
+ * type:         signature (identity-based)
+ * setting:      bilinear groups (asymmetric)
+
+:Authors: Lovesh Harchandani
+:Date:    5/2018
+'''
+
 from functools import reduce
 
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, pair
@@ -28,17 +40,19 @@ class BLSAggregation:
         h = group.hash(M, G1)
         return pair(pk['g'], sig) == pair(h, pk['g^x'])
 
-    def aggregate_sigs(self, signatures):
+    def aggregate_sigs_vulnerable(self, signatures):
+        # This method of aggregation is vulnerable to rogue public key attack
         return self.product(signatures)
 
-    def verify_aggregate_sig(self, message, aggregate_sig, public_keys):
+    def verify_aggregate_sig_vulnerable(self, message, aggregate_sig, public_keys):
+        # This method of verification is vulnerable to rogue public key attack
         g = self.check_and_return_same_generator_in_public_keys(public_keys)
         M = self.dump(message)
         h = group.hash(M, G1)
         combined_pk = self.product([pk['g^x'] for pk in public_keys])
         return pair(g, aggregate_sig) == pair(combined_pk, h)
 
-    def aggregate_sigs_new(self, pubkey_signatures):
+    def aggregate_sigs_safe(self, pubkey_signatures):
         # This method of aggregation is resistant to rogue public key attack
         sigs = []
         for pk, sig in pubkey_signatures:
@@ -49,8 +63,8 @@ class BLSAggregation:
 
         return self.product(sigs)
 
-    def verify_aggregate_sig_new(self, message, aggregate_sig, public_keys):
-        # This method of aggregation is resistant to rogue public key attack
+    def verify_aggregate_sig_safe(self, message, aggregate_sig, public_keys):
+        # This method of verification is resistant to rogue public key attack
         g = self.check_and_return_same_generator_in_public_keys(public_keys)
         pks = []
         for pk in public_keys:
@@ -78,7 +92,7 @@ class BLSAggregation:
         return next(iter(gs))
 
 
-def simple():
+def vulnerable():
     groupObj = PairingGroup('MNT224')
 
     m = {'a': "hello world!!!", 'b': "test message"}
@@ -106,23 +120,23 @@ def simple():
     if debug:
         print('VERIFICATION SUCCESS!!!')
 
-    aggregate_sig = bls.aggregate_sigs([sig1, sig2, sig3])
+    aggregate_sig = bls.aggregate_sigs_vulnerable([sig1, sig2, sig3])
     if debug:
         print("Aggregate signature: '%s'" % aggregate_sig)
 
-    assert bls.verify_aggregate_sig(m, aggregate_sig, [pk1, pk2, pk3]), \
+    assert bls.verify_aggregate_sig_vulnerable(m, aggregate_sig, [pk1, pk2, pk3]), \
         'Failure!!!'
 
     if debug:
         print('AGGREGATION VERIFICATION SUCCESS!!!')
 
-    assert not bls.verify_aggregate_sig(m, aggregate_sig, [pk1, pk2])
+    assert not bls.verify_aggregate_sig_vulnerable(m, aggregate_sig, [pk1, pk2])
 
     if debug:
         print('AGGREGATION VERIFICATION SUCCESS AGAIN!!!')
 
 
-def rogue_public_key_attack():
+def demo_rogue_public_key_attack():
     # Attack mentioned here https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html
     groupObj = PairingGroup('MNT224')
 
@@ -130,25 +144,28 @@ def rogue_public_key_attack():
     bls = BLSAggregation(groupObj)
     g = group.random(G2)
 
+    pk0, sk0 = bls.keygen(g)
     pk1, sk1 = bls.keygen(g)
 
-    # Construct the attacker's public key (pk2) as g^beta * pk1^-1
-    pk1_inverse = 1 / pk1['g^x']
+    # Construct the attacker's public key (pk2) as `g^beta * (pk1*pk2)^-1`,
+    # i.e inverse of the product of all public keys that the attacker wants
+    # to forge the multi-sig over
+    pk_inverse = 1 / (BLSAggregation.product([pk0['g^x'], pk1['g^x']]))
     beta = group.random()
     pk2, _ = bls.keygen(g)
-    pk2['g^x'] = (g ** beta) * pk1_inverse
+    pk2['g^x'] = (g ** beta) * pk_inverse
 
     M = BLSAggregation.dump(m)
     h = group.hash(M, G1)
     fake_aggregate_sig = h ** beta
-    assert bls.verify_aggregate_sig(m, fake_aggregate_sig, [pk1, pk2]), \
+    assert bls.verify_aggregate_sig_vulnerable(m, fake_aggregate_sig, [pk0, pk1, pk2]), \
         'Failure!!!'
 
     if debug:
         print('ROGUE PUBLIC KEY ATTACK SUCCESS!!!')
 
 
-def new():
+def safe():
     groupObj = PairingGroup('MNT224')
 
     m = {'a': "hello world!!!", 'b': "test message"}
@@ -176,24 +193,24 @@ def new():
     if debug:
         print('VERIFICATION SUCCESS!!!')
 
-    aggregate_sig = bls.aggregate_sigs_new([(pk1, sig1), (pk2, sig2),
-                                            (pk3, sig3)])
+    aggregate_sig = bls.aggregate_sigs_safe([(pk1, sig1), (pk2, sig2),
+                                             (pk3, sig3)])
     if debug:
         print("Aggregate signature: '%s'" % aggregate_sig)
 
-    assert bls.verify_aggregate_sig_new(m, aggregate_sig, [pk1, pk2, pk3]), \
+    assert bls.verify_aggregate_sig_safe(m, aggregate_sig, [pk1, pk2, pk3]), \
         'Failure!!!'
 
     if debug:
         print('NEW AGGREGATION VERIFICATION SUCCESS!!!')
 
-    assert not bls.verify_aggregate_sig_new(m, aggregate_sig, [pk1, pk2])
+    assert not bls.verify_aggregate_sig_safe(m, aggregate_sig, [pk1, pk2])
 
     if debug:
         print('NEW AGGREGATION VERIFICATION SUCCESS AGAIN!!!')
 
 
-def rogue_public_key_defence():
+def defend_rogue_public_key_attack():
     # Defence mentioned here https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html
     groupObj = PairingGroup('MNT224')
 
@@ -201,18 +218,21 @@ def rogue_public_key_defence():
     bls = BLSAggregation(groupObj)
     g = group.random(G2)
 
+    pk0, sk0 = bls.keygen(g)
     pk1, sk1 = bls.keygen(g)
 
-    # Construct the attacker's public key (pk2) as g^beta * pk1^-1
-    pk1_inverse = 1 / pk1['g^x']
+    # Construct the attacker's public key (pk2) as `g^beta * (pk1*pk2)^-1`,
+    # i.e inverse of the product of all public keys that the attacker wants
+    # to forge the multi-sig over
+    pk_inverse = 1 / (BLSAggregation.product([pk0['g^x'], pk1['g^x']]))
     beta = group.random()
     pk2, _ = bls.keygen(g)
-    pk2['g^x'] = (g ** beta) * pk1_inverse
+    pk2['g^x'] = (g ** beta) * pk_inverse
 
     M = BLSAggregation.dump(m)
     h = group.hash(M, G1)
     fake_aggregate_sig = h ** beta
-    assert not bls.verify_aggregate_sig_new(m, fake_aggregate_sig, [pk1, pk2]), \
+    assert not bls.verify_aggregate_sig_safe(m, fake_aggregate_sig, [pk0, pk1, pk2]), \
         'Failure!!!'
 
     if debug:
@@ -221,7 +241,7 @@ def rogue_public_key_defence():
 
 if __name__ == "__main__":
     debug = True
-    simple()
-    rogue_public_key_attack()
-    new()
-    rogue_public_key_defence()
+    vulnerable()
+    demo_rogue_public_key_attack()
+    safe()
+    defend_rogue_public_key_attack()
