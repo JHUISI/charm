@@ -55,10 +55,9 @@ class BLSAggregation:
     def aggregate_sigs_safe(self, pubkey_signatures):
         # This method of aggregation is resistant to rogue public key attack
         sigs = []
+        all_pubkeys = [i[0] for i in pubkey_signatures]
         for pk, sig in pubkey_signatures:
-            p = self.dump(pk['g^x'])
-            t = group.hash(p, ZR)
-            e = sig ** t
+            e = sig ** self.hash_keys(pk, all_pubkeys)
             sigs.append(e)
 
         return self.product(sigs)
@@ -66,16 +65,10 @@ class BLSAggregation:
     def verify_aggregate_sig_safe(self, message, aggregate_sig, public_keys):
         # This method of verification is resistant to rogue public key attack
         g = self.check_and_return_same_generator_in_public_keys(public_keys)
-        pks = []
-        for pk in public_keys:
-            p = self.dump(pk['g^x'])
-            t = group.hash(p, ZR)
-            pks.append(pk['g^x'] ** t)
-
-        combined_pk = self.product(pks)
+        aggregated_pk = self.aggregate_pub_key(public_keys)
         M = self.dump(message)
         h = group.hash(M, G1)
-        return pair(g, aggregate_sig) == pair(combined_pk, h)
+        return pair(g, aggregate_sig) == pair(aggregated_pk, h)
 
     @staticmethod
     def product(seq):
@@ -90,6 +83,21 @@ class BLSAggregation:
         gs = {pk['g'] for pk in public_keys}
         assert len(gs) == 1, 'All public keys should have same generator'
         return next(iter(gs))
+
+    @staticmethod
+    def hash_keys(pk, all_pks):
+        acc = BLSAggregation.dump(pk['g^x'])
+        for p in all_pks:
+            acc += BLSAggregation.dump(p['g^x'])
+        return group.hash(acc, ZR)
+
+    @staticmethod
+    def aggregate_pub_key(pks):
+        r = []
+        for pk in pks:
+            h = BLSAggregation.hash_keys(pk, pks)
+            r.append(pk['g^x'] ** h)
+        return BLSAggregation.product(r)
 
 
 def vulnerable():
