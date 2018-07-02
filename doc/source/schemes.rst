@@ -21,22 +21,6 @@ Implemented Schemes
    charm/schemes/sigma1
    charm/schemes/sigma2
    charm/schemes/sigma3
-   charm/schemes/abenc/abenc_bsw07
-   charm/schemes/abenc/abenc_dacmacs_yj14
-   charm/schemes/abenc/abenc_lsw08
-   charm/schemes/abenc/abenc_maabe_rw15
-   charm/schemes/abenc/abenc_maabe_yj14
-   charm/schemes/abenc/abenc_tbpre_lww14
-   charm/schemes/abenc/abenc_unmcpabe_yahk14
-   charm/schemes/abenc/abenc_waters09
-   charm/schemes/abenc/abenc_yct14
-   charm/schemes/abenc/ac17
-   charm/schemes/abenc/bsw07
-   charm/schemes/abenc/cgw15
-   charm/schemes/abenc/dabe_aw11
-   charm/schemes/abenc/dfa_fe12
-   charm/schemes/abenc/pk_hve08
-   charm/schemes/abenc/waters11
    charm/schemes/pkenc/pkenc_cs98
    charm/schemes/pkenc/pkenc_elgamal85
    charm/schemes/pkenc/pkenc_gm82
@@ -61,6 +45,22 @@ Implemented Schemes
    charm/schemes/pksig/pksig_waters
    charm/schemes/pksig/pksig_waters05
    charm/schemes/pksig/pksig_waters09
+   charm/schemes/abenc/abenc_bsw07
+   charm/schemes/abenc/abenc_dacmacs_yj14
+   charm/schemes/abenc/abenc_lsw08
+   charm/schemes/abenc/abenc_maabe_rw15
+   charm/schemes/abenc/abenc_maabe_yj14
+   charm/schemes/abenc/abenc_tbpre_lww14
+   charm/schemes/abenc/abenc_unmcpabe_yahk14
+   charm/schemes/abenc/abenc_waters09
+   charm/schemes/abenc/abenc_yct14
+   charm/schemes/abenc/ac17
+   charm/schemes/abenc/bsw07
+   charm/schemes/abenc/cgw15
+   charm/schemes/abenc/dabe_aw11
+   charm/schemes/abenc/dfa_fe12
+   charm/schemes/abenc/pk_hve08
+   charm/schemes/abenc/waters11
 
 .. end_auto_scheme_list
 
