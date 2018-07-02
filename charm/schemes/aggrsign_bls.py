@@ -32,7 +32,8 @@ class BLSAggregation:
 
     def sign(self, x, message):
         M = self.dump(message)
-        if debug: print("Message => '%s'" % M)
+        if debug:
+            print("Message => '%s'" % M)
         return group.hash(M, G1) ** x
 
     def verify(self, pk, sig, message):
@@ -41,7 +42,9 @@ class BLSAggregation:
         return pair(pk['g'], sig) == pair(h, pk['g^x'])
 
     def aggregate_sigs_vulnerable(self, signatures):
-        # This method of aggregation is vulnerable to rogue public key attack
+        """
+        This method of aggregation is vulnerable to rogue public key attack
+        """
         return self.product(signatures)
 
     def verify_aggregate_sig_vulnerable(self, message, aggregate_sig, public_keys):
