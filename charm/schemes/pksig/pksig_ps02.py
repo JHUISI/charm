@@ -70,6 +70,8 @@ class PS02:
         if len(pk['Y']) != len(messages):
             raise ValueError('Missing or extra messages or keys')
         s1, s2 = sig
+        if group.init(G1) == s1:
+            return False
         l2 = self.X2 * self.product([pk['Y'][i] ** group.hash(messages[i], ZR) for i in range(len(messages))])
         return pair(s1, l2) == pair(self.g2, s2)
 

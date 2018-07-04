@@ -56,6 +56,8 @@ class PS01:
     def verify(self, pk, sig, *messages):
         ms = [group.hash(m, ZR) for m in messages]
         s1, s2 = sig
+        if group.init(G1) == s1:
+            return False
         l2 = pk['X2'] * self.product([pk['Y2'][i] ** ms[i] for i in range(len(messages))])
         return pair(s1, l2) == pair(pk['g2'], s2)
 
