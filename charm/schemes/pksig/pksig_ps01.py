@@ -43,8 +43,10 @@ class PS01:
         return h, h ** exp
 
     def verify(self, pk, sig, *messages):
-        ms = [group.hash(m, ZR) for m in messages]
         s1, s2 = sig
+        if group.init(G1) == s1:
+            return False
+        ms = [group.hash(m, ZR) for m in messages]
         l2 = pk['X'] * self.product([pk['Y'][i] ** ms[i] for i in range(len(messages))])
         return pair(s1, l2) == pair(pk['g2'], s2)
 
