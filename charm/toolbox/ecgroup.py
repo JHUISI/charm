@@ -1,6 +1,7 @@
 try:
    from charm.core.math.elliptic_curve import elliptic_curve,ec_element,ZR,G,init,random,order,getGenerator,bitsize,serialize,deserialize,hashEC,encode,decode,getXY
    import charm.core.math.elliptic_curve as ecc
+   from charm.toolbox import bitstring
 except Exception as err:
    print(err)
    exit(-1)
@@ -68,7 +69,7 @@ class ECGroup():
                 if type(i) == ec_element:
                     s += serialize(i)
                 elif type(i) == str:
-                    s += bytes(str(i), 'utf8')
+                    s += bitstring.getBytes(str(i), 'utf8')
                 elif type(i) == bytes:
                     s += i
                 else:
