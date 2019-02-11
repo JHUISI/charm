@@ -415,6 +415,7 @@ PyObject *ECE_init(ECElement *self, PyObject *args) {
       if(long_obj != NULL) {
         if (_PyLong_Check(long_obj)) {
           setBigNum((PyLongObject *) long_obj, &obj->elemZ);
+          BN_mod(obj->elemZ, obj->elemZ, gobj->order, gobj->ctx);
         } else {
           EXIT_IF(TRUE, "expecting a number (int or long)");
         }
