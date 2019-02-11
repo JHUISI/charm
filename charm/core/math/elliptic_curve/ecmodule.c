@@ -881,6 +881,7 @@ static PyObject *ECE_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 					setBigNum((PyLongObject *) o2, &rhs_val);
 					ans = createNewPoint(G, lhs->group); // ->group, lhs->ctx);
 					EC_POINT_mul(ans->group->ec_group, ans->P, NULL, lhs->P, rhs_val, ans->group->ctx);
+					BN_free(rhs_val);
 			}
 			else if(rhs == -1) {
 				debug("finding modular inverse.\n");
