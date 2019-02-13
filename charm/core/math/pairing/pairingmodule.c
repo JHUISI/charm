@@ -341,6 +341,7 @@ char * init_pbc_param(char *file, pairing_t *pairing)
 	debug("Reading '%s'\n", file);
 	count = read_file(fp, &buf);
 	debug("param='%s'\n", buf);
+	fclose(fp);	
 
 	if(pbc_param_init_set_buf(params, buf, count) == 0) {
 		/* initialize the pairing_t struct with params */
