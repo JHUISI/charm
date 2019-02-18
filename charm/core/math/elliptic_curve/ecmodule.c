@@ -1196,7 +1196,9 @@ static PyObject *ECE_getGen(ECElement *self, PyObject *arg) {
  */
 void set_element_from_hash(ECElement *self, uint8_t *input, int input_len)
 {
-	EXIT_IF(self->type != G, "element not of type G.");
+	if (self->type != G) {
+	    PyErr_SetString(PyECErrorObject, "element not of type G.");
+	}
 
 	BIGNUM *x = BN_new(), *y = BN_new();
 	int TryNextX = TRUE;
