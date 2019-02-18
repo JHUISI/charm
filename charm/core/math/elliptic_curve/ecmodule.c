@@ -1194,30 +1194,33 @@ static PyObject *ECE_getGen(ECElement *self, PyObject *arg) {
 /*
  * Takes an arbitrary string and returns a group element
  */
-EC_POINT *element_from_hash(EC_GROUP *group, BIGNUM *order, uint8_t *input, int input_len)
+void set_element_from_hash(ECElement *self, uint8_t *input, int input_len)
 {
-	EC_POINT *P = NULL;
+	EXIT_IF(self->type != G, "element not of type G.");
+
 	BIGNUM *x = BN_new(), *y = BN_new();
 	int TryNextX = TRUE;
 	BN_CTX *ctx = BN_CTX_new();
+	ECGroup *gobj = self->group;
 	// assume input string is a binary string, then set x to (x mod q)
-	x = BN_bin2bn((const uint8_t *) input, input_len, NULL);
-	BN_mod(x, x, order, ctx);
-	P = EC_POINT_new(group);
+	BN_bin2bn((const uint8_t *) input, input_len, x);
+	BN_mod(x, x, gobj->order, ctx);
 	do {
 		// set x coordinate and then test whether it's on curve
+#ifdef DEBUG
 		char *xstr = BN_bn2dec(x);
 		debug("Generating another x => %s\n", xstr);
 		OPENSSL_free(xstr);
-		EC_POINT_set_compressed_coordinates_GFp(group, P, x, 1, ctx);
-		EC_POINT_get_affine_coordinates_GFp(group, P, x, y, ctx);
+#endif
+		EC_POINT_set_compressed_coordinates_GFp(gobj->ec_group, self->P, x, 1, ctx);
+		EC_POINT_get_affine_coordinates_GFp(gobj->ec_group, self->P, x, y, ctx);
 
 		if(BN_is_zero(x) || BN_is_zero(y)) {
 			BN_add(x, x, BN_value_one());
 			continue;
 		}
 
-		if(EC_POINT_is_on_curve(group, P, ctx)) {
+		if(EC_POINT_is_on_curve(gobj->ec_group, self->P, ctx)) {
 			TryNextX = FALSE;
 		}
 		else {
@@ -1228,7 +1231,6 @@ EC_POINT *element_from_hash(EC_GROUP *group, BIGNUM *order, uint8_t *input, int 
 	BN_free(x);
 	BN_free(y);
 	BN_CTX_free(ctx);
-	return P;
 }
 
 static PyObject *ECE_hash(ECElement *self, PyObject *args) {
@@ -1253,7 +1255,7 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 			printf_buffer_as_hex(hash_buf, hash_len);
 			// generate an EC element from message digest
 			hashObj = createNewPoint(G, gobj);
-			hashObj->P = element_from_hash(gobj->ec_group, gobj->order, (uint8_t *) hash_buf, hash_len);
+			set_element_from_hash(hashObj, (uint8_t *) hash_buf, hash_len);
 			return (PyObject *) hashObj;
 		}
 		else if(type == ZR) {

@@ -176,7 +176,7 @@ void	ECElement_dealloc(ECElement* self);
 ECElement *negatePoint(ECElement *self);
 ECElement *invertECElement(ECElement *self);
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix);
-EC_POINT *element_from_hash(EC_GROUP *group, BIGNUM *order, uint8_t *input, int input_len);
+void set_element_from_hash(ECElement *self, uint8_t *input, int input_len);
 
 #define EXIT_IF(check, msg) \
 	if(check) { 						\
