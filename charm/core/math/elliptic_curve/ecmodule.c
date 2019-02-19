@@ -1379,7 +1379,7 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
             return (PyObject *) encObj;
         }
         else {
-            printf("expected message len: %d, you provided: %d\n", (max_len - sizeof(uint32_t)), msg_len);
+            printf("expected message len: %lu, you provided: %d\n", (max_len - sizeof(uint32_t)), msg_len);
             EXIT_IF(TRUE, "message length does not match the selected group size.");
         }
 	}
@@ -1407,18 +1407,17 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 			BIGNUM *x = BN_new(), *y = BN_new();
 			// verifies that element is on the curve then gets coordinates
 			EC_POINT_get_affine_coordinates_GFp(gobj->ec_group, obj->P, x, y, gobj->ctx);
-
-            int max_byte_len = BN_num_bytes(gobj->order);
-            int prepend_zeros = max_byte_len;
-            // by default we will strip out the counter part (unless specified otherwise by user)
-            if (include_ctr == FALSE) {
-                max_byte_len -= RESERVED_ENCODING_BYTES;
-	        }
-            debug("Size of order => '%d'\n", max_byte_len);
+			int max_byte_len = BN_num_bytes(gobj->order);
+			int prepend_zeros = max_byte_len;
+			// by default we will strip out the counter part (unless specified otherwise by user)
+			if (include_ctr == FALSE) {
+				max_byte_len -= RESERVED_ENCODING_BYTES;
+			}
+			debug("Size of order => '%d'\n", max_byte_len);
 			int x_len = BN_num_bytes(x);
 			prepend_zeros -= x_len;
 			if (prepend_zeros > 0) {
-                x_len += prepend_zeros;
+                		x_len += prepend_zeros;
 			}
 			uint8_t *xstr = (uint8_t*) malloc(x_len + 1);
 			memset(xstr, 0, x_len);
@@ -1431,8 +1430,8 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
 			BN_free(x);
 			BN_free(y);
 
-            int size_msg = max_byte_len;
-			PyObject *decObj = PyBytes_FromStringAndSize(xstr, size_msg);
+            		int size_msg = max_byte_len;
+			PyObject *decObj = PyBytes_FromStringAndSize((const char *)xstr, size_msg);
 			OPENSSL_free(xstr);
 			return decObj;
 		}
@@ -1472,7 +1471,7 @@ static PyObject *Serialize(ECElement *self, PyObject *args) {
 			size_t len = BN_num_bytes(obj->elemZ);
 			uint8_t z_buf[len+1];
 			memset(z_buf, 0, len);
-			if(BN_bn2bin(obj->elemZ, z_buf) == len) {
+			if((size_t)BN_bn2bin(obj->elemZ, z_buf) == len) {
 				// we're okay
 				// convert z_buf to base64 and the rest is history.
 				size_t length = 0;
