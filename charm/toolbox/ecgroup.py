@@ -59,18 +59,18 @@ class ECGroup():
         """deserializes into a pairing object"""        
         return deserialize(self.ec_group, bytes_object)
     
-    # needs work to iterate over tuple
     def hash(self, args, target_type=ZR):
         """hashes objects into ZR or G"""        
         if isinstance(args, tuple):
             s = bytes()
+            DEL = '|'
             for i in args:
                 if type(i) == ec_element:
                     s += serialize(i)
                 elif type(i) == str:
-                    s += bytes(str(i), 'utf8')
+                    s += bytes(str(i) + DEL, 'utf8')
                 elif type(i) == bytes:
-                    s += i
+                    s += i + bytes(DEL, 'utf8') 
                 else:
                     print("unexpected type: ", type(i))
                 # consider other types    
