@@ -13,7 +13,6 @@ Yanjiang Yang, Joseph K Liu, Kaitai Liang, Kim Kwang Raymond Choo, Jianying Zhou
 :Authors:    Douglas Hellinger
 :Date:       11/2018
 """
-from typing import Dict
 
 from charm.toolbox.ABEnc import ABEnc, Output
 from charm.toolbox.pairinggroup import ZR, G1, G2, GT, pair
@@ -25,12 +24,12 @@ pk_t = {'g': G1, 'g2': G2, 'h': G1, 'e_gg_alpha': GT}
 mk_t = {'beta': ZR, 'alpha': ZR}
 pk_u_t = G2
 sk_u_t = ZR
-sk_t = {'k': G1, 'k_prime': G1, 'k_attrs': Dict}
+sk_t = {'k': G1, 'k_prime': G1, 'k_attrs': dict}
 ct_t = {'policy_str': str,
         'C': GT,
         'C_prime': G1,
         'C_prime_prime': G1,
-        'c_attrs': Dict
+        'c_attrs': dict
         }
 v_t = {'C': GT,
        'e_term': GT}
