@@ -2,7 +2,7 @@ import sys
 import unittest
 
 import pytest
-from hypothesis import given
+given = pytest.importorskip("hypothesis").given
 from hypothesis.strategies import lists
 
 from charm.schemes.abenc.abenc_yllc15 import YLLC15
