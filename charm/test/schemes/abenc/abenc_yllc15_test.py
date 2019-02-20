@@ -2,8 +2,8 @@ import sys
 import unittest
 
 import pytest
-settings = pytest.importorskip("hypothesis", reason="requires python3.4 or higher").settings
-given = pytest.importorskip("hypothesis", reason="requires python3.4 or higher").given
+settings = pytest.importorskip("hypothesis").settings
+given = pytest.importorskip("hypothesis").given
 from hypothesis.strategies import lists
 
 from charm.schemes.abenc.abenc_yllc15 import YLLC15
