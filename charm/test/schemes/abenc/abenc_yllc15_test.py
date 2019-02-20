@@ -2,6 +2,8 @@ import sys
 import unittest
 
 import pytest
+from hypothesis import settings
+
 given = pytest.importorskip("hypothesis").given
 from hypothesis.strategies import lists
 
@@ -23,6 +25,7 @@ class YLLC15Test(unittest.TestCase):
     @pytest.mark.skipif(sys.version_info < (3, 4),
                         reason="requires python3.4 or higher")
     @given(attrs=lists(attributes(), min_size=1))
+    @settings(deadline=300)
     def test_proxy_key_gen(self, attrs):
         pkcs, skcs = self.abe.ukgen(self.params, "aws@amazonaws.com")
         pku, sku = self.abe.ukgen(self.params, "alice@example.com")
