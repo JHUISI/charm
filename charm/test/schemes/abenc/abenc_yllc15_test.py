@@ -24,13 +24,14 @@ class YLLC15Test(unittest.TestCase):
     @pytest.mark.skipif(sys.version_info < (3, 4),
                         reason="requires python3.4 or higher")
     @given(attrs=lists(attributes(), min_size=1))
-    @settings(deadline=300)
+    @settings(deadline=300, max_examples=50)
     def test_proxy_key_gen_deduplicates_and_uppercases_attributes(self, attrs):
         pkcs, skcs = self.abe.ukgen(self.params, "aws@amazonaws.com")
         pku, sku = self.abe.ukgen(self.params, "alice@example.com")
         proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
         self.assertEqual({ attr.upper() for attr in set(attrs) }, proxy_key_user['k_attrs'].keys())
 
+    @settings(deadline=300, max_examples=50)
     @given(attrs=lists(attributes(), min_size=1))
     def test_encrypt_proxy_decrypt_decrypt_round_trip(self, attrs):
         pkcs, skcs = self.abe.ukgen(self.params, "aws@amazonaws.com")
