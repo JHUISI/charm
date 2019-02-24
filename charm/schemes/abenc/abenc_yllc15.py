@@ -143,8 +143,9 @@ class YLLC15(ABEnc):
         # reconstitute the policy random secret (A) which was used to encrypt the message
         A = 1
         for i in pruned_list:
-            attr = i.getAttributeAndIndex()
-            A *= (pair(c_attrs[attr][0], k_attrs[attr][0]) / pair(k_attrs[attr][1], c_attrs[attr][1])) ** z[attr]
+            attr_idx = i.getAttributeAndIndex()
+            attr = i.getAttribute()
+            A *= (pair(c_attrs[attr_idx][0], k_attrs[attr][0]) / pair(k_attrs[attr][1], c_attrs[attr_idx][1])) ** z[attr_idx]
 
         e_k_c_prime = pair(k, c_prime)
         denominator = (pair(k_prime, c_prime_prime) ** skcs) * A

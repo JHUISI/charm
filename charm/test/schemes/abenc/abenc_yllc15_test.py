@@ -2,6 +2,10 @@ import sys
 import unittest
 
 import pytest
+from hypothesis import reproduce_failure
+
+from charm.toolbox.secretutil import SecretUtil
+
 settings = pytest.importorskip("hypothesis").settings
 given = pytest.importorskip("hypothesis").given
 from hypothesis.strategies import lists
@@ -31,20 +35,24 @@ class YLLC15Test(unittest.TestCase):
         proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
         self.assertEqual({ attr.upper() for attr in set(attrs) }, proxy_key_user['k_attrs'].keys())
 
-    @settings(deadline=300, max_examples=50)
-    @given(attrs=lists(attributes(), min_size=1))
-    def test_encrypt_proxy_decrypt_decrypt_round_trip(self, attrs):
+    @settings(deadline=400, max_examples=50)
+    @given(policy_str=policy_expressions())
+    def test_encrypt_proxy_decrypt_decrypt_round_trip(self, policy_str):
         pkcs, skcs = self.abe.ukgen(self.params, "aws@amazonaws.com")
         pku, sku = self.abe.ukgen(self.params, "alice@example.com")
-        proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
-
+        attrs = self.extract_attributes(policy_str)
         random_key_elem = self.abe.group.random(GT)
-        pol = attrs[0]
-        ciphertext = self.abe.encrypt(self.params, random_key_elem, pol)
 
+        proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
+        ciphertext = self.abe.encrypt(self.params, random_key_elem, policy_str)
         intermediate_value = self.abe.proxy_decrypt(self.params, skcs, proxy_key_user, ciphertext)
         recovered_key_elem = self.abe.decrypt(self.params, sku, intermediate_value)
         self.assertEqual(random_key_elem, recovered_key_elem)
+
+    def extract_attributes(self, policy_str):
+        util = SecretUtil(self.abe.group)
+        policy = util.createPolicy(policy_str)
+        return [util.strip_index(policy_attr) for policy_attr in util.getAttributeList(policy)]
 
     @pytest.mark.skipif(sys.version_info < (3, 4),
                         reason="requires python3.4 or higher")
