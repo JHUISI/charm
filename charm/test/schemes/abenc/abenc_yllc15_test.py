@@ -2,7 +2,6 @@ import sys
 import unittest
 
 import pytest
-from hypothesis import reproduce_failure
 
 from charm.toolbox.secretutil import SecretUtil
 
