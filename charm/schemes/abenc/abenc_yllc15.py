@@ -71,6 +71,9 @@ class YLLC15(ABEnc):
     @Input(pk_t, mk_t, pk_u_t, pk_u_t, [str])
     # @Output(sk_t)
     def proxy_keygen(self, params, msk, pkcs, pku, attribute_list):
+        """
+        attributes specified in the `attribute_list` are converted to uppercase
+        """
         r1 = self.group.random(ZR)
         r2 = self.group.random(ZR)
         g = params['g']
@@ -80,10 +83,11 @@ class YLLC15(ABEnc):
         k_prime = g2 ** r1
         k_attrs = {}
         for attr in attribute_list:
+            attr_caps = attr.upper()
             r_attr = self.group.random(ZR)
-            k_attr1 = (g2 ** r2) * (self.group.hash(str(attr), G2) ** r_attr)
+            k_attr1 = (g2 ** r2) * (self.group.hash(str(attr_caps), G2) ** r_attr)
             k_attr2 = g ** r_attr
-            k_attrs[attr] = (k_attr1, k_attr2)
+            k_attrs[attr_caps] = (k_attr1, k_attr2)
 
         proxy_key_user = {'k': k, 'k_prime': k_prime, 'k_attrs': k_attrs}
         return proxy_key_user
@@ -94,6 +98,7 @@ class YLLC15(ABEnc):
         """
          Encrypt a message M under a policy string.
 
+         attributes specified in policy_str are converted to uppercase
          policy_str must use parentheses e.g. (A) and (B)
         """
         policy = self.util.createPolicy(policy_str)
@@ -138,8 +143,9 @@ class YLLC15(ABEnc):
         # reconstitute the policy random secret (A) which was used to encrypt the message
         A = 1
         for i in pruned_list:
-            attr = i.getAttributeAndIndex()
-            A *= (pair(c_attrs[attr][0], k_attrs[attr][0]) / pair(k_attrs[attr][1], c_attrs[attr][1])) ** z[attr]
+            attr_idx = i.getAttributeAndIndex()
+            attr = i.getAttribute()
+            A *= (pair(c_attrs[attr_idx][0], k_attrs[attr][0]) / pair(k_attrs[attr][1], c_attrs[attr_idx][1])) ** z[attr_idx]
 
         e_k_c_prime = pair(k, c_prime)
         denominator = (pair(k_prime, c_prime_prime) ** skcs) * A
