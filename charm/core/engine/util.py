@@ -95,7 +95,7 @@ def pickleObject(Object):
     return encoded
 
 def unpickleObject(Object):
-    if type(Object) == str:
+    if type(Object) == str or type(Object) == bytes:
        byte_object = Object
     else:
        return None

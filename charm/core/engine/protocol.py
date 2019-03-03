@@ -3,7 +3,6 @@
 
 from charm.core.engine.util import *
 from charm.toolbox.enum import Enum
-MAX_SIZE = 2048
 
 debug = False
 # standardize responses between client and server
@@ -19,6 +18,7 @@ class Protocol:
         self.party = {}
         self._serialize = False
         self.db = {} # initialize the database
+        self.MAX_SIZE = 2048
         
     def setup(self, *args):
         # handles the hookup between parties involved
@@ -138,7 +138,7 @@ class Protocol:
         # is necessary
         if self._socket != None:
             # block until data is available or remote host closes connection
-            result = self._socket.recv(MAX_SIZE)
+            result = self._socket.recv(self.MAX_SIZE)
             if result == '': return None
             else: 
                 if self._serialize:
