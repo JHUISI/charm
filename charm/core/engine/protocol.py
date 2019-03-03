@@ -3,12 +3,13 @@
 
 from charm.core.engine.util import *
 from charm.toolbox.enum import Enum
+from math import log2, ceil
 
 debug = False
 # standardize responses between client and server
 # code = Enum('Success', 'Fail', 'Repeat', 'StartSubprotocol', 'EndSubprotocol')
 class Protocol:
-    def __init__(self, error_states): # any init information?
+    def __init__(self, error_states, max_size=2048): # any init information?
         global error
         self.p_ID = 0
         self.p_ctr = 0
@@ -18,7 +19,8 @@ class Protocol:
         self.party = {}
         self._serialize = False
         self.db = {} # initialize the database
-        self.MAX_SIZE = 2048
+        self.max_size = max_size
+        self.prefix_size = ceil(log2(max_size))
         
     def setup(self, *args):
         # handles the hookup between parties involved
@@ -126,19 +128,33 @@ class Protocol:
         if self._socket != None:
             if self._serialize:
                 result = self._user_serialize(object)
-                self._socket.send(result)
             else:
                 result = self.serialize(object)
                 #print("DEBUG: send_msg : result =>", result)
-                self._socket.send(result)
+            if len(result) > self.max_size:
+                print("Message too long! max_size="+str(self.max_size))
+                return None
+            result = len(result).to_bytes(length=self.prefix_size, byteorder='big') + result
+            self._socket.send(result)
         return None
+
+    # receives exactly n bytes
+    def recv_all(self, n):
+        recvd = 0
+        res = b''
+        while recvd < n:
+            res = res + self._socket.recv(n-recvd)
+            recvd = len(res)
+        return res
 
     def recv_msg(self):
         # read the socket and return the received message (check if deserialization)
         # is necessary
         if self._socket != None:
             # block until data is available or remote host closes connection
-            result = self._socket.recv(self.MAX_SIZE)
+            msglen = int.from_bytes(self.recv_all(self.prefix_size), byteorder='big')
+            result = self.recv_all(msglen)
+
             if result == '': return None
             else: 
                 if self._serialize:
