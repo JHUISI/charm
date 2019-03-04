@@ -3,7 +3,7 @@
 
 from charm.core.engine.util import *
 from charm.toolbox.enum import Enum
-from math import log2, ceil
+from math import log, ceil
 
 debug = False
 # standardize responses between client and server
@@ -20,7 +20,7 @@ class Protocol:
         self._serialize = False
         self.db = {} # initialize the database
         self.max_size = max_size
-        self.prefix_size = ceil(log2(max_size))
+        self.prefix_size = ceil(log(max_size, 2))
         
     def setup(self, *args):
         # handles the hookup between parties involved
