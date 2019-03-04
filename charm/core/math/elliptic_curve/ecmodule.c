@@ -1009,7 +1009,7 @@ static PyObject *ECE_neg(PyObject *o1) {
 			obj2 = createNewPoint(ZR, obj1->group);
 			if(BN_copy(obj2->elemZ, obj1->elemZ) != NULL) {
 				int negate;
-				if(!BN_is_negative(obj2->elemZ)) negate = -1;
+				if(obj2->elemZ->neg == 0) negate = -1;
 				else negate = 0;
 				BN_set_negative(obj2->elemZ, negate);
 

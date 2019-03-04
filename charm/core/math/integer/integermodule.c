@@ -123,12 +123,12 @@ int bnToMPZ(BIGNUM *p, mpz_t m) {
 	size_t count = BN_num_bytes(p);
 	unsigned char* tmp = malloc(count);
 	if(!tmp) {
-		return FALSE;
+	    return FALSE;
 	}
 	BN_bn2bin(p, tmp);
 	mpz_import(m, count, 1, 1, 0, 0, tmp);
-	if(BN_is_negative(p)) {
-		mpz_neg(m, m);
+	if(p->neg != 0) {
+	    mpz_neg(m, m);
 	}
 	free(tmp);
 
