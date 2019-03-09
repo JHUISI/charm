@@ -21,9 +21,6 @@ class YLLC15Test(unittest.TestCase):
         self.abe = YLLC15(group)
         (self.params, self.msk) = self.abe.setup()
 
-    def test_ukgen(self, user_id='bob@example.com'):
-        (public_key, secret_key) = self.abe.ukgen(self.params, user_id)
-
     @pytest.mark.skipif(sys.version_info < (3, 4),
                         reason="requires python3.4 or higher")
     @given(attrs=lists(attributes(), min_size=1))
