@@ -59,6 +59,7 @@ class VRF10:
     def prove(self, sk, x):
         pi = {} # [i for i in range(sk['n'])]
         for i in range(0, sk['n']):
+            x = [group.init(ZR, long(j)) for j in x]
             dotProd0 = dotprod(1, -1, i+1, lam_func, sk['u'], x) 
             pi[i+1] = sk['g1'] ** (sk['u_t'] * dotProd0)
         

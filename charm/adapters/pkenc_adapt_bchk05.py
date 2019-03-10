@@ -43,7 +43,7 @@ class BCHKIBEnc(IBEnc):
 
     def elmtToString(self, g, length):
         hash_len = 20
-        b = math.ceil(length / hash_len)
+        b = int(math.ceil(length / hash_len))
         gStr = b''
         for i in range(1, b+1):
             gStr += sha2(g, i)
@@ -64,14 +64,11 @@ class BCHKIBEnc(IBEnc):
 
     def encrypt(self, pk, m):
         (k, ID, x) = encap.S(pk['pub'])
-        if type(m) != bytes:
-           m = bytes(m, 'utf8')	
-        if type(x) != bytes:
-           x = bytes(x, 'utf8')	
 
         ID2 = group.hash(ID, ZR)
 
         m2 = m + b':' + x
+#        m2 = m + ':' + x
 
         kprime = group.random(GT)
         kprimeStr = self.elmtToString(kprime, len(m2))
@@ -79,7 +76,8 @@ class BCHKIBEnc(IBEnc):
         C1 = ibenc.encrypt(pk['PK'], ID2, kprime)
 
         C2 = self.str_XOR(m2, kprimeStr)
-        C2 = C2.encode('utf8')
+#        C2 = C2.encode('utf8')
+        C2 = C2.encode('utf-8')
         
         C1prime = pickleObject(serializeObject(C1, group))
         
@@ -101,9 +99,8 @@ class BCHKIBEnc(IBEnc):
         k = encap.R(pk['pub'], c['ID'], x)
 
         C1prime = pickleObject(serializeObject(c['C1'], group))
-        
+
         if(c['tag'] == hmac.new(k, C1prime+c['C2'], hashlib.sha256).digest()):
-            return bytes(m2.split(':')[0], 'utf8')
+            return bytes(m2.split(':')[0])
         else:
             return b'FALSE'
-   

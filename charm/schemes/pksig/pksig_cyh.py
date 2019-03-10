@@ -77,7 +77,7 @@ class CYH(PKSig):
         
         r = group.random(ZR)
         pk = [ H1(i) for i in L] # get all signers pub keys
-        u[s] = (IDpk ** r) * (dotprod(1, s, num_signers, lam_func, u, pk, h) ** -1)
+        u[s] = (IDpk ** r) * (dotprod(1, s, num_signers, lam_func, u, pk, h) ** long(-1))
         h[s] = H2(M, Lt, u[s])
         S = IDsk ** (h[s] + r)
         sig = { 'u':u, 'S':S }

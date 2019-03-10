@@ -39,7 +39,7 @@ class IBE_SW05(IBEnc):
         IBEnc.__init__(self)
         global group, H, util
         group = groupObj
-        H = lambda x: group.hash(('0', x), ZR)
+        H = lambda x: group.hash((unicode('0'),unicode(x)), ZR)
         util = SecretShare(group, False)
         
     def setup(self, n, d):
@@ -138,7 +138,7 @@ class IBE_SW05_LUC(IBEnc):
         IBEnc.__init__(self)
         global group, H, util
         group = groupObj
-        H = lambda x: group.hash(('0', x), ZR)
+        H = lambda x: group.hash((unicode('0'), unicode(x)), ZR)
         util = SecretShare(group, False)
         
     def setup(self, n, d):
@@ -160,15 +160,16 @@ class IBE_SW05_LUC(IBEnc):
         return (pk, mk)
 
     def eval_T(self, pk, n, x):
-        N = [group.init(ZR,(x + 1)) for x in range(n + 1)]        
+        N = [group.init(ZR,long(x + 1)) for x in range(n + 1)]        
         N_int = [(x + 1) for x in range(n + 1)]
         
         coeffs = util.recoverCoefficients(N)
         prod_result = 1
         for i in N_int:
-            j = group.init(ZR, i)
+            j = group.init(ZR, long(i))
             prod_result *= (pk['t'][i-1] ** coeffs[j])
         
+        n = group.init(ZR, long(n))
         T = (pk['g2'] ** (x * n)) * prod_result
         return T
 

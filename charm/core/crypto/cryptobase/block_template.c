@@ -209,6 +209,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 		return NULL;
 	if (len==0)			/* Handle empty string */
 	{
+		//return PyString_FromStringAndSize(NULL, 0);
 		return PyUnicode_FromStringAndSize(NULL, 0);
 	}
 	if ( (len % BLOCK_SIZE) !=0 && 
@@ -401,6 +402,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 					free(buffer);
 					return NULL;
 				}
+				//if (!PyString_Check(ctr))
 				if (!PyUnicode_Check(ctr))
 				{
 					PyErr_SetString(PyExc_TypeError,
@@ -409,6 +411,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 					free(buffer);
 					return NULL;
 				}
+				//if (PyString_GET_SIZE(ctr) != BLOCK_SIZE) {
 				if (PyUnicode_GET_SIZE(ctr) != BLOCK_SIZE) {
 					PyErr_Format(PyExc_TypeError,
 						     "CTR counter function returned "
@@ -420,6 +423,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 				}
 				Py_UNBLOCK_THREADS;
 				PyObject *_ctr = PyUnicode_AsASCIIString(ctr);
+				//block_encrypt(&(self->st), (unsigned char *)PyString_AsString(ctr),
 				block_encrypt(&(self->st), (unsigned char *)PyBytes_AsString(_ctr),
 					      self->IV);
 				Py_BLOCK_THREADS;
@@ -443,6 +447,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 		return NULL;
 	}
 	Py_END_ALLOW_THREADS;
+	//result=PyString_FromStringAndSize((char *) buffer, len);
 	result=PyBytes_FromStringAndSize((char *) buffer, len);
 	free(buffer);
 	return(result);
@@ -478,6 +483,7 @@ ALG_Decrypt(ALGobject *self, PyObject *args)
 		return NULL;
 	if (len==0)			/* Handle empty string */
 	{
+		//return PyString_FromStringAndSize(NULL, 0);
 		return PyUnicode_FromStringAndSize(NULL, 0);
 	}
 	if ( (len % BLOCK_SIZE) !=0 && 
@@ -618,6 +624,7 @@ ALG_Decrypt(ALGobject *self, PyObject *args)
 		return NULL;
 	}
 	Py_END_ALLOW_THREADS;
+	//result=PyString_FromStringAndSize((char *) buffer, len);
 	result=PyBytes_FromStringAndSize((char *) buffer, len);
 	free(buffer);
 	return(result);

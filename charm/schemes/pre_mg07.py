@@ -30,11 +30,11 @@ class PreGA:
     >>> id2_secret_key = pre.keyGen(master_secret_key, ID2)
     >>> ciphertext = pre.encrypt(params, ID, msg);
     >>> pre.decryptFirstLevel(params,id_secret_key, ciphertext, ID)
-    b'hello world!!!!!'
+    'hello world!!!!!'
     >>> re_encryption_key = pre.rkGen(params,id_secret_key, ID, ID2)
     >>> ciphertext2 = pre.reEncrypt(params, ID, re_encryption_key, ciphertext)
     >>> pre.decryptSecondLevel(params,id2_secret_key,ID, ID2, ciphertext2)
-    b'hello world!!!!!'
+    'hello world!!!!!'
     """
     def __init__(self, groupObj):
         global group,h

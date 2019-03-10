@@ -1,7 +1,7 @@
 
 from charm.core.engine.protocol import Protocol
 from charm.core.engine.util import *
-from charm. toolbox.enum import Enum
+from charm.toolbox.enum import Enum
 
 #party = Enum('Prover', 'Verifier')
 

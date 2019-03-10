@@ -227,7 +227,7 @@ else
 fi
 
 case "$cpu" in
-  alpha|cris|ia64|lm32|m68k|microblaze|ppc|ppc64|sparc64|unicore32|armv6l|armv7l|s390|s390x)
+  alpha|cris|ia64|lm32|m68k|microblaze|ppc|ppc64|sparc64|unicore32|armv4b|armv6l|armv7l|s390|s390x)
     cpu="$cpu"
   ;;
   i386|i486|i586|i686|i86pc|BePC)
@@ -467,15 +467,14 @@ exit 1
 fi
 
 # Python version handling logic. We prefer the argument path given by --python 
-# If not specified, we check if python is python 3. 
-#Baring that, we try python3,python3.2.python3.1,etc 
+# If not specified, we check if python is python 2.7. 
 
-python3_found="no"
+python2_found="no"
 is_python_version(){
 cat > $TMPC << EOF
 import sys
 
-if float(sys.version[:3]) >= 3.0:
+if float(sys.version[:3]) == 2.7:
     exit(0)
 else:
    exit(-1)
@@ -493,11 +492,11 @@ return 1
 
 if [ -n "$python_path" ]; then 
         if (is_python_version $python_path); then
-            python3_found="yes"
+            python2_found="yes"
         else
-            echo "$python_path is not python 3.x. This version of charm requires"
-            echo "python 3.x. Please specify a valid python3 location with"
-            echo "--python=/path/to/python3, leave off the command to have this script"
+            echo "$python_path is not python 2.7. This version of charm requires"
+            echo "python 2.7. Please specify a valid python2.7 location with"
+            echo "--python=/path/to/python2.7, leave off the command to have this script"
             echo "try finding it on its own, or install charm for python2.7"
             exit 1
         fi 
@@ -505,27 +504,23 @@ else
         for pyversion in python python3 python3.2 python3.1 
         do 
             if (is_python_version `which $pyversion`); then
-                python3_found="yes"
+                python2_found="yes"
                 python_path=`which $pyversion`
                 break
             fi
         done
-        if test "$python3_found" = "no"; then 
-            echo "No python 3 version found. This version of Charm requires python version 3.x. Specify python3 location with --python=/path/to/python3"
-            echo "Otherwise, use the python 2.7+ version"
+        if test "$python2_found" = "no"; then 
+            echo "No python 2.7 version found. This version of Charm requires python version 2.7. Specify python2.7 location with --python=/path/to/python2.7"
+            echo "Otherwise, use the python 3+ version"
             exit 1
         fi
 fi
 
-if [ "$targetos" != "MINGW32" ] ; then
-    py_config="$(which python3-config)"
-    if ! test -e "$py_config"
-    then
-        echo "$py_config not found.  This version of Charm requires the python development environment (probably in python3-dev package)."
-        exit 1
-    fi
-    PY_CFLAGS=`$py_config --cflags`
-    PY_LDFLAGS=`$py_config --ldflags`
+py_config="$(which python-config)"
+if ! test -e "$py_config"
+then
+    echo "$py_config not found.  This version of Charm requires the python 2.7 development environment (probably in python-dev package)."
+    exit 1
 fi
 
 # check that the C compiler works.

@@ -6,6 +6,7 @@ import hashlib
 import math
 import struct
 import sys
+from array import *
 
 debug = False
 
@@ -386,7 +387,7 @@ class SAEPEncryptionPadding:
         M = v[:int(m/8)]
         t = v[int(m/8):int(m+s0/8)]
 
-        if(M[-1] == 128 and (M[-2] == 0 or M[-2] == 128)):
+        if(M[-1] == '\x80' and (M[-2] == '\x00' or M[-2] == '\x80')):
             index = M[:(len(M)-1)].rindex(b'\x80')
             M = M[:index]
         else:
@@ -399,7 +400,7 @@ class SAEPEncryptionPadding:
             print("v    => ", v)
             print("M    => ", M)
             print("t    => ", t)
-            print("r    =>" , r)
+            print("r    => ", r)
 
         return (M, t)
 
@@ -409,10 +410,10 @@ class PKCS7Padding(object):
         
     def encode(self,_bytes,block_size = 16):
         pad = self._padlength(_bytes)
-        return _bytes.ljust(pad+len(_bytes),bytes([pad]))
+        return _bytes.ljust(pad+len(_bytes), chr(pad & 0xFF))
 
     def decode(self,_bytes):
-        return _bytes[:-(_bytes[-1])]
+        return _bytes[:-ord(_bytes[-1])]
 
 
     def _padlength(self,_bytes):

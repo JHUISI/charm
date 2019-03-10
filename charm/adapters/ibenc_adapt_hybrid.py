@@ -35,7 +35,8 @@ class HybridIBEnc(IBEnc):
         return ibenc.extract(mk, ID)
     
     def encrypt(self, pk, ID, M):
-        if type(M) != bytes: raise "message not right type!"        
+#        if type(M) != bytes: raise "message not right type!"        
+        if type(M) != str: raise "message not right type!"        
         key = group.random(GT)
         c1 = ibenc.encrypt(pk, ID, key)
         # instantiate a symmetric enc scheme from this key

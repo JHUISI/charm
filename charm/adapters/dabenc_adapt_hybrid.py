@@ -38,11 +38,11 @@ class HybridABEncMA(ABEncMultiAuth):
     >>> hyb_abema.keygen(global_parameters, jhmi_secret_key,'jhmi.researcher', ID, secrets_keys)
 
         Encrypt a message to anyone who is both a profesor at JHU and a researcher at JHMI.
-    >>> msg = b'Hello World, I am a sensitive record!'
+    >>> msg = 'Hello World, I am a sensitive record!'
     >>> policy_str = "(jhmi.doctor or (jhmi.researcher and jhu.professor))"
     >>> cipher_text = hyb_abema.encrypt(global_parameters, allAuth_public_key, msg, policy_str)
     >>> hyb_abema.decrypt(global_parameters, secrets_keys, cipher_text)
-    b'Hello World, I am a sensitive record!'
+    'Hello World, I am a sensitive record!'
     """
     def __init__(self, scheme, groupObj):
         global abencma, group

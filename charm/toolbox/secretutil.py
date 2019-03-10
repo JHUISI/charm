@@ -11,7 +11,8 @@ class SecretUtil:
 #        self.parser = PolicyParser()
 
     def P(self, coeff, x):
-        share = 0
+#        share = 0
+        share = self.group.init(ZR, 0)
         # evaluate polynomial
         for i in range(0, len(coeff)):
             share += (coeff[i] * (x ** i))
@@ -32,13 +33,14 @@ class SecretUtil:
     def recoverCoefficients(self, list):
         """recovers the coefficients over a binary tree."""
         coeff = {}
-        list2 = [self.group.init(ZR, i) for i in list]
-        for i in list2:
-            result = 1
+        list2 = [self.group.init(ZR, long(i)) for i in list]
+        for i in list:
+            i2 = self.group.init(ZR, long(i))
+            result = self.group.init(ZR, long(1))
             for j in list2:
-                if not (i == j):
+                if not (i2 == j):
                     # lagrange basis poly
-                    result *= (0 - j) / (i - j)
+                    result *= (0 - j) / (i2 - j)
 #                print("coeff '%d' => '%s'" % (i, result))
             coeff[int(i)] = result
         return coeff
@@ -49,7 +51,7 @@ class SecretUtil:
         list = shares.keys()
         if self.verbose: print(list)
         coeff = self.recoverCoefficients(list)
-        secret = 0
+        secret = self.group.init(ZR, 0)
         for i in list:
             secret += (coeff[i] * shares[i])
 
@@ -135,7 +137,9 @@ class SecretUtil:
         
     
     def createPolicy(self, policy_string):
-        assert type(policy_string) == str, "invalid type for policy_string"
+        assert type(policy_string) in [str, unicode], "invalid type for policy_string"
+        if(type(policy_string) == str):
+            policy_string = unicode(policy_string)
         parser = PolicyParser()        
         policy_obj = parser.parse(policy_string)
         _dictCount, _dictLabel = {}, {}

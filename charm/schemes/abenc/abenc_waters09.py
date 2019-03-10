@@ -13,6 +13,7 @@ Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            11/2010
 '''
+from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEnc import ABEnc
@@ -52,11 +53,13 @@ class CPabe09(ABEnc):
         t = group.random()
         K = msk['g2^alpha'] * (pk['g2^a'] ** t)
         L = pk['g2'] ** t
-        k_x = [group.hash(s, G1) ** t for s in attributes]
+        k_x = [group.hash(unicode(s), G1) ** t for s in attributes]
         
         K_x = {}
         for i in range(0, len(k_x)):
             K_x[ attributes[i] ] = k_x[i]    
+
+        attributes = [unicode(a) for a in attributes]
 
         key = { 'K':K, 'L':L, 'K_x':K_x, 'attributes':attributes }
         return key
@@ -81,7 +84,7 @@ class CPabe09(ABEnc):
                D[ p_list[i] ] = (pk['g2'] ** r)
         
         if debug: print("SessionKey: %s" % C_tilde)
-        return { 'C0':C_0, 'C':C, 'D':D , 'C_tilde':C_tilde, 'policy':policy_str, 'attribute':p_list }
+        return { 'C0':C_0, 'C':C, 'D':D , 'C_tilde':C_tilde, 'policy':unicode(policy_str), 'attribute':p_list }
     
     def decrypt(self, pk, sk, ct):
         policy = util.createPolicy(ct['policy'])

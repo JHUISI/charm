@@ -9,7 +9,7 @@
 :Authors:	Gary Belvin
 :Date:			06/2011
 ''' 
-
+from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import *
 from charm.toolbox.bitstring import Bytes

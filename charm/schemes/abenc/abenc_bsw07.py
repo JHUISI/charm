@@ -13,6 +13,7 @@ John Bethencourt, Brent Waters (Pairing-based)
 :Authors:    J Ayo Akinyele
 :Date:            04/2011
 '''
+from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEnc import ABEnc, Input, Output
@@ -20,8 +21,8 @@ from charm.toolbox.ABEnc import ABEnc, Input, Output
 # type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
 mk_t = {'beta':ZR, 'g2_alpha':G2 }
-sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':str }
-ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2 }
+sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':unicode } 
+ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2, 'policy':unicode, 'attributes':unicode }
 
 debug = False
 class CPabe_BSW07(ABEnc):
@@ -69,8 +70,9 @@ class CPabe_BSW07(ABEnc):
         D_j, D_j_pr = {}, {}
         for j in S:
             r_j = group.random()
-            D_j[j] = g_r * (group.hash(j, G2) ** r_j)
+            D_j[j] = g_r * (group.hash(unicode(j), G2) ** r_j)
             D_j_pr[j] = pk['g'] ** r_j
+        S = [unicode(s) for s in S]
         return { 'D':D, 'Dj':D_j, 'Djp':D_j_pr, 'S':S }
     
     @Input(pk_t, GT, str)
@@ -87,9 +89,9 @@ class CPabe_BSW07(ABEnc):
             j = util.strip_index(i)
             C_y[i] = pk['g'] ** shares[i]
             C_y_pr[i] = group.hash(j, G2) ** shares[i] 
-        
+
         return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
-                 'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy_str, 'attributes':a_list }
+                 'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':unicode(policy_str), 'attributes':a_list }
     
     @Input(pk_t, sk_t, ct_t)
     @Output(GT)
@@ -103,8 +105,8 @@ class CPabe_BSW07(ABEnc):
         for i in pruned_list:
             j = i.getAttributeAndIndex(); k = i.getAttribute()
             A *= ( pair(ct['Cy'][j], sk['Dj'][k]) / pair(sk['Djp'][k], ct['Cyp'][j]) ) ** z[j]
-        
-        return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
+
+        return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)   
 
 
 def main():   
