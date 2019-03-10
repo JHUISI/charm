@@ -20,7 +20,7 @@ class Protocol:
         self._serialize = False
         self.db = {} # initialize the database
         self.max_size = max_size
-        self.prefix_size = ceil(log(max_size, 2))
+        self.prefix_size = ceil(log(max_size, 256))
         
     def setup(self, *args):
         # handles the hookup between parties involved
