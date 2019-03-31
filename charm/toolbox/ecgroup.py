@@ -58,32 +58,40 @@ class ECGroup():
     def deserialize(self, bytes_object):
         """deserializes into a pairing object"""        
         return deserialize(self.ec_group, bytes_object)
-    
+
     def hash(self, args, target_type=ZR):
-        """hashes objects into ZR or G"""        
-        if isinstance(args, tuple):
-            s = bytes()
-            DEL = '|'
-            for i in args:
-                if type(i) == ec_element:
-                    s += serialize(i)
-                elif type(i) == str:
-                    s += bytes(str(i) + DEL, 'utf8')
-                elif type(i) == bytes:
-                    s += i + bytes(DEL, 'utf8') 
-                else:
-                    print("unexpected type: ", type(i))
-                # consider other types    
-            #print("s => %s" % s)
-            assert len(s) != 0, "hash input is empty."
-            return hashEC(self.ec_group, str(s), target_type)
-        elif type(args) == ec_element:
-            msg = str(serialize(args))
-            return hashEC(self.ec_group, msg, target_type)
-        elif type(args) in [str, bytes]:
-            return hashEC(self.ec_group, args, target_type)
-        raise Exception("ECGroup - invalid input for hash")
-    
+        """hashes objects into ZR or G
+
+        Different object types may hash to the same element, e.g., the ASCII
+        string 'str' and the byte string b'str' map to the same element."""
+        def hash_encode(arg):
+            """encode a data type to bytes"""
+            if type(arg) is bytes:
+                s = arg
+            elif type(arg) is ec_element:
+                s = serialize(arg)
+            elif type(arg) is str:
+                s = arg.encode('utf-8')
+            elif isinstance(args, tuple):
+                # based on TupleHash (see NIST SP 800-185)
+                def left_encode(x):
+                    # This implictly checks for validity conditions:
+                    # An exception is raised if n > 255, i.e., if len(x) > 2**2040
+                    n = (x.bit_length() + 7 ) // 8
+                    return n.to_bytes(1, 'little') + x.to_bytes(n, 'little')
+
+                s = b''
+                for arg in args:
+                    z = hash_encode(arg)
+                    # concat with encode_string(z)
+                    s += left_encode(len(z)) + z
+            else:
+                raise ValueError("unexpected type to hash: {}".format(type(arg)))
+
+            return s
+
+        return hashEC(self.ec_group, hash_encode(args), target_type)
+
     def zr(self, point):
         """get the X coordinate only"""
         if type(point) == ec_element:
