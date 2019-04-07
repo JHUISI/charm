@@ -58,3 +58,5 @@ nosetests.xml
 
 # PyCharm
 .idea
+
+.hypothesis
