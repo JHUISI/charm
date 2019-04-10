@@ -34,7 +34,7 @@ class YLLC15Test(unittest.TestCase):
         proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
         self.assertEqual({ attr.upper() for attr in set(attrs) }, proxy_key_user['k_attrs'].keys())
 
-    @settings(deadline=400, max_examples=50)
+    @settings(deadline=500, max_examples=50)
     @given(policy_str=policy_expressions())
     def test_encrypt_proxy_decrypt_decrypt_round_trip(self, policy_str):
         pkcs, skcs = self.abe.ukgen(self.params)
@@ -44,7 +44,7 @@ class YLLC15Test(unittest.TestCase):
 
         proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
         ciphertext = self.abe.encrypt(self.params, random_key_elem, policy_str)
-        intermediate_value = self.abe.proxy_decrypt(self.params, skcs, proxy_key_user, ciphertext)
+        intermediate_value = self.abe.proxy_decrypt(skcs, proxy_key_user, ciphertext)
         recovered_key_elem = self.abe.decrypt(self.params, sku, intermediate_value)
         self.assertEqual(random_key_elem, recovered_key_elem)
 
@@ -65,7 +65,7 @@ class YLLC15Test(unittest.TestCase):
         random_key_elem = self.abe.group.random(GT)
         ciphertext = self.abe.encrypt(self.params, random_key_elem, policy)
 
-        result = self.abe.proxy_decrypt(self.params, skcs, proxy_key_user, ciphertext)
+        result = self.abe.proxy_decrypt(skcs, proxy_key_user, ciphertext)
         self.assertIsNone(result)
 
 
