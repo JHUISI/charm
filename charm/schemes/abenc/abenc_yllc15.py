@@ -61,7 +61,7 @@ class YLLC15(ABEnc):
 
     @Input(pk_t)
     @Output(pk_u_t, sk_u_t)
-    def ukgen(self, params, user_id):
+    def ukgen(self, params):
         g2 = params['g2']
         x = self.group.random(ZR)
         pku = g2 ** x

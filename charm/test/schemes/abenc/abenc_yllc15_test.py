@@ -22,23 +22,23 @@ class YLLC15Test(unittest.TestCase):
         (self.params, self.msk) = self.abe.setup()
 
     def test_ukgen(self, user_id='bob@example.com'):
-        (public_key, secret_key) = self.abe.ukgen(self.params, user_id)
+        (public_key, secret_key) = self.abe.ukgen(self.params)
 
     @pytest.mark.skipif(sys.version_info < (3, 4),
                         reason="requires python3.4 or higher")
     @given(attrs=lists(attributes(), min_size=1))
     @settings(deadline=300, max_examples=50)
     def test_proxy_key_gen_deduplicates_and_uppercases_attributes(self, attrs):
-        pkcs, skcs = self.abe.ukgen(self.params, "aws@amazonaws.com")
-        pku, sku = self.abe.ukgen(self.params, "alice@example.com")
+        pkcs, skcs = self.abe.ukgen(self.params)
+        pku, sku = self.abe.ukgen(self.params)
         proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
         self.assertEqual({ attr.upper() for attr in set(attrs) }, proxy_key_user['k_attrs'].keys())
 
     @settings(deadline=400, max_examples=50)
     @given(policy_str=policy_expressions())
     def test_encrypt_proxy_decrypt_decrypt_round_trip(self, policy_str):
-        pkcs, skcs = self.abe.ukgen(self.params, "aws@amazonaws.com")
-        pku, sku = self.abe.ukgen(self.params, "alice@example.com")
+        pkcs, skcs = self.abe.ukgen(self.params)
+        pku, sku = self.abe.ukgen(self.params)
         attrs = self.extract_attributes(policy_str)
         random_key_elem = self.abe.group.random(GT)
 
@@ -57,8 +57,8 @@ class YLLC15Test(unittest.TestCase):
                         reason="requires python3.4 or higher")
     @given(policy=policy_expressions())
     def test_policy_not_satisfied(self, policy):
-        pkcs, skcs = self.abe.ukgen(self.params, "aws@amazonaws.com")
-        pku, sku = self.abe.ukgen(self.params, "alice@example.com")
+        pkcs, skcs = self.abe.ukgen(self.params)
+        pku, sku = self.abe.ukgen(self.params)
         attribute_list = ["UNLIKELY_ATTRIBUTE_NAME"]
         proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attribute_list)
 
