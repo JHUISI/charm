@@ -61,7 +61,7 @@ class YLLC15(ABEnc):
 
     @Input(pk_t)
     @Output(pk_u_t, sk_u_t)
-    def ukgen(self, params, user_id):
+    def ukgen(self, params):
         g2 = params['g2']
         x = self.group.random(ZR)
         pku = g2 ** x
@@ -125,7 +125,7 @@ class YLLC15(ABEnc):
 
     # @Input(pk_t, sk_u_t, sk_t, ct_t)
     @Output(v_t)
-    def proxy_decrypt(self, params, skcs, proxy_key_user, ciphertext):
+    def proxy_decrypt(self, skcs, proxy_key_user, ciphertext):
         policy_root_node = ciphertext['policy_str']
         k = proxy_key_user['k']
         k_prime = proxy_key_user['k_prime']
