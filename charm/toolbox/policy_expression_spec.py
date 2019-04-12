@@ -1,14 +1,23 @@
 from hypothesis.strategies import text, composite, sampled_from, characters, one_of, integers
 
 
-def policy_expressions():
-    return one_of(attributes(), inequalities(), policy_expression())
+def policy_expressions(min_leaves=1, max_leaves=25):
+    return integers(min_leaves, max_leaves).flatmap(policy_expressions_of_size)
+
+
+def policy_expressions_of_size(num_leaves):
+    if num_leaves == 1:
+        return one_of(attributes(), inequalities())
+    else:
+        return policy_expression(num_leaves)
 
 
 @composite
-def policy_expression(draw):
-    left = draw(policy_expressions())
-    right = draw(policy_expressions())
+def policy_expression(draw, num_leaves):
+    left_leaves = draw(integers(min_value=1, max_value=num_leaves - 1))
+    right_leaves = num_leaves - left_leaves
+    left = draw(policy_expressions_of_size(left_leaves))
+    right = draw(policy_expressions_of_size(right_leaves))
     gate = draw(gates())
     return u'(' + u' '.join((left, gate, right)) + u')'
 

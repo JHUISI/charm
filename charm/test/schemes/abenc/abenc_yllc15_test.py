@@ -55,6 +55,7 @@ class YLLC15Test(unittest.TestCase):
 
     @pytest.mark.skipif(sys.version_info < (3, 4),
                         reason="requires python3.4 or higher")
+    @settings(deadline=400, max_examples=50)
     @given(policy=policy_expressions())
     def test_policy_not_satisfied(self, policy):
         pkcs, skcs = self.abe.ukgen(self.params)
