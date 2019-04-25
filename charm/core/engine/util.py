@@ -10,73 +10,81 @@ from base64 import *
 from charm.toolbox.bitstring import *
 
 def serializeDict(Object, group):
-    bytes_object = {}
-    if isinstance(Object, dict):
-        for i in Object.keys():
-            bytes_object[i]=serializeObject(Object[i],group)
-        return bytes_object
+    return {
+        k: serializeObject(o, group)
+        for k, o in Object.items()
+    }
 
 def serializeList(Object, group):
-    bytes_object_ = []
-    for i in Object:
-        bytes_object_.append(serializeObject(i,group))
-    return bytes_object_
+    return [
+        serializeObject(o, group)
+        for o in Object
+    ]
+
+serializers = {
+    dict: serializeDict,
+    list: serializeList,
+    tuple: serializeList,
+    str: lambda obj, g: 'str:' + obj,
+    bytes: lambda obj, g: 'bytes:' + obj.decode('UTF-8'),
+    int: lambda obj, g: obj,
+    float: lambda obj, g: obj,
+}
 
 def serializeObject(Objects, group):
     assert hasattr(group, 'serialize'), "group does not have serialize method"
 
-    if type(Objects) == dict: 
-       return serializeDict(Objects, group)
-    elif type(Objects) in [list,tuple]:
-        return serializeList(Objects, group)
-    elif type(Objects) == str:
-        return 'str:'+Objects
-    elif type(Objects) == bytes:
-        return 'bytes:'+Objects.decode('UTF-8')
-    elif type(Objects) in [int,float]: 
-       return Objects
-    else:
+    try:
+        serializer = serializers[type(Objects)]
+    except KeyError:
         return group.serialize(Objects)
+
+    return serializer(Objects, group)
 
 
 def deserializeDict(Object, group):
-    bytes_object = {}
-    for i in Object.keys():
-        bytes_object[i] = deserializeObject(Object[i], group)
-    return bytes_object
-    
+    return {
+        k: deserializeObject(o, group)
+        for k, o in Object.items()
+    }
+
+
 def deserializeList(Object, group):
-    _bytes_object = []
-    for i in Object:
-        _bytes_object.append(deserializeObject(i, group))
-    return _bytes_object
+    return [
+        deserializeObject(o, group)
+        for o in Object
+    ]
+
 
 def deserializeTuple(Object, group):
-    _bytes_object = []
-    for i in Object:
-        _bytes_object.append(deserializeObject(i, group))
-    return tuple(_bytes_object)
+    return tuple(deserializeList(Object, group))
+
+
+def deserializeStr(object):
+    typ, obj = object.split(':', 1)
+
+    if typ == 'str':
+        return str(obj)
+    elif typ == 'bytes':
+        return getBytes(obj)
+
+deserializers = {
+    dict: deserializeDict,
+    list: deserializeList,
+    tuple: deserializeTuple,
+    str: deserializeStr,
+    bytes: lambda obj, group: group.deserialize(obj)
+}
 
 def deserializeObject(Objects, group):
     assert hasattr(group, 'deserialize'), "group does not have deserialize method"
 
-    if type(Objects) == dict: 
-       return deserializeDict(Objects, group)
-    elif type(Objects) == list:
-        return deserializeList(Objects, group)
-    elif type(Objects) == tuple:
-        return deserializeTuple(Objects, group)
-    elif type(Objects) == str:
-        tmp=Objects.split(':',1)
-        (t,obj)=(tmp[0],tmp[1])
-        if t=='str':
-            return str(obj)
-        elif t=='bytes':
-            return getBytes(obj)
-    elif type(Objects) == bytes:
-        return group.deserialize(Objects)
-    else:
+    try:
+        deserializer = deserializers[type(Objects)]
+    except KeyError:
         return Objects
+
+    return deserializer(Objects, group)
     
 def pickleObject(Object):
     valid_types = [bytes, dict, list, str, int]    
@@ -111,7 +119,7 @@ def to_json(object):
         return {'__class__': 'bytes', '__value__': list(object) }
     elif isinstance(object, tuple):
         return {'__class__': 'tuple', '__value__': list(object) }
-    return TypeError(repr(python_ob) + " is not JSON serializable")
+    return TypeError(repr(object) + " is not JSON serializable")
 
 def from_json(json_object):
     if '__class__' in json_object:
