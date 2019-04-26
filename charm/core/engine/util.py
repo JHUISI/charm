@@ -60,7 +60,7 @@ def deserializeTuple(Object, group):
     return tuple(deserializeList(Object, group))
 
 
-def deserializeStr(object):
+def deserializeStr(object, group):
     typ, obj = object.split(':', 1)
 
     if typ == 'str':
