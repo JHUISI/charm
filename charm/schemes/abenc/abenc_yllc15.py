@@ -13,7 +13,6 @@ Yanjiang Yang, Joseph K Liu, Kaitai Liang, Kim Kwang Raymond Choo, Jianying Zhou
 :Authors:    Douglas Hellinger
 :Date:       11/2018
 """
-from _pytest.compat import NoneType
 
 from charm.toolbox.ABEnc import ABEnc, Output
 from charm.toolbox.pairinggroup import ZR, G1, G2, GT, pair
@@ -157,7 +156,7 @@ class YLLC15(ABEnc):
 
         return intermediate_value
 
-    @Input(NoneType, sku_t, v_t)
+    @Input(type(None), sku_t, v_t)
     @Output(GT)
     def decrypt(self, params, sku, intermediate_value):
         """
