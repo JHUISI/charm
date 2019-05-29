@@ -45,7 +45,7 @@ class YLLC15Test(unittest.TestCase):
         proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
         ciphertext = self.abe.encrypt(self.params, random_key_elem, policy_str)
         intermediate_value = self.abe.proxy_decrypt(skcs, proxy_key_user, ciphertext)
-        recovered_key_elem = self.abe.decrypt(self.params, sku, intermediate_value)
+        recovered_key_elem = self.abe.decrypt(None, sku, intermediate_value)
         self.assertEqual(random_key_elem, recovered_key_elem)
 
     def extract_attributes(self, policy_str):
