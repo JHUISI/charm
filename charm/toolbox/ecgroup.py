@@ -72,6 +72,8 @@ class ECGroup():
                 s = serialize(arg)
             elif type(arg) is str:
                 s = arg.encode('utf-8')
+            elif type(arg) is int:
+                s = arg.to_bytes((arg.bit_length() + 7) // 8, 'little')
             elif isinstance(args, tuple):
                 # based on TupleHash (see NIST SP 800-185)
                 def left_encode(x):
