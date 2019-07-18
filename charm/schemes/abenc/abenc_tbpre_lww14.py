@@ -21,7 +21,11 @@ from functools import reduce
 # taken from https://gist.github.com/endolith/114336
 def gcd(*numbers):
     """Return the greatest common divisor of the given integers"""
-    from fractions import gcd
+    import sys
+    if sys.version_info < (3, 5):
+        from fractions import gcd
+    else:
+        from math import gcd
     return reduce(gcd, numbers)
 
 # taken from https://gist.github.com/endolith/114336

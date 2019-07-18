@@ -23,7 +23,10 @@ from charm.core.engine.util import *
 from datetime import datetime
 from time import mktime
 import hashlib , os , math, sys, random
-from fractions import gcd
+if sys.version_info < (3, 5):
+    from fractions import gcd
+else:
+    from math import gcd
 from timeit import default_timer as timer
 
 #This generates values of p,q,n and n2
