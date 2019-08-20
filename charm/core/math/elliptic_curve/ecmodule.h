@@ -34,7 +34,6 @@
 #include <structmember.h>
 #include <longintrepr.h>
 #include <math.h>
-#include <gmp.h>
 #include "benchmarkmodule.h"
 #include "base64.h"
 
@@ -165,7 +164,6 @@ typedef struct {
 #define ElementG(a, b) a->type == G && b->type == G
 #define ElementZR(a, b) a->type == ZR && b->type == ZR
 
-void longObjToMPZ (mpz_t m, PyLongObject * p);
 void setBigNum(PyLongObject *obj, BIGNUM **value);
 PyObject *ECElement_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 int ECElement_init(ECElement *self, PyObject *args, PyObject *kwds);

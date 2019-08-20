@@ -41,50 +41,27 @@ void printf_buffer_as_hex(uint8_t * data, size_t len)
 #endif
 }
 
-void longObjToMPZ (mpz_t m, PyLongObject * p)
-{
-	int size, i, tmp = Py_SIZE(p);
-	mpz_t temp, temp2;
-	mpz_init (temp);
-	mpz_init (temp2);
-	if (tmp > 0)
-		size = tmp;
-	else
-		size = -tmp;
-	mpz_set_ui (m, 0);
-	for (i = 0; i < size; i++)
-	{
-		mpz_set_ui (temp, p->ob_digit[i]);
-		mpz_mul_2exp (temp2, temp, PyLong_SHIFT * i);
-		mpz_add (m, m, temp2);
-	}
-	mpz_clear (temp);
-	mpz_clear (temp2);
-}
-
 void setBigNum(PyLongObject *obj, BIGNUM **value) {
-  mpz_t tmp;
-  mpz_init(tmp);
-  // convert long object into an mpz_t type
-#if PY_MAJOR_VERSION < 3
-  PyObject *longObj2 = PyNumber_Long(obj);
-  longObjToMPZ(tmp, (PyLongObject *) longObj2);
-  Py_DECREF(longObj2);
+	// convert Python long object to temporary decimal string
+#if PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 3)
+	/* for Python 3.3+ */
+	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10);
+	const char *tmp_str = (const char *)PyUnicode_DATA(strObj);
+#elif PY_MAJOR_VERSION == 3
+	/* for Python 3.0-3.2 */
+	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10);
+	const char *tmp_str = PyUnicode_AS_DATA(strObj);
 #else
-  /* for Python 3.x */
-  longObjToMPZ(tmp, (PyLongObject *) obj);
+	/* for Python 2.x */
+	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10, 0, 0);
+	const char *tmp_str = PyString_AS_STRING(strObj);
 #endif
-  // now convert tmp into a decimal string
-  size_t tmp_len = mpz_sizeinbase(tmp, BASE_DEC) + 2;
-  char *tmp_str = (char *) malloc(tmp_len);
-  tmp_str = mpz_get_str(tmp_str, BASE_DEC, tmp);
-  debug("Element => '%s'\n", tmp_str);
-  //debug("Order of Element => '%zd'\n", tmp_len);
+	
+	// convert decimal string to OpenSSL bignum
+	BN_dec2bn(value, tmp_str);
 
-  // use BN_* to set decimal to BIGNUM
-  BN_dec2bn(value, (const char *) tmp_str);
-  free(tmp_str);
-  mpz_clear(tmp);
+	// free temporary decimal string
+	Py_DECREF(strObj);
 }
 
 /*!
