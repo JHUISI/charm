@@ -78,6 +78,7 @@ g++ -c -m64 -O2 mrlucas.c
 g++ -c -m64 -O2 mrzzn2.c
 g++ -c -m64 -O2 mrzzn2b.c
 g++ -c -m64 -O2 mrzzn3.c
+g++ -c -m64 -O2 mrzzn4.c
 g++ -c -m64 -O2 mrecn2.c
 g++ -c -m64 -O2 mrstrong.c
 g++ -c -m64 -O2 mrbrick.c
@@ -110,7 +111,7 @@ g++ -c -m64 -O2 crt.cpp
 # Cocks-Pinch curve
 #g++ -c -m64 -O2 cp_pair.cpp
 
-ar rc miracl.a mrcore.o mrarth0.o mrarth1.o mrarth2.o mralloc.o mrsmall.o mrzzn2.o mrzzn3.o
+ar rc miracl.a mrcore.o mrarth0.o mrarth1.o mrarth2.o mralloc.o mrsmall.o mrzzn2.o mrzzn3.o mrzzn4.o
 ar r miracl.a mrio1.o mrio2.o mrjack.o mrgcd.o mrxgcd.o mrarth3.o mrbits.o mrecn2.o
 ar r miracl.a mrrand.o mrprime.o mrcrt.o mrscrt.o mrmonty.o mrcurve.o mrsroot.o mrzzn2b.o
 ar r miracl.a mrpower.o mrfast.o mrshs.o mrshs256.o mraes.o mrlucas.o mrstrong.o mrgcm.o    
