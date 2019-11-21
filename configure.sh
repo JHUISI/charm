@@ -468,7 +468,7 @@ fi
 
 # Python version handling logic. We prefer the argument path given by --python 
 # If not specified, we check if python is python 3. 
-#Baring that, we try python3,python3.2.python3.1,etc 
+# Baring that, we try python3, python3.8, python3.7, etc 
 
 python3_found="no"
 is_python_version(){
@@ -502,7 +502,7 @@ if [ -n "$python_path" ]; then
             exit 1
         fi 
 else
-        for pyversion in python python3 python3.2 python3.1 
+        for pyversion in python python3 python3.8 python3.7 python3.6 python3.5 python3.4 python3.3 python3.2 python3.1 
         do 
             if (is_python_version `which $pyversion`); then
                 python3_found="yes"
