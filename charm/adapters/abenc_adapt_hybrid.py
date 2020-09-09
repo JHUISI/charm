@@ -22,20 +22,19 @@ class HybridABEnc(ABEnc):
     """
     def __init__(self, scheme, groupObj):
         ABEnc.__init__(self)
-        global abenc
         # check properties (TODO)
-        abenc = scheme
+        self.abenc = scheme
         self.group = groupObj
             
     def setup(self):
-        return abenc.setup()
+        return self.abenc.setup()
     
     def keygen(self, pk, mk, object):
-        return abenc.keygen(pk, mk, object)
+        return self.abenc.keygen(pk, mk, object)
     
     def encrypt(self, pk, M, object):
         key = self.group.random(GT)
-        c1 = abenc.encrypt(pk, key, object)
+        c1 = self.abenc.encrypt(pk, key, object)
         # instantiate a symmetric enc scheme from this key
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
         c2 = cipher.encrypt(M)
@@ -43,7 +42,7 @@ class HybridABEnc(ABEnc):
     
     def decrypt(self, pk, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
-        key = abenc.decrypt(pk, sk, c1)
+        key = self.abenc.decrypt(pk, sk, c1)
         if key is False:
             raise Exception("failed to decrypt!")
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
