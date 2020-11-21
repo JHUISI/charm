@@ -368,16 +368,14 @@ char * init_pbc_param(char *file, pairing_t *pairing)
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
 	SHA256_CTX sha2;
-	int i, new_input_len = input_len + 2; // extra byte for prefix
-	uint8_t first_block = 0;
-	uint8_t new_input[new_input_len+1];
+	const int new_input_len = input_len + 2; // extra byte for prefix
+	uint8_t new_input[new_input_len];
 //	printf("orig input => \n");
 //	printf_buffer_as_hex(input_buf, input_len);
-
-	memset(new_input, 0, new_input_len+1);
-	new_input[0] = first_block; // block number (always 0 by default)
+	memset(new_input, 0, new_input_len);
+	new_input[0] = (uint8_t)1; // block number (always 1 by default)
 	new_input[1] = hash_prefix; // set hash prefix
-	memcpy((uint8_t *)(new_input+2), input_buf, input_len); // copy input bytes
+	memcpy(new_input+2, input_buf, input_len); // copy input bytes
 
 //	printf("new input => \n");
 //	printf_buffer_as_hex(new_input, new_input_len);
@@ -387,7 +385,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 	if (hash_len <= HASH_LEN) {
 		SHA256_Init(&sha2);
 		SHA256_Update(&sha2, new_input, new_input_len);
-		uint8_t md[HASH_LEN+1];
+		uint8_t md[HASH_LEN];
 		SHA256_Final(md, &sha2);
 		memcpy(output_buf, md, hash_len);
 	}
@@ -395,28 +393,21 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 		// apply variable-size hash technique to get desired size
 		// determine block count.
 		int blocks = (int) ceil(((double) hash_len) / HASH_LEN);
-		debug("Num blocks needed: %d\n", blocks);
-		uint8_t md[HASH_LEN+1];
-		uint8_t md2[(blocks * HASH_LEN)+1];
-		uint8_t *target_buf = md2;
-		for(i = 0; i < blocks; i++) {
+		uint8_t md2[(blocks * HASH_LEN)];
+		for(int i = 0; i < blocks; i++) {
 			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
-			target_buf += (i * HASH_LEN);
-			new_input[0] = (uint8_t) i;
+			uint8_t md[HASH_LEN];
+			new_input[0] = (uint8_t)(i+1);
 			SHA256_Init(&sha2);
-			debug("input %d => ", i);
-			printf_buffer_as_hex(new_input, new_input_len);
-			SHA256_Update(&sha2, new_input, new_input_len);
+			int size = new_input_len;
+			SHA256_Update(&sha2, new_input, size);
 			SHA256_Final(md, &sha2);
-			memcpy(target_buf, md, hash_len);
-			debug("block %d => ", i);
-			printf_buffer_as_hex(md, HASH_LEN);
-			memset(md, 0, HASH_LEN);
+			memcpy(md2 +(i * HASH_LEN), md, HASH_LEN);
 		}
+		
 		// copy back to caller
 		memcpy(output_buf, md2, hash_len);
 	}
-
 	OPENSSL_cleanse(&sha2,sizeof(sha2));
 	return TRUE;
 }
@@ -1346,8 +1337,7 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 
 	VERIFY_GROUP(group);
 	int hash_len = mpz_sizeinbase(group->pair_obj->r, 2) / BYTE;
-	debug("hash_len : %d\n", hash_len);
-	uint8_t hash_buf[hash_len+1];
+	uint8_t hash_buf[hash_len];
 	memset(hash_buf, 0, hash_len);
 
 	// first case: is a string and type may or may not be set
@@ -1355,7 +1345,6 @@ static PyObject *Element_hash(Element *self, PyObject *args) {
 		str = NULL;
 		PyBytes_ToString2(str, objList, tmpObj);
 		if(type == ZR) {
-			debug("Hashing string '%s' to Zr...\n", str);
 			// create an element of Zr
 			// hash bytes using SHA1
 			int str_length = (int) strlen(str);
