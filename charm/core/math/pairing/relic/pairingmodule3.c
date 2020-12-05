@@ -112,7 +112,7 @@ PyObject *intToLongObj(integer_t x)
 {
 	/* borrowed from gmpy */
 	int size, isNeg = (bn_sign(x) == BN_NEG) ? TRUE : FALSE;
-	bn_size_str(&size, x, 2);
+	size = bn_size_str(x, 2);
 	size = (size + PyLong_SHIFT - 1) / PyLong_SHIFT;
 	int i;
 	integer_t m;
