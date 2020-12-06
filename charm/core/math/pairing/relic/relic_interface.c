@@ -310,20 +310,20 @@ status_t element_to_str(char *data, int len, element_t e)
     		bn_write_str(data, str_len, e->bn, DBASE);
     	}
     	else if(e->type == G1) {
-			g1_write_str(e->g1, tmp1, str_len);
+			charm_g1_write_str(e->g1, tmp1, str_len);
 
 			int dist_y = FP_STR;
 			snprintf(data, len, "[%s, %s]", tmp1, &(tmp1[dist_y]));
     	}
     	else if(e->type == G2) {
-			g2_write_str(e->g2, tmp1, str_len);
+			charm_g2_write_str(e->g2, tmp1, str_len);
 
 			int len2 = FP_STR;
 			int dist_x1 = len2, dist_y0 = len2 * 2, dist_y1 = len2 * 3;
 			snprintf(data, len, "[%s, %s, %s, %s]", tmp1, &(tmp1[dist_x1]), &(tmp1[dist_y0]), &(tmp1[dist_y1]));
     	}
     	else if(e->type == GT) {
-			gt_write_str(e->gt, tmp1, str_len);
+			charm_gt_write_str(e->gt, tmp1, str_len);
 
     		int len2 = FP_STR;
     		int dist_x01 = len2, dist_x10 = len2 * 2, dist_x11 = len2 * 3,
@@ -879,7 +879,7 @@ int element_length(element_t e)
 	return 0;
 }
 
-status_t g1_read_bin(g1_t g, uint8_t *data, int data_len)
+status_t charm_g1_read_bin(g1_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 	fp_read_bin(g->x, data, FP_BYTES);
@@ -890,7 +890,7 @@ status_t g1_read_bin(g1_t g, uint8_t *data, int data_len)
 	return ELEMENT_OK;
 }
 
-status_t g1_write_bin(g1_t g, uint8_t *data, int data_len)
+status_t charm_g1_write_bin(g1_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 	if(data_len < G1_LEN) return ELEMENT_INVALID_ARG_LEN;
@@ -914,7 +914,7 @@ status_t g1_write_bin(g1_t g, uint8_t *data, int data_len)
 	return ELEMENT_OK;
 }
 
-status_t g1_write_str(g1_t g, uint8_t *data, int data_len)
+status_t charm_g1_write_str(g1_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 	if(data_len < G1_LEN*2) return ELEMENT_INVALID_ARG_LEN;
@@ -929,7 +929,7 @@ status_t g1_write_str(g1_t g, uint8_t *data, int data_len)
 }
 
 
-status_t g2_read_bin(g2_t g, uint8_t *data, int data_len)
+status_t charm_g2_read_bin(g2_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 	if(data_len < G2_LEN) return ELEMENT_INVALID_ARG_LEN;
@@ -950,7 +950,7 @@ status_t g2_read_bin(g2_t g, uint8_t *data, int data_len)
 	return ELEMENT_OK;
 }
 
-status_t g2_write_bin(g2_t g, uint8_t *data, int data_len)
+status_t charm_g2_write_bin(g2_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 //	int out_len = (FP_BYTES * 4) + 4;
@@ -982,7 +982,7 @@ status_t g2_write_bin(g2_t g, uint8_t *data, int data_len)
 	return ELEMENT_OK;
 }
 
-status_t g2_write_str(g2_t g, uint8_t *data, int data_len)
+status_t charm_g2_write_str(g2_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 	int G2_STR = G2_LEN*4;
@@ -1002,7 +1002,7 @@ status_t g2_write_str(g2_t g, uint8_t *data, int data_len)
 }
 
 
-status_t gt_read_bin(gt_t g, uint8_t *data, int data_len)
+status_t charm_gt_read_bin(gt_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 	if(data_len < GT_LEN) return ELEMENT_INVALID_ARG_LEN;
@@ -1040,7 +1040,7 @@ status_t gt_read_bin(gt_t g, uint8_t *data, int data_len)
 	return ELEMENT_OK;
 }
 
-status_t gt_write_bin(gt_t g, uint8_t *data, int data_len)
+status_t charm_gt_write_bin(gt_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 	if(data_len < GT_LEN) return ELEMENT_INVALID_ARG_LEN;
@@ -1090,7 +1090,7 @@ status_t gt_write_bin(gt_t g, uint8_t *data, int data_len)
 	return ELEMENT_OK;
 }
 
-status_t gt_write_str(gt_t g, uint8_t *data, int data_len)
+status_t charm_gt_write_str(gt_t g, uint8_t *data, int data_len)
 {
 	if(g == NULL) return ELEMENT_UNINITIALIZED;
 	if(data_len < GT_LEN*3) return ELEMENT_INVALID_ARG_LEN;
@@ -1134,13 +1134,13 @@ status_t element_from_bytes(element_t e, unsigned char *data, int data_len)
 		bn_read_bin(e->bn, data, data_len);
 	}
 	else if(type == G1) {
-		return g1_read_bin(e->g1, data, data_len); // x & y
+		return charm_g1_read_bin(e->g1, data, data_len); // x & y
 	}
 	else if(type == G2) {
-		return g2_read_bin(e->g2, data, data_len); // x1, y1  & x2, y2
+		return charm_g2_read_bin(e->g2, data, data_len); // x1, y1  & x2, y2
 	}
 	else if(type == GT) {
-		return gt_read_bin(e->gt, data, data_len); // x1-6 && y1-6
+		return charm_gt_read_bin(e->gt, data, data_len); // x1-6 && y1-6
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;
@@ -1157,13 +1157,13 @@ status_t element_to_bytes(unsigned char *data, int data_len, element_t e)
 		bn_write_bin(data, data_len, e->bn);
 	}
 	else if(type == G1) {
-		return g1_write_bin(e->g1, data, data_len); // x & y
+		return charm_g1_write_bin(e->g1, data, data_len); // x & y
 	}
 	else if(type == G2) {
-		return g2_write_bin(e->g2, data, data_len); // x1, y1  & x2, y2
+		return charm_g2_write_bin(e->g2, data, data_len); // x1, y1  & x2, y2
 	}
 	else if(type == GT) {
-		return gt_write_bin(e->gt, data, data_len); // x1-6 && y1-6
+		return charm_gt_write_bin(e->gt, data, data_len); // x1-6 && y1-6
 	}
 	else {
 		return ELEMENT_INVALID_TYPES;

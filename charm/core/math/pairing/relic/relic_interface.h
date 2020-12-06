@@ -56,6 +56,19 @@ typedef enum _status_t { ELEMENT_OK = 2,
 enum Group {ZR, G1, G2, GT, NONE_G};
 typedef enum Group GroupType;
 
+//new macros to fix Relic renaming
+#define FP_BYTES RLC_FP_BYTES
+#define fp_write fp_write_str
+#define BN_BYTES (RLC_BN_DIGS * sizeof(dig_t))
+#define BN_NEG RLC_NEG
+#define BN_POS RLC_POS
+#define STS_OK RLC_OK
+#define G1_TABLE RLC_G1_TABLE
+#define G2_TABLE RLC_G2_TABLE
+#define CMP_GT RLC_GT
+#define CMP_EQ RLC_EQ
+//end new macros
+
 #define FP_STR FP_BYTES * 2 + 1
 #define G1_LEN (FP_BYTES * 2) + 2
 #define G2_LEN (FP_BYTES * 4) + 4
@@ -158,17 +171,17 @@ status_t element_to_bytes(unsigned char *data, int data_len, element_t e);
 status_t element_from_bytes(element_t e, unsigned char *data, int data_len);
 
 void print_as_hex(uint8_t *data, size_t len);
-status_t g1_read_bin(g1_t g, uint8_t *data, int data_len);
-status_t g1_write_bin(g1_t g, uint8_t *data, int data_len);
-status_t g1_write_str(g1_t g, uint8_t *data, int data_len);
+status_t charm_g1_read_bin(g1_t g, uint8_t *data, int data_len);
+status_t charm_g1_write_bin(g1_t g, uint8_t *data, int data_len);
+status_t charm_g1_write_str(g1_t g, uint8_t *data, int data_len);
 
-status_t g2_read_bin(g2_t g, uint8_t *data, int data_len);
-status_t g2_write_bin(g2_t g, uint8_t *data, int data_len);
-status_t g2_write_str(g2_t g, uint8_t *data, int data_len);
+status_t charm_g2_read_bin(g2_t g, uint8_t *data, int data_len);
+status_t charm_g2_write_bin(g2_t g, uint8_t *data, int data_len);
+status_t charm_g2_write_str(g2_t g, uint8_t *data, int data_len);
 
-status_t gt_read_bin(gt_t g, uint8_t *data, int data_len);
-status_t gt_write_bin(gt_t g, uint8_t *data, int data_len);
-status_t gt_write_str(gt_t g, uint8_t *data, int data_len);
+status_t charm_gt_read_bin(gt_t g, uint8_t *data, int data_len);
+status_t charm_gt_write_bin(gt_t g, uint8_t *data, int data_len);
+status_t charm_gt_write_str(gt_t g, uint8_t *data, int data_len);
 
 #define bn_inits(b) \
 		bn_null(b);	\
