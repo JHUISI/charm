@@ -108,7 +108,7 @@ Let's take a look at the encrypt routine as described in the paper. Given a mess
  	    u1  = pk['g1'] ** r
 	    u2  = pk['g2'] ** r
 	    e   = group.encode(m) * (pk['h'] ** r)
-	    alpha = pk['H'](u1, u2, e)
+	    alpha = pk['H']((u1, u2, e))
 	    v   = (pk['c'] ** r) * (pk['d'] ** (r * alpha)) 
 
 	    return { 'u1' : u1, 'u2' : u2, 'e' : e, 'v' : v } 
@@ -126,7 +126,7 @@ Finally, the decryption routine as described in the paper. Given a ciphertext, t
 ::
 
 	def decrypt(self, pk, sk, c):
-	    alpha = pk['H'](c['u1'], c['u2'], c['e'])
+	    alpha = pk['H']((c['u1'], c['u2'], c['e']))
 
             v_prime = (c['u1'] ** (sk['x1'] + (sk['y1'] * alpha))) * (c['u2'] ** (sk['x2'] + (sk['y2'] * alpha)))
 	    if (c['v'] != v_prime):
