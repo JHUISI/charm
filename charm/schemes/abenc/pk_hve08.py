@@ -45,7 +45,7 @@ class HVE08:
         return (pk, msk)
 
     def keygen(self, pk, msk, yVector):
-        """yVector: expects binary attributes of 0 or 1 and "dont care" attriute is represented by the value 2.
+        """yVector: expects binary attributes of 0 or 1 and "dont care" attribute is represented by the value 2.
         """
         g1 = pk['g1']
         g2 = pk['g2']
