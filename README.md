@@ -20,7 +20,7 @@ Features of Charm include:
 
 Documentation
 =============
-For complete install, see our [documentation](http://jhuisi.github.io/charm/install_source.html). 
+For complete install, see our [documentation](https://jhuisi.github.io/charm/install_source.html). 
 
 Pull Requests
 =============
@@ -30,7 +30,7 @@ Schemes in the dev branch are Python 3.x only and ones in the 2.7-dev branch are
 
 Schemes
 =======
-We have provided several cryptographic scheme [examples](http://jhuisi.github.io/charm/schemes.html) to get you going. If this doesn't help, then feel free to reach us for questions and/or comments at support@charm-crypto.com.
+We have provided several cryptographic scheme [examples](https://jhuisi.github.io/charm/schemes.html) to get you going. If this doesn't help, then feel free to reach us for questions and/or comments at support@charm-crypto.com.
 
 If you're using Charm to implement schemes, we want to know what your experience is with our framework. Your feedback is very valuable to us! 
 
