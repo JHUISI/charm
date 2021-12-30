@@ -54,10 +54,17 @@ else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
 
 #define BENCHMARK_MOD_NAME "charm.core.benchmark._C_API"
 
+#ifndef BENCHMARK_MODULE
+// define new benchmark type for benchmark module
+extern PyTypeObject BenchmarkType;
+// define new benchmark error type (will be used for notifying errors)
+extern PyObject *BenchmarkError;
+#else
 // define new benchmark type for benchmark module
 PyTypeObject BenchmarkType;
 // define new benchmark error type (will be used for notifying errors)
 PyObject *BenchmarkError;
+#endif
 // define a macro to help determine whether an object is of benchmark type
 #define PyBenchmark_Check(obj) PyObject_TypeCheck(obj, &BenchmarkType)
 /* header file for benchmark module */

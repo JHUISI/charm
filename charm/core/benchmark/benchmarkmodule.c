@@ -1,6 +1,11 @@
 #define BENCHMARK_MODULE
 #include "benchmarkmodule.h"
-
+#ifndef BENCHMARK_MODULE
+// define new benchmark type for benchmark module
+PyTypeObject BenchmarkType;
+// define new benchmark error type (will be used for notifying errors)
+PyObject *BenchmarkError;
+#endif
 double CalcUsecs(struct timeval *start, struct timeval *stop) {
 	double usec_per_second = 1000000;
 	double result = usec_per_second * (stop->tv_sec - start->tv_sec);
