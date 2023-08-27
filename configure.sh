@@ -227,7 +227,7 @@ else
 fi
 
 case "$cpu" in
-  alpha|cris|ia64|lm32|m68k|microblaze|ppc|ppc64|sparc64|unicore32|armv6l|armv7l|s390|s390x|arm64)
+  alpha|cris|ia64|lm32|m68k|microblaze|ppc|ppc64|sparc64|unicore32|armv6l|armv7l|s390|s390x|arm64|aarch64)
     cpu="$cpu"
   ;;
   i386|i486|i586|i686|i86pc|BePC)
