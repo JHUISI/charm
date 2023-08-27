@@ -24,6 +24,10 @@
 #ifndef PCT__COUNTER_H
 #define PCT__COUNTER_H
 
+#ifndef PY_SSIZE_T_CLEAN
+#define PY_SSIZE_T_CLEAN
+#endif
+
 #include <stdint.h>
 #include "Python.h"
 

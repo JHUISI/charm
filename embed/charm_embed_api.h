@@ -30,6 +30,10 @@
 #ifndef CHARM_EMBED_API_H
 #define CHARM_EMBED_API_H
 
+#ifndef PY_SSIZE_T_CLEAN
+#define PY_SSIZE_T_CLEAN
+#endif
+
 #include <gmp.h>
 #ifdef __cplusplus
 extern "C" {

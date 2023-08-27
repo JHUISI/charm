@@ -30,6 +30,10 @@
 #ifndef INTEGERMODULE_H
 #define INTEGERMODULE_H
 
+#ifndef PY_SSIZE_T_CLEAN
+#define PY_SSIZE_T_CLEAN
+#endif
+
 #include <Python.h>
 #include <stdio.h>
 #include <string.h>
