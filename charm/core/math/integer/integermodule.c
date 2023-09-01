@@ -2242,7 +2242,11 @@ static PyObject *GetAllBenchmarks(PyObject *self, PyObject *args) {
 
 PyMethodDef Integer_methods[] = {
 	{ "set", (PyCFunction) Integer_set, METH_VARARGS, "initialize with another integer object." },
+	#if PY_MINOR_VERSION <= 7
 	{ "isCoPrime", (PyCFunction) testCoPrime, METH_O | METH_NOARGS, "determine whether two integers a and b are relatively prime." },
+	#else
+	{ "isCoPrime", (PyCFunction) testCoPrime, METH_O, "determine whether two integers a and b are relatively prime." },
+	#endif
 	{ "isCongruent", (PyCFunction) testCongruency, METH_VARARGS, "determine whether two integers are congruent mod n." },
 //	{ "reduce", (PyCFunction) Integer_reduce, METH_NOARGS, "reduce an integer object modulo N." },
 	{ NULL }
