@@ -8,7 +8,7 @@ except Exception as err:
   exit(-1)
 
 class PairingGroup():
-    def __init__(self, param_id, param_file=False, secparam=512, verbose=False):
+    def __init__(self, param_id, param_file = False, secparam = 512, verbose = False, seed1 = None, seed2 = None):
         #legacy handler to handle calls that still pass in a file path
         if param_file:
           self.Pairing = pairing(file=param_id)
@@ -27,7 +27,7 @@ class PairingGroup():
  
         self.secparam = secparam # number of bits
         self._verbose = verbose
-        self.__gt = pair(self.random(G1), self.random(G2))
+        self.__gt = pair(self.random(G1, seed = seed1), self.random(G2, seed = seed2))
     
     def __str__(self):
         return str(self.Pairing)
