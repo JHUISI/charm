@@ -27,6 +27,7 @@ class PairingGroup():
  
         self.secparam = secparam # number of bits
         self._verbose = verbose
+        self.__gt = pair(self.random(G1), self.random(G2))
     
     def __str__(self):
         return str(self.Pairing)
@@ -61,7 +62,7 @@ class PairingGroup():
         return self.param
         
     def messageSize(self):
-        return self.secparam / 8        
+        return self.secparam >> 3        
 
     def init(self, type, value=None):
         """initializes an object with a specified type and value""" 
@@ -69,23 +70,20 @@ class PairingGroup():
             return init(self.Pairing, type, value)
         return init(self.Pairing, type)
             
-    def random(self, _type=ZR, count=1, seed=None):
-        """selects a random element in ZR, G1, G2 and GT"""
-        if _type == GT: return self.__randomGT()
-        elif _type in [ZR, G1, G2]:
-            if seed != None and count == 1:
-                return random(self.Pairing, _type, seed)
-            elif count > 1:
-                return tuple([random(self.Pairing, _type) for i in range(count)])                
-            return random(self.Pairing, _type)
-        return None
-
-        
-    def __randomGT(self):
-        if not hasattr(self, 'gt'):
-            self.gt = pair(self.random(G1), self.random(G2))
-        z = self.random(ZR)
-        return self.gt ** z
+    def random(self, _type = ZR, count = 1, seed = None):
+        """selects one or more random elements in ZR, G1, G2 and GT"""
+        if _type == GT:
+            if 1 == count:
+                return self.__gt ** (random(self.Pairing, ZR) if seed is None else random(self.Pairing, ZR, seed))
+            elif count >= 2:
+                return tuple(self.__gt ** random(self.Pairing, ZR) for _ in range(count))
+        elif _type in (ZR, G1, G2):
+            if 1 == count:
+                return random(self.Pairing, _type) if seed is None else random(self.Pairing, _type, seed)
+            elif count >= 2:
+                return tuple(random(self.Pairing, _type) for _ in range(count))
+        else:
+            return None
     
     def encode(self, message):
         raise NotImplementedException
