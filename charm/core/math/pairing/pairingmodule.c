@@ -29,6 +29,18 @@
 
 #include "pairingmodule.h"
 
+#if PY_MINOR_VERSION <= 10
+  #define PythonLongVal(l, i) l->ob_digit[i]
+#else 
+  #define PythonLongVal(l, i)  l->long_value.ob_digit[i]
+#endif
+
+#if PY_MINOR_VERSION <= 11
+  #define PYTHON_SET_SIZE(l, i) Py_SIZE(l) = i
+#else
+  #define PYTHON_SET_SIZE(l, i) Py_SET_SIZE(l, i);
+#endif
+		  
 int exp_rule(GroupType lhs, GroupType rhs)
 {
 	if(lhs == ZR && rhs == ZR) return TRUE;
@@ -121,17 +133,18 @@ PyObject *mpzToLongObj (mpz_t m)
 	mpz_init_set (temp, m);
 	for (i = 0; i < size; i++)
 	{
-		l->long_value.ob_digit[i] = (digit) (mpz_get_ui (temp) & PyLong_MASK);
+		PythonLongVal(l, i) = (digit) (mpz_get_ui (temp) & PyLong_MASK);
 		mpz_fdiv_q_2exp (temp, temp, PyLong_SHIFT);
 	}
 	i = size;
-	while ((i > 0) && (l->long_value.ob_digit[i - 1] == 0))
+	while ((i > 0) && (PythonLongVal(l, i - 1) == 0))
 		i--;
 	if(isNeg) {
-		Py_SET_SIZE(l,-i);
+		// Py_SET_SIZE(l,-i);
+		PYTHON_SET_SIZE(l, -i);
 	}
 	else {
-		Py_SET_SIZE(l,i);
+		PYTHON_SET_SIZE(l, i);
 	}
 	mpz_clear (temp);
 	return (PyObject *) l;
@@ -153,7 +166,7 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 	mpz_set_ui (m, 0);
 	for (i = 0; i < size; i++)
 	{
-		mpz_set_ui (temp, p->long_value.ob_digit[i]);
+		mpz_set_ui (temp, PythonLongVal(p, i));
 		mpz_mul_2exp (temp2, temp, PyLong_SHIFT * i);
 		mpz_add (m, m, temp2);
 	}
