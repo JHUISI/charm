@@ -29,13 +29,13 @@
 
 #include "integermodule.h"
 
-#if PY_MINOR_VERSION <= 10
+#if PY_MINOR_VERSION <= 11
   #define PythonLongVal(l) l->ob_digit
 #else 
   #define PythonLongVal(l)  l->long_value.ob_digit
 #endif
 
-#if PY_MINOR_VERSION <= 11
+#if PY_MINOR_VERSION <= 10
   #define PYTHON_SET_SIZE(l, i) Py_SIZE(l) = i
 #else
   #define PYTHON_SET_SIZE(l, i) Py_SET_SIZE(l, i);

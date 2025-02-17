@@ -29,13 +29,13 @@
 
 #include "pairingmodule.h"
 
-#if PY_MINOR_VERSION <= 10
+#if PY_MINOR_VERSION <= 11
   #define PythonLongVal(l, i) l->ob_digit[i]
 #else 
   #define PythonLongVal(l, i)  l->long_value.ob_digit[i]
 #endif
 
-#if PY_MINOR_VERSION <= 11
+#if PY_MINOR_VERSION <= 10
   #define PYTHON_SET_SIZE(l, i) Py_SIZE(l) = i
 #else
   #define PYTHON_SET_SIZE(l, i) Py_SET_SIZE(l, i);
