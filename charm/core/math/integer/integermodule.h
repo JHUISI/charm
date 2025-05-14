@@ -38,7 +38,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <structmember.h>
-#include <cpython/longintrepr.h>				/* for conversions */
+
+#if PY_MINOR_VERSION <= 10
+  #include <longintrepr.h>
+#else
+  #include <cpython/longintrepr.h>				/* for conversions */
+#endif
+
 #include <math.h>
 #include <string.h>
 #include <gmp.h>

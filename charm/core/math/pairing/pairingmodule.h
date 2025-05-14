@@ -36,7 +36,13 @@
 
 #include <Python.h>
 #include <structmember.h>
-#include <cpython/longintrepr.h>
+
+#if PY_MINOR_VERSION <= 10
+  #include <longintrepr.h>
+#else
+  #include <cpython/longintrepr.h>				/* for conversions */
+#endif
+
 #include <stdlib.h>
 #include <gmp.h>
 #include <pbc/pbc.h>

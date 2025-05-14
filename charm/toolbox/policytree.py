@@ -36,6 +36,9 @@ def createTree(op, node1, node2):
     node.addSubNode(node1, node2)
     return node
 
+def downcaseTokens(s, loc, toks):
+    return [t.lower() for t in toks]
+
 class PolicyParser:
     def __init__(self, verbose=False):
         self.finalPol = self.getBNF()

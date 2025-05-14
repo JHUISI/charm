@@ -3,8 +3,7 @@ Charm
 
 | Branch      | Status                                                                                                          |
 | ----------- | --------------------------------------------------------------------------------------------------------------- |
-| `dev`       | [![Build Status](https://travis-ci.org/JHUISI/charm.svg?branch=dev)](https://travis-ci.org/JHUISI/charm)        |
-| `dev-2.7`   | [![Build Status](https://travis-ci.org/JHUISI/charm.svg?branch=2.7-dev)](https://travis-ci.org/JHUISI/charm)    |
+| `dev`       | ![Build Status](https://github.com/JHUISI/charm/actions/workflows/ci.yml/badge.svg?branch=dev) |
 
 Charm is a framework for rapidly prototyping advanced cryptosystems.  Based on the Python language, it was designed from the ground up to minimize development time and code complexity while promoting the reuse of components.
 
@@ -38,8 +37,10 @@ Quick Install & Test
 ====================
 Installing Charm from source is straightforward. First, verify that you have installed the following dependencies:
 * [GMP 5.x](http://gmplib.org/)
-* [PBC](http://crypto.stanford.edu/pbc/download.html) 
-* [OPENSSL](http://www.openssl.org/source/)
+* [PBC 0.5.14](http://crypto.stanford.edu/pbc/download.html)
+* [OpenSSL](http://www.openssl.org/source/)
+* [PyParsing 2.1.5](https://pypi.org/project/pyparsing/2.1.5/)
+* [Hypothesis](https://pypi.org/project/hypothesis/)
 
 After that, you may proceed to install a basic configuration of Charm as follows:
 

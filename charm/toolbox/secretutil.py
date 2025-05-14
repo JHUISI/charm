@@ -33,12 +33,13 @@ class SecretUtil:
         """recovers the coefficients over a binary tree."""
         coeff = {}
         list2 = [self.group.init(ZR, i) for i in list]
-        for i in list2:
+        for idx, i in enumerate(list):
+            i_zr = list2[idx]  # self.group.init(ZR, i)
             result = 1
-            for j in list2:
-                if not (i == j):
+            for j_zr in list2:
+                if not (i_zr == j_zr):
                     # lagrange basis poly
-                    result *= (0 - j) / (i - j)
+                    result *= (0 - j_zr) / (i_zr - j_zr)
 #                print("coeff '%d' => '%s'" % (i, result))
             coeff[int(i)] = result
         return coeff
