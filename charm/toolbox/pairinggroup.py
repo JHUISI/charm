@@ -24,6 +24,8 @@ class PairingGroup():
         elif type(param_id) == int:
           self.Pairing = pairing(param_id)
           self.param   = param_id
+
+        assert isinstance(secparam, int) and secparam >= 1, "The security parameter $\\lambda$ should be a positive integer. "
  
         self.secparam = secparam # number of bits
         self._verbose = verbose
@@ -62,7 +64,7 @@ class PairingGroup():
         return self.param
         
     def messageSize(self):
-        return self.secparam >> 3        
+        return (self.secparam + 7) >> 3        
 
     def init(self, type, value=None):
         """initializes an object with a specified type and value""" 
