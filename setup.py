@@ -51,12 +51,12 @@ class UninstallCommand(Command):
         shutil.rmtree(path_to_charm+'/charm/engine', True)
 
         for files in os.listdir(path_to_charm):
-            if not re.match('Charm_Crypto-'+_charm_version+'\.egg-info', files) and re.match('Charm_Crypto-.*\.egg-info', files):
+            if not re.match('Charm_Crypto-'+_charm_version+'\\.egg-info', files) and re.match('Charm_Crypto-.*\\.egg-info', files):
                 #print(path_to_charm+'/'+files)
                 os.remove(path_to_charm+'/'+files)
 
         for files in os.listdir(path_to_charm+'/charm'):
-            if re.match('.*\.so$', files):
+            if re.match('.*\\.so$', files):
                 #print(path_to_charm+'/charm/'+files)
                 os.remove(path_to_charm+'/charm/'+files)
 
