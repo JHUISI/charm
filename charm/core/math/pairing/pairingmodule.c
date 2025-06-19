@@ -154,26 +154,17 @@ PyObject *mpzToLongObj (mpz_t m)
 
 void longObjToMPZ (mpz_t m, PyLongObject * p)
 {
-	int size, i, tmp = PyLongObj_Size(p);
+	int size = PyLongObj_Size(p);
 	int isNeg = FALSE;
-	mpz_t temp, temp2;
-	mpz_init (temp);
-	mpz_init (temp2);
-	if (tmp > 0)
-		size = tmp;
-	else {
-		size = -tmp;
+	if (size < 0) {
+		size = -size;
 		isNeg = TRUE;
 	}
 	mpz_set_ui (m, 0);
-	for (i = 0; i < size; i++)
-	{
-		mpz_set_ui (temp, PyLongObj_Val(p, i));
-		mpz_mul_2exp (temp2, temp, PyLong_SHIFT * i);
-		mpz_add (m, m, temp2);
+	for (int i = size - 1; i >= 0; i--) {
+		mpz_mul_2exp (m, m, PyLong_SHIFT);
+		mpz_add_ui (m, m, PyLongObj_Val(p, i));
 	}
-	mpz_clear (temp);
-	mpz_clear (temp2);
 	if(isNeg) mpz_neg(m, m);
 }
 
