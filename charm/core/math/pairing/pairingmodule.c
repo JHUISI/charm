@@ -35,9 +35,9 @@
   #define PyLongObj_Size(l)  Py_SIZE(l)
 #else
   #define PyLongObj_Val(l, i)  (l)->long_value.ob_digit[i]
-  // #define _PyLong_SIZE_SHIFTS __builtin_popcount(_PyLong_NON_SIZE_BITS)
-  #define _PyLong_SIZE_SHIFTS 2
-  #define PyLongObj_Size(l)  ((l)->long_value.lv_tag >> _PyLong_SIZE_SHIFTS)
+  // lv_tag sign bits: 00 = positive, 01 = zero, 10 = negative
+  #define PyLongObj_Size(l)  ((1 - ((l)->long_value.lv_tag & _PyLong_SIGN_MASK)) \
+							  * ((l)->long_value.lv_tag >> _PyLong_NON_SIZE_BITS))
 #endif
 
 // PEP 674 – Disallow using macros as l-values
@@ -124,7 +124,6 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
-// TODO: update these two functions to convert neg numbers
 PyObject *mpzToLongObj (mpz_t m)
 {
 	/* borrowed from gmpy */
