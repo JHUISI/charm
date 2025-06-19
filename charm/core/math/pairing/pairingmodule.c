@@ -31,18 +31,28 @@
 
 // PEP 757 – C API to import-export Python integers
 #if PY_MINOR_VERSION <= 11
-  #define PyLongObj_Val(l, i)  (l)->ob_digit[i]
-  #define PyLongObj_Size(l)  Py_SIZE(l)
+  #define PyLong_DIGIT(l, i)  (l)->ob_digit[i]
+  #define PyLong_SIZE(l)  Py_SIZE(l)
 #else
-  #define PyLongObj_Val(l, i)  (l)->long_value.ob_digit[i]
+  #define PyLong_DIGIT(l, i)  (l)->long_value.ob_digit[i]
   // lv_tag sign bits: 00 = positive, 01 = zero, 10 = negative
-  #define PyLongObj_Size(l)  ((1 - ((l)->long_value.lv_tag & _PyLong_SIGN_MASK)) \
-							  * ((l)->long_value.lv_tag >> _PyLong_NON_SIZE_BITS))
+  #define PyLong_SIZE(l)  ((1 - ((l)->long_value.lv_tag & _PyLong_SIGN_MASK)) \
+							* ((l)->long_value.lv_tag >> _PyLong_NON_SIZE_BITS))
 #endif
 
-// PEP 674 – Disallow using macros as l-values
 #if PY_MINOR_VERSION <= 10
-  #define Py_SET_SIZE(l, i)  do { Py_SIZE(l) = (i); } while (0)
+  #define PyLong_SET_SIZE(l, i)  do { Py_SIZE(l) = (i); } while (0)
+#elif PY_MINOR_VERSION <= 11
+  // PEP 674 – Disallow using macros as l-values
+  #define PyLong_SET_SIZE(l, i)  Py_SET_SIZE(l, i)
+#else
+  #define PyLong_SET_SIZE(l, i) \
+  do { \
+	int _signed_size = (i); \
+	int _sign = _signed_size > 0 ? 0 : (_signed_size == 0 ? 1 : 2); \
+	int _size = _signed_size < 0 ? -_signed_size : _signed_size; \
+	(l)->long_value.lv_tag = (_size << _PyLong_NON_SIZE_BITS) | _sign; \
+  } while (0)
 #endif
 		  
 int exp_rule(GroupType lhs, GroupType rhs)
@@ -136,25 +146,21 @@ PyObject *mpzToLongObj (mpz_t m)
 	mpz_init_set (temp, m);
 	for (i = 0; i < size; i++)
 	{
-		PyLongObj_Val(l, i) = (digit) (mpz_get_ui (temp) & PyLong_MASK);
+		PyLong_DIGIT(l, i) = (digit) (mpz_get_ui (temp) & PyLong_MASK);
 		mpz_fdiv_q_2exp (temp, temp, PyLong_SHIFT);
 	}
 	i = size;
-	while ((i > 0) && (PyLongObj_Val(l, i - 1) == 0))
+	while ((i > 0) && (PyLong_DIGIT(l, i - 1) == 0))
 		i--;
-	if(isNeg) {
-		Py_SET_SIZE(l, -i);
-	}
-	else {
-		Py_SET_SIZE(l, i);
-	}
+
+	PyLong_SET_SIZE(l, isNeg ? -i : i);
 	mpz_clear (temp);
 	return (PyObject *) l;
 }
 
 void longObjToMPZ (mpz_t m, PyLongObject * p)
 {
-	int size = PyLongObj_Size(p);
+	int size = PyLong_SIZE(p);
 	int isNeg = FALSE;
 	if (size < 0) {
 		size = -size;
@@ -163,7 +169,7 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 	mpz_set_ui (m, 0);
 	for (int i = size - 1; i >= 0; i--) {
 		mpz_mul_2exp (m, m, PyLong_SHIFT);
-		mpz_add_ui (m, m, PyLongObj_Val(p, i));
+		mpz_add_ui (m, m, PyLong_DIGIT(p, i));
 	}
 	if(isNeg) mpz_neg(m, m);
 }
