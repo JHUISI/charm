@@ -34,6 +34,11 @@
 #define PY_SSIZE_T_CLEAN
 #endif
 
+/* Define MS_WIN64 to get correct PYLONG_BITS_IN_DIGIT on Windows. */
+#if PY_MINOR_VERSION <= 10 && defined(_WIN32) && !defined(MS_WIN64)
+  #define MS_WIN64
+#endif
+
 #include <Python.h>
 #include <structmember.h>
 
@@ -78,8 +83,10 @@ typedef enum Group GroupType;
 
 #ifdef DEBUG
 #define debug_e(...)	element_printf("DEBUG: "__VA_ARGS__)
+#define debug_gmp(...)	gmp_printf("DEBUG: "__VA_ARGS__)
 #else
 #define debug_e(...)
+#define debug_gmp(...)
 #endif
 
 #define PrintPyRef(msg, o) printf("%s:" #msg " ref cnt = '%i'\n", __FUNCTION__, (int) Py_REFCNT(o));

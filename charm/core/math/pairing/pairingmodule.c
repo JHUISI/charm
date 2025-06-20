@@ -31,18 +31,28 @@
 
 // PEP 757 – C API to import-export Python integers
 #if PY_MINOR_VERSION <= 11
-  #define PyLongObj_Val(l, i)  (l)->ob_digit[i]
-  #define PyLongObj_Size(l)  Py_SIZE(l)
+  #define PyLong_DIGIT(l, i)  (l)->ob_digit[i]
+  #define PyLong_SIZE(l)  Py_SIZE(l)
 #else
-  #define PyLongObj_Val(l, i)  (l)->long_value.ob_digit[i]
-  // #define _PyLong_SIZE_SHIFTS __builtin_popcount(_PyLong_NON_SIZE_BITS)
-  #define _PyLong_SIZE_SHIFTS 2
-  #define PyLongObj_Size(l)  ((l)->long_value.lv_tag >> _PyLong_SIZE_SHIFTS)
+  #define PyLong_DIGIT(l, i)  (l)->long_value.ob_digit[i]
+  // lv_tag sign bits: 00 = positive, 01 = zero, 10 = negative
+  #define PyLong_SIZE(l)  ((1 - ((l)->long_value.lv_tag & _PyLong_SIGN_MASK)) \
+							* ((l)->long_value.lv_tag >> _PyLong_NON_SIZE_BITS))
 #endif
 
-// PEP 674 – Disallow using macros as l-values
 #if PY_MINOR_VERSION <= 10
-  #define Py_SET_SIZE(l, i)  do { Py_SIZE(l) = (i); } while (0)
+  #define PyLong_SET_SIZE(l, i)  do { Py_SIZE(l) = (i); } while (0)
+#elif PY_MINOR_VERSION <= 11
+  // PEP 674 – Disallow using macros as l-values
+  #define PyLong_SET_SIZE(l, i)  Py_SET_SIZE(l, i)
+#else
+  #define PyLong_SET_SIZE(l, i) \
+  do { \
+	int _signed_size = (i); \
+	int _sign = _signed_size > 0 ? 0 : (_signed_size == 0 ? 1 : 2); \
+	int _size = _signed_size < 0 ? -_signed_size : _signed_size; \
+	(l)->long_value.lv_tag = (_size << _PyLong_NON_SIZE_BITS) | _sign; \
+  } while (0)
 #endif
 		  
 int exp_rule(GroupType lhs, GroupType rhs)
@@ -124,7 +134,6 @@ static PyObject *f(PyObject *v, PyObject *w) { \
 	return NULL;				\
 }
 
-// TODO: update these two functions to convert neg numbers
 PyObject *mpzToLongObj (mpz_t m)
 {
 	/* borrowed from gmpy */
@@ -137,44 +146,31 @@ PyObject *mpzToLongObj (mpz_t m)
 	mpz_init_set (temp, m);
 	for (i = 0; i < size; i++)
 	{
-		PyLongObj_Val(l, i) = (digit) (mpz_get_ui (temp) & PyLong_MASK);
+		PyLong_DIGIT(l, i) = (digit) (mpz_get_ui (temp) & PyLong_MASK);
 		mpz_fdiv_q_2exp (temp, temp, PyLong_SHIFT);
 	}
 	i = size;
-	while ((i > 0) && (PyLongObj_Val(l, i - 1) == 0))
+	while ((i > 0) && (PyLong_DIGIT(l, i - 1) == 0))
 		i--;
-	if(isNeg) {
-		Py_SET_SIZE(l, -i);
-	}
-	else {
-		Py_SET_SIZE(l, i);
-	}
+
+	PyLong_SET_SIZE(l, isNeg ? -i : i);
 	mpz_clear (temp);
 	return (PyObject *) l;
 }
 
 void longObjToMPZ (mpz_t m, PyLongObject * p)
 {
-	int size, i, tmp = PyLongObj_Size(p);
+	int size = PyLong_SIZE(p);
 	int isNeg = FALSE;
-	mpz_t temp, temp2;
-	mpz_init (temp);
-	mpz_init (temp2);
-	if (tmp > 0)
-		size = tmp;
-	else {
-		size = -tmp;
+	if (size < 0) {
+		size = -size;
 		isNeg = TRUE;
 	}
 	mpz_set_ui (m, 0);
-	for (i = 0; i < size; i++)
-	{
-		mpz_set_ui (temp, PyLongObj_Val(p, i));
-		mpz_mul_2exp (temp2, temp, PyLong_SHIFT * i);
-		mpz_add (m, m, temp2);
+	for (int i = size - 1; i >= 0; i--) {
+		mpz_mul_2exp (m, m, PyLong_SHIFT);
+		mpz_add_ui (m, m, PyLong_DIGIT(p, i));
 	}
-	mpz_clear (temp);
-	mpz_clear (temp2);
 	if(isNeg) mpz_neg(m, m);
 }
 
@@ -843,40 +839,50 @@ static PyObject *Element_sub(Element *self, Element *other)
 static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 {
 	Element *self = NULL, *other = NULL, *newObject = NULL;
-	signed long int z;
+	mpz_t z;
 	int found_int = FALSE;
 
 	// lhs or rhs must be an element type
 	if(PyElement_Check(lhs)) {
 		self = (Element *) lhs;		
 	}
-	else if(PyNumber_Check(lhs)) {
-		if(PyArg_Parse(lhs, "l", &z)) {
-			debug("Integer lhs: '%li'\n", z);
-		}
+	else if(PyLong_Check(lhs)) {
+		mpz_init(z);
+		longObjToMPZ(z, (PyLongObject *) lhs);
+		debug_gmp("Integer lhs: '%Zd'\n", z);
 		found_int = TRUE;
+	}
+	else {
+		debug("lhs is not an element type or long object.\n");
+		PyErr_SetString(ElementError, "invalid left operand type");
+		return NULL;
 	}
 	
 	if(PyElement_Check(rhs)) {
 		other = (Element *) rhs;
 	}
-	else if(PyNumber_Check(rhs)) {
-		if(PyArg_Parse(rhs, "l", &z)) {
-			debug("Integer rhs: '%li'\n", z);
-		}
-		found_int = TRUE;		
+	else if(PyLong_Check(rhs)) {
+		mpz_init(z);
+		longObjToMPZ(z, (PyLongObject *) rhs);
+		debug_gmp("Integer rhs: '%Zd'\n", z);
+		found_int = TRUE;
+	}
+	else {
+		debug("rhs is not an element type or long object.\n");
+		PyErr_SetString(ElementError, "invalid right operand type");
+		return NULL;
 	}
 	
 	debug("Starting '%s'\n", __func__);	
 	if(PyElement_Check(lhs) && found_int) {
 		// lhs is the element type
 		newObject = createNewElement(self->element_type, self->pairing);
-		element_mul_si(newObject->e, self->e, z);
+		element_mul_mpz(newObject->e, self->e, z);
 	}
 	else if(PyElement_Check(rhs) && found_int) {
 		// rhs is the element type
 		newObject = createNewElement(other->element_type, other->pairing);
-		element_mul_si(newObject->e, other->e, z);
+		element_mul_mpz(newObject->e, other->e, z);
 	}
 	else if(PyElement_Check(lhs) && PyElement_Check(rhs)) {
 		// both are element types
@@ -898,6 +904,9 @@ static PyObject *Element_mul(PyObject *lhs, PyObject *rhs)
 	}
 	else {
 		EXIT_IF(TRUE, "invalid types.");
+	}
+	if (found_int) {
+		mpz_clear(z);
 	}
 #ifdef BENCHMARK_ENABLED
 	UPDATE_BENCH(MULTIPLICATION, newObject->element_type, newObject->pairing);
