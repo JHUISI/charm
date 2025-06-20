@@ -78,8 +78,10 @@ typedef enum Group GroupType;
 
 #ifdef DEBUG
 #define debug_e(...)	element_printf("DEBUG: "__VA_ARGS__)
+#define debug_gmp(...)	gmp_printf("DEBUG: "__VA_ARGS__)
 #else
 #define debug_e(...)
+#define debug_gmp(...)
 #endif
 
 #define PrintPyRef(msg, o) printf("%s:" #msg " ref cnt = '%i'\n", __FUNCTION__, (int) Py_REFCNT(o));
