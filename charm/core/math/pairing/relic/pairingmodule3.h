@@ -34,6 +34,11 @@
 #define PY_SSIZE_T_CLEAN
 #endif
 
+/* Define MS_WIN64 to get correct PYLONG_BITS_IN_DIGIT on Windows. */
+#if PY_MINOR_VERSION <= 10 && defined(_WIN64) && !defined(MS_WIN64)
+#define MS_WIN64
+#endif
+
 #include <Python.h>
 #include <structmember.h>
 #include <longintrepr.h>
