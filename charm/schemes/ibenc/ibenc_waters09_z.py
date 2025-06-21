@@ -23,7 +23,7 @@ have some duplicate elements in G2.
 5. The extract() takes one more params now, which is the mpk. We don't want to
 increse the size of msk by store redundant elements.
 '''
-from charm.toolbox.pairinggroup import ZR,G1,G2,pair
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import *
 
 debug = False
