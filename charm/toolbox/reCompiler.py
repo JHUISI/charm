@@ -1,4 +1,4 @@
-""" Module re_compile -- compile a regular expression into an FSA
+r""" Module re_compile -- compile a regular expression into an FSA
 
 To Do
 -----

@@ -24,6 +24,9 @@ class PairingGroup():
         elif type(param_id) == int:
           self.Pairing = pairing(param_id)
           self.param   = param_id
+
+        """ the secure parameter $\\lambda$ should be a positive integer; otherwise, it may lead to computation errors in getting the message size """
+        assert isinstance(secparam, int) and secparam >= 1, "The security parameter $\\lambda$ should be a positive integer. "
  
         self.secparam = secparam # number of bits
         self._verbose = verbose
@@ -62,7 +65,8 @@ class PairingGroup():
         return self.param
         
     def messageSize(self):
-        return self.secparam >> 3        
+        """ after filling complete bytes with every 8 bits, any remaining 1, 2, ..., 7 more bits will occupy an additional byte, even if they do not form a complete byte """
+        return (self.secparam + 7) >> 3        
 
     def init(self, type, value=None):
         """initializes an object with a specified type and value""" 
