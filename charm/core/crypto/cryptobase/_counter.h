@@ -31,6 +31,12 @@
 #include <stdint.h>
 #include "Python.h"
 
+/* Python 3.14+ compatibility - PyUnicode_GET_SIZE was removed */
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 14
+#define PyUnicode_GET_SIZE(o) PyUnicode_GetLength(o)
+#define PyUnicode_AS_STRING(o) PyUnicode_AsUTF8(o)
+#endif
+
 typedef struct {
     PyObject_HEAD
     PyObject *prefix;           /* Prefix bytes (useful for a nonce) */
