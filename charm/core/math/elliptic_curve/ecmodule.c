@@ -43,8 +43,23 @@ void printf_buffer_as_hex(uint8_t * data, size_t len)
 
 void setBigNum(PyLongObject *obj, BIGNUM **value) {
 	// convert Python long object to temporary decimal string
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 14
+	/* for Python 3.14+ - _PyLong_Format was removed, use PyObject_Repr */
+	PyObject *strObj = PyObject_Str((PyObject *)obj);
+	const char *tmp_str = PyUnicode_AsUTF8(strObj);
+#elif PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 3)
+	/* for Python 3.3-3.13 */
 	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10);
 	const char *tmp_str = (const char *)PyUnicode_DATA(strObj);
+#elif PY_MAJOR_VERSION == 3
+	/* for Python 3.0-3.2 */
+	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10);
+	const char *tmp_str = PyUnicode_AS_DATA(strObj);
+#else
+	/* for Python 2.x */
+	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10, 0, 0);
+	const char *tmp_str = PyString_AS_STRING(strObj);
+#endif
 
 	// convert decimal string to OpenSSL bignum
 	BN_dec2bn(value, tmp_str);

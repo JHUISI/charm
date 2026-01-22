@@ -20,6 +20,11 @@
 #include "modsupport.h"
 #include "_counter.h"
 
+/* Python 3.14+ compatibility - PyUnicode_GET_SIZE was removed */
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 14
+#define PyUnicode_GET_SIZE(o) PyUnicode_GetLength(o)
+#endif
+
 #define TRUE	1
 #define FALSE	0
 
