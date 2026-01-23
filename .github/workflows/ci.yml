@@ -25,9 +25,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libgmp-dev libssl-dev
-        wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
-        tar -xzf pbc-0.5.14.tar.gz
-        cd pbc-0.5.14
+        wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+        tar -xzf pbc-1.0.0.tar.gz
+        cd pbc-1.0.0
         ./configure
         make
         sudo make install

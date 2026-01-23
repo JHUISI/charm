@@ -2,7 +2,7 @@
 
 include ../../config.mk
 
-VERSION := 0.5.14
+VERSION := 1.0.0
 LIBPBC := pbc-${VERSION}
 
 all: get_pbc ${LIBPBC}/.built

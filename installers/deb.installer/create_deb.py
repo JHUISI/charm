@@ -15,7 +15,7 @@ import sys
 
 # globals
 # version number from config.mk
-CHARM_VERSION = "0.50"
+CHARM_VERSION = "0.60"
 
 # python version to use - python or python3
 if sys.version_info[0] < 3:
