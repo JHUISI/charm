@@ -9,10 +9,11 @@ Users:
 
 .. toctree::
    :maxdepth: 1
-   
+
+   updates_060
    updates_050
    updates
-   install_source 
+   install_source
    mobile
 
 Development Guide

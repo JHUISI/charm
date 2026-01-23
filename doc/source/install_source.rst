@@ -1,360 +1,471 @@
 .. _platform-install-manual:
 
-Platform Install Manual 
-===========================================
+Platform Install Manual
+=======================
 
-Charm has automated the installation process such that you
-do not have to directly handle dependencies, linking, and compiler flag settings. Note that these automated installers are available at our repository. 
-However, in the event you are interested in building and installing from source, we have provided installation steps for a number of widely used platforms. If we missed your favorite OS, feel free to write up the instructions and email us at support@charm-crypto.com. 
+This guide provides installation instructions for building Charm-Crypto from source
+on various platforms. Charm automates much of the build process through its configure
+and make scripts.
 
-Before we begin, please note the current dependencies:
+If you encounter any issues not covered here, please contact us at support@charm-crypto.com.
 
-- Python2.7 or Python3
+Dependencies
+------------
 
-- Pyparsing http://pyparsing.wikispaces.com/
+The following dependencies are required to build Charm:
 
-- GMP 5.x http://gmplib.org/ 
++-------------+------------------+----------+------------------------------------------+
+| Dependency  | Version          | Required | Notes                                    |
++=============+==================+==========+==========================================+
+| Python      | 3.4+             | Yes      | Python 2.x is not supported              |
++-------------+------------------+----------+------------------------------------------+
+| GMP         | 5.x+             | Yes      | GNU Multiple Precision Arithmetic Library|
++-------------+------------------+----------+------------------------------------------+
+| PBC         | 1.0.0            | Yes      | Pairing-Based Cryptography library       |
++-------------+------------------+----------+------------------------------------------+
+| OpenSSL     | 1.x or 3.x       | Yes      | Cryptographic library                    |
++-------------+------------------+----------+------------------------------------------+
+| pyparsing   | >=2.1.5, <2.4.1  | Yes      | Python parsing library                   |
++-------------+------------------+----------+------------------------------------------+
+| pytest      | latest           | Testing  | For running test suite                   |
++-------------+------------------+----------+------------------------------------------+
 
-- PBC (latest) http://crypto.stanford.edu/pbc/news.html
+Optional dependencies:
 
-- OPENSSL http://www.openssl.org/
+- **MIRACL** - See :ref:`charm-with-miracl` if interested.
+- **RELIC** - See :ref:`charm-with-relic` if interested.
 
-- (optional) MIRACL http://www.certivox.com/miracl/. See :ref:`charm-with-miracl` if interested. 
+Run ``./configure.sh --help`` for all available configuration options.
 
-- (optional) RELIC https://code.google.com/p/relic-toolkit/. See :ref:`charm-with-relic` if interested.
+Source Code
+-----------
 
-See ``./configure.sh --help`` for other options.
+Clone the latest version from GitHub::
 
-You can obtain a copy of the latest version of Charm from either of the following links:
-	https://github.com/JHUISI/charm/downloads
+    git clone https://github.com/JHUISI/charm.git
+    cd charm
 
-Please let us know at support@charm-crypto.com if you run into any setup or installation problems. We will be happy to offer our assistance.
+Building on Linux
+-----------------
 
-Building On Linux
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The Charm build process is managed through configure and make scripts.
+The general workflow for all Linux distributions is:
 
-Note that the entire compilation process is supported by the Charm configure/make scripts.
-The steps for building in linux this way are:
+1. Install system dependencies via package manager
+2. Build and install PBC 1.0.0 from source
+3. Configure Charm
+4. Build and install Charm
+5. Verify installation
 
-- In a terminal, run ``configure.sh``
+Ubuntu/Debian (22.04 LTS, 24.04 LTS)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- Confirm that you have installed the dependencies above. Then, proceed as follows:
+These instructions work for Ubuntu 22.04, 24.04, and recent Debian versions.
 
-  - ``make``
+**Step 1: Install build tools and dependencies**
 
-  - ``make install``
+.. code-block:: bash
 
-  - ``make test``
+    sudo apt-get update
+    sudo apt-get install -y build-essential flex bison wget m4 \
+        python3 python3-dev python3-setuptools python3-pip python3-venv \
+        libgmp-dev libssl-dev
+
+**Step 2: Build and install PBC 1.0.0**
+
+.. code-block:: bash
+
+    wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+    tar xzf pbc-1.0.0.tar.gz
+    cd pbc-1.0.0
+    ./configure LDFLAGS="-lgmp"
+    make
+    sudo make install
+    sudo ldconfig
+    cd ..
+
+**Step 3: Set up Python environment and install dependencies**
+
+.. code-block:: bash
+
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install 'pyparsing>=2.1.5,<2.4.1' pytest hypothesis
+
+**Step 4: Configure and build Charm**
+
+.. code-block:: bash
+
+    ./configure.sh
+    make
+    sudo make install
+    sudo ldconfig
+
+**Step 5: Verify installation**
+
+.. code-block:: bash
+
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    python -c "from charm.toolbox.pairinggroup import PairingGroup; print('Success!')"
+
+**Step 6: Run tests (optional)**
+
+.. code-block:: bash
+
+    make test
+
+Fedora/RHEL/CentOS
+^^^^^^^^^^^^^^^^^^
+
+These instructions work for Fedora 38+, RHEL 8+, CentOS Stream, Rocky Linux, and AlmaLinux.
+
+**Step 1: Install build tools and dependencies**
+
+.. code-block:: bash
+
+    # Use 'yum' instead of 'dnf' on older systems (RHEL 7, CentOS 7)
+    sudo dnf install -y gcc gcc-c++ make flex bison wget m4 \
+        python3 python3-devel python3-pip \
+        gmp-devel openssl-devel
+
+**Step 2: Build and install PBC 1.0.0**
+
+.. code-block:: bash
+
+    wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+    tar xzf pbc-1.0.0.tar.gz
+    cd pbc-1.0.0
+    ./configure LDFLAGS="-lgmp"
+    make
+    sudo make install
+    sudo ldconfig
+    cd ..
+
+**Step 3: Set up Python environment and install dependencies**
+
+.. code-block:: bash
+
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install 'pyparsing>=2.1.5,<2.4.1' pytest hypothesis
+
+**Step 4: Configure and build Charm**
+
+.. code-block:: bash
+
+    ./configure.sh
+    make
+    sudo make install
+    sudo ldconfig
+
+**Step 5: Verify installation**
+
+.. code-block:: bash
+
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    python -c "from charm.toolbox.pairinggroup import PairingGroup; print('Success!')"
+
+Arch Linux
+^^^^^^^^^^
+
+**Step 1: Install build tools and dependencies**
+
+.. code-block:: bash
+
+    sudo pacman -S base-devel wget m4 python python-setuptools python-pip gmp openssl
+
+**Step 2: Build and install PBC 1.0.0**
+
+.. code-block:: bash
+
+    wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+    tar xzf pbc-1.0.0.tar.gz
+    cd pbc-1.0.0
+    ./configure LDFLAGS="-lgmp"
+    make
+    sudo make install
+    sudo ldconfig
+    cd ..
+
+**Step 3: Set up Python environment and install dependencies**
+
+.. code-block:: bash
+
+    python -m venv venv
+    source venv/bin/activate
+    pip install 'pyparsing>=2.1.5,<2.4.1' pytest hypothesis
+
+**Step 4: Configure and build Charm**
+
+.. code-block:: bash
+
+    ./configure.sh
+    make
+    sudo make install
+    sudo ldconfig
+
+**Step 5: Verify installation**
+
+.. code-block:: bash
+
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    python -c "from charm.toolbox.pairinggroup import PairingGroup; print('Success!')"
+
+Building on Windows
+-------------------
+
+The recommended approach for building Charm on Windows is to use Windows Subsystem
+for Linux 2 (WSL2), which provides a full Linux environment.
+
+Windows with WSL2 (Recommended)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+WSL2 is available on Windows 10 version 2004+ and Windows 11.
+
+**Step 1: Install WSL2 with Ubuntu**
+
+Open PowerShell as Administrator and run:
+
+.. code-block:: powershell
+
+    wsl --install -d Ubuntu
+
+Restart your computer when prompted, then open Ubuntu from the Start menu.
+
+**Step 2: Follow Ubuntu/Debian instructions**
+
+Once inside WSL2, follow the :ref:`Ubuntu/Debian installation instructions <platform-install-manual>` above.
 
 .. note::
-	Another way to install dependencies is to use your package manager of choice.
 
-Ubuntu 10.04 LTS
-------------------------------------------
+    WSL2 provides near-native Linux performance and full compatibility with Charm.
+    This is the recommended approach for Windows development.
 
-Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+Building on macOS
+-----------------
 
-        1. Subversion
-                ``sudo apt-get install subversion``
-        2. Python 3 (By default, Ubuntu 10.04 LTS comes with 2.6 and does not officially support 2.7. Charm requires 2.7 or 3.x) and header files/static library
-                ``sudo apt-get install python3 python3-dev python3-setuptools``
-        3. m4
-                ``sudo apt-get install m4``
-        4. libssl-dev
-                ``sudo apt-get install libssl-dev``
+macOS requires Homebrew for dependency management. Instructions are provided for
+both Intel and Apple Silicon (M1/M2/M3) Macs.
 
-Next, we will install Charm. Navigate to your Charm directory.
-        1. We must first run the configuration script:
-                ``sudo ./configure.sh --python=/path/to/python3``
-        2. Now we will build and install Charm:
-                ``sudo make``
+macOS with Homebrew (Intel and Apple Silicon)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-                ``sudo make install``
-        3. And finally we must rebuild the search path for libraries
-                ``sudo ldconfig``
+**Step 1: Install Homebrew** (if not already installed)
 
-        4. Run Pytests
-        		``sudo make test``
+.. code-block:: bash
 
-Ubuntu 11.04
-----------------------------------
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
-        1. Subversion
-                ``sudo apt-get install subversion``
-        2. m4
-                ``sudo apt-get install m4``
-        3. Python 3 (this is an optional, though recommended, step)
-                ``sudo apt-get install python3``
-        4. Header files/static library
-                ``sudo apt-get install python-dev`` (if you did not install Python 3)
+**Step 2: Install build tools and dependencies**
 
-                ``sudo apt-get install python3-setuptools python3-dev`` (for Python 3.x)
-        5. libssl-dev (only necessary if you did not install Python 3)
-                ``sudo apt-get install libssl-dev``
+.. code-block:: bash
 
-Next, we will install Charm. Navigate to your Charm directory.
-        1. We must first run the configuration script:
-                ``sudo ./configure.sh``
+    brew install gmp openssl@3 wget python@3
 
-                [If you installed Python 3 and would like to use that, you will need to add ``--python=/path/to/python3``]
+**Step 3: Build and install PBC 1.0.0**
 
-        2. Now we will build and install Charm:
-                ``sudo make``
+.. code-block:: bash
 
-                ``sudo make install``
+    wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+    tar xzf pbc-1.0.0.tar.gz
+    cd pbc-1.0.0
+    ./configure LDFLAGS="-lgmp"
+    make
+    sudo make install
+    cd ..
 
-        3. And finally we must rebuild the search path for libraries
-                ``sudo ldconfig``
+**Step 4: Set up Python environment and install dependencies**
 
-        4. Run Pytests
-        		``sudo make test``
+.. code-block:: bash
 
-Ubuntu 13.04
-----------------------------------
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install 'pyparsing>=2.1.5,<2.4.1' pytest hypothesis
 
-Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
-        1. Subversion
-                ``sudo apt-get install subversion``
-        2. m4
-                ``sudo apt-get install m4``
-        3. Python 3 (this is an optional, though recommended, step)
-                ``sudo apt-get install python3``
-        4. Header files/static library
-                ``sudo apt-get install python-dev`` (if you did NOT install Python 3)
+**Step 5: Configure and build Charm**
 
-                ``sudo apt-get install python3-setuptools python3-dev`` (for Python 3.x)
-        5. libssl-dev (only necessary if you did not install Python 3)
-                ``sudo apt-get install libssl-dev``
-        
-        6. GMP
-        		``sudo apt-get install libgmp-dev``
+For Intel Macs:
 
-Next, we will install Charm. Navigate to your Charm directory.
-        1. We must first run the configuration script:
-                ``sudo ./configure.sh``
-        
-        2. Install PBC from source
-        		``./configure LDFLAGS="-lgmp"``
-        		
-        		``make``
-        		
-        		``sudo make install``
-        		
-        		``sudo ldconfig``
-        
-        3. Now we can build and install Charm:
-                ``sudo make``
+.. code-block:: bash
 
-                ``sudo make install``
+    ./configure.sh --enable-darwin
+    make
+    sudo make install
 
-        4. And finally we must rebuild the search path for libraries
-                ``sudo ldconfig``
-        
-        5. Run Pytests
-        		``sudo make test``
-        
-Fedora
-------------------------------------
+For Apple Silicon (M1/M2/M3) Macs:
 
-Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
-        1. m4
-                ``su -c "yum install m4"``
+.. code-block:: bash
 
-        2. Python 3 (this is an optional, though recommended, step)
-                ``su -c "yum install python3"``
+    export CFLAGS="-I/opt/homebrew/include"
+    export LDFLAGS="-L/opt/homebrew/lib"
+    ./configure.sh --enable-darwin
+    make
+    sudo make install
 
-        3. Header files/static library
-                ``su -c "yum install python-devel"`` (if you did not install Python 3)
+**Step 6: Verify installation**
 
-                ``su -c "yum install python3-devel"`` (if you did install Python 3)
+.. code-block:: bash
 
-        4. openssl-devel (only necessary if you did not install Python 3)
-                ``su -c "yum install openssl-devel"``
-
-Red Hat/Fedora has decided not to support ECC in OpenSSL due to patent concerns, so we now need to remove their restriction and manually import the required files.
-        1. Remove the ECC restriction
-                1. Navigate to /usr/include/openssl
-                        ``cd /usr/include/openssl``
-                2. Open the OpenSSL configuration file for editing using your editor of choice
-                        ``su -c "vi opensslconf-i386.h"``
-                3. Remove the flags that restrict the use of ECC
-
-Delete (at the beginning of file):
-::
-
-	#ifndef OPENSSL_NO_EC
- 	# define OPENSSL_NO_EC
-     	#endif
-    	#ifndef OPENSSL_NO_ECDH
-      	# define OPENSSL_NO_ECDH
-     	#endif
-  	#ifndef OPENSSL_NO_ECDSA
-  	# define OPENSSL_NO_ECDSA
-	# endif
-
-Delete (later on the file):
-::
-
-	# if defined(OPENSSL_NO_EC) && !defined(NO_EC)
-	#  define NO_EC
-	# endif
-	# if defined(OPENSSL_NO_ECDH) && !defined(NO_ECDH)
-	#  define NO_ECDH
-	# endif
-	# if defined(OPENSSL_NO_ECDSA) && !defined(NO_ECDSA)
-	#  define NO_ECDSA
-	# endif
-
-Save the file and close it
-
-        2. Add the ECC files
-                1. Navigate to http://www.openssl.org/source/ and download the latest version of openssl source and untar the tar ball.
-                2. Navigate to /path/to/openssl-[version]/include/openssl (ie inside the untarred file)
-                        ``cd /path/to/openssl-[version]/include/openssl``
-
-                3. Add the new files to the current OpenSSL installation
-                        ``su -c "yes n | cp * /usr/include/openssl"``
-
-Next, we will install Charm. Navigate to the Charm directory.
-        1. We must first run the configuration script:
-                ``su -c "./configure.sh"``
-
-                [If you installed Python 3 and would like to use that, you will need to add ``-–python=/path/to/python3``]
-
-        2. Now we will build and install Charm:
-                ``su -c "make"``
-
-                ``su -c "make install"``
-
-        3. And finally we must rebuild the searchpath for libraries
-                ``su -c "ldconfig"``
-
-Mint x86_64
---------------------------------------
-
-Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
-        1. Subversion
-                ``sudo apt-get install subversion``
-        2. m4
-                ``sudo apt-get install m4``
-        3. Python 3 (this is an optional, though recommended, step)
-                ``sudo apt-get install python3``
-        4. Header files/static library
-                ``sudo apt-get install python-dev`` (if you did not install Python 3)
-
-                ``sudo apt-get install python3-dev`` (if you did install Python 3)
-
-        5. libssl-dev (only necessary if you did not install Python 3)
-                ``sudo apt-get install libssl-dev``
-
-        6. This distro doesn't seem to come with binutils or gcc make sure you install those.
-
-Next, we will install Charm. Navigate to the Charm directory.
-        1. We must first run the configuration script:
-                ``sudo bash ./configure.sh``                
-
-                [If you installed Python 3 and would like to use that, you will need to add ``-–python=/path/to/python3``]
-
-        2. Now we will build and install Charm:
-                ``sudo make``
-
-                ``sudo make install``
-        3. And finally we must rebuild the searchpath for libraries
-                ``sudo ldconfig``
+    export DYLD_LIBRARY_PATH=/usr/local/lib:$DYLD_LIBRARY_PATH
+    python -c "from charm.toolbox.pairinggroup import PairingGroup; print('Success!')"
 
 .. note::
-	Bash to avoid unexpected operator error.
 
-Building in Windows
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    The ``--enable-darwin`` flag is required for all macOS builds to handle
+    macOS-specific compiler and library path configurations.
 
-Note that the entire compilation process is now supported by the Charm configure/make scripts. The steps for building in mingw32 this way are:
-        1. Download the latest source version of openssl.
-        2. Run MinGW Shell.
-    	3. Extract openssl, configure and install as shown below.
-	4. Extract Charm, and navigate to the top directory.
-        5. Run configure.sh as shown below.
-	6. Confirm that you have installed the dependencies above. Then, proceed as follows:
-    	    ``make``
+Generic Unix (Building All Dependencies from Source)
+----------------------------------------------------
 
-            ``make install``
+For systems without package managers or with outdated packages, you can build
+all dependencies from source.
 
-.. note::
-	Another way to install dependencies is to follow the Windows blocks below.
+**Step 1: Build GMP**
 
+.. code-block:: bash
 
-MinGW32
-----------------------------------
+    wget https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz
+    tar xf gmp-6.3.0.tar.xz
+    cd gmp-6.3.0
+    ./configure --enable-shared
+    make
+    sudo make install
+    cd ..
 
-Let's first build our dependencies with the following scripts:
+**Step 2: Build OpenSSL** (if not available or outdated)
 
-To build the GMP library:
-::
+.. code-block:: bash
 
-        ./configure --prefix=/mingw --disable-static --enable-shared
-        make
-        make install
+    wget https://www.openssl.org/source/openssl-3.0.12.tar.gz
+    tar xzf openssl-3.0.12.tar.gz
+    cd openssl-3.0.12
+    ./config shared
+    make
+    sudo make install
+    cd ..
 
+**Step 3: Build PBC 1.0.0**
 
-To build the openssl library:
-::
+.. code-block:: bash
 
-        ./config --openssldir=/mingw --shared # This gets us around installing perl.
-        make
-        make install
+    wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+    tar xzf pbc-1.0.0.tar.gz
+    cd pbc-1.0.0
+    ./configure LDFLAGS="-lgmp"
+    make
+    sudo make install
+    cd ..
 
-To build the PBC library:
-::
+**Step 4: Update library cache**
 
-        ./configure --prefix=/mingw --disable-static --enable-shared
-        make
-        make install
+.. code-block:: bash
 
+    sudo ldconfig
 
-To build the Charm library:
-::
+**Step 5: Continue with Charm installation**
 
-        ./configure.sh --prefix=/mingw --python=/c/Python32/python.exe
-	
-Building in Mac OS X
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Follow Steps 3-5 from the Ubuntu/Debian section above.
 
-Leopard v10.6
--------------------------------------
-Note that the entire compilation process is supported by the Charm configure/make scripts. The steps for building in os x this way are:
-    1. In a terminal, run ``configure.sh``
-    2. Confirm that you have installed the dependencies above. 
-    3. The next steps may require super user privileges so prepend a ``sudo`` to each command:
-		``make`` 
+Troubleshooting
+---------------
 
-       		``make install``
+This section covers common issues encountered during installation.
 
-		``make test``
-.. note::
-	Another way to install dependencies is to use ``macports`` or ``fink``.
+Library not found errors
+^^^^^^^^^^^^^^^^^^^^^^^^
 
+If you see errors like ``ImportError: libpbc.so.1: cannot open shared object file``:
 
-Lion v10.7 and Mountain Lion v10.8
-------------------------------------
+**On Linux:**
 
-In Lion, Apple has made the decision to deprecate the openssl library in favor of their Common-Crypto library implementation. As a result, you'll have to make some modifications to the library in order to use it with Charm. Please follow the steps below then proceed to install Charm:
-    1. Edit the ``crypto.h`` header file at ``/usr/include/openssl/crypto.h``
-    2. Add the following before the ``crypto.h`` header definition:
+.. code-block:: bash
 
-::
+    # Add to your shell profile (~/.bashrc or ~/.zshrc)
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#ifndef HEADER_CRYPTO_H
-#define HEADER_CRYPTO_H
+    # Update the library cache
+    sudo ldconfig
 
+**On macOS:**
 
-    3. Next, we can install Charm. Run the configure script as before, but due to some changes in the default compiler installed we have provided a command line option to account for these changes:
-		``./configure.sh --enable-darwin``
-    
-    4. The next steps may require super user privileges so prepend a ``sudo`` to each command:
-      		``make`` 
+.. code-block:: bash
 
-       		``make install``
+    # Add to your shell profile (~/.zshrc or ~/.bash_profile)
+    export DYLD_LIBRARY_PATH=/usr/local/lib:$DYLD_LIBRARY_PATH
 
-		``make test``
+Header not found on macOS Apple Silicon
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you see errors about missing headers on M1/M2/M3 Macs:
+
+.. code-block:: bash
+
+    export CFLAGS="-I/opt/homebrew/include"
+    export LDFLAGS="-L/opt/homebrew/lib"
+    ./configure.sh --enable-darwin
+
+This is needed because Homebrew installs to ``/opt/homebrew`` on Apple Silicon
+instead of ``/usr/local`` on Intel Macs.
+
+pyparsing version conflicts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Charm requires a specific version range of pyparsing:
+
+.. code-block:: bash
+
+    pip install 'pyparsing>=2.1.5,<2.4.1'
+
+If you have a newer version installed, you may need to create a virtual environment:
+
+.. code-block:: bash
+
+    python3 -m venv charm-env
+    source charm-env/bin/activate
+    pip install 'pyparsing>=2.1.5,<2.4.1'
+
+PBC build fails with GMP errors
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If PBC fails to build with GMP-related errors:
+
+.. code-block:: bash
+
+    # Ensure GMP is installed and use explicit LDFLAGS
+    ./configure LDFLAGS="-lgmp" CPPFLAGS="-I/usr/local/include"
+    make clean
+    make
+
+Permission denied errors
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you get permission errors during ``make install``:
+
+.. code-block:: bash
+
+    # Use sudo for system-wide installation
+    sudo make install
+
+    # Or install to user directory (add --prefix to configure)
+    ./configure.sh --prefix=$HOME/.local
+    make
+    make install
+
+Running Tests
+-------------
+
+After installation, verify everything works by running the test suite:
+
+.. code-block:: bash
+
+    # Run all tests
+    make test
+
+    # Run scheme tests only
+    make test-schemes
+
+    # Run toolbox tests only
+    make test-charm
+
+    # Use pytest directly for more options
+    pytest -v
