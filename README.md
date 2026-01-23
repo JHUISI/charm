@@ -37,7 +37,7 @@ Quick Install & Test
 ====================
 Installing Charm from source is straightforward. First, verify that you have installed the following dependencies:
 * [GMP 5.x](http://gmplib.org/)
-* [PBC 0.5.14](http://crypto.stanford.edu/pbc/download.html)
+* [PBC 1.0.0](http://crypto.stanford.edu/pbc/download.html)
 * [OpenSSL](http://www.openssl.org/source/)
 * [PyParsing 2.1.5](https://pypi.org/project/pyparsing/2.1.5/)
 * [Hypothesis](https://pypi.org/project/hypothesis/)
