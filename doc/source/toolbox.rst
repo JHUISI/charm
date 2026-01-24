@@ -9,6 +9,7 @@ Toolbox Classes
 
    toolbox/ABEnc
    toolbox/ABEncMultiAuth
+   toolbox/ABEnumeric
    toolbox/bitstring
    toolbox/Commit
    toolbox/conversion
@@ -31,6 +32,7 @@ Toolbox Classes
    toolbox/pairinggroup
    toolbox/PKEnc
    toolbox/PKSig
+   toolbox/policy_expression_spec
    toolbox/policytree
    toolbox/PREnc
    toolbox/reCompiler

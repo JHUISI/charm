@@ -484,8 +484,7 @@ def preprocess_numeric_policy(policy_str, num_bits=32, strict=False):
     Args:
         policy_str: Original policy string with numeric comparisons
         num_bits: Number of bits for numeric representation
-        strict: If True, raise exceptions on errors; if False, return original
-                expression on error (default: False)
+        strict: If True, raise exceptions on errors; if False, return original expression on error (default False)
 
     Returns:
         Expanded policy string with bit-level attributes
@@ -494,7 +493,7 @@ def preprocess_numeric_policy(policy_str, num_bits=32, strict=False):
         ValueError: If policy_str is None
         InvalidBitWidthError: If num_bits is invalid
 
-    Note:
+    Notes:
         - Empty strings or whitespace-only strings return empty string
         - Malformed expressions that don't match the pattern are left unchanged
         - In non-strict mode, errors during expansion leave the original expression

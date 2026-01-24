@@ -175,6 +175,45 @@ New Schemes
 - **Certificateless Public Key Cryptography** - Added CLPKC scheme
 - **Lamport OTS** - Implemented Lamport One-Time Signature scheme
 
+Numeric Attribute Comparisons
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This release introduces support for numeric attribute comparisons in CP-ABE policies,
+implementing the "bag of bits" technique from the Bethencourt-Sahai-Waters (BSW07) paper.
+
+**Features:**
+
+- Support for numeric comparisons in policies: ``>=``, ``>``, ``<=``, ``<``, ``==``
+- Automatic conversion of numeric comparisons to bit-level attribute expressions
+- ``NumericAttributeHelper`` class for easy policy expansion and attribute generation
+- Negation support via equivalent expression conversion
+
+**Example Usage:**
+
+.. code-block:: python
+
+    from charm.toolbox.ABEnumeric import NumericAttributeHelper
+
+    # Create helper with 8-bit integers (values 0-255)
+    helper = NumericAttributeHelper(num_bits=8)
+
+    # Expand policy with numeric comparisons
+    policy = helper.expand_policy("age >= 21 and level > 5")
+
+    # Generate user attributes for key generation
+    user_attrs = helper.user_attributes({'age': 25, 'level': 7, 'role': 'admin'})
+
+**Negation Limitation:**
+
+The underlying Monotone Span Program (MSP) does not support logical negation.
+Use the ``negate_comparison()`` function to convert negated comparisons to equivalent
+positive forms:
+
+- ``NOT (age >= 21)`` → ``age < 21``
+- ``NOT (age == 21)`` → ``(age < 21) or (age > 21)``
+
+See :doc:`toolbox/ABEnumeric` for complete documentation.
+
 Build System
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
