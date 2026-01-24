@@ -16,6 +16,34 @@ Comparisons are then encoded as boolean expressions over these bit attributes.
 
 Note: Uses '#' as delimiter instead of '_' because '_' is reserved for attribute
 indexing in the PolicyParser.
+
+Negation Limitation
+-------------------
+**Important**: The underlying Monotone Span Program (MSP) used in ABE schemes does
+NOT support logical negation. This is a fundamental cryptographic limitation, not
+an implementation limitation.
+
+The PolicyParser's `!` prefix creates an attribute with `!` in its name (e.g., `!A`
+becomes a literal attribute named "!A"), but this is NOT logical negation. To satisfy
+a policy containing `!A`, the user must have an attribute literally named "!A".
+
+For numeric comparisons, negation can be achieved through equivalent expressions:
+
+    NOT (age >= 21)  -->  age < 21
+    NOT (age > 21)   -->  age <= 21
+    NOT (age <= 21)  -->  age > 21
+    NOT (age < 21)   -->  age >= 21
+    NOT (age == 21)  -->  (age < 21) or (age > 21)
+
+Use the `negate_comparison()` function to automatically convert negated comparisons
+to their equivalent positive forms.
+
+Example:
+    >>> from charm.toolbox.ABEnumeric import negate_comparison
+    >>> negate_comparison('age', '>=', 21)
+    ('age', '<', 21)
+    >>> negate_comparison('age', '==', 21)  # Returns tuple for OR expression
+    (('age', '<', 21), ('age', '>', 21))
 """
 
 import re
@@ -257,6 +285,109 @@ def encode_less_than_or_equal(attr_name, value, num_bits=32):
 
 # Supported comparison operators
 SUPPORTED_OPERATORS = {'==', '>', '>=', '<', '<='}
+
+# Mapping of operators to their logical negations
+NEGATION_MAP = {
+    '>=': '<',
+    '>': '<=',
+    '<=': '>',
+    '<': '>=',
+    '==': None,  # Special case: requires OR of two comparisons
+}
+
+
+def negate_comparison(attr_name, operator, value):
+    """
+    Convert a negated numeric comparison to its equivalent positive form.
+
+    Since Monotone Span Programs (MSP) used in ABE do not support logical
+    negation, this function converts negated comparisons to equivalent
+    positive expressions.
+
+    Args:
+        attr_name: The attribute name (e.g., 'age', 'level')
+        operator: The original operator to negate ('==', '>', '>=', '<', '<=')
+        value: The numeric value in the comparison
+
+    Returns:
+        For simple negations (>=, >, <=, <):
+            A tuple (attr_name, negated_operator, value)
+
+        For equality negation (==):
+            A tuple of two comparisons: ((attr_name, '<', value), (attr_name, '>', value))
+            These should be combined with OR in the policy.
+
+    Raises:
+        InvalidOperatorError: If operator is not supported
+
+    Examples:
+        >>> negate_comparison('age', '>=', 21)
+        ('age', '<', 21)
+
+        >>> negate_comparison('age', '>', 21)
+        ('age', '<=', 21)
+
+        >>> negate_comparison('age', '==', 21)
+        (('age', '<', 21), ('age', '>', 21))
+
+    Usage in policies:
+        # Instead of: NOT (age >= 21)
+        negated = negate_comparison('age', '>=', 21)
+        policy = f"{negated[0]} {negated[1]} {negated[2]}"  # "age < 21"
+
+        # For equality negation:
+        negated = negate_comparison('age', '==', 21)
+        # Results in: (age < 21) or (age > 21)
+        policy = f"({negated[0][0]} {negated[0][1]} {negated[0][2]}) or ({negated[1][0]} {negated[1][1]} {negated[1][2]})"
+    """
+    if operator not in SUPPORTED_OPERATORS:
+        raise InvalidOperatorError(
+            f"Unsupported operator '{operator}'. "
+            f"Supported operators are: {', '.join(sorted(SUPPORTED_OPERATORS))}"
+        )
+
+    negated_op = NEGATION_MAP.get(operator)
+
+    if negated_op is not None:
+        # Simple negation: just flip the operator
+        return (attr_name, negated_op, value)
+    else:
+        # Equality negation: NOT (x == v) is (x < v) OR (x > v)
+        return ((attr_name, '<', value), (attr_name, '>', value))
+
+
+def negate_comparison_to_policy(attr_name, operator, value):
+    """
+    Convert a negated numeric comparison directly to a policy string.
+
+    This is a convenience function that calls negate_comparison() and
+    formats the result as a policy string ready for use.
+
+    Args:
+        attr_name: The attribute name (e.g., 'age', 'level')
+        operator: The original operator to negate ('==', '>', '>=', '<', '<=')
+        value: The numeric value in the comparison
+
+    Returns:
+        A policy string representing the negated comparison.
+
+    Examples:
+        >>> negate_comparison_to_policy('age', '>=', 21)
+        'age < 21'
+
+        >>> negate_comparison_to_policy('age', '==', 21)
+        '(age < 21) or (age > 21)'
+    """
+    result = negate_comparison(attr_name, operator, value)
+
+    if isinstance(result[0], tuple):
+        # Equality negation - two comparisons with OR
+        left = result[0]
+        right = result[1]
+        return f"({left[0]} {left[1]} {left[2]}) or ({right[0]} {right[1]} {right[2]})"
+    else:
+        # Simple negation
+        return f"{result[0]} {result[1]} {result[2]}"
 
 
 def expand_numeric_comparison(attr_name, operator, value, num_bits=32):
@@ -595,4 +726,76 @@ class NumericAttributeHelper:
             return user_value <= value
 
         return False
+
+    def negate_comparison(self, attr_name, operator, value):
+        """
+        Convert a negated numeric comparison to its equivalent positive form.
+
+        This is a convenience wrapper around the module-level negate_comparison()
+        function.
+
+        Args:
+            attr_name: The attribute name (e.g., 'age', 'level')
+            operator: The original operator to negate ('==', '>', '>=', '<', '<=')
+            value: The numeric value in the comparison
+
+        Returns:
+            For simple negations: (attr_name, negated_operator, value)
+            For equality negation: ((attr_name, '<', value), (attr_name, '>', value))
+
+        Example:
+            >>> helper = NumericAttributeHelper(num_bits=8)
+            >>> helper.negate_comparison('age', '>=', 21)
+            ('age', '<', 21)
+        """
+        return negate_comparison(attr_name, operator, value)
+
+    def expand_negated_policy(self, attr_name, operator, value):
+        """
+        Expand a negated numeric comparison into a bit-level policy expression.
+
+        This method first negates the comparison, then expands it to bit-level
+        attributes.
+
+        Args:
+            attr_name: The attribute name (e.g., 'age', 'level')
+            operator: The original operator to negate ('==', '>', '>=', '<', '<=')
+            value: The numeric value in the comparison
+
+        Returns:
+            A policy string with bit-level attributes representing NOT (attr op value)
+
+        Example:
+            >>> helper = NumericAttributeHelper(num_bits=8)
+            >>> # NOT (age >= 21) becomes age < 21
+            >>> policy = helper.expand_negated_policy('age', '>=', 21)
+            >>> # Returns the bit-level encoding of age < 21
+        """
+        negated = negate_comparison(attr_name, operator, value)
+
+        if isinstance(negated[0], tuple):
+            # Equality negation - expand both parts and combine with OR
+            left = negated[0]
+            right = negated[1]
+            left_expanded = expand_numeric_comparison(
+                left[0], left[1], left[2], self.num_bits
+            )
+            right_expanded = expand_numeric_comparison(
+                right[0], right[1], right[2], self.num_bits
+            )
+
+            # Handle None returns (tautologies/contradictions)
+            if left_expanded is None and right_expanded is None:
+                return None
+            elif left_expanded is None:
+                return f"({right_expanded})"
+            elif right_expanded is None:
+                return f"({left_expanded})"
+            else:
+                return f"(({left_expanded}) or ({right_expanded}))"
+        else:
+            # Simple negation
+            return expand_numeric_comparison(
+                negated[0], negated[1], negated[2], self.num_bits
+            )
 

@@ -791,6 +791,147 @@ class NumericAttributeEdgeCaseTest(unittest.TestCase):
         self.assertEqual(helper16.max_value, 65535)  # 2^16 - 1
 
 
+class NumericNegationTest(unittest.TestCase):
+    """Tests for negation of numeric comparisons."""
+
+    def setUp(self):
+        from charm.toolbox.ABEnumeric import (
+            NumericAttributeHelper, negate_comparison, negate_comparison_to_policy,
+            InvalidOperatorError
+        )
+        from charm.toolbox.policytree import PolicyParser
+        self.helper = NumericAttributeHelper(num_bits=8)
+        self.negate = negate_comparison
+        self.negate_to_policy = negate_comparison_to_policy
+        self.parser = PolicyParser()
+        self.InvalidOperatorError = InvalidOperatorError
+
+    # --- Basic Negation Tests ---
+    def test_negate_greater_equal(self):
+        """Test NOT (age >= 21) becomes age < 21."""
+        result = self.negate('age', '>=', 21)
+        self.assertEqual(result, ('age', '<', 21))
+
+    def test_negate_greater_than(self):
+        """Test NOT (age > 21) becomes age <= 21."""
+        result = self.negate('age', '>', 21)
+        self.assertEqual(result, ('age', '<=', 21))
+
+    def test_negate_less_equal(self):
+        """Test NOT (age <= 21) becomes age > 21."""
+        result = self.negate('age', '<=', 21)
+        self.assertEqual(result, ('age', '>', 21))
+
+    def test_negate_less_than(self):
+        """Test NOT (age < 21) becomes age >= 21."""
+        result = self.negate('age', '<', 21)
+        self.assertEqual(result, ('age', '>=', 21))
+
+    def test_negate_equality(self):
+        """Test NOT (age == 21) becomes (age < 21) OR (age > 21)."""
+        result = self.negate('age', '==', 21)
+        self.assertEqual(result, (('age', '<', 21), ('age', '>', 21)))
+
+    # --- Negation to Policy String Tests ---
+    def test_negate_to_policy_simple(self):
+        """Test negate_comparison_to_policy for simple operators."""
+        self.assertEqual(self.negate_to_policy('age', '>=', 21), 'age < 21')
+        self.assertEqual(self.negate_to_policy('age', '>', 21), 'age <= 21')
+        self.assertEqual(self.negate_to_policy('age', '<=', 21), 'age > 21')
+        self.assertEqual(self.negate_to_policy('age', '<', 21), 'age >= 21')
+
+    def test_negate_to_policy_equality(self):
+        """Test negate_comparison_to_policy for equality."""
+        result = self.negate_to_policy('age', '==', 21)
+        self.assertEqual(result, '(age < 21) or (age > 21)')
+
+    # --- Invalid Operator Tests ---
+    def test_negate_invalid_operator(self):
+        """Test that negating invalid operators raises error."""
+        with self.assertRaises(self.InvalidOperatorError):
+            self.negate('age', '!=', 21)
+
+    # --- Helper Method Tests ---
+    def test_helper_negate_comparison(self):
+        """Test NumericAttributeHelper.negate_comparison method."""
+        result = self.helper.negate_comparison('age', '>=', 21)
+        self.assertEqual(result, ('age', '<', 21))
+
+    def test_helper_expand_negated_policy_simple(self):
+        """Test expand_negated_policy for simple operators."""
+        # NOT (age >= 21) should expand to bit encoding of age < 21
+        result = self.helper.expand_negated_policy('age', '>=', 21)
+        self.assertIsNotNone(result)
+        self.assertIn('#b', result)
+
+    def test_helper_expand_negated_policy_equality(self):
+        """Test expand_negated_policy for equality."""
+        # NOT (age == 21) should expand to (age < 21) OR (age > 21)
+        result = self.helper.expand_negated_policy('age', '==', 21)
+        self.assertIsNotNone(result)
+        self.assertIn(' or ', result)
+        self.assertIn('#b', result)
+
+    # --- End-to-End Negation Tests ---
+    def test_negated_policy_satisfaction(self):
+        """Test that negated policies work correctly end-to-end."""
+        # Original: age >= 21 (user with age 20 should NOT satisfy)
+        # Negated: age < 21 (user with age 20 SHOULD satisfy)
+
+        negated_policy = self.negate_to_policy('age', '>=', 21)
+        expanded = self.helper.expand_policy(negated_policy)
+        tree = self.parser.parse(expanded)
+
+        # User with age 20 should satisfy "age < 21"
+        user_attrs = self.helper.user_attributes({'age': 20})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # User with age 21 should NOT satisfy "age < 21"
+        user_attrs = self.helper.user_attributes({'age': 21})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+        # User with age 25 should NOT satisfy "age < 21"
+        user_attrs = self.helper.user_attributes({'age': 25})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+    def test_negated_equality_satisfaction(self):
+        """Test that negated equality works correctly end-to-end."""
+        # NOT (age == 21) means age != 21, i.e., (age < 21) OR (age > 21)
+
+        negated_policy = self.negate_to_policy('age', '==', 21)
+        expanded = self.helper.expand_policy(negated_policy)
+        tree = self.parser.parse(expanded)
+
+        # User with age 20 should satisfy "age != 21"
+        user_attrs = self.helper.user_attributes({'age': 20})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # User with age 21 should NOT satisfy "age != 21"
+        user_attrs = self.helper.user_attributes({'age': 21})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+        # User with age 22 should satisfy "age != 21"
+        user_attrs = self.helper.user_attributes({'age': 22})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+    # --- Boundary Value Tests ---
+    def test_negate_at_zero(self):
+        """Test negation at zero boundary."""
+        # NOT (age >= 0) = age < 0 (always false for non-negative)
+        result = self.negate('age', '>=', 0)
+        self.assertEqual(result, ('age', '<', 0))
+
+        # NOT (age > 0) = age <= 0 (only true for 0)
+        result = self.negate('age', '>', 0)
+        self.assertEqual(result, ('age', '<=', 0))
+
+    def test_negate_at_max(self):
+        """Test negation at max value boundary."""
+        # NOT (age <= 255) = age > 255 (always false for 8-bit)
+        result = self.negate('age', '<=', 255)
+        self.assertEqual(result, ('age', '>', 255))
+
+
 def run_stress_test():
     """Run the stress test suite and print results."""
     print("=" * 70)
@@ -806,6 +947,7 @@ def run_stress_test():
     suite.addTests(loader.loadTestsFromTestCase(PolicyParserEdgeCaseTest))
     suite.addTests(loader.loadTestsFromTestCase(NumericAttributeTest))
     suite.addTests(loader.loadTestsFromTestCase(NumericAttributeEdgeCaseTest))
+    suite.addTests(loader.loadTestsFromTestCase(NumericNegationTest))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
