@@ -315,7 +315,8 @@ void	Element_dealloc(Element* self)
  */
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA256_CTX sha2;
+	EVP_MD_CTX *ctx;
+	unsigned int md_len;
 	int i, new_input_len = input_len + 2; // extra byte for prefix
 	uint8_t first_block = 0;
 	uint8_t new_input[new_input_len+1];
@@ -332,11 +333,14 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 	// prepare output buf
 	memset(output_buf, 0, hash_len);
 
+	ctx = EVP_MD_CTX_new();
+	if (ctx == NULL) return FALSE;
+
 	if (hash_len <= HASH_LEN) {
-		SHA256_Init(&sha2);
-		SHA256_Update(&sha2, new_input, new_input_len);
+		EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+		EVP_DigestUpdate(ctx, new_input, new_input_len);
 		uint8_t md[HASH_LEN+1];
-		SHA256_Final(md, &sha2);
+		EVP_DigestFinal_ex(ctx, md, &md_len);
 		memcpy(output_buf, md, hash_len);
 	}
 	else {
@@ -351,11 +355,11 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
 			target_buf += (i * HASH_LEN);
 			new_input[0] = (uint8_t) i;
-			SHA256_Init(&sha2);
+			EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
 			debug("input %d => ", i);
 			printf_buffer_as_hex(new_input, new_input_len);
-			SHA256_Update(&sha2, new_input, new_input_len);
-			SHA256_Final(md, &sha2);
+			EVP_DigestUpdate(ctx, new_input, new_input_len);
+			EVP_DigestFinal_ex(ctx, md, &md_len);
 			memcpy(target_buf, md, hash_len);
 			debug("block %d => ", i);
 			printf_buffer_as_hex(md, HASH_LEN);
@@ -365,7 +369,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 		memcpy(output_buf, md2, hash_len);
 	}
 
-	OPENSSL_cleanse(&sha2,sizeof(sha2));
+	EVP_MD_CTX_free(ctx);
 	return TRUE;
 }
 
