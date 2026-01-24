@@ -338,11 +338,59 @@ proof = instance.prove()
 - Batch verification: Random linear combination technique for efficient multi-proof verification
 - All implementations include comprehensive tests and documentation
 
-### Phase 4 (v0.70)
-- [ ] Complete deprecation of legacy API
-- [ ] Security audit
-- [ ] Performance benchmarks
-- [ ] Full documentation
+### Phase 4 (v0.70) - Production Hardening
+
+#### 4.1 Legacy API Deprecation
+- [ ] Add `DeprecationWarning` to all legacy functions in `zkp_generator.py`:
+  - `executeIntZKProof()` - emit warning on every call
+  - `executeNonIntZKProof()` - emit warning on every call
+  - `KoDLFixedBase()` and related internal functions
+- [ ] Update `__init__.py` to emit import-time deprecation warning for legacy modules
+- [ ] Add migration examples in deprecation messages pointing to new API
+- [ ] Document removal timeline (suggest v0.80 for complete removal)
+
+#### 4.2 Security Audit Checklist
+- [ ] **Input Validation**: Verify all public inputs are validated before use
+  - Check group membership for all elements
+  - Validate proof structure before verification
+  - Ensure challenge is computed correctly (Fiat-Shamir)
+- [ ] **Timing Attack Resistance**: Review for constant-time operations
+  - Verify comparison operations don't leak timing info
+  - Check exponentiation operations
+- [ ] **Random Number Generation**: Audit randomness sources
+  - Verify group.random() uses cryptographically secure RNG
+  - Check for proper seeding
+- [ ] **Serialization Security**: Review serialize/deserialize for injection attacks
+  - Validate deserialized data before use
+  - Check for buffer overflow vulnerabilities
+- [ ] **Error Handling**: Ensure errors don't leak sensitive information
+  - Review exception messages
+  - Verify failed proofs don't reveal witness info
+
+#### 4.3 Performance Benchmarks
+- [ ] Create benchmark suite comparing curves:
+  - BN254 vs SS512 vs MNT224
+  - Measure: proof generation time, verification time, proof size
+- [ ] Benchmark each proof type:
+  - Schnorr, DLEQ, Representation, AND, OR, Range, Batch
+- [ ] Compare batch verification speedup vs individual verification
+- [ ] Memory usage profiling
+- [ ] Document recommended use cases based on performance characteristics
+
+#### 4.4 Documentation Updates
+- [ ] Complete API reference documentation for all proof types
+- [ ] Add usage examples for each proof type
+- [ ] Create "Choosing the Right Proof Type" guide
+- [ ] Document security considerations and threat model
+- [ ] Add curve selection guide (BN254 recommended for production)
+- [ ] Update README with ZKP compiler section
+- [ ] Create Jupyter notebook tutorials
+
+#### 4.5 Additional Hardening
+- [ ] Add type hints to all public APIs
+- [ ] Improve error messages with actionable guidance
+- [ ] Add logging for debugging (configurable verbosity)
+- [ ] Consider adding proof composition helpers (e.g., prove_and_verify convenience functions)
 
 ---
 
