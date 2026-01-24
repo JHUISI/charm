@@ -5,6 +5,19 @@ Zero-Knowledge Proof Demo - Secure API Migration Guide
 This demo shows both the legacy (deprecated) API and the new secure API for
 zero-knowledge proofs in Charm-Crypto.
 
+=== RECOMMENDED CURVE: BN254 ===
+
+This demo uses the BN254 (Barreto-Naehrig) curve which provides:
+- ~128-bit security level (vs SS512's ~80-bit security)
+- Efficient pairing operations
+- Widely used in production systems (e.g., Ethereum precompiles)
+
+Available curves and their security levels:
+- BN254:   ~128-bit security (RECOMMENDED for production)
+- SS512:   ~80-bit security  (legacy, not recommended)
+- MNT224:  ~112-bit security (asymmetric curve)
+- SS1024:  ~80-bit security  (larger but same security as SS512)
+
 === MIGRATION GUIDE ===
 
 The legacy API (executeIntZKProof, executeNonIntZKProof) uses insecure dynamic
@@ -84,9 +97,9 @@ def demo_non_interactive_proof():
     print("NON-INTERACTIVE SCHNORR PROOF DEMO (New Secure API)")
     print("=" * 70)
 
-    # Setup: Use a standard pairing group
-    group = PairingGroup('SS512')
-    print(f"\n[Setup] Using pairing group: SS512")
+    # Setup: Use BN254 curve (~128-bit security, recommended for production)
+    group = PairingGroup('BN254')
+    print(f"\n[Setup] Using pairing group: BN254 (~128-bit security)")
 
     # Prover's secret and public values
     g = group.random(G1)   # Generator (public)
@@ -151,8 +164,8 @@ def demo_interactive_proof():
     print("INTERACTIVE SCHNORR PROOF DEMO (New Secure API)")
     print("=" * 70)
 
-    # Setup
-    group = PairingGroup('SS512')
+    # Setup: Use BN254 curve (~128-bit security)
+    group = PairingGroup('BN254')
     g = group.random(G1)
     x = group.random(ZR)
     h = g ** x
@@ -202,8 +215,8 @@ def demo_serialization():
     print("PROOF SERIALIZATION DEMO (Network Transmission)")
     print("=" * 70)
 
-    # Setup
-    group = PairingGroup('SS512')
+    # Setup: Use BN254 curve (~128-bit security)
+    group = PairingGroup('BN254')
     g = group.random(G1)
     x = group.random(ZR)
     h = g ** x
@@ -269,8 +282,8 @@ def demo_factory_api():
     print("FACTORY API DEMO (Statement-Based)")
     print("=" * 70)
 
-    # Setup
-    group = PairingGroup('SS512')
+    # Setup: Use BN254 curve (~128-bit security)
+    group = PairingGroup('BN254')
     g = group.random(G1)
     x = group.random(ZR)
     h = g ** x
@@ -336,12 +349,12 @@ def legacy_network_demo(argv):
         return False
 
     # DEPRECATED: Uses a.param file which may not be available
-    # Use PairingGroup('SS512') or similar named curves instead
+    # Use PairingGroup('BN254') for ~128-bit security (recommended)
     try:
         group = PairingGroup('a.param')
     except Exception:
-        print("Warning: 'a.param' not found, using 'SS512' instead")
-        group = PairingGroup('SS512')
+        print("Warning: 'a.param' not found, using 'BN254' instead (~128-bit security)")
+        group = PairingGroup('BN254')
 
     party_info['party'] = user
     party_info['setting'] = group

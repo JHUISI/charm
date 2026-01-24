@@ -18,7 +18,7 @@ class TestRangeProofBasic(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.h = self.group.random(G1)
         self.num_bits = 8  # Range [0, 256)
@@ -90,7 +90,7 @@ class TestRangeProofDifferentBitSizes(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.h = self.group.random(G1)
 
@@ -145,7 +145,7 @@ class TestRangeProofPedersenCommitment(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.h = self.group.random(G1)
 
@@ -193,7 +193,7 @@ class TestRangeProofSerialization(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.h = self.group.random(G1)
         self.num_bits = 4  # Use small bit size for fast tests

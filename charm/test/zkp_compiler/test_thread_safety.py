@@ -24,7 +24,7 @@ class TestNonInteractiveThreadSafety(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.num_threads = 10
         self.proofs_per_thread = 5
     
@@ -126,7 +126,7 @@ class TestThreadSafeWrappers(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
     
     def test_thread_safe_prover_context_manager(self):
         """Test ThreadSafeProver as context manager."""

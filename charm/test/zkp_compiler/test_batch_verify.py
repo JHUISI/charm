@@ -21,7 +21,7 @@ class TestBatchVerifySchnorr(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
 
     def _create_valid_schnorr_proof(self):
@@ -75,7 +75,7 @@ class TestBatchVerifyDLEQ(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g1 = self.group.random(G1)
         self.g2 = self.group.random(G1)
 
@@ -115,7 +115,7 @@ class TestBatchVerifierClass(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.g1 = self.group.random(G1)
         self.g2 = self.group.random(G1)
@@ -202,7 +202,7 @@ class TestBatchVerifyPerformance(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
 
     def test_batch_faster_than_individual(self):

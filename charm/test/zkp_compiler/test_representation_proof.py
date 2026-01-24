@@ -19,7 +19,7 @@ class TestRepresentationProofInteractive(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
 
     def test_prove_and_verify_interactive_two_generators(self):
         """Test complete interactive proof cycle with two generators (Pedersen commitment style)."""
@@ -109,7 +109,7 @@ class TestRepresentationProofNonInteractive(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
 
     def test_non_interactive_proof_valid_two_generators(self):
         """Test Fiat-Shamir transformed proof with two generators."""
@@ -245,7 +245,7 @@ class TestRepresentationProofSerialization(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
 
     def test_serialization_roundtrip(self):
         """Test that proof can be serialized and deserialized."""
@@ -295,9 +295,9 @@ class TestRepresentationProofSerialization(unittest.TestCase):
 class TestRepresentationProofWithDifferentGroups(unittest.TestCase):
     """Test Representation proofs with different pairing groups."""
 
-    def test_with_ss512_group(self):
-        """Test with SS512 pairing group."""
-        self._test_with_group('SS512')
+    def test_with_bn254_group(self):
+        """Test with BN254 pairing group."""
+        self._test_with_group('BN254')
 
     def test_with_mnt224_group(self):
         """Test with MNT224 pairing group."""

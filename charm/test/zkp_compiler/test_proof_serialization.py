@@ -18,7 +18,7 @@ class TestProofSerialization(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.x = self.group.random(ZR)
         self.h = self.g ** self.x
@@ -82,7 +82,7 @@ class TestProofSerialization(unittest.TestCase):
     
     def test_serialization_with_different_groups(self):
         """Test serialization works with different pairing groups."""
-        for curve in ['SS512', 'MNT224']:
+        for curve in ['BN254', 'MNT224']:
             with self.subTest(curve=curve):
                 group = PairingGroup(curve)
                 g = group.random(G1)
@@ -103,7 +103,7 @@ class TestProofSerializationErrors(unittest.TestCase):
     """Tests for serialization error handling."""
     
     def setUp(self):
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
     
     def test_deserialize_invalid_data_fails(self):
         """Test that invalid data raises an exception."""

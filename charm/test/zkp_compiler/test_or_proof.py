@@ -17,7 +17,7 @@ class TestORProofNonInteractive(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         # Create two public values with known discrete logs
         self.x1 = self.group.random(ZR)
@@ -124,7 +124,7 @@ class TestORProofWitnessIndistinguishability(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.x1 = self.group.random(ZR)
         self.x2 = self.group.random(ZR)
@@ -180,7 +180,7 @@ class TestORProofSerialization(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.x = self.group.random(ZR)
         self.h1 = self.g ** self.x

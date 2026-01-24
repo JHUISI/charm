@@ -18,7 +18,7 @@ class TestSchnorrProofInteractive(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.x = self.group.random(ZR)
         self.h = self.g ** self.x
@@ -73,7 +73,7 @@ class TestSchnorrProofNonInteractive(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g = self.group.random(G1)
         self.x = self.group.random(ZR)
         self.h = self.g ** self.x
@@ -142,9 +142,9 @@ class TestSchnorrProofNonInteractive(unittest.TestCase):
 class TestSchnorrProofWithDifferentGroups(unittest.TestCase):
     """Test Schnorr proofs with different pairing groups."""
     
-    def test_with_ss512_group(self):
-        """Test with SS512 pairing group."""
-        self._test_with_group('SS512')
+    def test_with_bn254_group(self):
+        """Test with BN254 pairing group."""
+        self._test_with_group('BN254')
     
     def test_with_mnt224_group(self):
         """Test with MNT224 pairing group."""

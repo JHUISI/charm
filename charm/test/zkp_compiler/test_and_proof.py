@@ -18,7 +18,7 @@ class TestANDProofNonInteractive(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
 
     def test_two_schnorr_proofs(self):
         """Test AND of two Schnorr proofs."""
@@ -176,7 +176,7 @@ class TestANDProofSerialization(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
 
     def test_serialization_roundtrip(self):
         """Test serialize and deserialize proof."""

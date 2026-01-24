@@ -19,7 +19,7 @@ class TestDLEQProofInteractive(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g1 = self.group.random(G1)
         self.g2 = self.group.random(G1)
         self.x = self.group.random(ZR)
@@ -102,7 +102,7 @@ class TestDLEQProofNonInteractive(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g1 = self.group.random(G1)
         self.g2 = self.group.random(G1)
         self.x = self.group.random(ZR)
@@ -194,7 +194,7 @@ class TestDLEQProofSerialization(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.group = PairingGroup('SS512')
+        self.group = PairingGroup('BN254')
         self.g1 = self.group.random(G1)
         self.g2 = self.group.random(G1)
         self.x = self.group.random(ZR)
@@ -237,9 +237,9 @@ class TestDLEQProofSerialization(unittest.TestCase):
 class TestDLEQProofWithDifferentGroups(unittest.TestCase):
     """Test DLEQ proofs with different pairing groups."""
 
-    def test_with_ss512_group(self):
-        """Test with SS512 pairing group."""
-        self._test_with_group('SS512')
+    def test_with_bn254_group(self):
+        """Test with BN254 pairing group."""
+        self._test_with_group('BN254')
 
     def test_with_mnt224_group(self):
         """Test with MNT224 pairing group."""
