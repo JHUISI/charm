@@ -102,7 +102,7 @@ class BCHKIBEnc(IBEnc):
 
         C1prime = pickleObject(serializeObject(c['C1'], group))
         
-        if(c['tag'] == hmac.new(k, C1prime+c['C2'], hashlib.sha256).digest()):
+        if hmac.compare_digest(c['tag'], hmac.new(k, C1prime+c['C2'], hashlib.sha256).digest()):
             return bytes(m2.split(':')[0], 'utf8')
         else:
             return b'FALSE'

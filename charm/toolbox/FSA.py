@@ -759,15 +759,16 @@ def toFSA(arg):
         return singleton(arg)
 
 def view(str):
-    import os, tempfile
+    import os, tempfile, subprocess
     dotfile = tempfile.mktemp()
     psfile = tempfile.mktemp()
-    open(dotfile, 'w').write(str)
+    with open(dotfile, 'w') as f:
+        f.write(str)
     dotter = 'dot'
     psviewer = 'gv'
     psoptions = '-antialias'
-    os.system("%s -Tps %s -o %s" % (dotter, dotfile, psfile))
-    os.system("%s %s %s&" % (psviewer, psoptions, psfile))
+    subprocess.run([dotter, '-Tps', dotfile, '-o', psfile], check=False)
+    subprocess.run([psviewer, psoptions, psfile], check=False)
 
 
 #

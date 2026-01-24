@@ -102,6 +102,56 @@ jobs:
         pytest -v charm/test/
         python -m unittest discover -p "*_test.py" charm/test/toolbox/
 
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-gmp
+          mingw-w64-x86_64-openssl
+          mingw-w64-x86_64-make
+          flex
+          bison
+          wget
+
+    - name: Build PBC library
+      shell: msys2 {0}
+      run: |
+        wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+        tar -xzf pbc-1.0.0.tar.gz
+        cd pbc-1.0.0
+        ./configure --prefix=/mingw64
+        make -j$(nproc)
+        make install
+
+    - name: Install Python dependencies
+      run: |
+        pip install --upgrade pip setuptools wheel
+        pip install pyparsing pytest hypothesis
+
+    - name: Build and test (limited)
+      run: |
+        # Windows build is experimental - run basic import tests
+        python -c "import charm; print('Charm package structure OK')"
+      continue-on-error: true
+
   # Optional: Build wheels using cibuildwheel
   build-wheels:
     if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
