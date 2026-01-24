@@ -124,14 +124,14 @@ jobs:
       env:
         LD_LIBRARY_PATH: /usr/local/lib:$LD_LIBRARY_PATH
       run: |
-        timeout 150 python charm/test/fuzz/fuzz_policy_parser.py -max_total_time=120 || true
+        timeout 360 python charm/test/fuzz/fuzz_policy_parser.py -max_total_time=300 || true
         echo "Policy parser fuzzing completed"
 
     - name: Run serialization fuzzer
       env:
         LD_LIBRARY_PATH: /usr/local/lib:$LD_LIBRARY_PATH
       run: |
-        timeout 150 python charm/test/fuzz/fuzz_serialization.py -max_total_time=120 || true
+        timeout 360 python charm/test/fuzz/fuzz_serialization.py -max_total_time=300 || true
         echo "Serialization fuzzing completed"
 
     - name: Upload crash artifacts

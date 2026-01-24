@@ -72,7 +72,7 @@ python charm/test/fuzz/fuzz_policy_parser.py crash-<hash>
 Fuzzing runs automatically in GitHub Actions CI on a weekly schedule (Sundays at 2am UTC)
 or when manually triggered via `workflow_dispatch`. The `fuzzing` job in `.github/workflows/ci.yml`:
 
-- Runs each fuzzer for ~2 minutes (120 seconds)
+- Runs each fuzzer for ~5 minutes (300 seconds)
 - Uploads any crash artifacts for investigation
 - Uses Linux where Atheris works out of the box
 - Does NOT run on every push/PR to save CI resources
