@@ -146,7 +146,9 @@ else:
 
 _charm_version = opt.get('VERSION')
 lib_config_file = 'charm/config.py'
-inc_dirs = [s[2:] for s in opt.get('CHARM_CFLAGS').split() if s.startswith('-I')]
+# Get include dirs from both CHARM_CFLAGS and CPPFLAGS
+inc_dirs = [s[2:] for s in opt.get('CHARM_CFLAGS', '').split() if s.startswith('-I')]
+inc_dirs += [s[2:] for s in opt.get('CPPFLAGS', '').split() if s.startswith('-I')]
 library_dirs = [s[2:] for s in opt.get('LDFLAGS').split() if s.startswith('-L')]
 runtime_library_dirs = [s[11:] for s in opt.get('LDFLAGS').split()
                         if s.lower().startswith('-wl,-rpath,')]
@@ -244,38 +246,69 @@ if platform.system() in ['Linux', 'Windows']:
    if opt.get('INT_MOD') == 'yes': integer_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
    if opt.get('ECC_MOD') == 'yes': ecc_module.sources.append(benchmark_path  + 'benchmarkmodule.c')
 
-setup(name = 'Charm-Crypto',
-	version =  _charm_version,
-	description = 'Charm is a framework for rapid prototyping of cryptosystems',
-	ext_modules = _ext_modules,
-	author = "J. Ayo Akinyele",
-	author_email = "ayo.akinyele@charm-crypto.com",
-	url = "http://charm-crypto.io/",
-        install_requires = ['setuptools',
-                            'pyparsing >= 2.1.5,<2.4.1',
-                            'hypothesis'],
-        tests_require=['pytest', 'hypothesis'],
-	packages = ['charm',
-                    'charm.core',
-                        'charm.core.crypto',
-                        'charm.core.engine',
-                        'charm.core.math',
-                    'charm.test',
-                        'charm.test.schemes',
-                        'charm.test.toolbox',
-                    'charm.toolbox',
-                    'charm.zkp_compiler',
-		    'charm.schemes',
-			'charm.schemes.ibenc',
-			'charm.schemes.abenc',
-			'charm.schemes.pkenc',
-			'charm.schemes.hibenc',
-			'charm.schemes.pksig',
-			'charm.schemes.commit',
-			'charm.schemes.grpsig',
-            'charm.schemes.prenc',
-		    'charm.adapters',
-                ],
-    license = 'LGPL',
-    cmdclass={'uninstall':UninstallCommand,'test':PyTest}
+# Package name follows PyPI conventions (lowercase, hyphenated)
+# The import name remains 'charm' for backward compatibility
+setup(
+    name='charm-crypto',
+    version=_charm_version,
+    description='Charm is a framework for rapid prototyping of cryptosystems',
+    long_description=open('README.md').read() if os.path.exists('README.md') else '',
+    long_description_content_type='text/markdown',
+    ext_modules=_ext_modules,
+    author="J. Ayo Akinyele",
+    author_email="ayo.akinyele@charm-crypto.com",
+    url="https://charm-crypto.io/",
+    project_urls={
+        "Documentation": "https://charm-crypto.io/documentation",
+        "Repository": "https://github.com/JHUISI/charm",
+        "Issues": "https://github.com/JHUISI/charm/issues",
+    },
+    install_requires=[
+        'pyparsing>=2.1.5,<4.0',
+    ],
+    extras_require={
+        'dev': ['pytest>=7.0', 'hypothesis>=6.0', 'build', 'twine'],
+        'docs': ['sphinx>=4.0', 'sphinx-rtd-theme'],
+    },
+    python_requires='>=3.8',
+    packages=[
+        'charm',
+        'charm.core',
+        'charm.core.crypto',
+        'charm.core.engine',
+        'charm.core.math',
+        'charm.test',
+        'charm.test.schemes',
+        'charm.test.toolbox',
+        'charm.toolbox',
+        'charm.zkp_compiler',
+        'charm.schemes',
+        'charm.schemes.ibenc',
+        'charm.schemes.abenc',
+        'charm.schemes.pkenc',
+        'charm.schemes.hibenc',
+        'charm.schemes.pksig',
+        'charm.schemes.commit',
+        'charm.schemes.grpsig',
+        'charm.schemes.prenc',
+        'charm.adapters',
+    ],
+    license='LGPL-3.0-or-later',
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: C',
+        'Topic :: Security :: Cryptography',
+    ],
+    cmdclass={'uninstall': UninstallCommand, 'test': PyTest}
 )
