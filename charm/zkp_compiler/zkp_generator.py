@@ -1,13 +1,33 @@
-# Implements the proof-of-concept ZK proof compiler
-# This compiler takes as input a set of public and secret inputs as well as a
-# statement to be proved/verified.  It outputs the
-#
-# DEPRECATION WARNING: This module uses insecure dynamic code generation (exec/compile).
-# For production use, please use the new secure API in:
-#   - charm.zkp_compiler.zkp_factory.ZKProofFactory
-#   - charm.zkp_compiler.schnorr_proof.SchnorrProof
-#
-# See the migration guide in doc/zkp_proof_types_design.md
+"""
+Legacy ZKP Generator Module (DEPRECATED)
+========================================
+
+.. deprecated:: 0.60
+    This module uses insecure dynamic code generation (exec/compile) which
+    can lead to code injection vulnerabilities. It will be removed in v0.80.
+
+    For production use, please migrate to the new secure API:
+
+    - :class:`charm.zkp_compiler.schnorr_proof.SchnorrProof`
+    - :class:`charm.zkp_compiler.dleq_proof.DLEQProof`
+    - :class:`charm.zkp_compiler.representation_proof.RepresentationProof`
+    - :class:`charm.zkp_compiler.zkp_factory.ZKProofFactory`
+
+    See the migration guide in doc/zkp_proof_types_design.md
+
+Example Migration
+-----------------
+Old (deprecated)::
+
+    from charm.zkp_compiler.zkp_generator import executeIntZKProof
+    result = executeIntZKProof(public, secret, statement, party_info)
+
+New (recommended)::
+
+    from charm.zkp_compiler.schnorr_proof import SchnorrProof
+    proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+    is_valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
+"""
 
 import logging
 import warnings
@@ -17,6 +37,16 @@ from charm.zkp_compiler.zkparser import *
 from charm.core.engine.protocol import *
 from charm.core.engine.util import *
 #from charm.core.math.pairing import *
+
+# Emit deprecation warning when this module is imported
+warnings.warn(
+    "The zkp_generator module is deprecated and will be removed in v0.80. "
+    "It uses insecure dynamic code execution (exec/compile). "
+    "Please migrate to charm.zkp_compiler.schnorr_proof or charm.zkp_compiler.zkp_factory. "
+    "See doc/zkp_proof_types_design.md for migration guide.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 # Set up logging instead of print statements
 logger = logging.getLogger(__name__)
