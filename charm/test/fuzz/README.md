@@ -4,9 +4,37 @@ This directory contains fuzzing harnesses for security testing using Atheris.
 
 ## Prerequisites
 
+### Linux (Recommended)
+
 ```bash
 pip install atheris
 ```
+
+### macOS
+
+Atheris requires LLVM's libFuzzer, which is not included with Apple Clang.
+You have two options:
+
+**Option 1: Use Homebrew LLVM**
+```bash
+brew install llvm
+export CLANG_BIN=/opt/homebrew/opt/llvm/bin/clang
+export CC=/opt/homebrew/opt/llvm/bin/clang
+export CXX=/opt/homebrew/opt/llvm/bin/clang++
+pip install atheris
+```
+
+**Option 2: Use Docker**
+```bash
+docker run -it --rm -v $(pwd):/charm python:3.11 bash
+cd /charm
+pip install atheris pytest pyparsing hypothesis
+python charm/test/fuzz/fuzz_policy_parser.py -max_total_time=600
+```
+
+**Option 3: Rely on CI**
+Fuzzing runs automatically in GitHub Actions on Linux. See the `fuzzing` job
+in `.github/workflows/ci.yml`.
 
 ## Running Fuzzers
 
@@ -41,7 +69,14 @@ python charm/test/fuzz/fuzz_policy_parser.py crash-<hash>
 
 ## CI Integration
 
-The fuzzing runs are not part of regular CI but should be run periodically:
+Fuzzing runs automatically in GitHub Actions CI on every push and pull request.
+The `fuzzing` job in `.github/workflows/ci.yml`:
+
+- Runs each fuzzer for ~4 minutes (240 seconds)
+- Uploads any crash artifacts for investigation
+- Uses Linux where Atheris works out of the box
+
+To run locally for longer periods:
 
 ```bash
 # Run all fuzzers for 10 minutes each
