@@ -538,6 +538,259 @@ class NumericAttributeTest(unittest.TestCase):
         self.assertFalse(self.parser.prune(tree, user_attrs))
 
 
+class NumericAttributeEdgeCaseTest(unittest.TestCase):
+    """Tests for edge cases in numeric attribute handling."""
+
+    def setUp(self):
+        from charm.toolbox.ABEnumeric import (
+            NumericAttributeHelper, preprocess_numeric_policy,
+            expand_numeric_comparison, int_to_bits, validate_num_bits,
+            validate_attribute_name, BitOverflowError, InvalidBitWidthError,
+            InvalidOperatorError, AttributeNameConflictError
+        )
+        self.helper = NumericAttributeHelper(num_bits=8)
+        self.strict_helper = NumericAttributeHelper(num_bits=8, strict=True)
+        self.preprocess = preprocess_numeric_policy
+        self.expand = expand_numeric_comparison
+        self.int_to_bits = int_to_bits
+        self.validate_num_bits = validate_num_bits
+        self.validate_attribute_name = validate_attribute_name
+        self.BitOverflowError = BitOverflowError
+        self.InvalidBitWidthError = InvalidBitWidthError
+        self.InvalidOperatorError = InvalidOperatorError
+        self.AttributeNameConflictError = AttributeNameConflictError
+
+    # --- Bit Overflow Tests ---
+    def test_bit_overflow_in_expand(self):
+        """Test that values exceeding bit width raise BitOverflowError."""
+        with self.assertRaises(self.BitOverflowError):
+            self.expand('age', '==', 256, num_bits=8)  # Max for 8-bit is 255
+
+    def test_bit_overflow_in_user_attributes(self):
+        """Test that user_attributes raises error for overflow values."""
+        with self.assertRaises(self.BitOverflowError):
+            self.helper.user_attributes({'age': 256})
+
+    def test_bit_overflow_error_in_int_to_bits(self):
+        """Test that int_to_bits raises BitOverflowError on overflow."""
+        with self.assertRaises(self.BitOverflowError):
+            self.int_to_bits(256, 8)
+
+    def test_boundary_value_at_max(self):
+        """Test value exactly at maximum (255 for 8-bit)."""
+        # Should work without error
+        expanded = self.expand('age', '==', 255, num_bits=8)
+        self.assertIsNotNone(expanded)
+
+    def test_boundary_value_just_over_max(self):
+        """Test value just over maximum."""
+        with self.assertRaises(self.BitOverflowError):
+            self.expand('age', '==', 256, num_bits=8)
+
+    # --- Negative Value Tests ---
+    def test_negative_value_in_expand(self):
+        """Test that negative values raise ValueError."""
+        with self.assertRaises(ValueError):
+            self.expand('age', '>=', -1, num_bits=8)
+
+    def test_negative_value_in_user_attributes(self):
+        """Test that user_attributes raises error for negative values."""
+        with self.assertRaises(ValueError):
+            self.helper.user_attributes({'age': -5})
+
+    def test_negative_value_message(self):
+        """Test that error message mentions negative values."""
+        try:
+            self.expand('age', '>=', -10, num_bits=8)
+        except ValueError as e:
+            self.assertIn('Negative', str(e))
+
+    # --- Invalid Operator Tests ---
+    def test_invalid_operator_exclamation_equal(self):
+        """Test that != operator is rejected."""
+        with self.assertRaises(self.InvalidOperatorError):
+            self.expand('age', '!=', 21, num_bits=8)
+
+    def test_invalid_operator_not_equal_diamond(self):
+        """Test that <> operator is rejected."""
+        with self.assertRaises(self.InvalidOperatorError):
+            self.expand('age', '<>', 21, num_bits=8)
+
+    def test_invalid_operator_tilde(self):
+        """Test that arbitrary operators are rejected."""
+        with self.assertRaises(self.InvalidOperatorError):
+            self.expand('age', '~', 21, num_bits=8)
+
+    def test_valid_operators_all_work(self):
+        """Test that all supported operators work."""
+        for op in ['==', '>', '>=', '<', '<=']:
+            result = self.expand('age', op, 10, num_bits=8)
+            self.assertIsNotNone(result)
+
+    # --- Invalid Bit Width Tests ---
+    def test_zero_bit_width(self):
+        """Test that num_bits=0 raises InvalidBitWidthError."""
+        with self.assertRaises(self.InvalidBitWidthError):
+            self.validate_num_bits(0)
+
+    def test_negative_bit_width(self):
+        """Test that negative num_bits raises InvalidBitWidthError."""
+        with self.assertRaises(self.InvalidBitWidthError):
+            self.validate_num_bits(-1)
+
+    def test_excessive_bit_width(self):
+        """Test that num_bits > 64 raises InvalidBitWidthError."""
+        with self.assertRaises(self.InvalidBitWidthError):
+            self.validate_num_bits(65)
+
+    def test_non_integer_bit_width(self):
+        """Test that non-integer num_bits raises InvalidBitWidthError."""
+        with self.assertRaises(self.InvalidBitWidthError):
+            self.validate_num_bits(8.5)
+
+    def test_string_bit_width(self):
+        """Test that string num_bits raises InvalidBitWidthError."""
+        with self.assertRaises(self.InvalidBitWidthError):
+            self.validate_num_bits("8")
+
+    # --- Attribute Name Conflict Tests ---
+    def test_attribute_name_with_encoding_pattern(self):
+        """Test that attribute names with #b# pattern are rejected."""
+        with self.assertRaises(self.AttributeNameConflictError):
+            self.validate_attribute_name('age#b0#1')
+
+    def test_attribute_name_with_partial_pattern(self):
+        """Test attribute names with partial encoding pattern."""
+        with self.assertRaises(self.AttributeNameConflictError):
+            self.validate_attribute_name('test#b5#value')
+
+    def test_valid_attribute_names(self):
+        """Test that normal attribute names are accepted."""
+        # These should not raise
+        self.validate_attribute_name('age')
+        self.validate_attribute_name('AGE')
+        self.validate_attribute_name('user_level')
+        self.validate_attribute_name('clearance123')
+
+    # --- Empty/Malformed Policy Tests ---
+    def test_none_policy(self):
+        """Test that None policy raises ValueError."""
+        with self.assertRaises(ValueError):
+            self.preprocess(None, num_bits=8)
+
+    def test_empty_policy(self):
+        """Test that empty policy returns empty string."""
+        result = self.preprocess('', num_bits=8)
+        self.assertEqual(result, '')
+
+    def test_whitespace_only_policy(self):
+        """Test that whitespace-only policy returns empty string."""
+        result = self.preprocess('   ', num_bits=8)
+        self.assertEqual(result, '')
+
+    def test_policy_without_numeric(self):
+        """Test that policy without numeric comparisons is unchanged."""
+        policy = 'admin and manager'
+        result = self.preprocess(policy, num_bits=8)
+        self.assertEqual(result, policy)
+
+    # --- Regex Edge Cases ---
+    def test_extra_spaces_around_operator(self):
+        """Test numeric comparison with extra spaces."""
+        policy = 'age   >=    21'
+        result = self.preprocess(policy, num_bits=8)
+        self.assertIn('#b', result)
+        self.assertNotIn('>=', result)
+
+    def test_no_spaces_around_operator(self):
+        """Test numeric comparison without spaces."""
+        policy = 'age>=21'
+        result = self.preprocess(policy, num_bits=8)
+        self.assertIn('#b', result)
+
+    def test_mixed_spacing(self):
+        """Test numeric comparison with mixed spacing."""
+        policy = 'age>= 21 and level <5'
+        result = self.preprocess(policy, num_bits=8)
+        self.assertIn('#b', result)
+        self.assertNotIn('>=', result)
+        self.assertNotIn('<', result)
+
+    def test_multiple_parentheses(self):
+        """Test policy with multiple levels of parentheses."""
+        policy = '((age >= 21) and (level > 5)) or admin'
+        result = self.preprocess(policy, num_bits=8)
+        self.assertIn('admin', result)
+        self.assertIn('#b', result)
+
+    def test_attr_name_all_caps(self):
+        """Test attribute name in all caps."""
+        policy = 'AGE >= 21'
+        result = self.preprocess(policy, num_bits=8)
+        self.assertIn('AGE#b', result)
+
+    def test_attr_name_mixed_case(self):
+        """Test attribute name in mixed case."""
+        policy = 'Age >= 21'
+        result = self.preprocess(policy, num_bits=8)
+        self.assertIn('Age#b', result)
+
+    # --- Strict Mode Tests ---
+    def test_strict_mode_raises_on_overflow(self):
+        """Test that strict mode raises exceptions."""
+        from charm.toolbox.ABEnumeric import preprocess_numeric_policy
+        with self.assertRaises(self.BitOverflowError):
+            preprocess_numeric_policy('age >= 256', num_bits=8, strict=True)
+
+    def test_non_strict_mode_continues_on_error(self):
+        """Test that non-strict mode leaves problematic expression unchanged."""
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            result = self.preprocess('age >= 256', num_bits=8, strict=False)
+            # Should keep original expression and warn
+            self.assertIn('age >= 256', result)
+            self.assertGreater(len(w), 0)
+
+    def test_strict_helper_raises_on_overflow(self):
+        """Test that helper in strict mode raises exceptions."""
+        with self.assertRaises((self.BitOverflowError, ValueError)):
+            self.strict_helper.expand_policy('age >= 256')
+
+    # --- Zero Comparison Tests ---
+    def test_greater_than_zero(self):
+        """Test attr > 0 works correctly."""
+        result = self.expand('age', '>', 0, num_bits=8)
+        self.assertIsNotNone(result)
+
+    def test_greater_equal_zero_is_tautology(self):
+        """Test attr >= 0 returns None (always true for non-negative)."""
+        result = self.expand('age', '>=', 0, num_bits=8)
+        # >= 0 is always true for non-negative, encode_greater_than_or_equal returns None
+        self.assertIsNone(result)
+
+    def test_less_than_zero_is_contradiction(self):
+        """Test attr < 0 handling."""
+        result = self.expand('age', '<', 0, num_bits=8)
+        # < 0 is always false for non-negative, returns None
+        self.assertIsNone(result)
+
+    def test_equal_zero(self):
+        """Test attr == 0 correctly encodes all zeros."""
+        result = self.expand('age', '==', 0, num_bits=8)
+        self.assertIsNotNone(result)
+        # Should have all #0 (zero bits)
+        self.assertIn('#0', result)
+
+    # --- Max Value Property Test ---
+    def test_helper_max_value_property(self):
+        """Test that NumericAttributeHelper exposes max_value correctly."""
+        from charm.toolbox.ABEnumeric import NumericAttributeHelper
+        self.assertEqual(self.helper.max_value, 255)  # 2^8 - 1 = 255
+        helper16 = NumericAttributeHelper(num_bits=16)
+        self.assertEqual(helper16.max_value, 65535)  # 2^16 - 1
+
+
 def run_stress_test():
     """Run the stress test suite and print results."""
     print("=" * 70)
@@ -552,6 +805,7 @@ def run_stress_test():
     suite.addTests(loader.loadTestsFromTestCase(PolicyParserStressTest))
     suite.addTests(loader.loadTestsFromTestCase(PolicyParserEdgeCaseTest))
     suite.addTests(loader.loadTestsFromTestCase(NumericAttributeTest))
+    suite.addTests(loader.loadTestsFromTestCase(NumericAttributeEdgeCaseTest))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)

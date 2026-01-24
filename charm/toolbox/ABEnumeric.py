@@ -9,19 +9,128 @@ The technique converts numeric comparisons (e.g., age >= 21) into boolean attrib
 expressions that can be evaluated using standard ABE schemes.
 
 For an n-bit integer k, we create the following attributes:
-- attr_bit_i:0  (bit i is 0)
-- attr_bit_i:1  (bit i is 1)
+- attr#bi#0  (bit i is 0)
+- attr#bi#1  (bit i is 1)
 
 Comparisons are then encoded as boolean expressions over these bit attributes.
+
+Note: Uses '#' as delimiter instead of '_' because '_' is reserved for attribute
+indexing in the PolicyParser.
 """
 
-from charm.toolbox.node import BinNode, OpType
+import re
+import warnings
+
+
+# Constants for validation
+MIN_BITS = 1
+MAX_BITS = 64  # Reasonable upper bound for bit width
+RESERVED_PATTERN = re.compile(r'#b\d+#')  # Pattern used in bit encoding
+
+
+class NumericAttributeError(Exception):
+    """Base exception for numeric attribute encoding errors."""
+    pass
+
+
+class BitOverflowError(NumericAttributeError):
+    """Raised when a value exceeds the representable range for the given bit width."""
+    pass
+
+
+class InvalidBitWidthError(NumericAttributeError):
+    """Raised when an invalid bit width is specified."""
+    pass
+
+
+class InvalidOperatorError(NumericAttributeError):
+    """Raised when an unsupported comparison operator is used."""
+    pass
+
+
+class AttributeNameConflictError(NumericAttributeError):
+    """Raised when an attribute name conflicts with the bit encoding format."""
+    pass
+
+
+def validate_num_bits(num_bits):
+    """
+    Validate the num_bits parameter.
+
+    Args:
+        num_bits: Number of bits for representation
+
+    Raises:
+        InvalidBitWidthError: If num_bits is invalid
+    """
+    if not isinstance(num_bits, int):
+        raise InvalidBitWidthError(f"num_bits must be an integer, got {type(num_bits).__name__}")
+    if num_bits < MIN_BITS:
+        raise InvalidBitWidthError(f"num_bits must be at least {MIN_BITS}, got {num_bits}")
+    if num_bits > MAX_BITS:
+        raise InvalidBitWidthError(f"num_bits must be at most {MAX_BITS}, got {num_bits}")
+
+
+def validate_value(value, num_bits, context="value"):
+    """
+    Validate a numeric value for the given bit width.
+
+    Args:
+        value: The numeric value to validate
+        num_bits: Number of bits for representation
+        context: Description of the value for error messages
+
+    Raises:
+        ValueError: If value is negative
+        BitOverflowError: If value exceeds the bit width
+    """
+    if value < 0:
+        raise ValueError(f"Negative values not supported for {context}: {value}")
+
+    max_value = (1 << num_bits) - 1
+    if value > max_value:
+        raise BitOverflowError(
+            f"{context} {value} exceeds maximum representable value {max_value} "
+            f"for {num_bits}-bit encoding. Consider increasing num_bits."
+        )
+
+
+def validate_attribute_name(attr_name):
+    """
+    Validate that an attribute name doesn't conflict with bit encoding format.
+
+    Args:
+        attr_name: The attribute name to validate
+
+    Raises:
+        AttributeNameConflictError: If the name conflicts with encoding format
+    """
+    if RESERVED_PATTERN.search(attr_name):
+        raise AttributeNameConflictError(
+            f"Attribute name '{attr_name}' contains reserved pattern '#b<digit>#' "
+            f"which conflicts with bit encoding format. Please rename the attribute."
+        )
 
 
 def int_to_bits(value, num_bits=32):
-    """Convert an integer to a list of bits (LSB first)."""
-    if value < 0:
-        raise ValueError("Negative values not supported")
+    """
+    Convert an integer to a list of bits (LSB first).
+
+    Args:
+        value: Non-negative integer to convert
+        num_bits: Number of bits in the representation
+
+    Returns:
+        List of bits (0 or 1), LSB first
+
+    Raises:
+        ValueError: If value is negative
+        BitOverflowError: If value exceeds bit width
+        InvalidBitWidthError: If num_bits is invalid
+    """
+    validate_num_bits(num_bits)
+    validate_value(value, num_bits, "value")
+
     bits = []
     for i in range(num_bits):
         bits.append((value >> i) & 1)
@@ -39,7 +148,13 @@ def bits_to_attributes(attr_name, value, num_bits=32):
     in the PolicyParser.
 
     This is used when generating user attribute sets.
+
+    Raises:
+        AttributeNameConflictError: If attr_name conflicts with encoding format
+        ValueError: If value is negative
+        BitOverflowError: If value exceeds bit width
     """
+    validate_attribute_name(attr_name)
     bits = int_to_bits(value, num_bits)
     attributes = set()
     for i, bit in enumerate(bits):
@@ -140,21 +255,71 @@ def encode_less_than_or_equal(attr_name, value, num_bits=32):
     return encode_less_than(attr_name, value + 1, num_bits)
 
 
+# Supported comparison operators
+SUPPORTED_OPERATORS = {'==', '>', '>=', '<', '<='}
+
+
 def expand_numeric_comparison(attr_name, operator, value, num_bits=32):
     """
     Expand a numeric comparison into a boolean policy expression.
-    
+
     Args:
         attr_name: The attribute name (e.g., 'age', 'level')
         operator: One of '==', '>', '>=', '<', '<='
         value: The numeric value to compare against
         num_bits: Number of bits for the representation (default 32)
-    
+
     Returns:
         A string policy expression using bit-level attributes
+
+    Raises:
+        InvalidOperatorError: If operator is not supported
+        AttributeNameConflictError: If attr_name conflicts with encoding format
+        ValueError: If value is negative
+        BitOverflowError: If value exceeds bit width
+        InvalidBitWidthError: If num_bits is invalid
     """
-    value = int(value)
-    
+    # Validate operator
+    if operator not in SUPPORTED_OPERATORS:
+        raise InvalidOperatorError(
+            f"Unsupported operator '{operator}'. "
+            f"Supported operators are: {', '.join(sorted(SUPPORTED_OPERATORS))}"
+        )
+
+    # Validate attribute name
+    validate_attribute_name(attr_name)
+
+    # Validate num_bits
+    validate_num_bits(num_bits)
+
+    # Convert and validate value
+    try:
+        value = int(value)
+    except (ValueError, TypeError) as e:
+        raise ValueError(f"Cannot convert value to integer: {value}") from e
+
+    if value < 0:
+        raise ValueError(f"Negative values not supported: {value}")
+
+    # Check for potential overflow in <= comparison (value + 1)
+    max_value = (1 << num_bits) - 1
+    if operator == '<=' and value >= max_value:
+        # value + 1 would overflow, but <= max_value is always true for valid values
+        warnings.warn(
+            f"Comparison '{attr_name} <= {value}' with {num_bits}-bit encoding: "
+            f"value equals or exceeds max ({max_value}), result is always true for valid inputs.",
+            UserWarning
+        )
+        # Return a tautology
+        return f"{attr_name}#b0#0 or {attr_name}#b0#1"
+
+    # Check for overflow in the value itself (for other operators)
+    if value > max_value:
+        raise BitOverflowError(
+            f"Value {value} exceeds maximum representable value {max_value} "
+            f"for {num_bits}-bit encoding. Consider increasing num_bits."
+        )
+
     if operator == '==':
         return encode_equality(attr_name, value, num_bits)
     elif operator == '>':
@@ -165,19 +330,17 @@ def expand_numeric_comparison(attr_name, operator, value, num_bits=32):
         return encode_less_than(attr_name, value, num_bits)
     elif operator == '<=':
         return encode_less_than_or_equal(attr_name, value, num_bits)
-    else:
-        raise ValueError(f"Unknown operator: {operator}")
 
 
 # Regex pattern to match numeric comparisons in policies
-import re
+# Matches: attr_name operator value (e.g., "age >= 21", "level>5")
+# Note: Uses word boundary to avoid matching partial words
 NUMERIC_PATTERN = re.compile(
-    r'(\w+)\s*(==|>=|<=|>|<)\s*(\d+)',
-    re.IGNORECASE
+    r'\b([a-zA-Z][a-zA-Z0-9]*)\s*(==|>=|<=|>|<)\s*(\d+)\b'
 )
 
 
-def preprocess_numeric_policy(policy_str, num_bits=32):
+def preprocess_numeric_policy(policy_str, num_bits=32, strict=False):
     """
     Preprocess a policy string to expand numeric comparisons.
 
@@ -185,32 +348,95 @@ def preprocess_numeric_policy(policy_str, num_bits=32):
         '(age >= 21 and clearance > 3) or admin'
 
     And expands numeric comparisons into bit-level attributes:
-        '((age_bit_4:1 or ...) and (clearance_bit_...)) or admin'
+        '((age#b4#1 or ...) and (clearance#b...)) or admin'
 
     Args:
         policy_str: Original policy string with numeric comparisons
         num_bits: Number of bits for numeric representation
+        strict: If True, raise exceptions on errors; if False, return original
+                expression on error (default: False)
 
     Returns:
         Expanded policy string with bit-level attributes
+
+    Raises:
+        ValueError: If policy_str is None
+        InvalidBitWidthError: If num_bits is invalid
+
+    Note:
+        - Empty strings or whitespace-only strings return empty string
+        - Malformed expressions that don't match the pattern are left unchanged
+        - In non-strict mode, errors during expansion leave the original expression
     """
+    # Validate inputs
+    if policy_str is None:
+        raise ValueError("policy_str cannot be None")
+
+    validate_num_bits(num_bits)
+
+    # Handle empty or whitespace-only strings
+    if not policy_str or policy_str.isspace():
+        return ""
+
+    errors = []
+
     def replace_match(match):
         attr_name = match.group(1)
         operator = match.group(2)
-        value = int(match.group(3))
+        value_str = match.group(3)
+        original = match.group(0)
 
-        expanded = expand_numeric_comparison(attr_name, operator, value, num_bits)
-        if expanded is None:
-            # Return a tautology or contradiction as appropriate
-            if operator in ['>=', '<='] and value == 0:
-                # >= 0 is always true for non-negative, use placeholder
-                return f"{attr_name}#b0#0 or {attr_name}#b0#1"
-            return "FALSE"  # placeholder for impossible conditions
+        try:
+            value = int(value_str)
 
-        # Wrap in parentheses to preserve operator precedence
-        return f"({expanded})"
+            # Check for attribute name conflicts
+            validate_attribute_name(attr_name)
 
-    return NUMERIC_PATTERN.sub(replace_match, policy_str)
+            expanded = expand_numeric_comparison(attr_name, operator, value, num_bits)
+            if expanded is None:
+                # Return a tautology or contradiction as appropriate
+                if operator == '>=' and value == 0:
+                    # >= 0 is always true for non-negative
+                    return f"({attr_name}#b0#0 or {attr_name}#b0#1)"
+                elif operator == '<' and value == 0:
+                    # < 0 is always false for non-negative
+                    # Return a contradiction (attribute AND its negation can't both be true)
+                    # But since we can't use negation easily, we use a placeholder
+                    warnings.warn(
+                        f"Comparison '{attr_name} < 0' is always false for non-negative values",
+                        UserWarning
+                    )
+                    return "FALSE"
+                elif operator == '>' and value == (1 << num_bits) - 1:
+                    # > max_value is always false
+                    warnings.warn(
+                        f"Comparison '{attr_name} > {value}' is always false for {num_bits}-bit values",
+                        UserWarning
+                    )
+                    return "FALSE"
+                return "FALSE"  # placeholder for impossible conditions
+
+            # Wrap in parentheses to preserve operator precedence
+            return f"({expanded})"
+
+        except (NumericAttributeError, ValueError) as e:
+            errors.append((original, str(e)))
+            if strict:
+                raise
+            # In non-strict mode, leave the original expression unchanged
+            return original
+
+    result = NUMERIC_PATTERN.sub(replace_match, policy_str)
+
+    # Warn about any errors that occurred in non-strict mode
+    if errors and not strict:
+        for original, error in errors:
+            warnings.warn(
+                f"Failed to expand numeric comparison '{original}': {error}",
+                UserWarning
+            )
+
+    return result
 
 
 def numeric_attributes_from_value(attr_name, value, num_bits=32):
@@ -247,10 +473,14 @@ class NumericAttributeHelper:
 
         # For key generation: get user attributes
         user_attrs = helper.user_attributes({'age': 25, 'level': 7, 'role': 'manager'})
-        # Returns: ['age_bit_0:1', 'age_bit_1:0', ..., 'level_bit_0:1', ..., 'ROLE']
+        # Returns: ['AGE#B0#1', 'AGE#B1#0', ..., 'LEVEL#B0#1', ..., 'MANAGER']
+
+    Attributes:
+        num_bits: Number of bits for numeric representation
+        max_value: Maximum representable value for the configured bit width
     """
 
-    def __init__(self, num_bits=32):
+    def __init__(self, num_bits=32, strict=False):
         """
         Initialize the helper with a specific bit width.
 
@@ -258,8 +488,16 @@ class NumericAttributeHelper:
             num_bits: Number of bits for numeric representation (default 32)
                      Use smaller values (e.g., 8, 16) for better performance
                      if your numeric ranges are limited.
+            strict: If True, raise exceptions on errors during policy expansion;
+                   if False, leave problematic expressions unchanged (default: False)
+
+        Raises:
+            InvalidBitWidthError: If num_bits is invalid
         """
+        validate_num_bits(num_bits)
         self.num_bits = num_bits
+        self.max_value = (1 << num_bits) - 1
+        self.strict = strict
 
     def expand_policy(self, policy_str):
         """
@@ -270,8 +508,12 @@ class NumericAttributeHelper:
 
         Returns:
             Expanded policy with bit-level attributes
+
+        Raises:
+            ValueError: If policy_str is None
+            NumericAttributeError: In strict mode, if expansion fails
         """
-        return preprocess_numeric_policy(policy_str, self.num_bits)
+        return preprocess_numeric_policy(policy_str, self.num_bits, self.strict)
 
     def user_attributes(self, attr_dict):
         """
@@ -286,11 +528,29 @@ class NumericAttributeHelper:
 
         Returns:
             List of attribute strings for key generation
+
+        Raises:
+            ValueError: If a numeric value is negative
+            BitOverflowError: If a numeric value exceeds the bit width
+            AttributeNameConflictError: If an attribute name conflicts with encoding
         """
+        if attr_dict is None:
+            raise ValueError("attr_dict cannot be None")
+
         result = []
 
         for name, value in attr_dict.items():
             if isinstance(value, int):
+                # Validate the value
+                if value < 0:
+                    raise ValueError(f"Negative value not supported for attribute '{name}': {value}")
+                if value > self.max_value:
+                    raise BitOverflowError(
+                        f"Value {value} for attribute '{name}' exceeds maximum {self.max_value} "
+                        f"for {self.num_bits}-bit encoding"
+                    )
+                # Validate attribute name
+                validate_attribute_name(name)
                 # Numeric attribute - convert to bits (uppercase to match parser)
                 attrs = numeric_attributes_from_value(name, value, self.num_bits)
                 result.extend([a.upper() for a in attrs])
