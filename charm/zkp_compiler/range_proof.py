@@ -310,7 +310,19 @@ class RangeProof:
 
         Returns:
             True if proof is valid, False otherwise
+
+        Security Notes:
+            - Validates proof structure before verification
+            - Verifies each bit commitment and OR proof
+            - Checks commitment reconstruction for consistency
         """
+        # Security: Validate proof structure
+        required_attrs = ['num_bits', 'bit_commitments', 'bit_proofs']
+        for attr in required_attrs:
+            if not hasattr(proof, attr):
+                logger.warning("Invalid range proof structure: missing %s", attr)
+                return False
+
         num_bits = proof.num_bits
 
         # Validate proof structure

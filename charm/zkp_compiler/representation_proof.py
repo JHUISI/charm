@@ -370,7 +370,28 @@ class RepresentationProof:
 
         Returns:
             True if proof is valid, False otherwise
+
+        Security Notes:
+            - Validates proof structure before verification
+            - Checks for identity element attacks
+            - Recomputes Fiat-Shamir challenge for consistency
         """
+        # Security: Validate proof structure
+        required_attrs = ['commitment', 'challenge', 'responses']
+        for attr in required_attrs:
+            if not hasattr(proof, attr):
+                logger.warning("Invalid representation proof structure: missing %s", attr)
+                return False
+
+        # Security: Check for identity element (potential attack vector)
+        try:
+            identity = group.init(G1, 1)
+            if proof.commitment == identity:
+                logger.warning("Security: Representation proof commitment is identity element")
+                return False
+        except Exception:
+            pass  # Some groups may not support identity check
+
         n = len(generators)
 
         # Validate proof structure

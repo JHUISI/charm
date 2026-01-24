@@ -372,7 +372,19 @@ class ANDProof:
 
         Returns:
             True if all sub-proofs are valid, False otherwise
+
+        Security Notes:
+            - Validates proof structure before verification
+            - Verifies shared challenge consistency across all sub-proofs
+            - Recomputes Fiat-Shamir challenge for consistency
         """
+        # Security: Validate proof structure
+        required_attrs = ['sub_proofs', 'shared_challenge']
+        for attr in required_attrs:
+            if not hasattr(proof, attr):
+                logger.warning("Invalid AND proof structure: missing %s", attr)
+                return False
+
         if len(statements) != len(proof.sub_proofs):
             logger.debug(
                 "Statement count (%d) doesn't match sub-proof count (%d)",
