@@ -57,6 +57,8 @@ Example:
     >>> valid = ORProof.verify_non_interactive(group, g, h1, h2, proof)
 """
 
+from typing import Any
+
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1
 from charm.core.engine.util import objectToBytes, bytesToObject
 import logging
@@ -67,8 +69,8 @@ logger = logging.getLogger(__name__)
 class ORProofData:
     """Container for OR proof data."""
 
-    def __init__(self, commitment1, commitment2, challenge1, challenge2,
-                 response1, response2, proof_type='or'):
+    def __init__(self, commitment1: Any, commitment2: Any, challenge1: Any, challenge2: Any,
+                 response1: Any, response2: Any, proof_type: str = 'or') -> None:
         """
         Initialize an OR proof.
 
@@ -120,7 +122,7 @@ class ORProof:
         return group.hash(data, ZR)
 
     @classmethod
-    def prove_non_interactive(cls, group, g, h1, h2, x, which):
+    def prove_non_interactive(cls, group: PairingGroup, g: Any, h1: Any, h2: Any, x: Any, which: int) -> 'ORProofData':
         """
         Generate non-interactive OR proof using CDS94 technique.
 
@@ -191,7 +193,7 @@ class ORProof:
         )
 
     @classmethod
-    def verify_non_interactive(cls, group, g, h1, h2, proof):
+    def verify_non_interactive(cls, group: PairingGroup, g: Any, h1: Any, h2: Any, proof: 'ORProofData') -> bool:
         """
         Verify non-interactive OR proof.
 
@@ -216,7 +218,7 @@ class ORProof:
         required_attrs = ['commitment1', 'commitment2', 'challenge1', 'challenge2', 'response1', 'response2']
         for attr in required_attrs:
             if not hasattr(proof, attr):
-                logger.warning("Invalid OR proof structure: missing %s", attr)
+                logger.warning("Invalid OR proof structure: missing '%s'. Ensure proof was created with ORProof.prove_non_interactive()", attr)
                 return False
 
         # Security: Check for identity element (potential attack vector)
@@ -257,7 +259,7 @@ class ORProof:
         return True
 
     @classmethod
-    def serialize_proof(cls, proof, group):
+    def serialize_proof(cls, proof: 'ORProofData', group: PairingGroup) -> bytes:
         """
         Serialize OR proof to bytes using Charm utilities.
 
@@ -280,7 +282,7 @@ class ORProof:
         return objectToBytes(proof_dict, group)
 
     @classmethod
-    def deserialize_proof(cls, data, group):
+    def deserialize_proof(cls, data: bytes, group: PairingGroup) -> 'ORProofData':
         """
         Deserialize bytes to OR proof.
 

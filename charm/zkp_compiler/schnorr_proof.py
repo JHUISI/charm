@@ -5,6 +5,8 @@ This module provides a direct implementation of Schnorr's ZKP protocol
 for proving knowledge of discrete logarithm.
 """
 
+from typing import Any
+
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1
 from charm.core.engine.util import objectToBytes, bytesToObject
 import logging
@@ -15,7 +17,7 @@ logger = logging.getLogger(__name__)
 class Proof:
     """Simple container for ZKP proof data."""
 
-    def __init__(self, commitment, challenge, response, proof_type='schnorr'):
+    def __init__(self, commitment: Any, challenge: Any, response: Any, proof_type: str = 'schnorr') -> None:
         """
         Initialize a proof.
 
@@ -150,7 +152,7 @@ class SchnorrProof:
         return group.hash(data, ZR)
 
     @classmethod
-    def prove_non_interactive(cls, group, g, h, x):
+    def prove_non_interactive(cls, group: PairingGroup, g: Any, h: Any, x: Any) -> Proof:
         """
         Generate non-interactive proof using Fiat-Shamir heuristic.
 
@@ -179,7 +181,7 @@ class SchnorrProof:
         return Proof(commitment=commitment, challenge=challenge, response=response, proof_type='schnorr')
 
     @classmethod
-    def verify_non_interactive(cls, group, g, h, proof):
+    def verify_non_interactive(cls, group: PairingGroup, g: Any, h: Any, proof: Proof) -> bool:
         """
         Verify non-interactive proof.
 
@@ -198,16 +200,18 @@ class SchnorrProof:
             - Recomputes Fiat-Shamir challenge for consistency
         """
         # Security: Validate proof structure
-        if not hasattr(proof, 'commitment') or not hasattr(proof, 'challenge') or not hasattr(proof, 'response'):
-            logger.warning("Invalid proof structure: missing required attributes")
-            return False
+        required_attrs = ['commitment', 'challenge', 'response']
+        for attr in required_attrs:
+            if not hasattr(proof, attr):
+                logger.warning("Invalid Schnorr proof structure: missing '%s'. Ensure proof was created with SchnorrProof.prove_non_interactive()", attr)
+                return False
 
         # Security: Check for identity element (potential attack vector)
         # The identity element would make the verification equation trivially true
         try:
             identity = group.init(G1, 1)
             if proof.commitment == identity:
-                logger.warning("Security: Proof commitment is identity element")
+                logger.warning("Security: Schnorr proof commitment is identity element (possible attack). Proof rejected.")
                 return False
         except Exception:
             pass  # Some groups may not support identity check
@@ -228,7 +232,7 @@ class SchnorrProof:
         return result
 
     @classmethod
-    def serialize_proof(cls, proof, group):
+    def serialize_proof(cls, proof: Proof, group: PairingGroup) -> bytes:
         """
         Serialize proof to bytes using Charm utilities.
 
@@ -248,7 +252,7 @@ class SchnorrProof:
         return objectToBytes(proof_dict, group)
 
     @classmethod
-    def deserialize_proof(cls, data, group):
+    def deserialize_proof(cls, data: bytes, group: PairingGroup) -> Proof:
         """
         Deserialize bytes to proof.
 

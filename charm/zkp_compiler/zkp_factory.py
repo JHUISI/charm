@@ -9,6 +9,7 @@ import logging
 import re
 from charm.zkp_compiler.zkparser import ZKParser
 from charm.zkp_compiler.schnorr_proof import SchnorrProof, Proof
+from charm.zkp_compiler.dleq_proof import DLEQProof
 from charm.toolbox.ZKProof import ZKProofBase, ZKParseError, ZKValidationError
 
 logger = logging.getLogger(__name__)
@@ -229,4 +230,101 @@ class ZKProofFactory:
         
         logger.debug("Created proof instance from statement: %s", statement)
         return SchnorrProofInstance(group, g, h, secret_x)
+
+
+def prove_and_verify_schnorr(group, g, h, x):
+    """
+    Proves and immediately verifies a Schnorr proof.
+
+    Useful for testing and debugging.
+
+    Args:
+        group: The pairing group to use
+        g: The generator element
+        h: The public element (h = g^x)
+        x: The secret exponent
+
+    Returns:
+        tuple: (proof, is_valid) where proof is the Proof object and is_valid is True if verification passed
+
+    Example::
+
+        group = PairingGroup('SS512')
+        g = group.random(G1)
+        x = group.random(ZR)
+        h = g ** x
+        proof, is_valid = prove_and_verify_schnorr(group, g, h, x)
+        assert is_valid
+    """
+    proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+    is_valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
+    return proof, is_valid
+
+
+def prove_and_verify_dleq(group, g1, h1, g2, h2, x):
+    """
+    Proves and immediately verifies a DLEQ proof.
+
+    Useful for testing and debugging.
+
+    Args:
+        group: The pairing group to use
+        g1: The first generator element
+        h1: The first public element (h1 = g1^x)
+        g2: The second generator element
+        h2: The second public element (h2 = g2^x)
+        x: The secret exponent
+
+    Returns:
+        tuple: (proof, is_valid) where proof is the DLEQProofData object and is_valid is True if verification passed
+
+    Example::
+
+        group = PairingGroup('SS512')
+        g1 = group.random(G1)
+        g2 = group.random(G1)
+        x = group.random(ZR)
+        h1 = g1 ** x
+        h2 = g2 ** x
+        proof, is_valid = prove_and_verify_dleq(group, g1, h1, g2, h2, x)
+        assert is_valid
+    """
+    proof = DLEQProof.prove_non_interactive(group, g1, h1, g2, h2, x)
+    is_valid = DLEQProof.verify_non_interactive(group, g1, h1, g2, h2, proof)
+    return proof, is_valid
+
+
+def configure_logging(level: str = 'WARNING') -> None:
+    """
+    Configure logging for all ZKP compiler modules.
+
+    Args:
+        level: Logging level ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
+
+    Example:
+        >>> from charm.zkp_compiler import configure_logging
+        >>> configure_logging('DEBUG')  # Enable debug output
+    """
+    numeric_level = getattr(logging, level.upper(), logging.WARNING)
+
+    # Configure all ZKP module loggers
+    zkp_modules = [
+        'charm.zkp_compiler.schnorr_proof',
+        'charm.zkp_compiler.dleq_proof',
+        'charm.zkp_compiler.representation_proof',
+        'charm.zkp_compiler.and_proof',
+        'charm.zkp_compiler.or_proof',
+        'charm.zkp_compiler.range_proof',
+        'charm.zkp_compiler.batch_verify',
+    ]
+
+    for module in zkp_modules:
+        module_logger = logging.getLogger(module)
+        module_logger.setLevel(numeric_level)
+        if not module_logger.handlers:
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter(
+                '%(name)s - %(levelname)s - %(message)s'
+            ))
+            module_logger.addHandler(handler)
 

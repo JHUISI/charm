@@ -74,6 +74,8 @@ USE CASES
    - Prove (g1, h1, g2, h2) is a valid DH tuple
 """
 
+from typing import Any
+
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1
 from charm.core.engine.util import objectToBytes, bytesToObject
 import logging
@@ -84,7 +86,7 @@ logger = logging.getLogger(__name__)
 class DLEQProofData:
     """Container for DLEQ proof data with two commitments."""
 
-    def __init__(self, commitment1, commitment2, challenge, response, proof_type='dleq'):
+    def __init__(self, commitment1: Any, commitment2: Any, challenge: Any, response: Any, proof_type: str = 'dleq') -> None:
         """
         Initialize a DLEQ proof.
 
@@ -277,7 +279,7 @@ class DLEQProof:
         return group.hash(data, ZR)
 
     @classmethod
-    def prove_non_interactive(cls, group, g1, h1, g2, h2, x):
+    def prove_non_interactive(cls, group: PairingGroup, g1: Any, h1: Any, g2: Any, h2: Any, x: Any) -> DLEQProofData:
         """
         Generate non-interactive DLEQ proof using Fiat-Shamir heuristic.
 
@@ -318,7 +320,7 @@ class DLEQProof:
         )
 
     @classmethod
-    def verify_non_interactive(cls, group, g1, h1, g2, h2, proof):
+    def verify_non_interactive(cls, group: PairingGroup, g1: Any, h1: Any, g2: Any, h2: Any, proof: DLEQProofData) -> bool:
         """
         Verify non-interactive DLEQ proof.
 
@@ -342,14 +344,14 @@ class DLEQProof:
         required_attrs = ['commitment1', 'commitment2', 'challenge', 'response']
         for attr in required_attrs:
             if not hasattr(proof, attr):
-                logger.warning("Invalid DLEQ proof structure: missing %s", attr)
+                logger.warning("Invalid DLEQ proof structure: missing '%s'. Ensure proof was created with DLEQProof.prove_non_interactive()", attr)
                 return False
 
         # Security: Check for identity element (potential attack vector)
         try:
             identity = group.init(G1, 1)
             if proof.commitment1 == identity or proof.commitment2 == identity:
-                logger.warning("Security: DLEQ proof commitment is identity element")
+                logger.warning("Security: DLEQ proof commitment is identity element (possible attack). Proof rejected.")
                 return False
         except Exception:
             pass  # Some groups may not support identity check
@@ -379,7 +381,7 @@ class DLEQProof:
         return result
 
     @classmethod
-    def serialize_proof(cls, proof, group):
+    def serialize_proof(cls, proof: DLEQProofData, group: PairingGroup) -> bytes:
         """
         Serialize DLEQ proof to bytes using Charm utilities.
 
@@ -400,7 +402,7 @@ class DLEQProof:
         return objectToBytes(proof_dict, group)
 
     @classmethod
-    def deserialize_proof(cls, data, group):
+    def deserialize_proof(cls, data: bytes, group: PairingGroup) -> DLEQProofData:
         """
         Deserialize bytes to DLEQ proof.
 

@@ -52,6 +52,8 @@ Usage Example:
     >>> assert valid
 """
 
+from typing import Any, List, Dict
+
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1
 from charm.core.engine.util import objectToBytes, bytesToObject
 import logging
@@ -66,7 +68,7 @@ class RangeProofData:
     bit proofs (OR proofs), and the sum proof.
     """
 
-    def __init__(self, bit_commitments, bit_proofs, sum_proof, num_bits, proof_type='range'):
+    def __init__(self, bit_commitments: List[Any], bit_proofs: List[Dict[str, Any]], sum_proof: Dict[str, Any], num_bits: int, proof_type: str = 'range') -> None:
         """
         Initialize a range proof.
 
@@ -216,7 +218,7 @@ class RangeProof:
         return True
 
     @classmethod
-    def prove(cls, group, g, h, value, randomness, num_bits=32):
+    def prove(cls, group: PairingGroup, g: Any, h: Any, value: int, randomness: Any, num_bits: int = 32) -> 'RangeProofData':
         """
         Generate a range proof that value is in [0, 2^num_bits).
 
@@ -295,7 +297,7 @@ class RangeProof:
         )
 
     @classmethod
-    def verify(cls, group, g, h, commitment, proof):
+    def verify(cls, group: PairingGroup, g: Any, h: Any, commitment: Any, proof: 'RangeProofData') -> bool:
         """
         Verify a range proof.
 
@@ -320,7 +322,7 @@ class RangeProof:
         required_attrs = ['num_bits', 'bit_commitments', 'bit_proofs']
         for attr in required_attrs:
             if not hasattr(proof, attr):
-                logger.warning("Invalid range proof structure: missing %s", attr)
+                logger.warning("Invalid Range proof structure: missing '%s'. Ensure proof was created with RangeProof.prove()", attr)
                 return False
 
         num_bits = proof.num_bits
@@ -372,7 +374,7 @@ class RangeProof:
         return True
 
     @classmethod
-    def serialize_proof(cls, proof, group):
+    def serialize_proof(cls, proof: 'RangeProofData', group: PairingGroup) -> bytes:
         """
         Serialize proof to bytes using Charm utilities.
 
@@ -393,7 +395,7 @@ class RangeProof:
         return objectToBytes(proof_dict, group)
 
     @classmethod
-    def deserialize_proof(cls, data, group):
+    def deserialize_proof(cls, data: bytes, group: PairingGroup) -> 'RangeProofData':
         """
         Deserialize bytes to proof.
 

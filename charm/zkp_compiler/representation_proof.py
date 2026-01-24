@@ -57,6 +57,8 @@ Usage Examples:
     valid = RepresentationProof.verify_non_interactive(group, generators, h, proof)
 """
 
+from typing import List, Any
+
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1
 from charm.core.engine.util import objectToBytes, bytesToObject
 import logging
@@ -71,7 +73,7 @@ class RepresentationProofData:
     knowledge of representation proof.
     """
 
-    def __init__(self, commitment, challenge, responses, proof_type='representation'):
+    def __init__(self, commitment: Any, challenge: Any, responses: List[Any], proof_type: str = 'representation') -> None:
         """
         Initialize a representation proof.
 
@@ -304,7 +306,7 @@ class RepresentationProof:
         return group.hash(data, ZR)
 
     @classmethod
-    def prove_non_interactive(cls, group, generators, h, witnesses):
+    def prove_non_interactive(cls, group: PairingGroup, generators: List[Any], h: Any, witnesses: List[Any]) -> 'RepresentationProofData':
         """
         Generate non-interactive proof using Fiat-Shamir heuristic.
 
@@ -355,7 +357,7 @@ class RepresentationProof:
         )
 
     @classmethod
-    def verify_non_interactive(cls, group, generators, h, proof):
+    def verify_non_interactive(cls, group: PairingGroup, generators: List[Any], h: Any, proof: 'RepresentationProofData') -> bool:
         """
         Verify non-interactive representation proof.
 
@@ -380,7 +382,7 @@ class RepresentationProof:
         required_attrs = ['commitment', 'challenge', 'responses']
         for attr in required_attrs:
             if not hasattr(proof, attr):
-                logger.warning("Invalid representation proof structure: missing %s", attr)
+                logger.warning("Invalid Representation proof structure: missing '%s'. Ensure proof was created with RepresentationProof.prove_non_interactive()", attr)
                 return False
 
         # Security: Check for identity element (potential attack vector)
@@ -424,7 +426,7 @@ class RepresentationProof:
         return result
 
     @classmethod
-    def serialize_proof(cls, proof, group):
+    def serialize_proof(cls, proof: 'RepresentationProofData', group: PairingGroup) -> bytes:
         """
         Serialize proof to bytes using Charm utilities.
 
@@ -444,7 +446,7 @@ class RepresentationProof:
         return objectToBytes(proof_dict, group)
 
     @classmethod
-    def deserialize_proof(cls, data, group):
+    def deserialize_proof(cls, data: bytes, group: PairingGroup) -> 'RepresentationProofData':
         """
         Deserialize bytes to proof.
 

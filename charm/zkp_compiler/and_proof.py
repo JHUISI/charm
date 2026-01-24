@@ -79,6 +79,8 @@ Example:
     >>> assert valid
 """
 
+from typing import List, Any, Dict
+
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1
 from charm.core.engine.util import objectToBytes, bytesToObject
 from charm.zkp_compiler.schnorr_proof import SchnorrProof, Proof
@@ -92,7 +94,7 @@ logger = logging.getLogger(__name__)
 class ANDProofData:
     """Container for AND proof data with multiple sub-proofs."""
 
-    def __init__(self, sub_proofs, shared_challenge, proof_type='and'):
+    def __init__(self, sub_proofs: List[Dict[str, Any]], shared_challenge: Any, proof_type: str = 'and') -> None:
         """
         Initialize an AND proof.
 
@@ -251,7 +253,7 @@ class ANDProof:
             raise ValueError(f"Unsupported statement type: {stmt_type}")
 
     @classmethod
-    def prove_non_interactive(cls, group, statements):
+    def prove_non_interactive(cls, group: PairingGroup, statements: List[Dict[str, Any]]) -> 'ANDProofData':
         """
         Generate non-interactive AND proof using Fiat-Shamir heuristic.
 
@@ -358,7 +360,7 @@ class ANDProof:
             return False
 
     @classmethod
-    def verify_non_interactive(cls, group, statements, proof):
+    def verify_non_interactive(cls, group: PairingGroup, statements: List[Dict[str, Any]], proof: 'ANDProofData') -> bool:
         """
         Verify non-interactive AND proof.
 
@@ -382,7 +384,7 @@ class ANDProof:
         required_attrs = ['sub_proofs', 'shared_challenge']
         for attr in required_attrs:
             if not hasattr(proof, attr):
-                logger.warning("Invalid AND proof structure: missing %s", attr)
+                logger.warning("Invalid AND proof structure: missing '%s'. Ensure proof was created with ANDProof.prove_non_interactive()", attr)
                 return False
 
         if len(statements) != len(proof.sub_proofs):
@@ -420,7 +422,7 @@ class ANDProof:
         return True
 
     @classmethod
-    def serialize_proof(cls, proof, group):
+    def serialize_proof(cls, proof: 'ANDProofData', group: PairingGroup) -> bytes:
         """
         Serialize AND proof to bytes using Charm utilities.
 
@@ -439,7 +441,7 @@ class ANDProof:
         return objectToBytes(proof_dict, group)
 
     @classmethod
-    def deserialize_proof(cls, data, group):
+    def deserialize_proof(cls, data: bytes, group: PairingGroup) -> 'ANDProofData':
         """
         Deserialize bytes to AND proof.
 

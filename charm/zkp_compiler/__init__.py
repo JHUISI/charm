@@ -58,7 +58,12 @@ from charm.zkp_compiler.and_proof import ANDProof
 from charm.zkp_compiler.or_proof import ORProof
 from charm.zkp_compiler.range_proof import RangeProof
 from charm.zkp_compiler.batch_verify import BatchVerifier, batch_verify_schnorr, batch_verify_dleq
-from charm.zkp_compiler.zkp_factory import ZKProofFactory
+from charm.zkp_compiler.zkp_factory import (
+    ZKProofFactory,
+    configure_logging,
+    prove_and_verify_schnorr,
+    prove_and_verify_dleq,
+)
 from charm.zkp_compiler.thread_safe import ThreadSafeProver, ThreadSafeVerifier
 
 __all__ = [
@@ -77,4 +82,8 @@ __all__ = [
     'ZKProofFactory',
     'ThreadSafeProver',
     'ThreadSafeVerifier',
+    # Convenience functions
+    'configure_logging',
+    'prove_and_verify_schnorr',
+    'prove_and_verify_dleq',
 ]

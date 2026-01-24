@@ -559,10 +559,10 @@ https://github.com/JHUISI/charm/blob/dev/doc/zkp_proof_types_design.md#migration
 - [x] Create Jupyter notebook tutorials
 
 #### 4.5 Additional Hardening
-- [ ] Add type hints to all public APIs
-- [ ] Improve error messages with actionable guidance
-- [ ] Add logging for debugging (configurable verbosity)
-- [ ] Consider adding proof composition helpers (e.g., prove_and_verify convenience functions)
+- [x] Add type hints to all public APIs
+- [x] Improve error messages with actionable guidance
+- [x] Add logging for debugging (configurable verbosity)
+- [x] Consider adding proof composition helpers (e.g., prove_and_verify convenience functions)
 
 ---
 
