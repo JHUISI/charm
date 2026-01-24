@@ -1,3 +1,22 @@
+v0.60 release (Python 3.8+ and OpenSSL 3.x compatibility)
+---------------------------------------------------------
+- Updated to require Python 3.8+ (dropped Python 2.x support)
+- Full OpenSSL 3.x compatibility across all C extension modules
+- Added PY_SSIZE_T_CLEAN macro to all C modules for Python 3.10+ compatibility
+- Fixed PyLongObject internal structure changes for Python 3.12+
+- Modernized CTR counter module (_counter.c) to use Python 3 Bytes API
+- Updated MIRACL pairing module to use EVP API instead of deprecated OpenSSL functions
+- Modern Python packaging with pyproject.toml (PEP 517/518)
+- Added GitHub Actions CI/CD workflow for automated testing
+- Added type stubs (.pyi files) for C extension modules
+- Upgraded to PBC library 1.0.0
+- Fixed segmentation faults in EC and pairing modules
+- Added new cryptographic scheme implementations and documentation
+- Removed deprecated platform.linux_distribution() usage
+- Removed obsolete distribute_setup.py
+- Updated configure.sh to detect Python 3.8-3.12
+- Various bug fixes and improvements
+
 v0.50 beta release (major release with many changes)
 -------------------------------------------
 - error handling updates to base modules
