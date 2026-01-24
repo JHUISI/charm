@@ -372,6 +372,172 @@ class PolicyParserEdgeCaseTest(unittest.TestCase):
             self.assertIsNotNone(tree)
 
 
+class NumericAttributeTest(unittest.TestCase):
+    """Tests for numeric attribute support using bag of bits encoding."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.parser = PolicyParser()
+        # Import here to avoid circular imports
+        from charm.toolbox.ABEnumeric import NumericAttributeHelper
+        cls.helper = NumericAttributeHelper(num_bits=8)
+
+    def test_greater_than(self):
+        """Test attr > value comparison."""
+        expanded = self.helper.expand_policy('age > 10')
+        tree = self.parser.parse(expanded)
+
+        # age=15 should satisfy age > 10
+        user_attrs = self.helper.user_attributes({'age': 15})
+        result = self.parser.prune(tree, user_attrs)
+        self.assertTrue(result)
+
+        # age=10 should NOT satisfy age > 10
+        user_attrs = self.helper.user_attributes({'age': 10})
+        result = self.parser.prune(tree, user_attrs)
+        self.assertFalse(result)
+
+        # age=5 should NOT satisfy age > 10
+        user_attrs = self.helper.user_attributes({'age': 5})
+        result = self.parser.prune(tree, user_attrs)
+        self.assertFalse(result)
+
+    def test_greater_than_or_equal(self):
+        """Test attr >= value comparison."""
+        expanded = self.helper.expand_policy('age >= 18')
+        tree = self.parser.parse(expanded)
+
+        # age=25 should satisfy
+        user_attrs = self.helper.user_attributes({'age': 25})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # age=18 should satisfy (boundary)
+        user_attrs = self.helper.user_attributes({'age': 18})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # age=17 should NOT satisfy
+        user_attrs = self.helper.user_attributes({'age': 17})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+    def test_less_than(self):
+        """Test attr < value comparison."""
+        expanded = self.helper.expand_policy('age < 18')
+        tree = self.parser.parse(expanded)
+
+        # age=17 should satisfy
+        user_attrs = self.helper.user_attributes({'age': 17})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # age=18 should NOT satisfy
+        user_attrs = self.helper.user_attributes({'age': 18})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+        # age=25 should NOT satisfy
+        user_attrs = self.helper.user_attributes({'age': 25})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+    def test_less_than_or_equal(self):
+        """Test attr <= value comparison."""
+        expanded = self.helper.expand_policy('level <= 5')
+        tree = self.parser.parse(expanded)
+
+        # level=3 should satisfy
+        user_attrs = self.helper.user_attributes({'level': 3})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # level=5 should satisfy (boundary)
+        user_attrs = self.helper.user_attributes({'level': 5})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # level=6 should NOT satisfy
+        user_attrs = self.helper.user_attributes({'level': 6})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+    def test_equality(self):
+        """Test attr == value comparison."""
+        expanded = self.helper.expand_policy('level == 5')
+        tree = self.parser.parse(expanded)
+
+        # level=5 should satisfy
+        user_attrs = self.helper.user_attributes({'level': 5})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # level=4 should NOT satisfy
+        user_attrs = self.helper.user_attributes({'level': 4})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+        # level=6 should NOT satisfy
+        user_attrs = self.helper.user_attributes({'level': 6})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+    def test_compound_numeric_policy(self):
+        """Test combined numeric comparisons."""
+        expanded = self.helper.expand_policy('age >= 18 and level > 5')
+        tree = self.parser.parse(expanded)
+
+        # age=25, level=10 should satisfy both
+        user_attrs = self.helper.user_attributes({'age': 25, 'level': 10})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # age=25, level=3 should fail (level > 5 fails)
+        user_attrs = self.helper.user_attributes({'age': 25, 'level': 3})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+        # age=15, level=10 should fail (age >= 18 fails)
+        user_attrs = self.helper.user_attributes({'age': 15, 'level': 10})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+    def test_mixed_numeric_and_string_policy(self):
+        """Test policies mixing numeric comparisons and string attributes."""
+        expanded = self.helper.expand_policy('(age >= 21 or admin) and level > 0')
+        tree = self.parser.parse(expanded)
+
+        # age=25, level=1 should satisfy (age >= 21 satisfies first clause)
+        user_attrs = self.helper.user_attributes({'age': 25, 'level': 1})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # role=admin, level=1 should satisfy (admin satisfies first clause)
+        user_attrs = self.helper.user_attributes({'level': 1, 'role': 'ADMIN'})
+        result = self.parser.prune(tree, user_attrs)
+        self.assertTrue(result)
+
+    def test_bit_encoding_correctness(self):
+        """Test that bit encoding is correct for various values."""
+        from charm.toolbox.ABEnumeric import int_to_bits
+
+        # Test specific values
+        self.assertEqual(int_to_bits(0, 8), [0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(int_to_bits(1, 8), [1, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(int_to_bits(5, 8), [1, 0, 1, 0, 0, 0, 0, 0])  # 101
+        self.assertEqual(int_to_bits(255, 8), [1, 1, 1, 1, 1, 1, 1, 1])
+
+    def test_boundary_values(self):
+        """Test boundary conditions for numeric comparisons."""
+        # Test at boundary of 8-bit range
+        expanded = self.helper.expand_policy('val >= 255')
+        tree = self.parser.parse(expanded)
+
+        # val=255 should satisfy (exactly equal)
+        user_attrs = self.helper.user_attributes({'val': 255})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        # val=254 should NOT satisfy
+        user_attrs = self.helper.user_attributes({'val': 254})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+    def test_zero_comparisons(self):
+        """Test comparisons with zero."""
+        # age > 0
+        expanded = self.helper.expand_policy('age > 0')
+        tree = self.parser.parse(expanded)
+
+        user_attrs = self.helper.user_attributes({'age': 1})
+        self.assertTrue(self.parser.prune(tree, user_attrs))
+
+        user_attrs = self.helper.user_attributes({'age': 0})
+        self.assertFalse(self.parser.prune(tree, user_attrs))
+
+
 def run_stress_test():
     """Run the stress test suite and print results."""
     print("=" * 70)
@@ -385,6 +551,7 @@ def run_stress_test():
 
     suite.addTests(loader.loadTestsFromTestCase(PolicyParserStressTest))
     suite.addTests(loader.loadTestsFromTestCase(PolicyParserEdgeCaseTest))
+    suite.addTests(loader.loadTestsFromTestCase(NumericAttributeTest))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
