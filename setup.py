@@ -22,44 +22,6 @@ class PyTest(TestCommand):
         import sys
         sys.exit(pytest.main(self.test_args))
 
-class UninstallCommand(Command):
-    description = "remove old files"
-    user_options= []
-    def initialize_options(self):
-        self.cwd = None
-    def finalize_options(self):
-        self.cwd = os.getcwd()
-    def run(self):
-        install_system=platform.system();
-        path_to_charm2 = None;
-        if install_system == 'Darwin':
-            path_to_charm = get_python_lib();
-        elif install_system == 'Windows':
-            path_to_charm = get_python_lib();
-        elif install_system == 'Linux':
-            dist = platform.linux_distribution()[0];
-            if dist == 'Ubuntu' or dist == 'debian' or dist == 'LinuxMint':
-                path_to_charm = get_python_lib(1, 1, '/usr/local') + '/dist-packages';
-                path_to_charm2 = get_python_lib(1, 1, '/usr/local') + '/site-packages';
-            elif dist == 'Fedora':
-                path_to_charm = get_python_lib(1, 1, '/usr') + '/site-packages';
-        #print('python path =>', path_to_charm, _charm_version);
-        shutil.rmtree(path_to_charm+'/__pycache__', True)
-        shutil.rmtree(path_to_charm+'/compiler', True)
-        shutil.rmtree(path_to_charm+'/schemes', True)
-        shutil.rmtree(path_to_charm+'/toolbox', True)
-        shutil.rmtree(path_to_charm+'/charm/engine', True)
-
-        for files in os.listdir(path_to_charm):
-            if not re.match('Charm_Crypto-'+_charm_version+'\\.egg-info', files) and re.match('Charm_Crypto-.*\\.egg-info', files):
-                #print(path_to_charm+'/'+files)
-                os.remove(path_to_charm+'/'+files)
-
-        for files in os.listdir(path_to_charm+'/charm'):
-            if re.match('.*\\.so$', files):
-                #print(path_to_charm+'/charm/'+files)
-                os.remove(path_to_charm+'/charm/'+files)
-
 _ext_modules = []
 
 def read_config(file):
@@ -263,13 +225,6 @@ setup(
         "Repository": "https://github.com/JHUISI/charm",
         "Issues": "https://github.com/JHUISI/charm/issues",
     },
-    install_requires=[
-        'pyparsing>=2.1.5,<4.0',
-    ],
-    extras_require={
-        'dev': ['pytest>=7.0', 'hypothesis>=6.0', 'build', 'twine'],
-        'docs': ['sphinx>=4.0', 'sphinx-rtd-theme'],
-    },
     python_requires='>=3.8',
     packages=[
         'charm',
@@ -310,5 +265,5 @@ setup(
         'Programming Language :: C',
         'Topic :: Security :: Cryptography',
     ],
-    cmdclass={'uninstall': UninstallCommand, 'test': PyTest}
+    cmdclass={'test': PyTest}
 )

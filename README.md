@@ -33,20 +33,41 @@ We have provided several cryptographic scheme [examples](https://jhuisi.github.i
 
 If you're using Charm to implement schemes, we want to know what your experience is with our framework. Your feedback is very valuable to us! 
 
-Quick Install & Test
-====================
-Installing Charm from source is straightforward. First, verify that you have installed the following dependencies:
+Installation
+============
+
+### Prerequisites
+
+Charm requires the following system libraries:
 * [GMP 5.x](http://gmplib.org/)
 * [PBC 1.0.0](http://crypto.stanford.edu/pbc/download.html)
 * [OpenSSL](http://www.openssl.org/source/)
-* [PyParsing 2.1.5](https://pypi.org/project/pyparsing/2.1.5/)
-* [Hypothesis](https://pypi.org/project/hypothesis/)
 
-After that, you may proceed to install a basic configuration of Charm as follows:
+**On Ubuntu/Debian:**
+```bash
+sudo apt-get install libgmp-dev libssl-dev flex bison
+```
 
-* `./configure.sh` (include `--enable-darwin` if running Mac OS X)
-* `make install` (may require super-user privileges)
-* `make test` (may also require super-user privileges)
+**On macOS:**
+```bash
+brew install gmp openssl@3
+```
+
+**PBC Library:** Must be built from source. Download from http://crypto.stanford.edu/pbc/download.html and follow the build instructions.
+
+### From Source (Development)
+
+After installing the prerequisites:
+
+```bash
+./configure.sh  # add --enable-darwin on macOS
+pip install .
+```
+
+To run tests:
+```bash
+make test
+```
 
 If most (or all) Python tests pass, then the Charm installation was successful. Enjoy!
 

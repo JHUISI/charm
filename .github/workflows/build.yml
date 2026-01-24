@@ -30,9 +30,9 @@ jobs:
 
     - name: Build and install PBC library
       run: |
-        wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
-        tar -xzf pbc-0.5.14.tar.gz
-        cd pbc-0.5.14
+        wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+        tar -xzf pbc-1.0.0.tar.gz
+        cd pbc-1.0.0
         ./configure
         make -j$(nproc)
         sudo make install
@@ -52,8 +52,8 @@ jobs:
     - name: Run tests
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-        pytest -v charm/test/ || true
-        python -m unittest discover -p "*_test.py" charm/test/toolbox/ || true
+        pytest -v charm/test/
+        python -m unittest discover -p "*_test.py" charm/test/toolbox/
 
   build-macos:
     runs-on: macos-latest
@@ -76,9 +76,9 @@ jobs:
 
     - name: Build and install PBC library
       run: |
-        wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
-        tar -xzf pbc-0.5.14.tar.gz
-        cd pbc-0.5.14
+        wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+        tar -xzf pbc-1.0.0.tar.gz
+        cd pbc-1.0.0
         ./configure LDFLAGS="-L$(brew --prefix gmp)/lib" CPPFLAGS="-I$(brew --prefix gmp)/include"
         make -j$(sysctl -n hw.ncpu)
         sudo make install
@@ -99,8 +99,8 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v charm/test/ || true
-        python -m unittest discover -p "*_test.py" charm/test/toolbox/ || true
+        pytest -v charm/test/
+        python -m unittest discover -p "*_test.py" charm/test/toolbox/
 
   # Optional: Build wheels using cibuildwheel
   build-wheels:
@@ -119,17 +119,17 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libgmp-dev libssl-dev flex bison
-        wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
-        tar -xzf pbc-0.5.14.tar.gz
-        cd pbc-0.5.14 && ./configure && make -j$(nproc) && sudo make install && sudo ldconfig
+        wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+        tar -xzf pbc-1.0.0.tar.gz
+        cd pbc-1.0.0 && ./configure && make -j$(nproc) && sudo make install && sudo ldconfig
 
     - name: Install system dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
         brew install gmp openssl@3 flex bison
-        wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
-        tar -xzf pbc-0.5.14.tar.gz
-        cd pbc-0.5.14
+        wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+        tar -xzf pbc-1.0.0.tar.gz
+        cd pbc-1.0.0
         ./configure LDFLAGS="-L$(brew --prefix gmp)/lib" CPPFLAGS="-I$(brew --prefix gmp)/include"
         make -j$(sysctl -n hw.ncpu) && sudo make install
 

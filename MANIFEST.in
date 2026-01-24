@@ -1,5 +1,5 @@
 include VERSION README.md INSTALL configure.sh Makefile CHANGELOG setup.cfg
-include LICENSE.txt pyproject.toml config.dist.py pytest.ini pip.conf
+include LICENSE.txt pyproject.toml config.dist.py pytest.ini
 graft doc
 graft doc/source
 recursive-include charm *.h *.c *.py
