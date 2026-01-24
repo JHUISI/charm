@@ -1294,6 +1294,10 @@ static PyObject *ECE_encode(ECElement *self, PyObject *args) {
         if(len == max_len) {
             // concatenate msg
             char *input = (char *) malloc(len + 1);
+            if (input == NULL) {
+                PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for input buffer");
+                return NULL;
+            }
             memset(input, 0, len);
             memcpy(input, old_msg, msg_len);
             int TryNextCTR = TRUE;
@@ -1391,6 +1395,12 @@ static PyObject *ECE_decode(ECElement *self, PyObject *args) {
                 		x_len += prepend_zeros;
 			}
 			uint8_t *xstr = (uint8_t*) malloc(x_len + 1);
+			if (xstr == NULL) {
+				PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for xstr buffer");
+				BN_free(x);
+				BN_free(y);
+				return NULL;
+			}
 			memset(xstr, 0, x_len);
 			debug("Size of xstr => '%d'\n", x_len);
 			// BN_bn2bin does not include leading null bytes that might've been included in original message

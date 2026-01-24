@@ -191,6 +191,7 @@ void print_mpz(mpz_t x, int base) {
 	if(base <= 2 || base > 64) return;
 	size_t x_size = mpz_sizeinbase(x, base) + 2;
 	char *x_str = (char *) malloc(x_size);
+	if (x_str == NULL) return;
 	x_str = mpz_get_str(x_str, base, x);
 	debug("Element => '%s'\n", x_str);
 	debug("Order of Element => '%zd'\n", x_size);
@@ -298,6 +299,7 @@ int hash_to_group_element(mpz_t x, int block_num, uint8_t *output_buf) {
 	if (block_num > 0) {
 		int len = count + sizeof(uint32_t);
 		uint8_t *tmp_buf = (uint8_t *) malloc(len + 1);
+		if (tmp_buf == NULL) return FALSE;
 		memset(tmp_buf, 0, len);
 		// sprintf(tmp_buf, "%d%s", block_num, (char *) rop_buf);
 		uint32_t block_str = (uint32_t) block_num;
@@ -497,11 +499,16 @@ PyObject *Integer_print(Integer *self) {
 	if (self->initialized) {
 		size_t e_size = mpz_sizeinbase(self->e, 10) + 2;
 		char *e_str = (char *) malloc(e_size);
+		if (e_str == NULL) return NULL;
 		mpz_get_str(e_str, 10, self->e);
 
 		if (mpz_sgn(self->m) != 0) {
 			size_t m_size = mpz_sizeinbase(self->m, 10) + 2;
 			char *m_str = (char *) malloc(m_size);
+			if (m_str == NULL) {
+				free(e_str);
+				return NULL;
+			}
 			mpz_get_str(m_str, 10, self->m);
 			strObject = PyUnicode_FromFormat("%s mod %s", (const char *) e_str,
 					(const char *) m_str);
@@ -1088,6 +1095,7 @@ static PyObject *Integer_hash(PyObject *self, PyObject *args) {
 
 			/* allocate space big enough to hold exported objects */
 			rop_buf = (uint8_t *) malloc(o_size + 1);
+			if (rop_buf == NULL) return NULL;
 			memset(rop_buf, 0, o_size);
 			int cur_ptr = 0;
 			/* export objects here using mpz_export into allocated buffer */

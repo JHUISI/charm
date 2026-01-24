@@ -177,12 +177,22 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 char *convert_buffer_to_hex(uint8_t * data, size_t len)
 {
 	size_t i;
-	char *tmp = (char *) malloc(len*2 + 2);
+	size_t buf_size = len*2 + 2;
+	char *tmp = (char *) malloc(buf_size);
+	if (tmp == NULL) {
+		return NULL;
+	}
 	char *tmp2 = tmp;
-	memset(tmp, 0, len*2+1);
+	memset(tmp, 0, buf_size);
 
-	for(i = 0; i < len; i++)
-		tmp += sprintf(tmp, "%02x", data[i]);
+	for(i = 0; i < len; i++) {
+		size_t remaining = buf_size - (size_t)(tmp - tmp2);
+		int written = snprintf(tmp, remaining, "%02x", data[i]);
+		if (written < 0 || (size_t)written >= remaining) {
+			break;  /* Prevent buffer overflow */
+		}
+		tmp += written;
+	}
 
 	return tmp2;
 }
@@ -467,14 +477,18 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 	unsigned int buf_len = element_length_in_bytes(*element);
 
 	uint8_t* temp_buf = (uint8_t *) malloc(buf_len + 1);
-	memset(temp_buf, '\0', buf_len);
 	if(temp_buf == NULL) {
 		return FALSE;
 	}
+	memset(temp_buf, '\0', buf_len);
 
 	element_to_bytes((unsigned char *) temp_buf, *element);
 	// create output buffer
 	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 1);
+	if(temp2_buf == NULL) {
+		free(temp_buf);
+		return FALSE;
+	}
 	memset(temp2_buf, 0, (last_buflen + buf_len));
 	int i;
 	for(i = 0; i < last_buflen; i++)
@@ -726,6 +740,9 @@ PyObject *Element_print(Element* self)
 {
 	PyObject *strObj;
 	char *tmp = (char *) malloc(MAX_LEN);
+	if(tmp == NULL) {
+		return NULL;
+	}
 	memset(tmp, 0, MAX_LEN);
 	size_t max = MAX_LEN;
 	debug("Contents of element object\n");
@@ -1569,6 +1586,9 @@ static long Element_index(Element *o1) {
 		size_t len;
 		len = element_length_in_bytes(o1->e);
 		buff = (uint8_t*) malloc(len);
+		if(buff == NULL) {
+			return -1;
+		}
 		element_to_bytes(buff, o1->e);
 		result = PyObject_Hash(PyBytes_FromStringAndSize((char*)buff, len));
 		free(buff);
@@ -1706,6 +1726,9 @@ void print_mpz(mpz_t x, int base) {
 	if(base <= 2 || base > 64) return;
 	size_t x_size = mpz_sizeinbase(x, base) + 2;
 	char *x_str = (char *) malloc(x_size);
+	if(x_str == NULL) {
+		return;
+	}
 	x_str = mpz_get_str(x_str, base, x);
 	printf("Element => '%s'\n", x_str);
 	printf("Order of Element => '%zd'\n", x_size);
