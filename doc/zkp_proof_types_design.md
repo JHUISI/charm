@@ -1,0 +1,371 @@
+# ZKP Proof Types Design Document
+
+## Overview
+
+This document describes the design and implementation plan for zero-knowledge proof (ZKP) types in the Charm-Crypto library. It covers both the existing Schnorr protocol and planned future proof types.
+
+## Table of Contents
+
+1. [Architecture Overview](#architecture-overview)
+2. [Existing Proof Type: Schnorr Protocol](#existing-proof-type-schnorr-protocol)
+3. [New Proof Type: Discrete Log Equality (DLEQ)](#new-proof-type-discrete-log-equality-dleq)
+4. [New Proof Type: Knowledge of Representation](#new-proof-type-knowledge-of-representation)
+5. [New Proof Type: Range Proofs](#new-proof-type-range-proofs)
+6. [Proof Composition Techniques](#proof-composition-techniques)
+7. [Migration Guide](#migration-guide)
+8. [Implementation Roadmap](#implementation-roadmap)
+
+---
+
+## Architecture Overview
+
+### Base Classes
+
+All ZKP implementations inherit from `ZKProofBase` (defined in `charm/toolbox/ZKProof.py`):
+
+```python
+from charm.toolbox.ZKProof import ZKProofBase, zkpSecDefs
+
+class MyZKProof(ZKProofBase):
+    def __init__(self):
+        ZKProofBase.__init__(self)
+        self.setProperty(secDef='NIZK', assumption='DL', secModel='ROM')
+    
+    def setup(self, group): ...
+    def prove(self, statement, witness): ...
+    def verify(self, statement, proof): ...
+    def serialize(self, proof, group): ...
+    def deserialize(self, data, group): ...
+```
+
+### Security Definitions
+
+| Definition | Description | Use Case |
+|------------|-------------|----------|
+| `HVZK` | Honest-Verifier Zero-Knowledge | Interactive protocols with trusted verifier |
+| `ZK` | Zero-Knowledge | Secure against malicious verifiers |
+| `NIZK` | Non-Interactive Zero-Knowledge | Fiat-Shamir transformed proofs |
+| `SIM` | Simulation Sound | Proofs unforgeable even with simulated proofs |
+
+### Module Structure
+
+```
+charm/
+├── toolbox/
+│   └── ZKProof.py              # Base class and exceptions
+└── zkp_compiler/
+    ├── schnorr_proof.py        # Schnorr DL proof (NEW)
+    ├── zkp_factory.py          # Factory for creating proofs (NEW)
+    ├── zkparser.py             # Statement parser (existing)
+    ├── zkp_generator.py        # Legacy compiler (deprecated)
+    └── zknode.py               # AST node types (existing)
+```
+
+---
+
+## Existing Proof Type: Schnorr Protocol
+
+### Description
+
+Schnorr's protocol is a Sigma protocol for proving knowledge of a discrete logarithm:
+- **Statement**: "I know x such that h = g^x"
+- **Security**: Honest-Verifier Zero-Knowledge (HVZK), or NIZK with Fiat-Shamir
+
+### Protocol (Interactive)
+
+```
+Prover(x, g, h)              Verifier(g, h)
+--------------               --------------
+r ← random ZR
+u = g^r
+                    u
+                ─────────>
+                    c
+                <─────────    c ← random ZR
+z = r + c·x
+                    z
+                ─────────>
+                              Verify: g^z == u · h^c
+```
+
+### API Usage
+
+```python
+from charm.toolbox.pairinggroup import PairingGroup, ZR, G1
+from charm.zkp_compiler.schnorr_proof import SchnorrProof
+from charm.zkp_compiler.zkp_factory import ZKProofFactory
+
+# Setup
+group = PairingGroup('SS512')
+g = group.random(G1)  # Generator
+x = group.random(ZR)  # Secret
+h = g ** x            # Public value
+
+# Non-interactive proof (recommended)
+proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+is_valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
+
+# Using the factory
+instance = ZKProofFactory.create_schnorr_proof(group, g, h, x)
+proof = instance.prove()
+is_valid = instance.verify(proof)
+
+# Interactive proof
+prover = SchnorrProof.Prover(x, group)
+verifier = SchnorrProof.Verifier(group)
+
+commitment = prover.create_commitment(g)
+challenge = verifier.create_challenge()
+response = prover.create_response(challenge)
+is_valid = verifier.verify(g, h, commitment, response)
+```
+
+### Serialization
+
+```python
+# Serialize for storage/transmission
+data = SchnorrProof.serialize_proof(proof, group)
+
+# Deserialize
+recovered = SchnorrProof.deserialize_proof(data, group)
+```
+
+---
+
+## New Proof Type: Discrete Log Equality (DLEQ)
+
+### Description
+
+DLEQ (Chaum-Pedersen) proves that two discrete logarithms are equal:
+- **Statement**: "I know x such that h₁ = g₁^x AND h₂ = g₂^x"
+- **Security**: HVZK/NIZK
+- **Use Cases**: VRFs, ElGamal re-encryption proofs, threshold cryptography
+
+### Protocol
+
+```
+Prover(x, g₁, h₁, g₂, h₂)         Verifier(g₁, h₁, g₂, h₂)
+---
+
+## New Proof Type: Knowledge of Representation
+
+### Description
+
+Proves knowledge of a representation in a given basis:
+- **Statement**: "I know (x₁, x₂, ..., xₙ) such that h = g₁^x₁ · g₂^x₂ · ... · gₙ^xₙ"
+- **Security**: HVZK/NIZK
+- **Use Cases**: Anonymous credentials, Pedersen commitments, multi-attribute proofs
+
+### Protocol
+
+```
+Prover(x₁...xₙ, g₁...gₙ, h)       Verifier(g₁...gₙ, h)
+---------------------------       ----------------------
+r₁...rₙ ← random ZR
+u = ∏ᵢ gᵢ^rᵢ
+                    u
+                ─────────>
+                    c
+                <─────────        c ← random ZR
+zᵢ = rᵢ + c·xᵢ (for all i)
+                  z₁...zₙ
+                ─────────>
+                              Verify: ∏ᵢ gᵢ^zᵢ == u · h^c
+```
+
+### Proposed API
+
+```python
+class RepresentationProof(ZKProofBase):
+    """Proof of knowledge of representation."""
+
+    @classmethod
+    def prove_non_interactive(cls, group, generators, h, witnesses):
+        """Prove knowledge of witnesses for h = ∏ gᵢ^xᵢ."""
+        ...
+
+    @classmethod
+    def verify_non_interactive(cls, group, generators, h, proof):
+        """Verify a representation proof."""
+        ...
+```
+
+---
+
+## New Proof Type: Range Proofs
+
+### Description
+
+Proves that a committed value lies within a range:
+- **Statement**: "I know x such that C = g^x · h^r AND 0 ≤ x < 2ⁿ"
+- **Security**: NIZK
+- **Use Cases**: Confidential transactions, age verification, voting
+
+### Approach: Bit Decomposition
+
+For simplicity, we use bit decomposition (O(n) proof size):
+
+1. Commit to each bit: Cᵢ = g^bᵢ · h^rᵢ
+2. Prove each Cᵢ commits to 0 or 1 (OR proof)
+3. Prove ∑ 2^i · bᵢ = x
+
+### Proposed API
+
+```python
+class RangeProof(ZKProofBase):
+    """Range proof for committed values."""
+
+    @classmethod
+    def prove(cls, group, g, h, commitment, value, randomness, bits=32):
+        """Prove value is in range [0, 2^bits)."""
+        ...
+
+    @classmethod
+    def verify(cls, group, g, h, commitment, proof, bits=32):
+        """Verify a range proof."""
+        ...
+```
+
+---
+
+## Proof Composition Techniques
+
+### AND Composition (Conjunction)
+
+To prove "Statement A AND Statement B":
+1. Use the same challenge for both proofs
+2. Combine commitments and responses
+
+```python
+# Example: Prove knowledge of x AND y
+class ANDProof:
+    @classmethod
+    def prove(cls, group, proofs):
+        """Combine multiple proofs with same challenge."""
+        # All proofs share a single challenge (Fiat-Shamir over all commitments)
+        ...
+```
+
+### OR Composition (Disjunction)
+
+To prove "Statement A OR Statement B" (without revealing which):
+- Uses the technique from Cramer-Damgård-Schoenmakers (CDS94)
+- Simulator creates fake proof for unknown statement
+
+```python
+class ORProof:
+    @classmethod
+    def prove(cls, group, proof_a, proof_b, which_known):
+        """Prove one of two statements without revealing which."""
+        # Real proof for known, simulated for unknown
+        # Challenges must sum to verifier's challenge
+        ...
+```
+
+---
+
+## Migration Guide
+
+### From Legacy API to New API
+
+**Old (Deprecated):**
+```python
+# WARNING: Uses insecure exec()
+from charm.zkp_compiler.zkp_generator import executeNonIntZKProof
+
+result = executeNonIntZKProof(public, secret, statement, party_info)
+```
+
+**New (Recommended):**
+```python
+from charm.zkp_compiler.schnorr_proof import SchnorrProof
+from charm.zkp_compiler.zkp_factory import ZKProofFactory
+
+# Direct API
+proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+is_valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
+
+# Factory API (for statement-based creation)
+instance = ZKProofFactory.create_from_statement(
+    group, "h = g^x",
+    public_params={'g': g, 'h': h},
+    secret_params={'x': x}
+)
+proof = instance.prove()
+```
+
+---
+
+## Implementation Roadmap
+
+### Phase 1 (Current - v0.60) ✅
+- [x] Create ZKProofBase class
+- [x] Implement Schnorr proof without exec()
+- [x] Create ZKProofFactory
+- [x] Add deprecation warnings to legacy API
+- [x] Comprehensive unit tests (>90% coverage)
+
+### Phase 2 (v0.61)
+- [ ] Implement DLEQ (Chaum-Pedersen) proof
+- [ ] Implement Knowledge of Representation proof
+- [ ] Add support for multi-character variable names
+- [ ] Thread-safe implementation
+
+### Phase 3 (v0.62)
+- [ ] Implement AND composition
+- [ ] Implement OR composition (CDS94)
+- [ ] Implement Range Proofs
+- [ ] Batch verification
+
+### Phase 4 (v0.70)
+- [ ] Complete deprecation of legacy API
+- [ ] Security audit
+- [ ] Performance benchmarks
+- [ ] Full documentation
+
+---
+
+## References
+
+1. **Schnorr Protocol**: C.P. Schnorr, "Efficient Signature Generation by Smart Cards", 1991
+2. **DLEQ (Chaum-Pedersen)**: Chaum & Pedersen, "Wallet Databases with Observers", 1992
+3. **OR Composition (CDS94)**: Cramer, Damgård, Schoenmakers, "Proofs of Partial Knowledge", 1994
+4. **Fiat-Shamir Transform**: Fiat & Shamir, "How to Prove Yourself", 1986
+5. **Bulletproofs**: Bünz et al., "Bulletproofs: Short Proofs for Confidential Transactions", 2018
+
+---
+
+*Document Version: 1.0*
+*Last Updated: 2026-01-24*
+*Author: Charm-Crypto Team*---------------------          --------------------------
+r ← random ZR
+u₁ = g₁^r, u₂ = g₂^r
+                    u₁, u₂
+                  ─────────>
+                    c
+                  <─────────       c ← random ZR (or Fiat-Shamir)
+z = r + c·x
+                    z
+                  ─────────>
+                               Verify: g₁^z == u₁·h₁^c AND g₂^z == u₂·h₂^c
+```
+
+### Proposed API
+
+```python
+class DLEQProof(ZKProofBase):
+    """Proof of discrete log equality (Chaum-Pedersen)."""
+    
+    @classmethod
+    def prove_non_interactive(cls, group, g1, h1, g2, h2, x):
+        """Prove knowledge of x such that h1 = g1^x and h2 = g2^x."""
+        ...
+    
+    @classmethod
+    def verify_non_interactive(cls, group, g1, h1, g2, h2, proof):
+        """Verify a DLEQ proof."""
+        ...
+```
+
+---
+

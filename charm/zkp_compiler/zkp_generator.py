@@ -1,12 +1,25 @@
 # Implements the proof-of-concept ZK proof compiler
 # This compiler takes as input a set of public and secret inputs as well as a
-# statement to be proved/verified.  It outputs the  
+# statement to be proved/verified.  It outputs the
+#
+# DEPRECATION WARNING: This module uses insecure dynamic code generation (exec/compile).
+# For production use, please use the new secure API in:
+#   - charm.zkp_compiler.zkp_factory.ZKProofFactory
+#   - charm.zkp_compiler.schnorr_proof.SchnorrProof
+#
+# See the migration guide in doc/zkp_proof_types_design.md
+
+import logging
+import warnings
 
 from pyparsing import *
 from charm.zkp_compiler.zkparser import *
 from charm.core.engine.protocol import *
 from charm.core.engine.util import *
 #from charm.core.math.pairing import *
+
+# Set up logging instead of print statements
+logger = logging.getLogger(__name__)
 
 int_default = True
 
@@ -115,10 +128,10 @@ def KoDLFixedBase(publicDict, secretDict, baseVarKey, expVarKey, statesCode, int
     stateDef6 += addToCode(["Protocol.setState(self, None)", "return None"])
     statesCode += stateDef6 + "\n"
     
-#    print("Finishing state 1 =>", statesCode)    
-    f = open('tmpGenCode.py', 'w')
-    f.write(statesCode)
-    f.close()
+#    print("Finishing state 1 =>", statesCode)
+    # SECURITY: Removed filesystem write of generated code (tmpGenCode.py)
+    # The generated code is logged at DEBUG level for debugging purposes
+    logger.debug("Generated ZK proof code:\n%s", statesCode)
 
     return statesCode
 
@@ -228,48 +241,100 @@ def dict_check(node, pk, sk):
     return True
 
 def write_out(name, prefix, value):
-    f = open(name, 'a')
-    f.write(str(prefix) + " => " + str(value) + "\n")
-    f.close()
+    """Log debug output instead of writing to filesystem.
+
+    SECURITY: This function previously wrote to the filesystem, which could
+    allow attackers to write arbitrary content. Now it logs to the debug
+    logger instead.
+    """
+    logger.debug("%s: %s => %s", name, prefix, value)
 
 
 # Generate an interactive ZK proof from a statement and variables.  The output
 # of this function is a subclass of Protocol.  To execute the proof, first
 # set it up using the Protocol API and run Execute().
 def executeIntZKProof(public, secret, statement, party_info, interactive=int_default):
-    print("Executing Interactive ZK proof...")
+    """Execute an interactive ZK proof.
+
+    .. deprecated:: 0.60
+        This function uses insecure dynamic code execution (exec/compile).
+        Use :class:`charm.zkp_compiler.zkp_factory.ZKProofFactory` instead.
+
+        Migration example::
+
+            # Old (deprecated):
+            # result = executeIntZKProof(public, secret, statement, party_info)
+
+            # New (recommended):
+            from charm.zkp_compiler.zkp_factory import ZKProofFactory
+            proof_instance = ZKProofFactory.create_schnorr_proof(group, g, h, x)
+            proof = proof_instance.prove()
+            is_valid = proof_instance.verify(proof)
+    """
+    warnings.warn(
+        "executeIntZKProof() uses insecure dynamic code execution. "
+        "Use charm.zkp_compiler.zkp_factory.ZKProofFactory instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    logger.info("Executing Interactive ZK proof...")
     # verify that party_info contains wellformed dictionary
     party_keys = set(['party', 'setting', 'socket'])
     if not party_keys.issubset(set(party_info.keys())):
         missing_keys = party_keys.difference_update(set(party_info_keys()))
-        print("Required key/values missing: '%s'" % missing_keys)
+        logger.error("Required key/values missing: '%s'", missing_keys)
         return None
-    
+
     p_name, p_socket, groupObj = party_info['party'], party_info['socket'], party_info['setting']
     if p_name.upper() == 'PROVER': partyID = PROVER
     elif p_name.upper() == 'VERIFIER': partyID = VERIFIER
-    else: print("Unrecognized party!"); return None
+    else: logger.error("Unrecognized party!"); return None
 
     # Parse through the statement and insert code into each state of the prover and/or verifier
-    ZKClass = parseAndGenerateCode(public, secret, statement, partyID, interactive)    
+    ZKClass = parseAndGenerateCode(public, secret, statement, partyID, interactive)
     dummy_class = '<string>'
+    # SECURITY WARNING: compile() and exec() are used here for legacy compatibility.
+    # This is a known security vulnerability. Use ZKProofFactory for new code.
     proof_code = compile(ZKClass, dummy_class, 'exec')
-    print("Proof code object =>", proof_code)    
+    logger.debug("Proof code object => %s", proof_code)
 #    return proof_code
-    ns = {} 
-    exec(proof_code, globals(), ns)    
+    ns = {}
+    exec(proof_code, globals(), ns)  # nosec B102 - legacy code, deprecated
     ZKProof = ns['ZKProof']
 
     prov_db = None
     if(partyID == PROVER):
         prov_db = {}; prov_db.update(public); prov_db.update(secret)
     zkp = ZKProof(groupObj, prov_db)
-    zkp.setup( {'name':p_name.lower(), 'type':partyID, 'socket':p_socket}) 
+    zkp.setup( {'name':p_name.lower(), 'type':partyID, 'socket':p_socket})
     # is there a way to check type of socket?
     zkp.execute(partyID)
     return zkp.result
 
+
 def executeNonIntZKProof(public, secret, statement, party_info):
-    print("Executing Non-interactive ZK proof...")
+    """Execute a non-interactive ZK proof.
+
+    .. deprecated:: 0.60
+        This function uses insecure dynamic code execution (exec/compile).
+        Use :class:`charm.zkp_compiler.schnorr_proof.SchnorrProof` instead.
+
+        Migration example::
+
+            # Old (deprecated):
+            # result = executeNonIntZKProof(public, secret, statement, party_info)
+
+            # New (recommended):
+            from charm.zkp_compiler.schnorr_proof import SchnorrProof
+            proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+            is_valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
+    """
+    warnings.warn(
+        "executeNonIntZKProof() uses insecure dynamic code execution. "
+        "Use charm.zkp_compiler.schnorr_proof.SchnorrProof instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    logger.info("Executing Non-interactive ZK proof...")
     return executeIntZKProof(public, secret, statement, party_info, interactive=False)
     
