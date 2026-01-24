@@ -10,7 +10,9 @@ Toolbox Test Code
    test/conversion_test
    test/ecgroup_test
    test/paddingschemes_test
+   test/policy_parser_stress_test
    test/secretshare_test
    test/symcrypto_test
+   test/test_policy_expression
 
 .. end_auto_test_toolbox_list
