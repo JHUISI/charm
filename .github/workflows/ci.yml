@@ -7,6 +7,11 @@ on:
   pull_request:
     branches:
       - dev
+  schedule:
+    # Run fuzzing weekly on Sundays at 2am UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    # Allow manual triggering for fuzzing
 
 jobs:
   build:
@@ -78,6 +83,8 @@ jobs:
   fuzzing:
     runs-on: ubuntu-latest
     name: Fuzzing (Atheris)
+    # Optional job - only runs on schedule or manual trigger
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     steps:
     - name: Checkout code
@@ -117,14 +124,14 @@ jobs:
       env:
         LD_LIBRARY_PATH: /usr/local/lib:$LD_LIBRARY_PATH
       run: |
-        timeout 300 python charm/test/fuzz/fuzz_policy_parser.py -max_total_time=240 || true
+        timeout 150 python charm/test/fuzz/fuzz_policy_parser.py -max_total_time=120 || true
         echo "Policy parser fuzzing completed"
 
     - name: Run serialization fuzzer
       env:
         LD_LIBRARY_PATH: /usr/local/lib:$LD_LIBRARY_PATH
       run: |
-        timeout 300 python charm/test/fuzz/fuzz_serialization.py -max_total_time=240 || true
+        timeout 150 python charm/test/fuzz/fuzz_serialization.py -max_total_time=120 || true
         echo "Serialization fuzzing completed"
 
     - name: Upload crash artifacts
