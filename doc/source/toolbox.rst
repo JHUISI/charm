@@ -46,5 +46,6 @@ Toolbox Classes
    toolbox/symcrypto
    toolbox/xmlserialize
    toolbox/zknode
+   toolbox/zkp_compiler
 
 .. end_auto_toolbox_list

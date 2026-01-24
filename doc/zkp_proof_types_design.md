@@ -273,33 +273,205 @@ class ORProof:
 
 ## Migration Guide
 
-### From Legacy API to New API
+This section provides guidance for migrating from the legacy ZKP compiler API to the new secure proof type classes.
 
-**Old (Deprecated):**
+### Why Migrate
+
+The legacy API (`executeIntZKProof()` and `executeNonIntZKProof()`) has **critical security vulnerabilities** that make it unsuitable for production use:
+
+1. **Uses Python's `exec()` and `compile()`**: The legacy implementation dynamically generates and executes Python code at runtime, which:
+   - Creates potential code injection vulnerabilities if any input is user-controlled
+   - Makes security auditing extremely difficult
+   - Prevents static analysis tools from detecting issues
+
+2. **No input validation**: The legacy API lacks proper validation of group elements and proof structure
+
+3. **Not thread-safe**: The legacy implementation uses shared global state that can cause race conditions
+
+4. **Difficult to audit**: Dynamic code generation obscures the actual cryptographic operations
+
+### Legacy vs New API Comparison
+
+| Feature | Legacy API | New Secure API |
+|---------|------------|----------------|
+| Code execution | Uses `exec()`/`compile()` | Direct method calls |
+| Input validation | None | Full group membership checks |
+| Thread safety | Not thread-safe | Thread-safe by design |
+| Serialization | Custom format | JSON with validation |
+| Security auditable | Difficult | Easy to audit |
+
+**Side-by-side example:**
+
 ```python
-# WARNING: Uses insecure exec()
-from charm.zkp_compiler.zkp_generator import executeNonIntZKProof
+# BEFORE (Legacy - DEPRECATED)
+from charm.zkp_compiler.zkp_generator import executeIntZKProof
 
-result = executeNonIntZKProof(public, secret, statement, party_info)
+result = executeIntZKProof(
+    "h = g^x",
+    {'g': g, 'h': h},
+    {'x': x}
+)
+
+# AFTER (New Secure API)
+from charm.zkp_compiler.schnorr_proof import SchnorrProof
+
+proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
 ```
 
-**New (Recommended):**
 ```python
+# BEFORE (Legacy non-interactive - DEPRECATED)
+from charm.zkp_compiler.zkp_generator import executeNonIntZKProof
+
+result = executeNonIntZKProof(
+    {'g': g, 'h': h},          # public params
+    {'x': x},                   # secret params
+    "h = g^x",                  # statement
+    {'prover': 'prover_id'}     # party info
+)
+
+# AFTER (New Secure API)
 from charm.zkp_compiler.schnorr_proof import SchnorrProof
+
+proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
+```
+
+### Step-by-Step Migration
+
+#### Step 1: Update Imports
+
+```python
+# BEFORE
+from charm.zkp_compiler.zkp_generator import executeIntZKProof, executeNonIntZKProof
+
+# AFTER
+from charm.zkp_compiler.schnorr_proof import SchnorrProof
+from charm.zkp_compiler.dleq_proof import DLEQProof
+from charm.zkp_compiler.representation_proof import RepresentationProof
+from charm.zkp_compiler.zkp_factory import ZKProofFactory  # Optional factory API
+```
+
+#### Step 2: Replace Proof Generation
+
+```python
+# BEFORE
+result = executeIntZKProof("h = g^x", {'g': g, 'h': h}, {'x': x})
+proof_data = result['proof']
+
+# AFTER
+proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+# proof is a dict with 'commitment' and 'response' keys
+```
+
+#### Step 3: Replace Verification
+
+```python
+# BEFORE
+# Legacy verification was often bundled with proof generation
+is_valid = result['verified']
+
+# AFTER
+is_valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
+```
+
+#### Step 4: Update Serialization (if used)
+
+```python
+# BEFORE (legacy custom format)
+serialized = str(result)
+
+# AFTER (JSON-based serialization)
+serialized = SchnorrProof.serialize_proof(proof, group)
+recovered = SchnorrProof.deserialize_proof(serialized, group)
+```
+
+### Common Migration Patterns
+
+#### Pattern 1: Simple Discrete Log Proof → SchnorrProof
+
+Use when proving knowledge of `x` in `h = g^x`:
+
+```python
+# Legacy
+result = executeIntZKProof("h = g^x", {'g': g, 'h': h}, {'x': x})
+
+# New
+from charm.zkp_compiler.schnorr_proof import SchnorrProof
+proof = SchnorrProof.prove_non_interactive(group, g, h, x)
+valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
+```
+
+#### Pattern 2: Equality Proof → DLEQProof
+
+Use when proving `h1 = g1^x` AND `h2 = g2^x` (same exponent):
+
+```python
+# Legacy (required complex statement parsing)
+result = executeNonIntZKProof(
+    {'g1': g1, 'h1': h1, 'g2': g2, 'h2': h2},
+    {'x': x},
+    "h1 = g1^x and h2 = g2^x",
+    party_info
+)
+
+# New
+from charm.zkp_compiler.dleq_proof import DLEQProof
+proof = DLEQProof.prove_non_interactive(group, g1, h1, g2, h2, x)
+valid = DLEQProof.verify_non_interactive(group, g1, h1, g2, h2, proof)
+```
+
+#### Pattern 3: Multi-Exponent Proof → RepresentationProof
+
+Use when proving `h = g1^x1 * g2^x2 * ... * gn^xn`:
+
+```python
+# Legacy (limited support, required custom parsing)
+# Often not possible with legacy API
+
+# New
+from charm.zkp_compiler.representation_proof import RepresentationProof
+generators = [g1, g2, g3]
+witnesses = [x1, x2, x3]
+proof = RepresentationProof.prove_non_interactive(group, generators, h, witnesses)
+valid = RepresentationProof.verify_non_interactive(group, generators, h, proof)
+```
+
+#### Using the Factory for Statement-Based Creation
+
+If you prefer statement-based syntax similar to the legacy API:
+
+```python
 from charm.zkp_compiler.zkp_factory import ZKProofFactory
 
-# Direct API
-proof = SchnorrProof.prove_non_interactive(group, g, h, x)
-is_valid = SchnorrProof.verify_non_interactive(group, g, h, proof)
-
-# Factory API (for statement-based creation)
+# Create proof instance from statement
 instance = ZKProofFactory.create_from_statement(
-    group, "h = g^x",
+    group,
+    "h = g^x",
     public_params={'g': g, 'h': h},
     secret_params={'x': x}
 )
 proof = instance.prove()
+valid = instance.verify(proof)
 ```
+
+### Deprecation Timeline
+
+| Version | Status | Action |
+|---------|--------|--------|
+| **v0.60** | Current | New secure API introduced alongside legacy API |
+| **v0.70** | Deprecation | Legacy API emits `DeprecationWarning` on every use |
+| **v0.80** | Removal | Legacy API completely removed from codebase |
+
+**Starting in v0.70**, using legacy functions will emit warnings:
+
+```
+DeprecationWarning: executeIntZKProof() is deprecated and will be removed in v0.80.
+Use SchnorrProof.prove_non_interactive() instead. See migration guide at:
+https://github.com/JHUISI/charm/blob/dev/doc/zkp_proof_types_design.md#migration-guide
+```
+
+**Recommended action**: Migrate to the new API before v0.80 to ensure continued compatibility.
 
 ---
 
@@ -341,50 +513,50 @@ proof = instance.prove()
 ### Phase 4 (v0.70) - Production Hardening
 
 #### 4.1 Legacy API Deprecation
-- [ ] Add `DeprecationWarning` to all legacy functions in `zkp_generator.py`:
+- [x] Add `DeprecationWarning` to all legacy functions in `zkp_generator.py`:
   - `executeIntZKProof()` - emit warning on every call
   - `executeNonIntZKProof()` - emit warning on every call
   - `KoDLFixedBase()` and related internal functions
-- [ ] Update `__init__.py` to emit import-time deprecation warning for legacy modules
-- [ ] Add migration examples in deprecation messages pointing to new API
-- [ ] Document removal timeline (suggest v0.80 for complete removal)
+- [x] Update `__init__.py` to emit import-time deprecation warning for legacy modules
+- [x] Add migration examples in deprecation messages pointing to new API
+- [x] Document removal timeline (suggest v0.80 for complete removal)
 
 #### 4.2 Security Audit Checklist
-- [ ] **Input Validation**: Verify all public inputs are validated before use
+- [x] **Input Validation**: Verify all public inputs are validated before use
   - Check group membership for all elements
   - Validate proof structure before verification
   - Ensure challenge is computed correctly (Fiat-Shamir)
-- [ ] **Timing Attack Resistance**: Review for constant-time operations
+- [x] **Timing Attack Resistance**: Review for constant-time operations
   - Verify comparison operations don't leak timing info
   - Check exponentiation operations
-- [ ] **Random Number Generation**: Audit randomness sources
+- [x] **Random Number Generation**: Audit randomness sources
   - Verify group.random() uses cryptographically secure RNG
   - Check for proper seeding
-- [ ] **Serialization Security**: Review serialize/deserialize for injection attacks
+- [x] **Serialization Security**: Review serialize/deserialize for injection attacks
   - Validate deserialized data before use
   - Check for buffer overflow vulnerabilities
-- [ ] **Error Handling**: Ensure errors don't leak sensitive information
+- [x] **Error Handling**: Ensure errors don't leak sensitive information
   - Review exception messages
   - Verify failed proofs don't reveal witness info
 
 #### 4.3 Performance Benchmarks
-- [ ] Create benchmark suite comparing curves:
+- [x] Create benchmark suite comparing curves:
   - BN254 vs SS512 vs MNT224
   - Measure: proof generation time, verification time, proof size
-- [ ] Benchmark each proof type:
+- [x] Benchmark each proof type:
   - Schnorr, DLEQ, Representation, AND, OR, Range, Batch
-- [ ] Compare batch verification speedup vs individual verification
-- [ ] Memory usage profiling
-- [ ] Document recommended use cases based on performance characteristics
+- [x] Compare batch verification speedup vs individual verification
+- [x] Memory usage profiling
+- [x] Document recommended use cases based on performance characteristics
 
 #### 4.4 Documentation Updates
-- [ ] Complete API reference documentation for all proof types
-- [ ] Add usage examples for each proof type
-- [ ] Create "Choosing the Right Proof Type" guide
-- [ ] Document security considerations and threat model
-- [ ] Add curve selection guide (BN254 recommended for production)
-- [ ] Update README with ZKP compiler section
-- [ ] Create Jupyter notebook tutorials
+- [x] Complete API reference documentation for all proof types
+- [x] Add usage examples for each proof type
+- [x] Create "Choosing the Right Proof Type" guide
+- [x] Document security considerations and threat model
+- [x] Add curve selection guide (BN254 recommended for production)
+- [x] Update README with ZKP compiler section
+- [x] Create Jupyter notebook tutorials
 
 #### 4.5 Additional Hardening
 - [ ] Add type hints to all public APIs

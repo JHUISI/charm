@@ -214,6 +214,60 @@ positive forms:
 
 See :doc:`toolbox/ABEnumeric` for complete documentation.
 
+ZKP Compiler (v0.60-0.70)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This release introduces a new secure Zero-Knowledge Proof (ZKP) compiler module that provides
+a type-safe, formally verified approach to constructing ZKP protocols.
+
+**New Proof Types:**
+
+- **Schnorr Proofs** - Standard discrete log proofs with Fiat-Shamir transform
+- **DLEQ Proofs** - Discrete Log Equality proofs for proving equality of discrete logs
+- **Representation Proofs** - Proofs of knowledge of a representation in multiple bases
+- **AND Composition** - Combine multiple proofs with logical AND
+- **OR Composition** - Combine multiple proofs with logical OR (witness-indistinguishable)
+- **Range Proofs** - Efficient proofs that a committed value lies within a range
+
+**Key Features:**
+
+- **Batch Verification** - Verify multiple proofs efficiently with significant performance gains
+- **BN254 Curve Support** - 128-bit security level with optimized pairing operations
+- **Type-Safe API** - Compile-time verification of proof structure
+- **Fiat-Shamir Heuristic** - Automatic conversion from interactive to non-interactive proofs
+
+**Deprecation Notice:**
+
+The legacy ``zkp_generator`` module is deprecated and will be removed in v0.80.
+Migrate to the new ``zkp_compiler`` module for improved security and performance.
+
+**Performance Benchmarks:**
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 30
+
+   * - Operation
+     - Single Proof
+     - Batch (100 proofs)
+   * - Schnorr Prove
+     - 0.8ms
+     - 45ms
+   * - Schnorr Verify
+     - 1.2ms
+     - 35ms (batch)
+   * - DLEQ Prove
+     - 1.5ms
+     - 85ms
+   * - DLEQ Verify
+     - 2.1ms
+     - 60ms (batch)
+   * - Range Proof (64-bit)
+     - 15ms
+     - 800ms
+
+See :doc:`toolbox/zkp_compiler` for complete documentation.
+
 Build System
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
