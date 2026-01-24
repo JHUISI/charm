@@ -1,55 +1,143 @@
+"""
+Zero-Knowledge Statement Parser.
+
+This module provides a parser for ZK proof statements using pyparsing.
+It converts statements like "h = g^x" or "(h = g^x) and (j = g^y)" into
+a binary tree representation for processing by the ZKP compiler.
+
+Supported Syntax:
+    - Single variable names: x, y, g, h (backwards compatible)
+    - Multi-character variable names: x1, x2, alpha, beta, gamma (NEW in v0.61)
+    - Exponentiation: g^x, g1^x1
+    - Equality: h = g^x
+    - Conjunction: (h = g^x) and (j = g^y)
+    - Disjunction: (h = g^x) or (j = g^y)
+
+Examples::
+
+    parser = ZKParser()
+    result = parser.parse("h = g^x")  # Single-char variables
+    result = parser.parse("h1 = g1^x1")  # Multi-char variables
+    result = parser.parse("commitment = generator^secret")  # Descriptive names
+"""
 from pyparsing import *
 from charm.toolbox.zknode import *
-import string,sys
+import string
+import sys
 
 objStack = []
 
+
 def createNode(s, loc, toks):
+    """Create a BinNode from a parsed token."""
     print('createNode => ', toks)
     return BinNode(toks[0])
 
+
 # convert 'attr < value' to a binary tree based on 'or' and 'and'
 def parseNumConditional(s, loc, toks):
+    """Parse numeric conditional expressions."""
     print("print: %s" % toks)
     return BinNode(toks[0])
 
+
 def debug(s, loc, toks):
+    """Debug helper to print tokens."""
     print("print: %s" % toks)
     return toks
 
+
 def markPublic(s, loc, toks):
+    """Mark tokens as public variables."""
     print("public: %s" % toks)
     return toks
 
+
 def markSecret(s, loc, toks):
+    """Mark tokens as secret variables."""
     print("secret: %s" % toks)
     return toks
 
-        
-def pushFirst( s, loc, toks ):
-#    print("Pushing first =>", toks[0])
-    objStack.append( toks[0] )
+
+def pushFirst(s, loc, toks):
+    """Push the first token onto the object stack."""
+    # print("Pushing first =>", toks[0])
+    objStack.append(toks[0])
+
 
 def createTree(op, node1, node2):
-    if(op == "OR"):
+    """
+    Create a binary tree node for an operator.
+
+    Args:
+        op: The operator string ("OR", "AND", "^", "=")
+        node1: Left child node
+        node2: Right child node
+
+    Returns:
+        BinNode with the operator type and children
+    """
+    if op == "OR":
         node = BinNode(1)
-    elif(op == "AND"):
+    elif op == "AND":
         node = BinNode(2)
-    elif(op == "^"):
+    elif op == "^":
         node = BinNode(3)
-    elif(op == "="):
+    elif op == "=":
         node = BinNode(4)
-    else:    
+    else:
         return None
     node.addSubNode(node1, node2)
     return node
 
+
 class ZKParser:
+    """
+    Parser for Zero-Knowledge proof statements.
+
+    Converts ZK statements into binary tree representation for processing.
+
+    Supports both single-character variables (legacy) and multi-character
+    variable names (new in v0.61).
+
+    Examples::
+
+        parser = ZKParser()
+
+        # Single-character variables (legacy, still supported)
+        result = parser.parse("h = g^x")
+
+        # Multi-character variables (new in v0.61)
+        result = parser.parse("h1 = g1^x1")
+        result = parser.parse("commitment = generator^secret")
+
+        # Complex statements
+        result = parser.parse("(h = g^x) and (j = g^y)")
+        result = parser.parse("(pk1 = g^sk1) and (pk2 = g^sk2)")
+    """
+
     def __init__(self, verbose=False):
+        """
+        Initialize the ZK parser.
+
+        Args:
+            verbose: If True, print debug information during parsing
+        """
         self.finalPol = self.getBNF()
         self.verbose = verbose
 
     def getBNF(self):
+        """
+        Build the Backus-Naur Form grammar for ZK statements.
+
+        Returns:
+            pyparsing grammar object
+
+        Grammar supports:
+            - Variable names: alphanumeric starting with letter (e.g., x, x1, alpha)
+            - Operators: ^, =, AND, OR
+            - Parentheses for grouping
+        """
         # supported operators => (OR, AND, <
         OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
         OperatorAND = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
@@ -57,12 +145,16 @@ class ZKParser:
         rpar = Literal(")").suppress()
 
         ExpOp = Literal("^")
-        Equality = Literal("=") # | Literal("==") | Word("<>", max=1)
+        Equality = Literal("=")  # | Literal("==") | Word("<>", max=1)
         Token = Equality | ExpOp
         Operator = OperatorAND | OperatorOR | Token
 
         # describes an individual leaf node
-        leafNode = Word(alphas, max=1).setParseAction( createNode )
+        # UPDATED in v0.61: Support multi-character variable names
+        # Old: Word(alphas, max=1) - only single characters like x, y, g
+        # New: Word(alphas, alphanums) - alphanumeric starting with letter
+        #      Examples: x, x1, x2, alpha, beta, generator, secret
+        leafNode = Word(alphas, alphanums).setParseAction(createNode)
         # describes expressions such as (attr < value)
 #        leafConditional = (Word(alphanums) + ExpOp + Word(nums)).setParseAction( parseNumConditional )
 

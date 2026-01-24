@@ -54,9 +54,12 @@ charm/
 ├── toolbox/
 │   └── ZKProof.py              # Base class and exceptions
 └── zkp_compiler/
-    ├── schnorr_proof.py        # Schnorr DL proof (NEW)
-    ├── zkp_factory.py          # Factory for creating proofs (NEW)
-    ├── zkparser.py             # Statement parser (existing)
+    ├── schnorr_proof.py        # Schnorr DL proof (v0.60)
+    ├── dleq_proof.py           # DLEQ/Chaum-Pedersen proof (v0.61)
+    ├── representation_proof.py # Knowledge of Representation (v0.61)
+    ├── thread_safe.py          # Thread-safe wrappers (v0.61)
+    ├── zkp_factory.py          # Factory for creating proofs (v0.60)
+    ├── zkparser.py             # Statement parser (multi-char vars v0.61)
     ├── zkp_generator.py        # Legacy compiler (deprecated)
     └── zknode.py               # AST node types (existing)
 ```
@@ -305,11 +308,18 @@ proof = instance.prove()
 - [x] Add deprecation warnings to legacy API
 - [x] Comprehensive unit tests (>90% coverage)
 
-### Phase 2 (v0.61)
-- [ ] Implement DLEQ (Chaum-Pedersen) proof
-- [ ] Implement Knowledge of Representation proof
-- [ ] Add support for multi-character variable names
-- [ ] Thread-safe implementation
+### Phase 2 (v0.61) ✅
+- [x] Implement DLEQ (Chaum-Pedersen) proof - `charm/zkp_compiler/dleq_proof.py`
+- [x] Implement Knowledge of Representation proof - `charm/zkp_compiler/representation_proof.py`
+- [x] Add support for multi-character variable names - Updated `zkparser.py`
+- [x] Thread-safe implementation - `charm/zkp_compiler/thread_safe.py`
+
+**Phase 2 Implementation Notes:**
+- DLEQ proves h1 = g1^x AND h2 = g2^x for same secret x (Chaum-Pedersen protocol)
+- Representation proof supports n generators: h = g1^x1 * g2^x2 * ... * gn^xn
+- Parser now supports variable names like `x1`, `alpha`, `commitment` (was single-char only)
+- Non-interactive proof methods are thread-safe by design
+- Interactive provers/verifiers can use `ThreadSafeProver`/`ThreadSafeVerifier` wrappers
 
 ### Phase 3 (v0.62)
 - [ ] Implement AND composition
