@@ -58,6 +58,10 @@ charm/
     ├── dleq_proof.py           # DLEQ/Chaum-Pedersen proof (v0.61)
     ├── representation_proof.py # Knowledge of Representation (v0.61)
     ├── thread_safe.py          # Thread-safe wrappers (v0.61)
+    ├── and_proof.py            # AND composition (v0.62)
+    ├── or_proof.py             # OR composition/CDS94 (v0.62)
+    ├── range_proof.py          # Range proofs (v0.62)
+    ├── batch_verify.py         # Batch verification (v0.62)
     ├── zkp_factory.py          # Factory for creating proofs (v0.60)
     ├── zkparser.py             # Statement parser (multi-char vars v0.61)
     ├── zkp_generator.py        # Legacy compiler (deprecated)
@@ -321,11 +325,18 @@ proof = instance.prove()
 - Non-interactive proof methods are thread-safe by design
 - Interactive provers/verifiers can use `ThreadSafeProver`/`ThreadSafeVerifier` wrappers
 
-### Phase 3 (v0.62)
-- [ ] Implement AND composition
-- [ ] Implement OR composition (CDS94)
-- [ ] Implement Range Proofs
-- [ ] Batch verification
+### Phase 3 (v0.62) ✅
+- [x] Implement AND composition - `charm/zkp_compiler/and_proof.py`
+- [x] Implement OR composition (CDS94) - `charm/zkp_compiler/or_proof.py`
+- [x] Implement Range Proofs - `charm/zkp_compiler/range_proof.py`
+- [x] Batch verification - `charm/zkp_compiler/batch_verify.py`
+
+**Phase 3 Implementation Notes:**
+- AND composition: Combines multiple proofs with shared Fiat-Shamir challenge
+- OR composition: CDS94 technique - simulates unknown branch, challenges sum to main challenge
+- Range proofs: Bit decomposition approach with O(n) proof size for [0, 2^n) ranges
+- Batch verification: Random linear combination technique for efficient multi-proof verification
+- All implementations include comprehensive tests and documentation
 
 ### Phase 4 (v0.70)
 - [ ] Complete deprecation of legacy API
