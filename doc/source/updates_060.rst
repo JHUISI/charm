@@ -214,8 +214,8 @@ positive forms:
 
 See :doc:`toolbox/ABEnumeric` for complete documentation.
 
-ZKP Compiler (v0.60-0.70)
-^^^^^^^^^^^^^^^^^^^^^^^^^
+ZKP Compiler (v0.61)
+^^^^^^^^^^^^^^^^^^^^
 
 This release introduces a new secure Zero-Knowledge Proof (ZKP) compiler module that provides
 a type-safe, formally verified approach to constructing ZKP protocols.
@@ -238,7 +238,7 @@ a type-safe, formally verified approach to constructing ZKP protocols.
 
 **Deprecation Notice:**
 
-The legacy ``zkp_generator`` module is deprecated and will be removed in v0.80.
+The legacy ``zkp_generator`` module is deprecated and will be removed in v0.70.
 Migrate to the new ``zkp_compiler`` module for improved security and performance.
 
 **Performance Benchmarks:**

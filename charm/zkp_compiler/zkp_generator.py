@@ -4,7 +4,7 @@ Legacy ZKP Generator Module (DEPRECATED)
 
 .. deprecated:: 0.60
     This module uses insecure dynamic code generation (exec/compile) which
-    can lead to code injection vulnerabilities. It will be removed in v0.80.
+    can lead to code injection vulnerabilities. It will be removed in v0.70.
 
     For production use, please migrate to the new secure API:
 
@@ -40,7 +40,7 @@ from charm.core.engine.util import *
 
 # Emit deprecation warning when this module is imported
 warnings.warn(
-    "The zkp_generator module is deprecated and will be removed in v0.80. "
+    "The zkp_generator module is deprecated and will be removed in v0.70. "
     "It uses insecure dynamic code execution (exec/compile). "
     "Please migrate to charm.zkp_compiler.schnorr_proof or charm.zkp_compiler.zkp_factory. "
     "See doc/zkp_proof_types_design.md for migration guide.",

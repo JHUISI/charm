@@ -459,19 +459,19 @@ valid = instance.verify(proof)
 
 | Version | Status | Action |
 |---------|--------|--------|
-| **v0.60** | Current | New secure API introduced alongside legacy API |
-| **v0.70** | Deprecation | Legacy API emits `DeprecationWarning` on every use |
-| **v0.80** | Removal | Legacy API completely removed from codebase |
+| **v0.60** | Initial | New secure API introduced alongside legacy API |
+| **v0.61** | Current | Legacy API emits `DeprecationWarning` on every use |
+| **v0.70** | Removal | Legacy API removed from codebase |
 
-**Starting in v0.70**, using legacy functions will emit warnings:
+**Starting in v0.61**, using legacy functions will emit warnings:
 
 ```
-DeprecationWarning: executeIntZKProof() is deprecated and will be removed in v0.80.
+DeprecationWarning: executeIntZKProof() is deprecated and will be removed in v0.70.
 Use SchnorrProof.prove_non_interactive() instead. See migration guide at:
 https://github.com/JHUISI/charm/blob/dev/doc/zkp_proof_types_design.md#migration-guide
 ```
 
-**Recommended action**: Migrate to the new API before v0.80 to ensure continued compatibility.
+**Recommended action**: Migrate to the new API before v0.70 to ensure continued compatibility.
 
 ---
 
@@ -510,7 +510,7 @@ https://github.com/JHUISI/charm/blob/dev/doc/zkp_proof_types_design.md#migration
 - Batch verification: Random linear combination technique for efficient multi-proof verification
 - All implementations include comprehensive tests and documentation
 
-### Phase 4 (v0.70) - Production Hardening
+### Phase 4 (v0.61) - Production Hardening
 
 #### 4.1 Legacy API Deprecation
 - [x] Add `DeprecationWarning` to all legacy functions in `zkp_generator.py`:
@@ -519,7 +519,7 @@ https://github.com/JHUISI/charm/blob/dev/doc/zkp_proof_types_design.md#migration
   - `KoDLFixedBase()` and related internal functions
 - [x] Update `__init__.py` to emit import-time deprecation warning for legacy modules
 - [x] Add migration examples in deprecation messages pointing to new API
-- [x] Document removal timeline (suggest v0.80 for complete removal)
+- [x] Document removal timeline (suggest v0.70 for complete removal)
 
 #### 4.2 Security Audit Checklist
 - [x] **Input Validation**: Verify all public inputs are validated before use
