@@ -43,20 +43,9 @@ void printf_buffer_as_hex(uint8_t * data, size_t len)
 
 void setBigNum(PyLongObject *obj, BIGNUM **value) {
 	// convert Python long object to temporary decimal string
-#if PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 3)
-	/* for Python 3.3+ */
 	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10);
 	const char *tmp_str = (const char *)PyUnicode_DATA(strObj);
-#elif PY_MAJOR_VERSION == 3
-	/* for Python 3.0-3.2 */
-	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10);
-	const char *tmp_str = PyUnicode_AS_DATA(strObj);
-#else
-	/* for Python 2.x */
-	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10, 0, 0);
-	const char *tmp_str = PyString_AS_STRING(strObj);
-#endif
-	
+
 	// convert decimal string to OpenSSL bignum
 	BN_dec2bn(value, tmp_str);
 
@@ -75,10 +64,11 @@ void setBigNum(PyLongObject *obj, BIGNUM **value) {
  */
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA256_CTX sha2;
+	EVP_MD_CTX *ctx = NULL;
 	int i, new_input_len = input_len + 2; // extra byte for prefix
 	uint8_t first_block = 0;
 	uint8_t new_input[new_input_len+1];
+	unsigned int md_len = 0;
 
 	memset(new_input, 0, new_input_len+1);
 	new_input[0] = first_block; // block number (always 0 by default)
@@ -90,11 +80,14 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 	// prepare output buf
 	memset(output_buf, 0, hash_len);
 
+	ctx = EVP_MD_CTX_new();
+	if (ctx == NULL) return FALSE;
+
 	if (hash_len <= HASH_LEN) {
-		SHA256_Init(&sha2);
-		SHA256_Update(&sha2, new_input, new_input_len);
 		uint8_t md[HASH_LEN+1];
-		SHA256_Final(md, &sha2);
+		EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+		EVP_DigestUpdate(ctx, new_input, new_input_len);
+		EVP_DigestFinal_ex(ctx, md, &md_len);
 		memcpy(output_buf, md, hash_len);
 	}
 	else {
@@ -109,11 +102,11 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
 			target_buf += (i * HASH_LEN);
 			new_input[0] = (uint8_t) i;
-			SHA256_Init(&sha2);
+			EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
 			debug("input %d => ", i);
 			printf_buffer_as_hex(new_input, new_input_len);
-			SHA256_Update(&sha2, new_input, new_input_len);
-			SHA256_Final(md, &sha2);
+			EVP_DigestUpdate(ctx, new_input, new_input_len);
+			EVP_DigestFinal_ex(ctx, md, &md_len);
 			memcpy(target_buf, md, hash_len);
 			debug("block %d => ", i);
 			printf_buffer_as_hex(md, HASH_LEN);
@@ -123,7 +116,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 		memcpy(output_buf, md2, hash_len);
 	}
 
-	OPENSSL_cleanse(&sha2,sizeof(sha2));
+	EVP_MD_CTX_free(ctx);
 	return TRUE;
 }
 
@@ -227,7 +220,8 @@ int ECGroup_init(ECGroup *self, PyObject *args, PyObject *kwds)
 {
   PyObject *pObj = NULL, *aObj = NULL, *bObj = NULL;
   char *params = NULL, *param_string = NULL;
-  int pf_len, ps_len, nid;
+  Py_ssize_t pf_len, ps_len;
+  int nid;
   static char *kwlist[] = {"params", "param_string", "p", "a", "b", "nid", NULL};
 
   if (! PyArg_ParseTupleAndKeywords(args, kwds, "|s#s#OOOi", kwlist,
@@ -1215,7 +1209,7 @@ void set_element_from_hash(ECElement *self, uint8_t *input, int input_len)
 static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 
 	char *msg = NULL;
-	int msg_len;
+	Py_ssize_t msg_len;
 	GroupType type;
 	ECElement *hashObj = NULL;
 	ECGroup *gobj = NULL;
@@ -1228,7 +1222,7 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 		uint8_t hash_buf[hash_len+1];
 		if(type == G) {
 			// hash input bytes
-			hash_to_bytes((uint8_t *) msg, msg_len, hash_buf, hash_len, HASH_FUNCTION_STR_TO_G_CRH);
+			hash_to_bytes((uint8_t *) msg, (int) msg_len, hash_buf, hash_len, HASH_FUNCTION_STR_TO_G_CRH);
 			debug("Message => '%s'\n", msg);
 			debug("Digest  => ");
 			printf_buffer_as_hex(hash_buf, hash_len);
@@ -1238,7 +1232,7 @@ static PyObject *ECE_hash(ECElement *self, PyObject *args) {
 			return (PyObject *) hashObj;
 		}
 		else if(type == ZR) {
-			hash_to_bytes((uint8_t *) msg, msg_len, hash_buf, hash_len, HASH_FUNCTION_STR_TO_ZR_CRH);
+			hash_to_bytes((uint8_t *) msg, (int) msg_len, hash_buf, hash_len, HASH_FUNCTION_STR_TO_ZR_CRH);
 			debug("Message => '%s'\n", msg);
 			debug("Digest  => ");
 			printf_buffer_as_hex(hash_buf, hash_len);
@@ -1918,7 +1912,7 @@ void initelliptic_curve(void) 		{
 	RAND_load_file(rand_file, RAND_MAX_BYTES);
 #else
 	debug("Windows: seeding openssl prng.\n");
-	RAND_screen();
+	RAND_poll();
 #endif
 
 LEAVE:
@@ -1928,7 +1922,5 @@ LEAVE:
     INITERROR;
 	}
 
-#if PY_MAJOR_VERSION >= 3
 	return m;
-#endif
 }

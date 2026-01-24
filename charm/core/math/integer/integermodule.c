@@ -48,12 +48,7 @@ struct module_state {
 #endif
 };
 
-#if PY_MAJOR_VERSION >= 3
 #define GETSTATE(m) ((struct module_state *) PyModule_GetState(m))
-#else
-#define GETSTATE(m) (&_state)
-static struct module_state _state;
-#endif
 
 #ifdef BENCHMARK_ENABLED
 static Benchmark *tmpBench;
@@ -71,8 +66,8 @@ static Benchmark *tmpBench;
 			Py_INCREF(obj_dst->dBench); }
 
 #define CAST_TO_LONG(obj, lng) 	\
-	if(PyInt_Check(obj)) { 			\
-		lng = PyInt_AS_LONG(obj); }	\
+	if(PyLong_Check(obj)) { 			\
+		lng = PyLong_AsLong(obj); }	\
 	else {							\
 	  Py_INCREF(Py_NotImplemented);	\
 	  return Py_NotImplemented; }	\
@@ -234,7 +229,8 @@ void printf_buffer_as_hex(uint8_t *data, size_t len) {
  */
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA256_CTX sha2;
+	EVP_MD_CTX *ctx = NULL;
+	unsigned int md_len = 0;
 	int i, new_input_len = input_len + 2; // extra byte for prefix
 	uint8_t first_block = 0;
 	uint8_t new_input[new_input_len+1];
@@ -249,11 +245,14 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 	// prepare output buf
 	memset(output_buf, 0, hash_len);
 
+	ctx = EVP_MD_CTX_new();
+	if (ctx == NULL) return FALSE;
+
 	if (hash_len <= HASH_LEN) {
-		SHA256_Init(&sha2);
-		SHA256_Update(&sha2, new_input, new_input_len);
+		EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+		EVP_DigestUpdate(ctx, new_input, new_input_len);
 		uint8_t md[HASH_LEN+1];
-		SHA256_Final(md, &sha2);
+		EVP_DigestFinal_ex(ctx, md, &md_len);
 		memcpy(output_buf, md, hash_len);
 	}
 	else {
@@ -268,11 +267,11 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
 			target_buf += (i * HASH_LEN);
 			new_input[0] = (uint8_t) i;
-			SHA256_Init(&sha2);
+			EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
 			debug("input %d => ", i);
 			printf_buffer_as_hex(new_input, new_input_len);
-			SHA256_Update(&sha2, new_input, new_input_len);
-			SHA256_Final(md, &sha2);
+			EVP_DigestUpdate(ctx, new_input, new_input_len);
+			EVP_DigestFinal_ex(ctx, md, &md_len);
 			memcpy(target_buf, md, hash_len);
 			debug("block %d => ", i);
 			printf_buffer_as_hex(md, HASH_LEN);
@@ -282,7 +281,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 		memcpy(output_buf, md2, hash_len);
 	}
 
-	OPENSSL_cleanse(&sha2,sizeof(sha2));
+	EVP_MD_CTX_free(ctx);
 	return TRUE;
 }
 
@@ -904,13 +903,7 @@ static PyObject *Integer_pow(PyObject *o1, PyObject *o2, PyObject *o3) {
 	if (foundRHS) {
 		debug("foundRHS!\n");
 //		long rhs = PyLong_AsLong(o2);
-#if PY_MAJOR_VERSION < 3
-		PyObject *_o2 = PyNumber_Long(o2);
-		longObjToMPZ(exponent, _o2);
-		Py_DECREF(_o2);
-#else
 		longObjToMPZ(exponent, o2);
-#endif
 
 		if(PyErr_Occurred() || mpz_sgn(exponent) >= 0) {
 			//PyErr_Print(); // for debug purposes
@@ -2265,7 +2258,6 @@ PyMethodDef Integer_methods[] = {
 	{ NULL }
 };
 
-#if PY_MAJOR_VERSION >= 3
 PyNumberMethods integer_number = {
 	Integer_add, /* nb_add */
 	Integer_sub, /* nb_subtract */
@@ -2343,93 +2335,6 @@ PyTypeObject IntegerType = {
 	0, /* tp_alloc */
 	Integer_new, /* tp_new */
 };
-#else
-/* python 2.x series */
-PyNumberMethods integer_number = {
-    Integer_add,                       /* nb_add */
-    Integer_sub,                       /* nb_subtract */
-    Integer_mul,                        /* nb_multiply */
-    Integer_div,                       /* nb_divide */
-    Integer_remainder,                      /* nb_remainder */
-    0,						/* nb_divmod */
-    Integer_pow,						/* nb_power */
-    0,            		/* nb_negative */
-    0,            /* nb_positive */
-    0,            /* nb_absolute */
-    0,          	/* nb_nonzero */
-    (unaryfunc)Integer_invert,         /* nb_invert */
-    0,                    /* nb_lshift */
-    0,                    /* nb_rshift */
-    0,                       /* nb_and */
-    Integer_xor,                       /* nb_xor */
-    0,                        /* nb_or */
-    0,                    				/* nb_coerce */
-    (unaryfunc)Integer_long,            /* nb_int */
-    (unaryfunc)Integer_long,           /* nb_long */
-    0,          /* nb_float */
-    0,            /* nb_oct */
-    0,            /* nb_hex */
-    Integer_add,                      /* nb_inplace_add */
-    Integer_sub,                      /* nb_inplace_subtract */
-    Integer_mul,                      /* nb_inplace_multiply */
-    Integer_div,                      /* nb_inplace_divide */
-    0,                      /* nb_inplace_remainder */
-    0,								/* nb_inplace_power */
-    0,                   /* nb_inplace_lshift */
-    0,                   /* nb_inplace_rshift */
-    0,                      /* nb_inplace_and */
-    0,                      /* nb_inplace_xor */
-    0,                       /* nb_inplace_or */
-    0,                  /* nb_floor_divide */
-    0,                   /* nb_true_divide */
-    0,                 /* nb_inplace_floor_divide */
-    0,                  /* nb_inplace_true_divide */
-    0,          /* nb_index */
-};
-
-PyTypeObject IntegerType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "integer.Element",             /*tp_name*/
-    sizeof(Integer),             /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)Integer_dealloc, /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    &integer_number,       /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0, 						/*tp_call*/
-    (reprfunc)Integer_print,   /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_CHECKTYPES, /*tp_flags*/
-    "Modular Integer objects",           /* tp_doc */
-    0,		               /* tp_traverse */
-    0,		               /* tp_clear */
-    Integer_equals,		   /* tp_richcompare */
-    0,		               /* tp_weaklistoffset */
-    0,		               /* tp_iter */
-    0,		               /* tp_iternext */
-    Integer_methods,           /* tp_methods */
-    0,           /* tp_members */
-    0,                         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc) Integer_init,      /* tp_init */
-    0,                         /* tp_alloc */
-    Integer_new,                 /* tp_new */
-};
-
-#endif
 
 /* global module methods (include isPrime, randomPrime, etc. here). */
 PyMethodDef module_methods[] = {
@@ -2460,7 +2365,6 @@ PyMethodDef module_methods[] = {
 	{ NULL, NULL }
 };
 
-#if PY_MAJOR_VERSION >= 3
 static int int_traverse(PyObject *m, visitproc visit, void *arg) {
 	Py_VISIT(GETSTATE(m)->error);
 #if defined(BENCHMARK_ENABLED)
@@ -2499,11 +2403,6 @@ static struct PyModuleDef moduledef = {
 #define INITERROR return NULL
 PyMODINIT_FUNC
 PyInit_integer(void) {
-#else
-#define CLEAN_EXIT goto LEAVE;
-#define INITERROR return
-void initinteger(void) {
-#endif
 	PyObject *m=NULL;
 	if (PyType_Ready(&IntegerType) < 0)
 		CLEAN_EXIT;
@@ -2515,11 +2414,7 @@ void initinteger(void) {
 #endif
 
 	// initialize module
-#if PY_MAJOR_VERSION >= 3
 	m = PyModule_Create(&moduledef);
-#else
-	m = Py_InitModule("integer", module_methods);
-#endif
 	// add integer type to module
 	struct module_state *st = GETSTATE(m);
 	st->error = PyErr_NewException("integer.Error", NULL, NULL);
@@ -2546,7 +2441,7 @@ void initinteger(void) {
 	RAND_load_file(rand_file, RAND_MAX_BYTES);
 #else
 	debug("Windows: seeding openssl prng.\n");
-	RAND_screen();
+	RAND_poll();
 #endif
 
 LEAVE:
@@ -2560,7 +2455,5 @@ LEAVE:
    }
 
    debug("importing integer module.\n");
-#if PY_MAJOR_VERSION >= 3
 	return m;
-#endif
 }

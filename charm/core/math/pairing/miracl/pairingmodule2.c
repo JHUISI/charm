@@ -435,7 +435,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 {
 	char *params = NULL, *param_string = NULL;
-	size_t b_len = 0;
+	Py_ssize_t b_len = 0;
 	int aes_sec = -1;
     static char *kwlist[] = {"aes_sec", "params", "param_string", NULL};
 	
@@ -1568,7 +1568,7 @@ PyObject *AES_Encrypt(Element *self, PyObject *args)
 {
 	PyObject *keyObj = NULL, *tmp_obj = NULL; // string or bytes object
 	char *messageStr;
-	int m_len = 0;
+	Py_ssize_t m_len = 0;
 
 	if(!PyArg_ParseTuple(args, "Os#", &keyObj, &messageStr, &m_len)) {
 		PyErr_SetString(ElementError, "invalid arguments.");
@@ -1588,7 +1588,7 @@ PyObject *AES_Encrypt(Element *self, PyObject *args)
 		// perform AES encryption using miracl
 		char *cipher = NULL;
 
-		int c_len = aes_encrypt(keyStr, messageStr, m_len, &cipher);
+		int c_len = aes_encrypt(keyStr, messageStr, (int) m_len, &cipher);
 
 		PyObject *str = PyBytes_FromStringAndSize((const char *) cipher, c_len);
 		free(cipher);
@@ -1604,7 +1604,7 @@ PyObject *AES_Decrypt(Element *self, PyObject *args)
 {
 	PyObject *keyObj = NULL, *tmp_obj = NULL; // string or bytes object
 	char *ciphertextStr;
-	int c_len = 0;
+	Py_ssize_t c_len = 0;
 
 	if(!PyArg_ParseTuple(args, "Os#", &keyObj, &ciphertextStr, &c_len)) {
 		PyErr_SetString(ElementError, "invalid arguments.");
@@ -1619,7 +1619,7 @@ PyObject *AES_Decrypt(Element *self, PyObject *args)
 		// perform AES encryption using miracl
 		char *message = NULL;
 
-		int m_len = aes_decrypt(keyStr, ciphertextStr, c_len, &message);
+		int m_len = aes_decrypt(keyStr, ciphertextStr, (int) c_len, &message);
 
 		PyObject *str = PyBytes_FromStringAndSize((const char *) message, m_len);
 		free(message);

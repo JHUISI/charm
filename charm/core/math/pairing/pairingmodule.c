@@ -379,7 +379,8 @@ char * init_pbc_param(char *file, pairing_t *pairing)
  */
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA256_CTX sha2;
+	EVP_MD_CTX *ctx = NULL;
+	unsigned int md_len = 0;
 	const int new_input_len = input_len + 2; // extra byte for prefix
 	uint8_t new_input[new_input_len];
 //	printf("orig input => \n");
@@ -394,11 +395,14 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 	// prepare output buf
 	memset(output_buf, 0, hash_len);
 
+	ctx = EVP_MD_CTX_new();
+	if (ctx == NULL) return FALSE;
+
 	if (hash_len <= HASH_LEN) {
-		SHA256_Init(&sha2);
-		SHA256_Update(&sha2, new_input, new_input_len);
+		EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+		EVP_DigestUpdate(ctx, new_input, new_input_len);
 		uint8_t md[HASH_LEN];
-		SHA256_Final(md, &sha2);
+		EVP_DigestFinal_ex(ctx, md, &md_len);
 		memcpy(output_buf, md, hash_len);
 	}
 	else {
@@ -410,17 +414,17 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
 			uint8_t md[HASH_LEN];
 			new_input[0] = (uint8_t)(i+1);
-			SHA256_Init(&sha2);
+			EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
 			int size = new_input_len;
-			SHA256_Update(&sha2, new_input, size);
-			SHA256_Final(md, &sha2);
+			EVP_DigestUpdate(ctx, new_input, size);
+			EVP_DigestFinal_ex(ctx, md, &md_len);
 			memcpy(md2 +(i * HASH_LEN), md, HASH_LEN);
 		}
-		
+
 		// copy back to caller
 		memcpy(output_buf, md2, hash_len);
 	}
-	OPENSSL_cleanse(&sha2,sizeof(sha2));
+	EVP_MD_CTX_free(ctx);
 	return TRUE;
 }
 
@@ -561,7 +565,7 @@ int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 	char *param_buf2 = NULL;
 	PyObject *n = NULL, *short_val = NULL;
 	int qbits = 0, rbits = 0;
-	size_t b_len = 0;
+	Py_ssize_t b_len = 0;
 	int seed = -1;
 	uint8_t hash_id[HASH_LEN+1];
 	

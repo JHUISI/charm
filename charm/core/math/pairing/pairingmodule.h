@@ -59,6 +59,7 @@
 #include <openssl/objects.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
+#include <openssl/evp.h>
 #ifdef BENCHMARK_ENABLED
 #include "benchmark_util.h"
 #endif

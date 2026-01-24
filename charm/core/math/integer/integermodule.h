@@ -60,6 +60,7 @@
 #include <openssl/rand.h>
 #include <openssl/bn.h>
 #include <openssl/sha.h>
+#include <openssl/evp.h>
 
 /* integermath */
 #define MAX_RUN  	25
@@ -69,8 +70,6 @@
 #define ErrorMsg(msg) \
 	PyErr_SetString(IntegerError, msg); \
 	return NULL;
-
-#if PY_MAJOR_VERSION >= 3
 
 #define Convert_Types(left, right, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured)  \
 	if(PyInteger_Check(left)) { \
@@ -99,42 +98,6 @@
 	else if(PyLong_Check(o2)) {  \
 		foundRHS = TRUE; }  \
 	else { ErrorMsg("invalid right operand type."); }
-
-#else
-/* python 2.x series */
-#define Convert_Types(left, right, lhs, rhs, foundLHS, foundRHS, lhs_mpz, rhs_mpz, errorOccured)  \
-	if(PyInteger_Check(left)) { \
-		lhs = (Integer *) left; } \
-	else if(PyLong_Check(left) || PyInt_Check(left)) { \
-		PyObject *_left = PyNumber_Long(left); \
-		longObjToMPZ(lhs_mpz, _left);	\
-		foundLHS = TRUE;  Py_XDECREF(_left); } \
-	else { errorOccured = TRUE; } \
-						\
-	if(PyInteger_Check(right)) {  \
-		rhs = (Integer *) right; } \
-	else if(PyLong_Check(right) || PyInt_Check(right)) { \
-		PyObject *_right = PyNumber_Long(right); \
-		longObjToMPZ(rhs_mpz, _right);	\
-		foundRHS = TRUE;  Py_XDECREF(_right); } \
-	else { errorOccured = TRUE; }
-
-// TODO: revisit o1 & o2 in 2nd if blocks
-#define Convert_Types2(o1, o2, lhs, rhs, foundLHS, foundRHS)  \
-	if(PyInteger_Check(o1)) { \
-		lhs = (Integer *) o1; } \
-	else if(PyLong_Check(o1) || PyInt_Check(o1)) { \
-		foundLHS = TRUE;  } \
-	else { ErrorMsg("invalid left operand type."); } \
-							\
-	if(PyInteger_Check(o2)) {  \
-		rhs = (Integer *) o2; } \
-	else if(PyLong_Check(o2) || PyInt_Check(o2)) {  \
-		foundRHS = TRUE; }  \
-	else { ErrorMsg("invalid right operand type."); }
-
-
-#endif
 
 //#ifdef BENCHMARK_ENABLED
 //static Benchmark *dBench;
