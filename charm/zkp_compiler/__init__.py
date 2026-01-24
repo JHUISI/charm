@@ -20,7 +20,7 @@ The following modules provide secure, production-ready ZKP implementations:
 
 Deprecated (Legacy) API
 -----------------------
-The following module is DEPRECATED and will be removed in v0.70:
+The following module is DEPRECATED and will be removed in v0.80:
 
 - :mod:`charm.zkp_compiler.zkp_generator` - Uses insecure exec()/compile()
 
