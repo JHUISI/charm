@@ -141,25 +141,79 @@ class TestSchnorrProofNonInteractive(unittest.TestCase):
 
 class TestSchnorrProofWithDifferentGroups(unittest.TestCase):
     """Test Schnorr proofs with different pairing groups."""
-    
+
     def test_with_bn254_group(self):
         """Test with BN254 pairing group."""
         self._test_with_group('BN254')
-    
+
     def test_with_mnt224_group(self):
         """Test with MNT224 pairing group."""
         self._test_with_group('MNT224')
-    
+
     def _test_with_group(self, curve_name):
         """Helper to test with a specific group."""
         group = PairingGroup(curve_name)
         g = group.random(G1)
         x = group.random(ZR)
         h = g ** x
-        
+
         proof = SchnorrProof.prove_non_interactive(group, g, h, x)
         result = SchnorrProof.verify_non_interactive(group, g, h, proof)
         self.assertTrue(result)
+
+
+class TestSchnorrProofSecurity(unittest.TestCase):
+    """Security-focused tests for Schnorr proofs."""
+
+    def setUp(self):
+        """Set up test fixtures."""
+        self.group = PairingGroup('BN254')
+        self.g = self.group.random(G1)
+        self.x = self.group.random(ZR)
+        self.h = self.g ** self.x
+
+    def test_invalid_proof_structure_rejected(self):
+        """Test that proofs with missing attributes are rejected."""
+        # Create a fake proof object without required attributes
+        class FakeProof:
+            pass
+
+        fake_proof = FakeProof()
+        result = SchnorrProof.verify_non_interactive(self.group, self.g, self.h, fake_proof)
+        self.assertFalse(result)
+
+    def test_identity_commitment_rejected(self):
+        """Test that proofs with identity element commitment are rejected."""
+        # Create a valid proof first
+        proof = SchnorrProof.prove_non_interactive(self.group, self.g, self.h, self.x)
+
+        # Replace commitment with identity element
+        identity = self.group.init(G1, 1)
+        tampered_proof = Proof(
+            commitment=identity,
+            challenge=proof.challenge,
+            response=proof.response,
+            proof_type='schnorr'
+        )
+
+        result = SchnorrProof.verify_non_interactive(self.group, self.g, self.h, tampered_proof)
+        self.assertFalse(result)
+
+    def test_challenge_mismatch_rejected(self):
+        """Test that proofs with wrong challenge are rejected."""
+        proof = SchnorrProof.prove_non_interactive(self.group, self.g, self.h, self.x)
+
+        # Tamper with the challenge
+        wrong_challenge = self.group.random(ZR)
+        tampered_proof = Proof(
+            commitment=proof.commitment,
+            challenge=wrong_challenge,
+            response=proof.response,
+            proof_type='schnorr'
+        )
+
+        result = SchnorrProof.verify_non_interactive(self.group, self.g, self.h, tampered_proof)
+        self.assertFalse(result)
 
 
 if __name__ == "__main__":

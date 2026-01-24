@@ -332,7 +332,28 @@ class DLEQProof:
 
         Returns:
             True if proof is valid, False otherwise
+
+        Security Notes:
+            - Validates proof structure before verification
+            - Checks for identity element attacks
+            - Recomputes Fiat-Shamir challenge for consistency
         """
+        # Security: Validate proof structure
+        required_attrs = ['commitment1', 'commitment2', 'challenge', 'response']
+        for attr in required_attrs:
+            if not hasattr(proof, attr):
+                logger.warning("Invalid DLEQ proof structure: missing %s", attr)
+                return False
+
+        # Security: Check for identity element (potential attack vector)
+        try:
+            identity = group.init(G1, 1)
+            if proof.commitment1 == identity or proof.commitment2 == identity:
+                logger.warning("Security: DLEQ proof commitment is identity element")
+                return False
+        except Exception:
+            pass  # Some groups may not support identity check
+
         # Recompute challenge c = hash(g1, h1, g2, h2, u1, u2)
         expected_challenge = cls._compute_challenge_hash(
             group, g1, h1, g2, h2, proof.commitment1, proof.commitment2)

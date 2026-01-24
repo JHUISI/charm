@@ -191,7 +191,27 @@ class SchnorrProof:
 
         Returns:
             True if proof is valid, False otherwise
+
+        Security Notes:
+            - Validates proof structure before verification
+            - Checks for identity element attacks
+            - Recomputes Fiat-Shamir challenge for consistency
         """
+        # Security: Validate proof structure
+        if not hasattr(proof, 'commitment') or not hasattr(proof, 'challenge') or not hasattr(proof, 'response'):
+            logger.warning("Invalid proof structure: missing required attributes")
+            return False
+
+        # Security: Check for identity element (potential attack vector)
+        # The identity element would make the verification equation trivially true
+        try:
+            identity = group.init(G1, 1)
+            if proof.commitment == identity:
+                logger.warning("Security: Proof commitment is identity element")
+                return False
+        except Exception:
+            pass  # Some groups may not support identity check
+
         # Recompute challenge c = hash(g, h, commitment)
         expected_challenge = cls._compute_challenge_hash(group, g, h, proof.commitment)
 
