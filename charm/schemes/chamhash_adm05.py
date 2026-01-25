@@ -39,43 +39,40 @@ class ChamHash_Adm05(ChamHash):
 
     def __init__(self, p=0, q=0):
         ChamHash.__init__(self)
-        global group
-        group = IntegerGroupQ(0)
+        self.group = IntegerGroupQ(0)
         # if p and q parameters have already been selected
-        group.p, group.q, group.r = p, q, 2
-        self.group = group        
-    
+        self.group.p, self.group.q, self.group.r = p, q, 2
+
     def paramgen(self, secparam=1024):
-        if group.p == 0 or group.q == 0:
-            group.paramgen(secparam)
-        g, x = group.randomGen(), group.random()    # g, [1,q-1]
+        if self.group.p == 0 or self.group.q == 0:
+            self.group.paramgen(secparam)
+        g, x = self.group.randomGen(), self.group.random()    # g, [1,q-1]
         y = g ** x
-        
+
         if debug:
             print("Public params")
             print("g =>", g); print("y =>", y)
-        
+
         pk = {'g': g, 'y': y}
         sk = {'x': x}
         return pk, sk
-    
+
     def hash(self, pk, m, r=0, s=0):
-        p, q = group.p, group.q
+        p, q = self.group.p, self.group.q
         if r == 0:
-            r = group.random()
+            r = self.group.random()
         if s == 0:
-            s = group.random()
-        e = group.hash(m, r)
-        
+            s = self.group.random()
+        e = self.group.hash(m, r)
+
         C = r - (((pk['y'] ** e) * (pk['g'] ** s)) % p) % q
         return C, r, s
 
-    @staticmethod
-    def find_collision(pk, sk, C, new_message):
-        p, q = group.p, group.q
-        k_prime = group.random()
+    def find_collision(self, pk, sk, C, new_message):
+        p, q = self.group.p, self.group.q
+        k_prime = self.group.random()
         r_prime = C + ((pk['g'] ** k_prime) % p) % q
-        e_prime = group.hash(new_message, r_prime)
+        e_prime = self.group.hash(new_message, r_prime)
         s_prime = (k_prime - (e_prime * sk['x'])) % q
         C_prime = r_prime - (((pk['y'] ** e_prime) * (pk['g'] ** s_prime)) % p) % q
         return C_prime, r_prime, s_prime
