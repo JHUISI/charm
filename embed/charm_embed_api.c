@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface for C/C++ applications
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  *
  ************************************************************************/
 

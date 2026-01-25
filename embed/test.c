@@ -23,7 +23,7 @@
  *
  *   @brief   Example usage of the Charm embed API for C/C++ applications
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  *
  *   This file demonstrates how to use the Charm embed API to perform
  *   attribute-based encryption (ABE) operations from C code.

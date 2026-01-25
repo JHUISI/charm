@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface over GMP multi-precision integers
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  *
  ************************************************************************/
 

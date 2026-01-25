@@ -218,7 +218,7 @@ setup(
     long_description_content_type='text/markdown',
     ext_modules=_ext_modules,
     author="J. Ayo Akinyele",
-    author_email="ayo.akinyele@charm-crypto.com",
+    author_email="jakinye3@jhu.edu",
     url="https://charm-crypto.io/",
     project_urls={
         "Documentation": "https://charm-crypto.io/documentation",

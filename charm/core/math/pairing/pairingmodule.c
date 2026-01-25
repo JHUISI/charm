@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface over PBC library
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  *
  ************************************************************************/
 
