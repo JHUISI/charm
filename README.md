@@ -43,7 +43,7 @@ Charm requires the following system libraries:
 | Library | Version | Purpose |
 |---------|---------|---------|
 | [GMP](http://gmplib.org/) | 5.0+ | Arbitrary precision arithmetic |
-| [PBC](http://crypto.stanford.edu/pbc/download.html) | 0.5.14+ | Pairing-based cryptography |
+| [PBC](http://crypto.stanford.edu/pbc/download.html) | 1.0.0 | Pairing-based cryptography |
 | [OpenSSL](http://www.openssl.org/source/) | 1.1+ | Cryptographic primitives |
 
 **Ubuntu/Debian:**
@@ -58,9 +58,9 @@ brew install gmp openssl@3 pbc
 
 **PBC from Source** (if not available via package manager):
 ```bash
-wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
-tar xzf pbc-0.5.14.tar.gz
-cd pbc-0.5.14
+wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+tar xzf pbc-1.0.0.tar.gz
+cd pbc-1.0.0
 ./configure && make && sudo make install
 ```
 
