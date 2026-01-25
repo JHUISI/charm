@@ -83,10 +83,10 @@ Dependency Version Changes
      - Low (more permissive)
    * - OpenSSL
      - 1.0.x / 1.1.x
-     - **1.1.x / 3.x**
+     - **3.x**
      - Medium
 
-**OpenSSL Migration**: Ensure OpenSSL 1.1.0+ or 3.x is installed:
+**OpenSSL Migration**: Ensure OpenSSL 3.x is installed:
 
 - macOS: ``brew install openssl@3``
 - Ubuntu/Debian: ``apt install libssl-dev``
@@ -139,7 +139,7 @@ Migration Checklist
 Before upgrading from v0.50 to v0.60:
 
 1. ☐ Verify Python version is 3.8+: ``python --version``
-2. ☐ Verify OpenSSL version is 1.1.0+: ``openssl version``
+2. ☐ Verify OpenSSL version is 3.x: ``openssl version``
 3. ☐ Update package name in requirements: ``Charm-Crypto`` → ``charm-crypto``
 4. ☐ Remove any ``python setup.py uninstall`` usage (use ``pip uninstall``)
 5. ☐ Check for direct ``_counter`` module usage (ensure code handles ``bytes``)
