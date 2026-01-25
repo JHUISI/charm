@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,76 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-sigma2">
-<span id="sigma2"></span><h1>sigma2<a class="headerlink" href="#module-sigma2" title="Link to this heading">¶</a></h1>
-<p><strong>Sigma Protocol 2 (Sigma2)</strong></p>
-<p><em>Authors:</em> Charm Developers</p>
-<div class="line-block">
-<div class="line"><strong>Notes:</strong> Sigma protocol for proving knowledge with pairing-based verification</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> sigma protocol (zero-knowledge proof)</p></li>
-<li><p><strong>Setting:</strong> bilinear groups (pairing-based)</p></li>
-<li><p><strong>Assumption:</strong> DL</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><ol class="upperalpha simple" start="10">
-<li><p>Ayo Akinyele</p></li>
-</ol>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>2/2012</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="sigma2.SigmaProtocol2">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sigma2.</span></span><span class="sig-name descname"><span class="pre">SigmaProtocol2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sigma2.html#SigmaProtocol2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sigma2.SigmaProtocol2" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sigma</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="sigma2.SigmaProtocol2.gen_common">
-<span class="sig-name descname"><span class="pre">gen_common</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sigma2.html#SigmaProtocol2.gen_common"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sigma2.SigmaProtocol2.gen_common" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="sigma2.SigmaProtocol2.prover_state1">
-<span class="sig-name descname"><span class="pre">prover_state1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sigma2.html#SigmaProtocol2.prover_state1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sigma2.SigmaProtocol2.prover_state1" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="sigma2.SigmaProtocol2.prover_state3">
-<span class="sig-name descname"><span class="pre">prover_state3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sigma2.html#SigmaProtocol2.prover_state3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sigma2.SigmaProtocol2.prover_state3" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="sigma2.SigmaProtocol2.prover_state5">
-<span class="sig-name descname"><span class="pre">prover_state5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sigma2.html#SigmaProtocol2.prover_state5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sigma2.SigmaProtocol2.prover_state5" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="sigma2.SigmaProtocol2.verifier_state2">
-<span class="sig-name descname"><span class="pre">verifier_state2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sigma2.html#SigmaProtocol2.verifier_state2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sigma2.SigmaProtocol2.verifier_state2" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="sigma2.SigmaProtocol2.verifier_state4">
-<span class="sig-name descname"><span class="pre">verifier_state4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sigma2.html#SigmaProtocol2.verifier_state4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sigma2.SigmaProtocol2.verifier_state4" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="sigma2.SigmaProtocol2.verifier_state6">
-<span class="sig-name descname"><span class="pre">verifier_state6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sigma2.html#SigmaProtocol2.verifier_state6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sigma2.SigmaProtocol2.verifier_state6" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="sigma2">
+<h1>sigma2<a class="headerlink" href="#sigma2" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -518,36 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">sigma2</a><ul>
-<li><a class="reference internal" href="#sigma2.SigmaProtocol2"><code class="docutils literal notranslate"><span class="pre">SigmaProtocol2</span></code></a><ul>
-<li><a class="reference internal" href="#sigma2.SigmaProtocol2.gen_common"><code class="docutils literal notranslate"><span class="pre">SigmaProtocol2.gen_common()</span></code></a></li>
-<li><a class="reference internal" href="#sigma2.SigmaProtocol2.prover_state1"><code class="docutils literal notranslate"><span class="pre">SigmaProtocol2.prover_state1()</span></code></a></li>
-<li><a class="reference internal" href="#sigma2.SigmaProtocol2.prover_state3"><code class="docutils literal notranslate"><span class="pre">SigmaProtocol2.prover_state3()</span></code></a></li>
-<li><a class="reference internal" href="#sigma2.SigmaProtocol2.prover_state5"><code class="docutils literal notranslate"><span class="pre">SigmaProtocol2.prover_state5()</span></code></a></li>
-<li><a class="reference internal" href="#sigma2.SigmaProtocol2.verifier_state2"><code class="docutils literal notranslate"><span class="pre">SigmaProtocol2.verifier_state2()</span></code></a></li>
-<li><a class="reference internal" href="#sigma2.SigmaProtocol2.verifier_state4"><code class="docutils literal notranslate"><span class="pre">SigmaProtocol2.verifier_state4()</span></code></a></li>
-<li><a class="reference internal" href="#sigma2.SigmaProtocol2.verifier_state6"><code class="docutils literal notranslate"><span class="pre">SigmaProtocol2.verifier_state6()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

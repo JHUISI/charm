@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -200,22 +200,19 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
-<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../miracl.html">Building MIRACL for Charm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cryptographers.html">For Cryptographers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers.html">For App Developers</a></li>
 </ul>
-<ul>
+<ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
@@ -296,20 +293,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
-</ul>
-</li>
-</ul>
-<ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
@@ -353,6 +337,19 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
+</ul>
+</li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../test/conversion_test.html">conversion_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../test/ecgroup_test.html">ecgroup_test</a></li>
@@ -363,6 +360,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../test/test_policy_expression.html">test_policy_expression</a></li>
 </ul>
 </li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
 </ul>
 
 </div>
@@ -400,192 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-pairinggroup">
-<span id="pairinggroup"></span><h1>pairinggroup<a class="headerlink" href="#module-pairinggroup" title="Link to this heading">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pairinggroup.</span></span><span class="sig-name descname"><span class="pre">PairingGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.EndBenchmark">
-<span class="sig-name descname"><span class="pre">EndBenchmark</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.EndBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.EndBenchmark" title="Link to this definition">¶</a></dt>
-<dd><p>ends an ongoing benchmark</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.GetBenchmark">
-<span class="sig-name descname"><span class="pre">GetBenchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.GetBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.GetBenchmark" title="Link to this definition">¶</a></dt>
-<dd><p>retrieves benchmark results for any of these options: 
-RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Pair, Granular</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.GetGeneralBenchmarks">
-<span class="sig-name descname"><span class="pre">GetGeneralBenchmarks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.GetGeneralBenchmarks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.GetGeneralBenchmarks" title="Link to this definition">¶</a></dt>
-<dd><p>retrieves benchmark count for all group operations</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.GetGranularBenchmarks">
-<span class="sig-name descname"><span class="pre">GetGranularBenchmarks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.GetGranularBenchmarks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.GetGranularBenchmarks" title="Link to this definition">¶</a></dt>
-<dd><p>retrieves group operation count per type: ZR, G1, G2, and GT</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.InitBenchmark">
-<span class="sig-name descname"><span class="pre">InitBenchmark</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.InitBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.InitBenchmark" title="Link to this definition">¶</a></dt>
-<dd><p>initiates the benchmark state</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.StartBenchmark">
-<span class="sig-name descname"><span class="pre">StartBenchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.StartBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.StartBenchmark" title="Link to this definition">¶</a></dt>
-<dd><p>starts the benchmark with any of these options: 
-RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Pair, Granular</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.debug">
-<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.debug" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.decode" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.deserialize">
-<span class="sig-name descname"><span class="pre">deserialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.deserialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.deserialize" title="Link to this definition">¶</a></dt>
-<dd><p>Deserialize a bytes serialized element into a pairing object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>compression</strong> – must be used for objects serialized with the
-compression parameter set to True. Default is True for
-compatibility with previous versions of charm.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.encode">
-<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.encode" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.groupSetting">
-<span class="sig-name descname"><span class="pre">groupSetting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.groupSetting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.groupSetting" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.groupType">
-<span class="sig-name descname"><span class="pre">groupType</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.groupType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.groupType" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.hash">
-<span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.hash" title="Link to this definition">¶</a></dt>
-<dd><p>hashes objects into ZR, G1 or G2 depending on the pairing curve</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.init">
-<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.init" title="Link to this definition">¶</a></dt>
-<dd><p>initializes an object with a specified type and value</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.ismember">
-<span class="sig-name descname"><span class="pre">ismember</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.ismember"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.ismember" title="Link to this definition">¶</a></dt>
-<dd><p>membership test for a pairing object</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.ismemberDict">
-<span class="sig-name descname"><span class="pre">ismemberDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.ismemberDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.ismemberDict" title="Link to this definition">¶</a></dt>
-<dd><p>membership test for a dict of pairing objects</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.ismemberList">
-<span class="sig-name descname"><span class="pre">ismemberList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.ismemberList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.ismemberList" title="Link to this definition">¶</a></dt>
-<dd><p>membership test for a list of pairing objects</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.messageSize">
-<span class="sig-name descname"><span class="pre">messageSize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.messageSize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.messageSize" title="Link to this definition">¶</a></dt>
-<dd><p>after filling complete bytes with every 8 bits, any remaining 1, 2, …, 7 more bits will occupy an additional byte, even if they do not form a complete byte</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.order">
-<span class="sig-name descname"><span class="pre">order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.order" title="Link to this definition">¶</a></dt>
-<dd><p>returns the order of the group</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.pair_prod">
-<span class="sig-name descname"><span class="pre">pair_prod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.pair_prod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.pair_prod" title="Link to this definition">¶</a></dt>
-<dd><p>takes two lists of G1 &amp; G2 and computes a pairing product</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.paramgen">
-<span class="sig-name descname"><span class="pre">paramgen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qbits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rbits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.paramgen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.paramgen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.random">
-<span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.random" title="Link to this definition">¶</a></dt>
-<dd><p>selects one or more random elements in ZR, G1, G2 and GT</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pairinggroup.PairingGroup.serialize">
-<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#PairingGroup.serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.PairingGroup.serialize" title="Link to this definition">¶</a></dt>
-<dd><p>Serialize a pairing object into bytes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>compression</strong> – <dl class="simple">
-<dt>serialize the compressed representation of the</dt><dd><p>curve element, taking about half the space but potentially
-incurring in non-negligible computation costs when
-deserializing. Default is True for compatibility with previous
-versions of charm.</p>
-</dd>
-</dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b1</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b1</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b1</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pairinggroup.extract_key">
-<span class="sig-prename descclassname"><span class="pre">pairinggroup.</span></span><span class="sig-name descname"><span class="pre">extract_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pairinggroup.html#extract_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pairinggroup.extract_key" title="Link to this definition">¶</a></dt>
-<dd><p>Given a group element, extract a symmetric key
-:param g:
-:return:</p>
-</dd></dl>
-
+          <section id="pairinggroup">
+<h1>pairinggroup<a class="headerlink" href="#pairinggroup" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -632,53 +455,8 @@ versions of charm.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">pairinggroup</a><ul>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup"><code class="docutils literal notranslate"><span class="pre">PairingGroup</span></code></a><ul>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.EndBenchmark"><code class="docutils literal notranslate"><span class="pre">PairingGroup.EndBenchmark()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.GetBenchmark"><code class="docutils literal notranslate"><span class="pre">PairingGroup.GetBenchmark()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.GetGeneralBenchmarks"><code class="docutils literal notranslate"><span class="pre">PairingGroup.GetGeneralBenchmarks()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.GetGranularBenchmarks"><code class="docutils literal notranslate"><span class="pre">PairingGroup.GetGranularBenchmarks()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.InitBenchmark"><code class="docutils literal notranslate"><span class="pre">PairingGroup.InitBenchmark()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.StartBenchmark"><code class="docutils literal notranslate"><span class="pre">PairingGroup.StartBenchmark()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.debug"><code class="docutils literal notranslate"><span class="pre">PairingGroup.debug()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.decode"><code class="docutils literal notranslate"><span class="pre">PairingGroup.decode()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.deserialize"><code class="docutils literal notranslate"><span class="pre">PairingGroup.deserialize()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.encode"><code class="docutils literal notranslate"><span class="pre">PairingGroup.encode()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.groupSetting"><code class="docutils literal notranslate"><span class="pre">PairingGroup.groupSetting()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.groupType"><code class="docutils literal notranslate"><span class="pre">PairingGroup.groupType()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.hash"><code class="docutils literal notranslate"><span class="pre">PairingGroup.hash()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.init"><code class="docutils literal notranslate"><span class="pre">PairingGroup.init()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.ismember"><code class="docutils literal notranslate"><span class="pre">PairingGroup.ismember()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.ismemberDict"><code class="docutils literal notranslate"><span class="pre">PairingGroup.ismemberDict()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.ismemberList"><code class="docutils literal notranslate"><span class="pre">PairingGroup.ismemberList()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.messageSize"><code class="docutils literal notranslate"><span class="pre">PairingGroup.messageSize()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.order"><code class="docutils literal notranslate"><span class="pre">PairingGroup.order()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.pair_prod"><code class="docutils literal notranslate"><span class="pre">PairingGroup.pair_prod()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.paramgen"><code class="docutils literal notranslate"><span class="pre">PairingGroup.paramgen()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.random"><code class="docutils literal notranslate"><span class="pre">PairingGroup.random()</span></code></a></li>
-<li><a class="reference internal" href="#pairinggroup.PairingGroup.serialize"><code class="docutils literal notranslate"><span class="pre">PairingGroup.serialize()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pairinggroup.extract_key"><code class="docutils literal notranslate"><span class="pre">extract_key()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

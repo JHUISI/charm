@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -200,22 +200,19 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
-<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../miracl.html">Building MIRACL for Charm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cryptographers.html">For Cryptographers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers.html">For App Developers</a></li>
 </ul>
-<ul>
+<ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
@@ -296,20 +293,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
-</ul>
-</li>
-</ul>
-<ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
@@ -353,6 +337,19 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
+</ul>
+</li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../test/conversion_test.html">conversion_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../test/ecgroup_test.html">ecgroup_test</a></li>
@@ -363,6 +360,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../test/test_policy_expression.html">test_policy_expression</a></li>
 </ul>
 </li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
 </ul>
 
 </div>
@@ -400,96 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-conversion">
-<span id="conversion"></span><h1>conversion<a class="headerlink" href="#module-conversion" title="Link to this heading">¶</a></h1>
-<dl class="field-list simple">
-<dt class="field-odd">Date<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Jul 5, 2011</p>
-</dd>
-<dt class="field-even">Authors<span class="colon">:</span></dt>
-<dd class="field-even"><p>Gary Belvin</p>
-</dd>
-</dl>
-<p>This class facilitates conversion between domain spaces</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="conversion.Conversion">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">conversion.</span></span><span class="sig-name descname"><span class="pre">Conversion</span></span><a class="reference internal" href="../_modules/conversion.html#Conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conversion.Conversion" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The goal is to convert arbitrarily between any of the following types</p>
-<p>Input types:</p>
-<ul class="simple">
-<li><p>bytes</p></li>
-<li><p>Bytes</p></li>
-<li><p>int</p></li>
-<li><p>Integer Element</p></li>
-<li><p>Modular Integer Element</p></li>
-</ul>
-<p>Output types:</p>
-<ul class="simple">
-<li><p>int</p></li>
-<li><p>Group element</p></li>
-<li><p>Integer element</p></li>
-<li><p>Integer element mod N</p></li>
-</ul>
-<dl class="py method">
-<dt class="sig sig-object py" id="conversion.Conversion.IP2OS">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IP2OS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xLen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conversion.html#Conversion.IP2OS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conversion.Conversion.IP2OS" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">number</span></code>: is a normal integer, not modular</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">xLen</span></code>: is the intended length of the resulting octet string</p></li>
-</ul>
-</dd>
-</dl>
-<p>Converts an integer into a byte string</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="conversion.Conversion.OS2IP">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OS2IP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conversion.html#Conversion.OS2IP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conversion.Conversion.OS2IP" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A python <code class="docutils literal notranslate"><span class="pre">int</span></code> if element is False. An <code class="docutils literal notranslate"><span class="pre">integer.Element</span></code> if element is True</p>
-</dd>
-</dl>
-<p>Converts a byte string to an integer</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="conversion.Conversion.bytes2element">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bytes2element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conversion.html#Conversion.bytes2element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conversion.Conversion.bytes2element" title="Link to this definition">¶</a></dt>
-<dd><p>Converts a byte string to a group element</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="conversion.Conversion.bytes2integer">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bytes2integer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conversion.html#Conversion.bytes2integer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conversion.Conversion.bytes2integer" title="Link to this definition">¶</a></dt>
-<dd><p>Converts a bytes string to an integer object</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="conversion.Conversion.bytes2str">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bytes2str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byteobj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conversion.html#Conversion.bytes2str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conversion.Conversion.bytes2str" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="conversion.Conversion.int2bin">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">int2bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intobj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conversion.html#Conversion.int2bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conversion.Conversion.int2bin" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="conversion.Conversion.str2bytes">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">str2bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strobj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/conversion.html#Conversion.str2bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conversion.Conversion.str2bytes" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="conversion">
+<h1>conversion<a class="headerlink" href="#conversion" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -536,36 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">conversion</a><ul>
-<li><a class="reference internal" href="#conversion.Conversion"><code class="docutils literal notranslate"><span class="pre">Conversion</span></code></a><ul>
-<li><a class="reference internal" href="#conversion.Conversion.IP2OS"><code class="docutils literal notranslate"><span class="pre">Conversion.IP2OS()</span></code></a></li>
-<li><a class="reference internal" href="#conversion.Conversion.OS2IP"><code class="docutils literal notranslate"><span class="pre">Conversion.OS2IP()</span></code></a></li>
-<li><a class="reference internal" href="#conversion.Conversion.bytes2element"><code class="docutils literal notranslate"><span class="pre">Conversion.bytes2element()</span></code></a></li>
-<li><a class="reference internal" href="#conversion.Conversion.bytes2integer"><code class="docutils literal notranslate"><span class="pre">Conversion.bytes2integer()</span></code></a></li>
-<li><a class="reference internal" href="#conversion.Conversion.bytes2str"><code class="docutils literal notranslate"><span class="pre">Conversion.bytes2str()</span></code></a></li>
-<li><a class="reference internal" href="#conversion.Conversion.int2bin"><code class="docutils literal notranslate"><span class="pre">Conversion.int2bin()</span></code></a></li>
-<li><a class="reference internal" href="#conversion.Conversion.str2bytes"><code class="docutils literal notranslate"><span class="pre">Conversion.str2bytes()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

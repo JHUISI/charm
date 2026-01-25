@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,63 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-encap_bchk05">
-<span id="encap-bchk05"></span><h1>encap_bchk05<a class="headerlink" href="#module-encap_bchk05" title="Link to this heading">¶</a></h1>
-<p><strong>Key Encapsulation Mechanism (BCHK05)</strong></p>
-<p><em>Authors:</em> Based on commitment scheme constructions</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Key Encapsulation from Commitment Schemes”</div>
-<div class="line"><strong>Notes:</strong> Simple hash-based encapsulation scheme</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> key encapsulation mechanism (KEM)</p></li>
-<li><p><strong>Setting:</strong> hash-based</p></li>
-<li><p><strong>Assumption:</strong> random oracle</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Charm Developers</p>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>Unknown</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="encap_bchk05.EncapBCHK">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">encap_bchk05.</span></span><span class="sig-name descname"><span class="pre">EncapBCHK</span></span><a class="reference internal" href="../../_modules/encap_bchk05.html#EncapBCHK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encap_bchk05.EncapBCHK" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">encap</span> <span class="o">=</span> <span class="n">EncapBCHK</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hout</span> <span class="o">=</span> <span class="n">encap</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">com</span><span class="p">,</span> <span class="n">dec</span><span class="p">)</span> <span class="o">=</span> <span class="n">encap</span><span class="o">.</span><span class="n">S</span><span class="p">(</span><span class="n">hout</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rout</span> <span class="o">=</span> <span class="n">encap</span><span class="o">.</span><span class="n">R</span><span class="p">(</span><span class="n">hout</span><span class="p">,</span> <span class="n">com</span><span class="p">,</span> <span class="n">dec</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">==</span> <span class="n">rout</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="encap_bchk05.EncapBCHK.R">
-<span class="sig-name descname"><span class="pre">R</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pub</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">com</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/encap_bchk05.html#EncapBCHK.R"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encap_bchk05.EncapBCHK.R" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="encap_bchk05.EncapBCHK.S">
-<span class="sig-name descname"><span class="pre">S</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pub</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/encap_bchk05.html#EncapBCHK.S"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encap_bchk05.EncapBCHK.S" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="encap_bchk05.EncapBCHK.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/encap_bchk05.html#EncapBCHK.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#encap_bchk05.EncapBCHK.setup" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="encap-bchk05">
+<h1>encap_bchk05<a class="headerlink" href="#encap-bchk05" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -505,32 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">encap_bchk05</a><ul>
-<li><a class="reference internal" href="#encap_bchk05.EncapBCHK"><code class="docutils literal notranslate"><span class="pre">EncapBCHK</span></code></a><ul>
-<li><a class="reference internal" href="#encap_bchk05.EncapBCHK.R"><code class="docutils literal notranslate"><span class="pre">EncapBCHK.R()</span></code></a></li>
-<li><a class="reference internal" href="#encap_bchk05.EncapBCHK.S"><code class="docutils literal notranslate"><span class="pre">EncapBCHK.S()</span></code></a></li>
-<li><a class="reference internal" href="#encap_bchk05.EncapBCHK.setup"><code class="docutils literal notranslate"><span class="pre">EncapBCHK.setup()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

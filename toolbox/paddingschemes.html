@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,140 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-paddingschemes">
-<span id="paddingschemes"></span><h1>paddingschemes<a class="headerlink" href="#module-paddingschemes" title="Link to this heading">¶</a></h1>
-<p>A collection of encryption and signature padding schemes</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="paddingschemes.MGF1">
-<span class="sig-prename descclassname"><span class="pre">paddingschemes.</span></span><span class="sig-name descname"><span class="pre">MGF1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maskBytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hashFn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hLen</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#MGF1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.MGF1" title="Link to this definition">¶</a></dt>
-<dd><p>MGF1 Mask Generation Function</p>
-<p>Implemented according to PKCS #1 specification, see appendix B.2.1:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">hLen</span></code>: is the output length of the hash function</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">maskBytes</span></code>: the number of mask bytes to return</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="paddingschemes.OAEPEncryptionPadding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">paddingschemes.</span></span><span class="sig-name descname"><span class="pre">OAEPEncryptionPadding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_hash_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Gary Belvin</p>
-</dd>
-</dl>
-<p>OAEPEncryptionPadding</p>
-<p>Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
-Implemented according to PKCS#1 v2.1 Section 7 <a class="reference external" href="ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf">ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf</a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="paddingschemes.OAEPEncryptionPadding.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encMessage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding.decode" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="paddingschemes.OAEPEncryptionPadding.encode">
-<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emLen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#OAEPEncryptionPadding.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.OAEPEncryptionPadding.encode" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return<span class="colon">:</span></dt>
-<dd class="field-odd"><p>a Bytes object</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="paddingschemes.PKCS7Padding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">paddingschemes.</span></span><span class="sig-name descname"><span class="pre">PKCS7Padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="paddingschemes.PKCS7Padding.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding.decode" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="paddingschemes.PKCS7Padding.encode">
-<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PKCS7Padding.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.PKCS7Padding.encode" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="paddingschemes.PSSPadding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">paddingschemes.</span></span><span class="sig-name descname"><span class="pre">PSSPadding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_hash_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.PSSPadding" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Gary Belvin</p>
-</dd>
-</dl>
-<p>PSSSignaturePadding</p>
-<p>Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing. 
-Implemented according to section 8 of <a class="reference external" href="ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf">ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf</a>.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="paddingschemes.PSSPadding.encode">
-<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emBits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.PSSPadding.encode" title="Link to this definition">¶</a></dt>
-<dd><p>Encodes a message with PSS padding
-emLen will be set to the minimum allowed length if not explicitly set</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="paddingschemes.PSSPadding.verify">
-<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">EM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emBits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#PSSPadding.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.PSSPadding.verify" title="Link to this definition">¶</a></dt>
-<dd><p>Verifies that EM is a correct encoding for M</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p>M - the message to verify</p></li>
-<li><p>EM - the encoded message</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return<span class="colon">:</span></dt>
-<dd class="field-even"><p>true for ‘consistent’ or false for ‘inconsistent’</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="paddingschemes.SAEPEncryptionPadding">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">paddingschemes.</span></span><span class="sig-name descname"><span class="pre">SAEPEncryptionPadding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_hash_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha384'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Christina Garman</p>
-</dd>
-</dl>
-<p>SAEPEncryptionPadding</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="paddingschemes.SAEPEncryptionPadding.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encMessage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding.decode" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="paddingschemes.SAEPEncryptionPadding.encode">
-<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#SAEPEncryptionPadding.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.SAEPEncryptionPadding.encode" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="paddingschemes.hashFunc">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">paddingschemes.</span></span><span class="sig-name descname"><span class="pre">hashFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_hash_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/paddingschemes.html#hashFunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#paddingschemes.hashFunc" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
+          <section id="paddingschemes">
+<h1>paddingschemes<a class="headerlink" href="#paddingschemes" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -582,48 +455,8 @@ emLen will be set to the minimum allowed length if not explicitly set</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">paddingschemes</a><ul>
-<li><a class="reference internal" href="#paddingschemes.MGF1"><code class="docutils literal notranslate"><span class="pre">MGF1()</span></code></a></li>
-<li><a class="reference internal" href="#paddingschemes.OAEPEncryptionPadding"><code class="docutils literal notranslate"><span class="pre">OAEPEncryptionPadding</span></code></a><ul>
-<li><a class="reference internal" href="#paddingschemes.OAEPEncryptionPadding.decode"><code class="docutils literal notranslate"><span class="pre">OAEPEncryptionPadding.decode()</span></code></a></li>
-<li><a class="reference internal" href="#paddingschemes.OAEPEncryptionPadding.encode"><code class="docutils literal notranslate"><span class="pre">OAEPEncryptionPadding.encode()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#paddingschemes.PKCS7Padding"><code class="docutils literal notranslate"><span class="pre">PKCS7Padding</span></code></a><ul>
-<li><a class="reference internal" href="#paddingschemes.PKCS7Padding.decode"><code class="docutils literal notranslate"><span class="pre">PKCS7Padding.decode()</span></code></a></li>
-<li><a class="reference internal" href="#paddingschemes.PKCS7Padding.encode"><code class="docutils literal notranslate"><span class="pre">PKCS7Padding.encode()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#paddingschemes.PSSPadding"><code class="docutils literal notranslate"><span class="pre">PSSPadding</span></code></a><ul>
-<li><a class="reference internal" href="#paddingschemes.PSSPadding.encode"><code class="docutils literal notranslate"><span class="pre">PSSPadding.encode()</span></code></a></li>
-<li><a class="reference internal" href="#paddingschemes.PSSPadding.verify"><code class="docutils literal notranslate"><span class="pre">PSSPadding.verify()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#paddingschemes.SAEPEncryptionPadding"><code class="docutils literal notranslate"><span class="pre">SAEPEncryptionPadding</span></code></a><ul>
-<li><a class="reference internal" href="#paddingschemes.SAEPEncryptionPadding.decode"><code class="docutils literal notranslate"><span class="pre">SAEPEncryptionPadding.decode()</span></code></a></li>
-<li><a class="reference internal" href="#paddingschemes.SAEPEncryptionPadding.encode"><code class="docutils literal notranslate"><span class="pre">SAEPEncryptionPadding.encode()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#paddingschemes.hashFunc"><code class="docutils literal notranslate"><span class="pre">hashFunc</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

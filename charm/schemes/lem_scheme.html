@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,111 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-lem_scheme">
-<span id="lem-scheme"></span><h1>lem_scheme<a class="headerlink" href="#module-lem_scheme" title="Link to this heading">¶</a></h1>
-<p><strong>Private and Dynamic Time-Series Data Aggregation (LEM14)</strong></p>
-<p><em>Authors:</em> Iraklis Leontiadis, Kaoutar Elkhiyaoui, Refik Molva</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Private and Dynamic Time-Series Data Aggregation with Trust Relaxation”</div>
-<div class="line"><strong>Published in:</strong> CANS 2014</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2014/256.pdf">http://eprint.iacr.org/2014/256.pdf</a></div>
-<div class="line"><strong>Notes:</strong> Enables plaintext evaluation of sums from encrypted time-series values</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> aggregation (privacy-preserving)</p></li>
-<li><p><strong>Setting:</strong> integer groups</p></li>
-<li><p><strong>Assumption:</strong> Paillier</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Iraklis Leontiadis</p>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>2/2015</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="lem_scheme.Aggregator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">Aggregator</span></span><a class="reference internal" href="../../_modules/lem_scheme.html#Aggregator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.Aggregator" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for computing Pka and generating Ska</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="lem_scheme.Aggregator.decrypt">
-<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">encarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Aggregator.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.Aggregator.decrypt" title="Link to this definition">¶</a></dt>
-<dd><p>Decrypting the sum</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="lem_scheme.Collector">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">Collector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">auxarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Collector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.Collector" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Computes auxt from list of auxiliary information from all users</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="lem_scheme.Users">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">Users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Users"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.Users" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Computing users secret keys(ski) for users list <a href="#id1"><span class="problematic" id="id2">*</span></a>userdata</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="lem_scheme.Users.auxiliary">
-<span class="sig-name descname"><span class="pre">auxiliary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Users.auxiliary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.Users.auxiliary" title="Link to this definition">¶</a></dt>
-<dd><p>Computes auxiliary for all users into a list</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="lem_scheme.Users.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#Users.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.Users.encrypt" title="Link to this definition">¶</a></dt>
-<dd><p>Encrypts all user data into a list</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="lem_scheme.auxiliaryfunc">
-<span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">auxiliaryfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#auxiliaryfunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.auxiliaryfunc" title="Link to this definition">¶</a></dt>
-<dd><p>Auxiliary information of one value, where  b=ski</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="lem_scheme.egcd">
-<span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">egcd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#egcd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.egcd" title="Link to this definition">¶</a></dt>
-<dd><p>Extended Euclidian gcd function between a and b</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="lem_scheme.encryptfunc">
-<span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">encryptfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#encryptfunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.encryptfunc" title="Link to this definition">¶</a></dt>
-<dd><p>Encryption of one value, where a=plaintext(number), d=ski</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="lem_scheme.hash">
-<span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.hash" title="Link to this definition">¶</a></dt>
-<dd><p>Computing hash value of time</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="lem_scheme.modinv">
-<span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">modinv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#modinv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.modinv" title="Link to this definition">¶</a></dt>
-<dd><p>Finding modulo inverse of a mod m</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="lem_scheme.secretkey">
-<span class="sig-prename descclassname"><span class="pre">lem_scheme.</span></span><span class="sig-name descname"><span class="pre">secretkey</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lem_scheme.html#secretkey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lem_scheme.secretkey" title="Link to this definition">¶</a></dt>
-<dd><p>Generating random secret key smaller than n2</p>
-</dd></dl>
-
+          <section id="lem-scheme">
+<h1>lem_scheme<a class="headerlink" href="#lem-scheme" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -553,42 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">lem_scheme</a><ul>
-<li><a class="reference internal" href="#lem_scheme.Aggregator"><code class="docutils literal notranslate"><span class="pre">Aggregator</span></code></a><ul>
-<li><a class="reference internal" href="#lem_scheme.Aggregator.decrypt"><code class="docutils literal notranslate"><span class="pre">Aggregator.decrypt()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#lem_scheme.Collector"><code class="docutils literal notranslate"><span class="pre">Collector</span></code></a></li>
-<li><a class="reference internal" href="#lem_scheme.Users"><code class="docutils literal notranslate"><span class="pre">Users</span></code></a><ul>
-<li><a class="reference internal" href="#lem_scheme.Users.auxiliary"><code class="docutils literal notranslate"><span class="pre">Users.auxiliary()</span></code></a></li>
-<li><a class="reference internal" href="#lem_scheme.Users.encrypt"><code class="docutils literal notranslate"><span class="pre">Users.encrypt()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#lem_scheme.auxiliaryfunc"><code class="docutils literal notranslate"><span class="pre">auxiliaryfunc()</span></code></a></li>
-<li><a class="reference internal" href="#lem_scheme.egcd"><code class="docutils literal notranslate"><span class="pre">egcd()</span></code></a></li>
-<li><a class="reference internal" href="#lem_scheme.encryptfunc"><code class="docutils literal notranslate"><span class="pre">encryptfunc()</span></code></a></li>
-<li><a class="reference internal" href="#lem_scheme.hash"><code class="docutils literal notranslate"><span class="pre">hash()</span></code></a></li>
-<li><a class="reference internal" href="#lem_scheme.modinv"><code class="docutils literal notranslate"><span class="pre">modinv()</span></code></a></li>
-<li><a class="reference internal" href="#lem_scheme.secretkey"><code class="docutils literal notranslate"><span class="pre">secretkey()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,87 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-protocol_a01">
-<span id="protocol-a01"></span><h1>protocol_a01<a class="headerlink" href="#module-protocol_a01" title="Link to this heading">¶</a></h1>
-<p><strong>Abe Blind Signature Scheme (A01)</strong></p>
-<p><em>Authors:</em> Masayuki Abe</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “A Secure Three-move Blind Signature Scheme for Polynomially Many Signatures”</div>
-<div class="line"><strong>Published in:</strong> EUROCRYPT 2001</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://www.iacr.org/archive/eurocrypt2001/20450135.pdf">http://www.iacr.org/archive/eurocrypt2001/20450135.pdf</a></div>
-<div class="line"><strong>Notes:</strong> Three-move interactive blind signature protocol</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> blind signature</p></li>
-<li><p><strong>Setting:</strong> integer groups</p></li>
-<li><p><strong>Assumption:</strong> DL</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Antonio de la Piedra</p>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>12/2013</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="protocol_a01.Asig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">protocol_a01.</span></span><span class="sig-name descname"><span class="pre">Asig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_a01.Asig.signer_state1">
-<span class="sig-name descname"><span class="pre">signer_state1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig.signer_state1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig.signer_state1" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_a01.Asig.signer_state3">
-<span class="sig-name descname"><span class="pre">signer_state3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig.signer_state3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig.signer_state3" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_a01.Asig.signer_state5">
-<span class="sig-name descname"><span class="pre">signer_state5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig.signer_state5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig.signer_state5" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_a01.Asig.signer_state7">
-<span class="sig-name descname"><span class="pre">signer_state7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig.signer_state7"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig.signer_state7" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_a01.Asig.user_state2">
-<span class="sig-name descname"><span class="pre">user_state2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig.user_state2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig.user_state2" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_a01.Asig.user_state4">
-<span class="sig-name descname"><span class="pre">user_state4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig.user_state4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig.user_state4" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_a01.Asig.user_state6">
-<span class="sig-name descname"><span class="pre">user_state6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig.user_state6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig.user_state6" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_a01.Asig.user_state8">
-<span class="sig-name descname"><span class="pre">user_state8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#Asig.user_state8"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.Asig.user_state8" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="protocol_a01.SHA1">
-<span class="sig-prename descclassname"><span class="pre">protocol_a01.</span></span><span class="sig-name descname"><span class="pre">SHA1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_a01.html#SHA1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_a01.SHA1" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
+          <section id="protocol-a01">
+<h1>protocol_a01<a class="headerlink" href="#protocol-a01" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -529,38 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">protocol_a01</a><ul>
-<li><a class="reference internal" href="#protocol_a01.Asig"><code class="docutils literal notranslate"><span class="pre">Asig</span></code></a><ul>
-<li><a class="reference internal" href="#protocol_a01.Asig.signer_state1"><code class="docutils literal notranslate"><span class="pre">Asig.signer_state1()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_a01.Asig.signer_state3"><code class="docutils literal notranslate"><span class="pre">Asig.signer_state3()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_a01.Asig.signer_state5"><code class="docutils literal notranslate"><span class="pre">Asig.signer_state5()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_a01.Asig.signer_state7"><code class="docutils literal notranslate"><span class="pre">Asig.signer_state7()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_a01.Asig.user_state2"><code class="docutils literal notranslate"><span class="pre">Asig.user_state2()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_a01.Asig.user_state4"><code class="docutils literal notranslate"><span class="pre">Asig.user_state4()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_a01.Asig.user_state6"><code class="docutils literal notranslate"><span class="pre">Asig.user_state6()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_a01.Asig.user_state8"><code class="docutils literal notranslate"><span class="pre">Asig.user_state8()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#protocol_a01.SHA1"><code class="docutils literal notranslate"><span class="pre">SHA1()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

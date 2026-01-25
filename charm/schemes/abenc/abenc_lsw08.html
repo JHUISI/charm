@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,88 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-abenc_lsw08">
-<span id="abenc-lsw08"></span><h1>abenc_lsw08<a class="headerlink" href="#module-abenc_lsw08" title="Link to this heading">¶</a></h1>
-<p><strong>Key-Policy Attribute-Based Encryption (LSW08)</strong></p>
-<p><em>Authors:</em> Allison Lewko, Amit Sahai, Brent Waters</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Revocation Systems with Very Small Private Keys”</div>
-<div class="line"><strong>Published in:</strong> IEEE Symposium on Security and Privacy, 2010</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2008/309.pdf">http://eprint.iacr.org/2008/309.pdf</a></div>
-<div class="line"><strong>Notes:</strong> Large Universe Construction</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> key-policy attribute-based encryption (public key)</p></li>
-<li><p><strong>Setting:</strong> Pairing groups</p></li>
-<li><p><strong>Assumption:</strong> Decisional Bilinear Diffie-Hellman</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><ol class="upperalpha simple" start="10">
-<li><p>Ayo Akinyele</p></li>
-</ol>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>12/2010</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="abenc_lsw08.KPabe">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_lsw08.</span></span><span class="sig-name descname"><span class="pre">KPabe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_lsw08.html#KPabe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_lsw08.KPabe" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEnc</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kpabe</span> <span class="o">=</span> <span class="n">KPabe</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="s1">&#39;(ONE or THREE) and (THREE or TWO)&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span> <span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span><span class="o">=</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">kpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">cipher_text</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_lsw08.KPabe.decrypt">
-<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_lsw08.html#KPabe.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_lsw08.KPabe.decrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_lsw08.KPabe.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_lsw08.html#KPabe.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_lsw08.KPabe.encrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_lsw08.KPabe.keygen">
-<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_lsw08.html#KPabe.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_lsw08.KPabe.keygen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_lsw08.KPabe.negatedAttr">
-<span class="sig-name descname"><span class="pre">negatedAttr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_lsw08.html#KPabe.negatedAttr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_lsw08.KPabe.negatedAttr" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_lsw08.KPabe.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_lsw08.html#KPabe.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_lsw08.KPabe.setup" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="abenc_lsw08.main">
-<span class="sig-prename descclassname"><span class="pre">abenc_lsw08.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_lsw08.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_lsw08.main" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
+          <section id="abenc-lsw08">
+<h1>abenc_lsw08<a class="headerlink" href="#abenc-lsw08" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -530,35 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">abenc_lsw08</a><ul>
-<li><a class="reference internal" href="#abenc_lsw08.KPabe"><code class="docutils literal notranslate"><span class="pre">KPabe</span></code></a><ul>
-<li><a class="reference internal" href="#abenc_lsw08.KPabe.decrypt"><code class="docutils literal notranslate"><span class="pre">KPabe.decrypt()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_lsw08.KPabe.encrypt"><code class="docutils literal notranslate"><span class="pre">KPabe.encrypt()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_lsw08.KPabe.keygen"><code class="docutils literal notranslate"><span class="pre">KPabe.keygen()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_lsw08.KPabe.negatedAttr"><code class="docutils literal notranslate"><span class="pre">KPabe.negatedAttr()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_lsw08.KPabe.setup"><code class="docutils literal notranslate"><span class="pre">KPabe.setup()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#abenc_lsw08.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

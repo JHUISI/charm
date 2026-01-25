@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,97 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-pre_mg07">
-<span id="pre-mg07"></span><h1>pre_mg07<a class="headerlink" href="#module-pre_mg07" title="Link to this heading">¶</a></h1>
-<p><strong>Identity-Based Proxy Re-Encryption (MG07)</strong></p>
-<p><em>Authors:</em> Matthew Green, Giuseppe Ateniese</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Identity-Based Proxy Re-Encryption”</div>
-<div class="line"><strong>Published in:</strong> Applied Cryptography and Network Security, 2007</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://link.springer.com/chapter/10.1007%2F978-3-540-72738-5_19">http://link.springer.com/chapter/10.1007%2F978-3-540-72738-5_19</a></div>
-<div class="line"><strong>Notes:</strong> Section 4.3</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> proxy re-encryption (identity-based)</p></li>
-<li><p><strong>Setting:</strong> bilinear groups (symmetric)</p></li>
-<li><p><strong>Assumption:</strong> DBDH</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><ol class="upperalpha simple" start="14">
-<li><p>Fotiou</p></li>
-</ol>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>11/2012</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="pre_mg07.PreGA">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pre_mg07.</span></span><span class="sig-name descname"><span class="pre">PreGA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pre_mg07.PreGA" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">pc_element</span>  
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ID</span> <span class="o">=</span> <span class="s2">&quot;nikos fotiou&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ID2</span> <span class="o">=</span> <span class="s2">&quot;test user&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;hello world!!!!!&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">,</span> <span class="n">secparam</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>  
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pre</span> <span class="o">=</span> <span class="n">PreGA</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">id_secret_key</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">keyGen</span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">id2_secret_key</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">keyGen</span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">ID2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pre</span><span class="o">.</span><span class="n">decryptFirstLevel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="n">id_secret_key</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
-<span class="go">b&#39;hello world!!!!!&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">re_encryption_key</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">rkGen</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="n">id_secret_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">ID2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext2</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">reEncrypt</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">re_encryption_key</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pre</span><span class="o">.</span><span class="n">decryptSecondLevel</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="n">id2_secret_key</span><span class="p">,</span><span class="n">ID</span><span class="p">,</span> <span class="n">ID2</span><span class="p">,</span> <span class="n">ciphertext2</span><span class="p">)</span>
-<span class="go">b&#39;hello world!!!!!&#39;</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="pre_mg07.PreGA.decryptFirstLevel">
-<span class="sig-name descname"><span class="pre">decryptFirstLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.decryptFirstLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pre_mg07.PreGA.decryptFirstLevel" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pre_mg07.PreGA.decryptSecondLevel">
-<span class="sig-name descname"><span class="pre">decryptSecondLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IDsrc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.decryptSecondLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pre_mg07.PreGA.decryptSecondLevel" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pre_mg07.PreGA.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pre_mg07.PreGA.encrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pre_mg07.PreGA.keyGen">
-<span class="sig-name descname"><span class="pre">keyGen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.keyGen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pre_mg07.PreGA.keyGen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pre_mg07.PreGA.reEncrypt">
-<span class="sig-name descname"><span class="pre">reEncrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IDsrc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.reEncrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pre_mg07.PreGA.reEncrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pre_mg07.PreGA.rkGen">
-<span class="sig-name descname"><span class="pre">rkGen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IDsrc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">IDdest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.rkGen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pre_mg07.PreGA.rkGen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pre_mg07.PreGA.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pre_mg07.html#PreGA.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pre_mg07.PreGA.setup" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="pre-mg07">
+<h1>pre_mg07<a class="headerlink" href="#pre-mg07" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -539,36 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">pre_mg07</a><ul>
-<li><a class="reference internal" href="#pre_mg07.PreGA"><code class="docutils literal notranslate"><span class="pre">PreGA</span></code></a><ul>
-<li><a class="reference internal" href="#pre_mg07.PreGA.decryptFirstLevel"><code class="docutils literal notranslate"><span class="pre">PreGA.decryptFirstLevel()</span></code></a></li>
-<li><a class="reference internal" href="#pre_mg07.PreGA.decryptSecondLevel"><code class="docutils literal notranslate"><span class="pre">PreGA.decryptSecondLevel()</span></code></a></li>
-<li><a class="reference internal" href="#pre_mg07.PreGA.encrypt"><code class="docutils literal notranslate"><span class="pre">PreGA.encrypt()</span></code></a></li>
-<li><a class="reference internal" href="#pre_mg07.PreGA.keyGen"><code class="docutils literal notranslate"><span class="pre">PreGA.keyGen()</span></code></a></li>
-<li><a class="reference internal" href="#pre_mg07.PreGA.reEncrypt"><code class="docutils literal notranslate"><span class="pre">PreGA.reEncrypt()</span></code></a></li>
-<li><a class="reference internal" href="#pre_mg07.PreGA.rkGen"><code class="docutils literal notranslate"><span class="pre">PreGA.rkGen()</span></code></a></li>
-<li><a class="reference internal" href="#pre_mg07.PreGA.setup"><code class="docutils literal notranslate"><span class="pre">PreGA.setup()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

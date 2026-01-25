@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,108 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-pkenc_rsa">
-<span id="pkenc-rsa"></span><h1>pkenc_rsa<a class="headerlink" href="#module-pkenc_rsa" title="Link to this heading">¶</a></h1>
-<p><strong>RSA Public Key Encryption Scheme (RSA)</strong></p>
-<p><em>Authors:</em> R. Rivest, A. Shamir, L. Adleman</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “A Method for Obtaining Digital Signatures and Public-Key Cryptosystems”</div>
-<div class="line"><strong>Published in:</strong> Communications of the ACM, 1978</div>
-<div class="line"><strong>Available from:</strong></div>
-<div class="line"><strong>Notes:</strong></div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> encryption (public key)</p></li>
-<li><p><strong>Setting:</strong> Integer</p></li>
-<li><p><strong>Assumption:</strong> RSA (Integer Factorization)</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><ol class="upperalpha simple" start="10">
-<li><p>Ayo Akinyele, Gary Belvin</p></li>
-</ol>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>07/2011</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pkenc_rsa.</span></span><span class="sig-name descname"><span class="pre">RSA</span></span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA.convert" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA.keygen">
-<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA.keygen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA.paramgen">
-<span class="sig-name descname"><span class="pre">paramgen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA.paramgen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA.paramgen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA_Enc">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pkenc_rsa.</span></span><span class="sig-name descname"><span class="pre">RSA_Enc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">padding=&lt;charm.toolbox.paddingschemes.OAEPEncryptionPadding</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pkenc_rsa.RSA" title="pkenc_rsa.RSA"><code class="xref py py-class docutils literal notranslate"><span class="pre">RSA</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PKEnc</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Enc</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;This is a test&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA_Enc.decrypt">
-<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc.decrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA_Enc.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Enc.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA_Enc.encrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA_Sig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pkenc_rsa.</span></span><span class="sig-name descname"><span class="pre">RSA_Sig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">padding=&lt;charm.toolbox.paddingschemes.PSSPadding</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pkenc_rsa.RSA" title="pkenc_rsa.RSA"><code class="xref py py-class docutils literal notranslate"><span class="pre">RSA</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PKSig</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;This is a test message.&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rsa</span> <span class="o">=</span> <span class="n">RSA_Sig</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rsa</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA_Sig.sign">
-<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig.sign" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_rsa.RSA_Sig.verify">
-<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_rsa.html#RSA_Sig.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_rsa.RSA_Sig.verify" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="pkenc-rsa">
+<h1>pkenc_rsa<a class="headerlink" href="#pkenc-rsa" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -550,42 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">pkenc_rsa</a><ul>
-<li><a class="reference internal" href="#pkenc_rsa.RSA"><code class="docutils literal notranslate"><span class="pre">RSA</span></code></a><ul>
-<li><a class="reference internal" href="#pkenc_rsa.RSA.convert"><code class="docutils literal notranslate"><span class="pre">RSA.convert()</span></code></a></li>
-<li><a class="reference internal" href="#pkenc_rsa.RSA.keygen"><code class="docutils literal notranslate"><span class="pre">RSA.keygen()</span></code></a></li>
-<li><a class="reference internal" href="#pkenc_rsa.RSA.paramgen"><code class="docutils literal notranslate"><span class="pre">RSA.paramgen()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pkenc_rsa.RSA_Enc"><code class="docutils literal notranslate"><span class="pre">RSA_Enc</span></code></a><ul>
-<li><a class="reference internal" href="#pkenc_rsa.RSA_Enc.decrypt"><code class="docutils literal notranslate"><span class="pre">RSA_Enc.decrypt()</span></code></a></li>
-<li><a class="reference internal" href="#pkenc_rsa.RSA_Enc.encrypt"><code class="docutils literal notranslate"><span class="pre">RSA_Enc.encrypt()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pkenc_rsa.RSA_Sig"><code class="docutils literal notranslate"><span class="pre">RSA_Sig</span></code></a><ul>
-<li><a class="reference internal" href="#pkenc_rsa.RSA_Sig.sign"><code class="docutils literal notranslate"><span class="pre">RSA_Sig.sign()</span></code></a></li>
-<li><a class="reference internal" href="#pkenc_rsa.RSA_Sig.verify"><code class="docutils literal notranslate"><span class="pre">RSA_Sig.verify()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

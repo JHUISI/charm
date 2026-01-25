@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -200,22 +200,19 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
-<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../miracl.html">Building MIRACL for Charm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cryptographers.html">For Cryptographers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers.html">For App Developers</a></li>
 </ul>
-<ul>
+<ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
@@ -296,20 +293,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
-</ul>
-</li>
-</ul>
-<ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
@@ -353,6 +337,19 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
+</ul>
+</li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../test/conversion_test.html">conversion_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../test/ecgroup_test.html">ecgroup_test</a></li>
@@ -363,6 +360,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../test/test_policy_expression.html">test_policy_expression</a></li>
 </ul>
 </li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
 </ul>
 
 </div>
@@ -400,53 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-hash_module">
-<span id="hash-module"></span><h1>hash_module<a class="headerlink" href="#module-hash_module" title="Link to this heading">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="hash_module.Hash">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hash_module.</span></span><span class="sig-name descname"><span class="pre">Hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairingElement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">htype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha256'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integerElement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Hash" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="hash_module.Hash.hashToZn">
-<span class="sig-name descname"><span class="pre">hashToZn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Hash.hashToZn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Hash.hashToZn" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="hash_module.Hash.hashToZr">
-<span class="sig-name descname"><span class="pre">hashToZr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Hash.hashToZr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Hash.hashToZr" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="hash_module.Waters">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hash_module.</span></span><span class="sig-name descname"><span class="pre">Waters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha256'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Waters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Waters" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.hash_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">Waters</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s2">&quot;SS512&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">waters</span> <span class="o">=</span> <span class="n">Waters</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">&quot;user@email.com&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="hash_module.Waters.hash">
-<span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Waters.hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Waters.hash" title="Link to this definition">¶</a></dt>
-<dd><p>Hash the identity string and break it up in to l bit pieces</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="hash_module.Waters.sha2">
-<span class="sig-name descname"><span class="pre">sha2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Waters.sha2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Waters.sha2" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="hash-module">
+<h1>hash_module<a class="headerlink" href="#hash-module" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -493,36 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">hash_module</a><ul>
-<li><a class="reference internal" href="#hash_module.Hash"><code class="docutils literal notranslate"><span class="pre">Hash</span></code></a><ul>
-<li><a class="reference internal" href="#hash_module.Hash.hashToZn"><code class="docutils literal notranslate"><span class="pre">Hash.hashToZn()</span></code></a></li>
-<li><a class="reference internal" href="#hash_module.Hash.hashToZr"><code class="docutils literal notranslate"><span class="pre">Hash.hashToZr()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#hash_module.Waters"><code class="docutils literal notranslate"><span class="pre">Waters</span></code></a><ul>
-<li><a class="reference internal" href="#hash_module.Waters.hash"><code class="docutils literal notranslate"><span class="pre">Waters.hash()</span></code></a></li>
-<li><a class="reference internal" href="#hash_module.Waters.sha2"><code class="docutils literal notranslate"><span class="pre">Waters.sha2()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

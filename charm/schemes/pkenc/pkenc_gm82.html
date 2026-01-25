@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,85 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-pkenc_gm82">
-<span id="pkenc-gm82"></span><h1>pkenc_gm82<a class="headerlink" href="#module-pkenc_gm82" title="Link to this heading">¶</a></h1>
-<p><strong>Goldwasser-Micali Public Key Encryption Scheme (GM82)</strong></p>
-<p><em>Authors:</em> S. Goldwasser, S. Micali</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Probabilistic Encryption and How to Play Mental Poker Keeping Secret All Partial Information”</div>
-<div class="line"><strong>Published in:</strong> 14th Symposium on Theory of Computing (STOC), 1982</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://groups.csail.mit.edu/cis/pubs/shafi/1982-stoc.pdf">http://groups.csail.mit.edu/cis/pubs/shafi/1982-stoc.pdf</a></div>
-<div class="line"><strong>Notes:</strong></div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> encryption (public key)</p></li>
-<li><p><strong>Setting:</strong> Integer</p></li>
-<li><p><strong>Assumption:</strong> Quadratic Residuosity</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Guillermo Ramos</p>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>01/2015</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="pkenc_gm82.GM82">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pkenc_gm82.</span></span><span class="sig-name descname"><span class="pre">GM82</span></span><a class="reference internal" href="../../../_modules/pkenc_gm82.html#GM82"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_gm82.GM82" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PKEnc</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gm82</span> <span class="o">=</span> <span class="n">GM82</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="p">)</span> <span class="o">=</span> <span class="n">gm82</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">zero</span> <span class="o">=</span> <span class="n">gm82</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">one</span> <span class="o">=</span> <span class="n">gm82</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gm82</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">zero</span><span class="p">)</span>
-<span class="go">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gm82</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">one</span><span class="p">)</span>
-<span class="go">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gm82</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">gm82</span><span class="o">.</span><span class="n">xor</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="n">zero</span><span class="p">))</span>
-<span class="go">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gm82</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">gm82</span><span class="o">.</span><span class="n">xor</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">zero</span><span class="p">,</span> <span class="n">one</span><span class="p">))</span>
-<span class="go">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gm82</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">gm82</span><span class="o">.</span><span class="n">xor</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">one</span><span class="p">,</span> <span class="n">zero</span><span class="p">))</span>
-<span class="go">1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gm82</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">gm82</span><span class="o">.</span><span class="n">xor</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">one</span><span class="p">,</span> <span class="n">one</span><span class="p">))</span>
-<span class="go">0</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_gm82.GM82.decrypt">
-<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_gm82.html#GM82.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_gm82.GM82.decrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_gm82.GM82.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_gm82.html#GM82.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_gm82.GM82.encrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_gm82.GM82.keygen">
-<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_gm82.html#GM82.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_gm82.GM82.keygen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pkenc_gm82.GM82.xor">
-<span class="sig-name descname"><span class="pre">xor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_gm82.html#GM82.xor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_gm82.GM82.xor" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pkenc_gm82.isResidue">
-<span class="sig-prename descclassname"><span class="pre">pkenc_gm82.</span></span><span class="sig-name descname"><span class="pre">isResidue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_gm82.html#isResidue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_gm82.isResidue" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
+          <section id="pkenc-gm82">
+<h1>pkenc_gm82<a class="headerlink" href="#pkenc-gm82" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -527,34 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">pkenc_gm82</a><ul>
-<li><a class="reference internal" href="#pkenc_gm82.GM82"><code class="docutils literal notranslate"><span class="pre">GM82</span></code></a><ul>
-<li><a class="reference internal" href="#pkenc_gm82.GM82.decrypt"><code class="docutils literal notranslate"><span class="pre">GM82.decrypt()</span></code></a></li>
-<li><a class="reference internal" href="#pkenc_gm82.GM82.encrypt"><code class="docutils literal notranslate"><span class="pre">GM82.encrypt()</span></code></a></li>
-<li><a class="reference internal" href="#pkenc_gm82.GM82.keygen"><code class="docutils literal notranslate"><span class="pre">GM82.keygen()</span></code></a></li>
-<li><a class="reference internal" href="#pkenc_gm82.GM82.xor"><code class="docutils literal notranslate"><span class="pre">GM82.xor()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pkenc_gm82.isResidue"><code class="docutils literal notranslate"><span class="pre">isResidue()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

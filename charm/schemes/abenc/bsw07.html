@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,66 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-bsw07">
-<span id="bsw07"></span><h1>bsw07<a class="headerlink" href="#module-bsw07" title="Link to this heading">¶</a></h1>
-<p><strong>Ciphertext-Policy Attribute-Based Encryption (BSW07) - Asymmetric</strong></p>
-<p><em>Authors:</em> John Bethencourt, Amit Sahai, Brent Waters</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Ciphertext-Policy Attribute-Based Encryption”</div>
-<div class="line"><strong>Published in:</strong> IEEE Symposium on Security and Privacy, 2007</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://doi.org/10.1109/SP.2007.11">https://doi.org/10.1109/SP.2007.11</a></div>
-<div class="line"><strong>Notes:</strong> Asymmetric version of the scheme in Section 4.2</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption</p></li>
-<li><p><strong>Setting:</strong> Pairing groups</p></li>
-<li><p><strong>Assumption:</strong> Generic group model</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Shashank Agrawal</p>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>05/2016</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="bsw07.BSW07">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bsw07.</span></span><span class="sig-name descname"><span class="pre">BSW07</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/bsw07.html#BSW07"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bsw07.BSW07" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEnc</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="bsw07.BSW07.decrypt">
-<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctxt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/bsw07.html#BSW07.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bsw07.BSW07.decrypt" title="Link to this definition">¶</a></dt>
-<dd><p>Decrypt ciphertext ctxt with key key.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="bsw07.BSW07.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/bsw07.html#BSW07.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bsw07.BSW07.encrypt" title="Link to this definition">¶</a></dt>
-<dd><p>Encrypt a message M under a policy string.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="bsw07.BSW07.keygen">
-<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/bsw07.html#BSW07.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bsw07.BSW07.keygen" title="Link to this definition">¶</a></dt>
-<dd><p>Generate a key for a set of attributes.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="bsw07.BSW07.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/bsw07.html#BSW07.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bsw07.BSW07.setup" title="Link to this definition">¶</a></dt>
-<dd><p>Generates public key and master secret key.</p>
-</dd></dl>
-
-</dd></dl>
-
+          <section id="bsw07">
+<h1>bsw07<a class="headerlink" href="#bsw07" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -508,33 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">bsw07</a><ul>
-<li><a class="reference internal" href="#bsw07.BSW07"><code class="docutils literal notranslate"><span class="pre">BSW07</span></code></a><ul>
-<li><a class="reference internal" href="#bsw07.BSW07.decrypt"><code class="docutils literal notranslate"><span class="pre">BSW07.decrypt()</span></code></a></li>
-<li><a class="reference internal" href="#bsw07.BSW07.encrypt"><code class="docutils literal notranslate"><span class="pre">BSW07.encrypt()</span></code></a></li>
-<li><a class="reference internal" href="#bsw07.BSW07.keygen"><code class="docutils literal notranslate"><span class="pre">BSW07.keygen()</span></code></a></li>
-<li><a class="reference internal" href="#bsw07.BSW07.setup"><code class="docutils literal notranslate"><span class="pre">BSW07.setup()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

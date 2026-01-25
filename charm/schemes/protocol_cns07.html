@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,94 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-protocol_cns07">
-<span id="protocol-cns07"></span><h1>protocol_cns07<a class="headerlink" href="#module-protocol_cns07" title="Link to this heading">¶</a></h1>
-<p><strong>Simulatable Adaptive Oblivious Transfer (CNS07)</strong></p>
-<p><em>Authors:</em> Jan Camenisch, Gregory Neven, abhi shelat</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Simulatable Adaptive Oblivious Transfer”</div>
-<div class="line"><strong>Published in:</strong> EUROCRYPT 2007</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2008/014">http://eprint.iacr.org/2008/014</a></div>
-<div class="line"><strong>Notes:</strong> Uses sigma protocols for interactive proofs</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> oblivious transfer protocol</p></li>
-<li><p><strong>Setting:</strong> bilinear groups (asymmetric)</p></li>
-<li><p><strong>Assumption:</strong> DBDH</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><ol class="upperalpha simple" start="10">
-<li><p>Ayo Akinyele</p></li>
-</ol>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>2/2012</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">protocol_cns07.</span></span><span class="sig-name descname"><span class="pre">ObliviousTransfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupObj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.get_common">
-<span class="sig-name descname"><span class="pre">get_common</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.get_common"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.get_common" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.receiver_init2">
-<span class="sig-name descname"><span class="pre">receiver_init2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_init2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_init2" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.receiver_transfer4">
-<span class="sig-name descname"><span class="pre">receiver_transfer4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer4" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.receiver_transfer6">
-<span class="sig-name descname"><span class="pre">receiver_transfer6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer6" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.receiver_transfer8">
-<span class="sig-name descname"><span class="pre">receiver_transfer8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.receiver_transfer8"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.receiver_transfer8" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.sender_init1">
-<span class="sig-name descname"><span class="pre">sender_init1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_init1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_init1" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.sender_init3">
-<span class="sig-name descname"><span class="pre">sender_init3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_init3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_init3" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.sender_transfer5">
-<span class="sig-name descname"><span class="pre">sender_transfer5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer5" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.sender_transfer7">
-<span class="sig-name descname"><span class="pre">sender_transfer7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer7"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer7" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="protocol_cns07.ObliviousTransfer.sender_transfer9">
-<span class="sig-name descname"><span class="pre">sender_transfer9</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_cns07.html#ObliviousTransfer.sender_transfer9"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_cns07.ObliviousTransfer.sender_transfer9" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="protocol-cns07">
+<h1>protocol_cns07<a class="headerlink" href="#protocol-cns07" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -536,39 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">protocol_cns07</a><ul>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer</span></code></a><ul>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.get_common"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.get_common()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.receiver_init2"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.receiver_init2()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.receiver_transfer4"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.receiver_transfer4()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.receiver_transfer6"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.receiver_transfer6()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.receiver_transfer8"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.receiver_transfer8()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.sender_init1"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.sender_init1()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.sender_init3"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.sender_init3()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.sender_transfer5"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.sender_transfer5()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.sender_transfer7"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.sender_transfer7()</span></code></a></li>
-<li><a class="reference internal" href="#protocol_cns07.ObliviousTransfer.sender_transfer9"><code class="docutils literal notranslate"><span class="pre">ObliviousTransfer.sender_transfer9()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

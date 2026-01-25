@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,73 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-abenc_yllc15">
-<span id="abenc-yllc15"></span><h1>abenc_yllc15<a class="headerlink" href="#module-abenc_yllc15" title="Link to this heading">¶</a></h1>
-<p><strong>Extended Proxy-Assisted Revocable CP-ABE (YLLC15)</strong></p>
-<p><em>Authors:</em> Yanjiang Yang, Joseph K Liu, Kaitai Liang, Kim Kwang Raymond Choo, Jianying Zhou</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Extended Proxy-Assisted Approach: Achieving Revocable Fine-Grained Encryption of Cloud Data”</div>
-<div class="line"><strong>Published in:</strong> 2015</div>
-<div class="line"><strong>Available from:</strong> N/A</div>
-<div class="line"><strong>Notes:</strong> Adapted from BSW07, provides revocable fine-grained encryption for cloud data</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption</p></li>
-<li><p><strong>Setting:</strong> Pairing groups</p></li>
-<li><p><strong>Assumption:</strong> Decisional Bilinear Diffie-Hellman</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Douglas Hellinger</p>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>11/2018</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="abenc_yllc15.YLLC15">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_yllc15.</span></span><span class="sig-name descname"><span class="pre">YLLC15</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_yllc15.html#YLLC15"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_yllc15.YLLC15" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEnc</span></code></p>
-<p>Possibly a subclass of BSW07?</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_yllc15.YLLC15.decrypt">
-<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abenc_yllc15.YLLC15.decrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_yllc15.YLLC15.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abenc_yllc15.YLLC15.encrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_yllc15.YLLC15.proxy_decrypt">
-<span class="sig-name descname"><span class="pre">proxy_decrypt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abenc_yllc15.YLLC15.proxy_decrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_yllc15.YLLC15.proxy_keygen">
-<span class="sig-name descname"><span class="pre">proxy_keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abenc_yllc15.YLLC15.proxy_keygen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_yllc15.YLLC15.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abenc_yllc15.YLLC15.setup" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_yllc15.YLLC15.ukgen">
-<span class="sig-name descname"><span class="pre">ukgen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#abenc_yllc15.YLLC15.ukgen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="abenc-yllc15">
+<h1>abenc_yllc15<a class="headerlink" href="#abenc-yllc15" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -515,35 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">abenc_yllc15</a><ul>
-<li><a class="reference internal" href="#abenc_yllc15.YLLC15"><code class="docutils literal notranslate"><span class="pre">YLLC15</span></code></a><ul>
-<li><a class="reference internal" href="#abenc_yllc15.YLLC15.decrypt"><code class="docutils literal notranslate"><span class="pre">YLLC15.decrypt()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_yllc15.YLLC15.encrypt"><code class="docutils literal notranslate"><span class="pre">YLLC15.encrypt()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_yllc15.YLLC15.proxy_decrypt"><code class="docutils literal notranslate"><span class="pre">YLLC15.proxy_decrypt()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_yllc15.YLLC15.proxy_keygen"><code class="docutils literal notranslate"><span class="pre">YLLC15.proxy_keygen()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_yllc15.YLLC15.setup"><code class="docutils literal notranslate"><span class="pre">YLLC15.setup()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_yllc15.YLLC15.ukgen"><code class="docutils literal notranslate"><span class="pre">YLLC15.ukgen()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,91 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-abenc_unmcpabe_yahk14">
-<span id="abenc-unmcpabe-yahk14"></span><h1>abenc_unmcpabe_yahk14<a class="headerlink" href="#module-abenc_unmcpabe_yahk14" title="Link to this heading">¶</a></h1>
-<p><strong>Non-monotonic CP-ABE (YAHK14)</strong></p>
-<p><em>Authors:</em> Shota Yamada, Nuttapong Attrapadung, Goichiro Hanaoka, Noboru Kunihiro</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “A Framework and Compact Constructions for Non-monotonic Attribute-Based Encryption”</div>
-<div class="line"><strong>Published in:</strong> Public-Key Cryptography (PKC) 2014, Pages 275-292</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2014/181">http://eprint.iacr.org/2014/181</a> (Section 7)</div>
-<div class="line"><strong>Notes:</strong> Supports non-monotonic access structures (with negation)</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption (public key)</p></li>
-<li><p><strong>Setting:</strong> Bilinear pairing group of prime order</p></li>
-<li><p><strong>Assumption:</strong> Complex q-type assumption</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><p>al, artjomb</p>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>07/2015</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="abenc_unmcpabe_yahk14.CPABE_YAHK14">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_unmcpabe_yahk14.</span></span><span class="sig-name descname"><span class="pre">CPABE_YAHK14</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_unmcpabe_yahk14.html#CPABE_YAHK14"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEnc</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cpabe</span> <span class="o">=</span> <span class="n">CPABE_YAHK14</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">]</span> <span class="c1"># must be integer strings</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">access_policy</span> <span class="o">=</span> <span class="s1">&#39;2 and !1&#39;</span> <span class="c1"># must be integer strings</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">==</span> <span class="n">decrypted_msg</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_unmcpabe_yahk14.CPABE_YAHK14.decrypt">
-<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_unmcpabe_yahk14.html#CPABE_YAHK14.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.decrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_unmcpabe_yahk14.CPABE_YAHK14.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_unmcpabe_yahk14.html#CPABE_YAHK14.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.encrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_unmcpabe_yahk14.CPABE_YAHK14.exp">
-<span class="sig-name descname"><span class="pre">exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_unmcpabe_yahk14.html#CPABE_YAHK14.exp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.exp" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_unmcpabe_yahk14.CPABE_YAHK14.keygen">
-<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_unmcpabe_yahk14.html#CPABE_YAHK14.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.keygen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_unmcpabe_yahk14.CPABE_YAHK14.randomMessage">
-<span class="sig-name descname"><span class="pre">randomMessage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_unmcpabe_yahk14.html#CPABE_YAHK14.randomMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.randomMessage" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="abenc_unmcpabe_yahk14.CPABE_YAHK14.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_unmcpabe_yahk14.html#CPABE_YAHK14.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.setup" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="abenc_unmcpabe_yahk14.main">
-<span class="sig-prename descclassname"><span class="pre">abenc_unmcpabe_yahk14.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_unmcpabe_yahk14.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_unmcpabe_yahk14.main" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
+          <section id="abenc-unmcpabe-yahk14">
+<h1>abenc_unmcpabe_yahk14<a class="headerlink" href="#abenc-unmcpabe-yahk14" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -533,36 +455,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">abenc_unmcpabe_yahk14</a><ul>
-<li><a class="reference internal" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14"><code class="docutils literal notranslate"><span class="pre">CPABE_YAHK14</span></code></a><ul>
-<li><a class="reference internal" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.decrypt"><code class="docutils literal notranslate"><span class="pre">CPABE_YAHK14.decrypt()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.encrypt"><code class="docutils literal notranslate"><span class="pre">CPABE_YAHK14.encrypt()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.exp"><code class="docutils literal notranslate"><span class="pre">CPABE_YAHK14.exp()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.keygen"><code class="docutils literal notranslate"><span class="pre">CPABE_YAHK14.keygen()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.randomMessage"><code class="docutils literal notranslate"><span class="pre">CPABE_YAHK14.randomMessage()</span></code></a></li>
-<li><a class="reference internal" href="#abenc_unmcpabe_yahk14.CPABE_YAHK14.setup"><code class="docutils literal notranslate"><span class="pre">CPABE_YAHK14.setup()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#abenc_unmcpabe_yahk14.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

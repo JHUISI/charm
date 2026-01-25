@@ -515,13 +515,13 @@
 </tr>
 <tr class="row-even"><td><p>OpenSSL</p></td>
 <td><p>1.0.x / 1.1.x</p></td>
-<td><p><strong>1.1.x / 3.x</strong></p></td>
+<td><p><strong>3.x</strong></p></td>
 <td><p>Medium</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><strong>OpenSSL Migration</strong>: Ensure OpenSSL 1.1.0+ or 3.x is installed:</p>
+<p><strong>OpenSSL Migration</strong>: Ensure OpenSSL 3.x is installed:</p>
 <ul class="simple">
 <li><p>macOS: <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">openssl&#64;3</span></code></p></li>
 <li><p>Ubuntu/Debian: <code class="docutils literal notranslate"><span class="pre">apt</span> <span class="pre">install</span> <span class="pre">libssl-dev</span></code></p></li>
@@ -572,7 +572,7 @@
 <p>Before upgrading from v0.50 to v0.60:</p>
 <ol class="arabic simple">
 <li><p>☐ Verify Python version is 3.8+: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code></p></li>
-<li><p>☐ Verify OpenSSL version is 1.1.0+: <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">version</span></code></p></li>
+<li><p>☐ Verify OpenSSL version is 3.x: <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">version</span></code></p></li>
 <li><p>☐ Update package name in requirements: <code class="docutils literal notranslate"><span class="pre">Charm-Crypto</span></code> → <code class="docutils literal notranslate"><span class="pre">charm-crypto</span></code></p></li>
 <li><p>☐ Remove any <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">uninstall</span></code> usage (use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span></code>)</p></li>
 <li><p>☐ Check for direct <code class="docutils literal notranslate"><span class="pre">_counter</span></code> module usage (ensure code handles <code class="docutils literal notranslate"><span class="pre">bytes</span></code>)</p></li>

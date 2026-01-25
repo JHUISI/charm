@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -200,22 +200,19 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
-<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../miracl.html">Building MIRACL for Charm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cryptographers.html">For Cryptographers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers.html">For App Developers</a></li>
 </ul>
-<ul>
+<ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
@@ -296,20 +293,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
-</ul>
-</li>
-</ul>
-<ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
@@ -353,6 +337,19 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
+</ul>
+</li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../test/conversion_test.html">conversion_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../test/ecgroup_test.html">ecgroup_test</a></li>
@@ -363,6 +360,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../test/test_policy_expression.html">test_policy_expression</a></li>
 </ul>
 </li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
 </ul>
 
 </div>
@@ -400,93 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-securerandom">
-<span id="securerandom"></span><h1>securerandom<a class="headerlink" href="#module-securerandom" title="Link to this heading">¶</a></h1>
-<p>Base class for cryptographic secure random number generation
-:authors: Gary Belvin</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="securerandom.OpenSSLRand">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">securerandom.</span></span><span class="sig-name descname"><span class="pre">OpenSSLRand</span></span><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.OpenSSLRand" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">SecureRandom</span></code></a></p>
-<p>Uses the OpenSSL PRNG for random bits</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="securerandom.OpenSSLRand.getRandomBits">
-<span class="sig-name descname"><span class="pre">getRandomBits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand.getRandomBits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.OpenSSLRand.getRandomBits" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="securerandom.OpenSSLRand.getRandomBytes">
-<span class="sig-name descname"><span class="pre">getRandomBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand.getRandomBytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.OpenSSLRand.getRandomBytes" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a random bit string of length bytes</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="securerandom.SecureRandom">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">securerandom.</span></span><span class="sig-name descname"><span class="pre">SecureRandom</span></span><a class="reference internal" href="../_modules/securerandom.html#SecureRandom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandom" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="securerandom.SecureRandom.addSeed">
-<span class="sig-name descname"><span class="pre">addSeed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.addSeed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandom.addSeed" title="Link to this definition">¶</a></dt>
-<dd><p>Add randomness to the generator.  
-Always increases entropy</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="securerandom.SecureRandom.getRandomBytes">
-<span class="sig-name descname"><span class="pre">getRandomBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.getRandomBytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandom.getRandomBytes" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a random bit string of length bytes</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="securerandom.SecureRandomFactory">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">securerandom.</span></span><span class="sig-name descname"><span class="pre">SecureRandomFactory</span></span><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandomFactory" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class provides a central place to swap out the randomness engine
-used by the charm framework.
-Classes should call <code class="docutils literal notranslate"><span class="pre">rand</span> <span class="pre">=</span> <span class="pre">SecureRandomFactory.getInstance()</span></code> 
-to acquire a randomnesss generator</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="securerandom.SecureRandomFactory.getInstance">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getInstance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory.getInstance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandomFactory.getInstance" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="securerandom.WeakRandom">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">securerandom.</span></span><span class="sig-name descname"><span class="pre">WeakRandom</span></span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.WeakRandom" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">SecureRandom</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="securerandom.WeakRandom.addSeed">
-<span class="sig-name descname"><span class="pre">addSeed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.addSeed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.WeakRandom.addSeed" title="Link to this definition">¶</a></dt>
-<dd><p>Add randomness to the generator.  
-Always increases entropy</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="securerandom.WeakRandom.getRandomBytes">
-<span class="sig-name descname"><span class="pre">getRandomBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.getRandomBytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.WeakRandom.getRandomBytes" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a random bit string of length bytes</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="securerandom.WeakRandom.myrandom">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">myrandom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.myrandom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.WeakRandom.myrandom" title="Link to this definition">¶</a></dt>
-<dd><p>This method does <strong>NOT</strong> provide cryptographically secure random numbers.
-This should <strong>NOT</strong> be used for production code</p>
-</dd></dl>
-
-</dd></dl>
-
+          <section id="securerandom">
+<h1>securerandom<a class="headerlink" href="#securerandom" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -533,46 +455,8 @@ This should <strong>NOT</strong> be used for production code</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">securerandom</a><ul>
-<li><a class="reference internal" href="#securerandom.OpenSSLRand"><code class="docutils literal notranslate"><span class="pre">OpenSSLRand</span></code></a><ul>
-<li><a class="reference internal" href="#securerandom.OpenSSLRand.getRandomBits"><code class="docutils literal notranslate"><span class="pre">OpenSSLRand.getRandomBits()</span></code></a></li>
-<li><a class="reference internal" href="#securerandom.OpenSSLRand.getRandomBytes"><code class="docutils literal notranslate"><span class="pre">OpenSSLRand.getRandomBytes()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#securerandom.SecureRandom"><code class="docutils literal notranslate"><span class="pre">SecureRandom</span></code></a><ul>
-<li><a class="reference internal" href="#securerandom.SecureRandom.addSeed"><code class="docutils literal notranslate"><span class="pre">SecureRandom.addSeed()</span></code></a></li>
-<li><a class="reference internal" href="#securerandom.SecureRandom.getRandomBytes"><code class="docutils literal notranslate"><span class="pre">SecureRandom.getRandomBytes()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#securerandom.SecureRandomFactory"><code class="docutils literal notranslate"><span class="pre">SecureRandomFactory</span></code></a><ul>
-<li><a class="reference internal" href="#securerandom.SecureRandomFactory.getInstance"><code class="docutils literal notranslate"><span class="pre">SecureRandomFactory.getInstance()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#securerandom.WeakRandom"><code class="docutils literal notranslate"><span class="pre">WeakRandom</span></code></a><ul>
-<li><a class="reference internal" href="#securerandom.WeakRandom.addSeed"><code class="docutils literal notranslate"><span class="pre">WeakRandom.addSeed()</span></code></a></li>
-<li><a class="reference internal" href="#securerandom.WeakRandom.getRandomBytes"><code class="docutils literal notranslate"><span class="pre">WeakRandom.getRandomBytes()</span></code></a></li>
-<li><a class="reference internal" href="#securerandom.WeakRandom.myrandom"><code class="docutils literal notranslate"><span class="pre">WeakRandom.myrandom()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

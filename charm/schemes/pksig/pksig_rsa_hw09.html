@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,122 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-pksig_rsa_hw09">
-<span id="pksig-rsa-hw09"></span><h1>pksig_rsa_hw09<a class="headerlink" href="#module-pksig_rsa_hw09" title="Link to this heading">¶</a></h1>
-<p><strong>Hohenberger-Waters RSA Stateless Signature (HW09-RSA)</strong></p>
-<p><em>Authors:</em> S. Hohenberger, B. Waters</p>
-<div class="line-block">
-<div class="line"><strong>Title:</strong> “Realizing Hash-and-Sign Signatures under Standard Assumptions”</div>
-<div class="line"><strong>Published in:</strong> EUROCRYPT, 2009</div>
-<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2009/028.pdf">http://eprint.iacr.org/2009/028.pdf</a></div>
-<div class="line"><strong>Notes:</strong> Section 3. Status: Needs improvement.</div>
-</div>
-<p class="rubric">Scheme Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> signature (public key)</p></li>
-<li><p><strong>Setting:</strong> RSA</p></li>
-<li><p><strong>Assumption:</strong> RSA</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><ol class="upperalpha simple" start="10">
-<li><p>Ayo Akinyele, Christina Garman</p></li>
-</ol>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>12/2011</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.BlumIntegerSquareRoot">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pksig_rsa_hw09.</span></span><span class="sig-name descname"><span class="pre">BlumIntegerSquareRoot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#BlumIntegerSquareRoot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.BlumIntegerSquareRoot" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.BlumIntegerSquareRoot.pow">
-<span class="sig-name descname"><span class="pre">pow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modularInt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#BlumIntegerSquareRoot.pow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.BlumIntegerSquareRoot.pow" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.LogFunction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pksig_rsa_hw09.</span></span><span class="sig-name descname"><span class="pre">LogFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#LogFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.LogFunction" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.Prf">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pksig_rsa_hw09.</span></span><span class="sig-name descname"><span class="pre">Prf</span></span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.Prf.eval">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf.eval" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.Prf.keygen">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Prf.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.Prf.keygen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.SHA1">
-<span class="sig-prename descclassname"><span class="pre">pksig_rsa_hw09.</span></span><span class="sig-name descname"><span class="pre">SHA1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#SHA1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.SHA1" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pksig_rsa_hw09.</span></span><span class="sig-name descname"><span class="pre">Sig_RSA_Stateless_HW09</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CH=&lt;class</span> <span class="pre">'charm.schemes.chamhash_rsa_hw09.ChamHash_HW09'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PKSig</span></code></p>
-<blockquote>
-<div><p>This scheme is probablistic and thus time consuming, so we skip it
-when running doctests.</p>
-</div></blockquote>
-<p>#doctest: +SKIP</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span> <span class="o">=</span> <span class="n">Sig_RSA_Stateless_HW09</span><span class="p">()</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">13075790812874903063868976368194105132206964291400106069285054021531242344673657224376055832139406140158530256050580761865568307154219348003780027259560207</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">12220150399144091059083151334113293594120344494042436487743750419696868216757186059428173175925369884682105191510729093971051869295857706815002710593321543</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">SHA1</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;this is the message I want to sign.&#39;</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span> 
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash">
-<span class="sig-name descname"><span class="pre">HW_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyLen</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.HW_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen">
-<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keyLength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign">
-<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify">
-<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#Sig_RSA_Stateless_HW09.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pksig_rsa_hw09.randomQR">
-<span class="sig-prename descclassname"><span class="pre">pksig_rsa_hw09.</span></span><span class="sig-name descname"><span class="pre">randomQR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_rsa_hw09.html#randomQR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_rsa_hw09.randomQR" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
+          <section id="pksig-rsa-hw09">
+<h1>pksig_rsa_hw09<a class="headerlink" href="#pksig-rsa-hw09" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -564,45 +455,8 @@ when running doctests.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">pksig_rsa_hw09</a><ul>
-<li><a class="reference internal" href="#pksig_rsa_hw09.BlumIntegerSquareRoot"><code class="docutils literal notranslate"><span class="pre">BlumIntegerSquareRoot</span></code></a><ul>
-<li><a class="reference internal" href="#pksig_rsa_hw09.BlumIntegerSquareRoot.pow"><code class="docutils literal notranslate"><span class="pre">BlumIntegerSquareRoot.pow()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.LogFunction"><code class="docutils literal notranslate"><span class="pre">LogFunction</span></code></a></li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.Prf"><code class="docutils literal notranslate"><span class="pre">Prf</span></code></a><ul>
-<li><a class="reference internal" href="#pksig_rsa_hw09.Prf.eval"><code class="docutils literal notranslate"><span class="pre">Prf.eval()</span></code></a></li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.Prf.keygen"><code class="docutils literal notranslate"><span class="pre">Prf.keygen()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.SHA1"><code class="docutils literal notranslate"><span class="pre">SHA1()</span></code></a></li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09"><code class="docutils literal notranslate"><span class="pre">Sig_RSA_Stateless_HW09</span></code></a><ul>
-<li><a class="reference internal" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.HW_hash"><code class="docutils literal notranslate"><span class="pre">Sig_RSA_Stateless_HW09.HW_hash()</span></code></a></li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.keygen"><code class="docutils literal notranslate"><span class="pre">Sig_RSA_Stateless_HW09.keygen()</span></code></a></li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.sign"><code class="docutils literal notranslate"><span class="pre">Sig_RSA_Stateless_HW09.sign()</span></code></a></li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.Sig_RSA_Stateless_HW09.verify"><code class="docutils literal notranslate"><span class="pre">Sig_RSA_Stateless_HW09.verify()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pksig_rsa_hw09.randomQR"><code class="docutils literal notranslate"><span class="pre">randomQR()</span></code></a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

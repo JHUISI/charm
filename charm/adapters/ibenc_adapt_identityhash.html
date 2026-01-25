@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -402,77 +402,13 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="module-ibenc_adapt_identityhash">
-<span id="ibenc-adapt-identityhash"></span><h1>ibenc_adapt_identityhash<a class="headerlink" href="#module-ibenc_adapt_identityhash" title="Link to this heading">¶</a></h1>
-<p><strong>Identity Hashing Adapter for IBE (HashID Adapter)</strong></p>
-<p><em>Description:</em> Converts an Identity-Based Encryption scheme that requires ZR (integer)
-identities into one that accepts arbitrary string identities via cryptographic hashing.</p>
-<div class="line-block">
-<div class="line"><strong>Notes:</strong> Hashes string identities to ZR elements using the pairing group’s hash function.</div>
-<div class="line">Transforms security from selective-ID (IND-sID-CPA) to full-ID (IND-ID-CPA) under ROM.</div>
-</div>
-<p class="rubric">Adapter Properties</p>
-<ul class="simple">
-<li><p><strong>Type:</strong> identity transform adapter</p></li>
-<li><p><strong>Underlying Scheme:</strong> any IBE scheme with ZR identity space</p></li>
-<li><p><strong>Purpose:</strong> enables use of human-readable string identities (e.g., email addresses)</p></li>
-</ul>
-<p class="rubric">Implementation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Authors<span class="colon">:</span></dt>
-<dd class="field-odd"><ol class="upperalpha simple" start="10">
-<li><p>Ayo Akinyele</p></li>
-</ol>
-</dd>
-<dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>2011</p>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="ibenc_adapt_identityhash.HashIDAdapter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ibenc_adapt_identityhash.</span></span><span class="sig-name descname"><span class="pre">HashIDAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ibenc_adapt_identityhash.html#HashIDAdapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ibenc_adapt_identityhash.HashIDAdapter" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IBEnc</span></code></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.ibenc.ibenc_bb03</span><span class="w"> </span><span class="kn">import</span> <span class="n">IBE_BB04</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hashID</span> <span class="o">=</span> <span class="n">HashIDAdapter</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">hashID</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ID</span> <span class="o">=</span> <span class="s1">&#39;john.doe@example.com&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">hashID</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">master_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">hashID</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">hashID</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">==</span> <span class="n">decrypted_msg</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="ibenc_adapt_identityhash.HashIDAdapter.decrypt">
-<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ibenc_adapt_identityhash.html#HashIDAdapter.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ibenc_adapt_identityhash.HashIDAdapter.decrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ibenc_adapt_identityhash.HashIDAdapter.encrypt">
-<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ibenc_adapt_identityhash.html#HashIDAdapter.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ibenc_adapt_identityhash.HashIDAdapter.encrypt" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ibenc_adapt_identityhash.HashIDAdapter.extract">
-<span class="sig-name descname"><span class="pre">extract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ibenc_adapt_identityhash.html#HashIDAdapter.extract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ibenc_adapt_identityhash.HashIDAdapter.extract" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="ibenc_adapt_identityhash.HashIDAdapter.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/ibenc_adapt_identityhash.html#HashIDAdapter.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ibenc_adapt_identityhash.HashIDAdapter.setup" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+          <section id="ibenc-adapt-identityhash">
+<h1>ibenc_adapt_identityhash<a class="headerlink" href="#ibenc-adapt-identityhash" title="Link to this heading">¶</a></h1>
 </section>
 
         </article>
@@ -519,33 +455,8 @@ identities into one that accepts arbitrary string identities via cryptographic h
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">ibenc_adapt_identityhash</a><ul>
-<li><a class="reference internal" href="#ibenc_adapt_identityhash.HashIDAdapter"><code class="docutils literal notranslate"><span class="pre">HashIDAdapter</span></code></a><ul>
-<li><a class="reference internal" href="#ibenc_adapt_identityhash.HashIDAdapter.decrypt"><code class="docutils literal notranslate"><span class="pre">HashIDAdapter.decrypt()</span></code></a></li>
-<li><a class="reference internal" href="#ibenc_adapt_identityhash.HashIDAdapter.encrypt"><code class="docutils literal notranslate"><span class="pre">HashIDAdapter.encrypt()</span></code></a></li>
-<li><a class="reference internal" href="#ibenc_adapt_identityhash.HashIDAdapter.extract"><code class="docutils literal notranslate"><span class="pre">HashIDAdapter.extract()</span></code></a></li>
-<li><a class="reference internal" href="#ibenc_adapt_identityhash.HashIDAdapter.setup"><code class="docutils literal notranslate"><span class="pre">HashIDAdapter.setup()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
