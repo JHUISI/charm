@@ -104,29 +104,27 @@ make test-embed      # C/C++ embed API tests
 
 ## Quick Example
 
+BLS signatures (Boneh-Lynn-Shacham) — a pairing-based signature scheme standardized in
+[IETF RFC 9380](https://datatracker.ietf.org/doc/rfc9380/) and used in Ethereum 2.0:
+
 ```python
-from charm.toolbox.pairinggroup import PairingGroup, GT
-from charm.schemes.abenc.abenc_bsw07 import CPabe_BSW07
+from charm.toolbox.pairinggroup import PairingGroup
+from charm.schemes.pksig.pksig_bls04 import BLS01
 
 # Initialize pairing group (BN254 curve, ~128-bit security)
 group = PairingGroup('BN254')
+bls = BLS01(group)
 
-# Create CP-ABE scheme instance
-cpabe = CPabe_BSW07(group)
+# Key generation
+(pk, sk) = bls.keygen()
 
-# Setup
-(pk, mk) = cpabe.setup()
+# Sign a message
+message = {'msg': 'hello world'}
+signature = bls.sign(sk['x'], message)
 
-# Generate key for attributes
-sk = cpabe.keygen(pk, mk, ['ONE', 'TWO', 'THREE'])
-
-# Encrypt with policy
-msg = group.random(GT)
-ct = cpabe.encrypt(pk, msg, '((ONE and TWO) or THREE)')
-
-# Decrypt
-recovered = cpabe.decrypt(pk, sk, ct)
-assert msg == recovered
+# Verify signature
+assert bls.verify(pk, signature, message)
+print("BLS signature verified!")
 ```
 
 ## Schemes
