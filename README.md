@@ -116,10 +116,12 @@ from charm.schemes.pksig.pksig_bls04 import BLS01
 group = PairingGroup('BN254')
 bls = BLS01(group)
 
-# Key generation, signing, and verification
+# Ethereum 2.0 validator attestation
+attestation = {'slot': 1234, 'epoch': 38, 'beacon_block_root': '0xabc...'}
+
 (pk, sk) = bls.keygen()
-signature = bls.sign(sk['x'], {'msg': 'hello world'})
-assert bls.verify(pk, signature, {'msg': 'hello world'})
+signature = bls.sign(sk['x'], attestation)
+assert bls.verify(pk, signature, attestation)
 ```
 
 ### ECDSA with secp256k1 (Bitcoin, Ethereum, XRPL)
@@ -135,10 +137,12 @@ from charm.schemes.pksig.pksig_ecdsa import ECDSA
 group = ECGroup(secp256k1)
 ecdsa = ECDSA(group)
 
-# Key generation, signing, and verification
+# Sign a blockchain transaction
+tx = '{"from":"0x1a2b...","to":"0x3c4d...","value":"1.5","nonce":42}'
+
 (pk, sk) = ecdsa.keygen(0)
-signature = ecdsa.sign(pk, sk, 'hello world')
-assert ecdsa.verify(pk, signature, 'hello world')
+signature = ecdsa.sign(pk, sk, tx)
+assert ecdsa.verify(pk, signature, tx)
 ```
 
 ## Schemes
