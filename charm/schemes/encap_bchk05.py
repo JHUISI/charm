@@ -34,7 +34,7 @@ class EncapBCHK():
     """
     def __init__(self):
         global H
-        H = hashlib.sha1()
+        H = hashlib.sha1()  # nosec B324 - SHA1 used for historical compatibility
 
     def setup(self):
         pub = hashlib.sha256()
@@ -46,14 +46,14 @@ class EncapBCHK():
 
         r = hashlib.sha256(x.encode('utf-8')).digest()
 
-        com = hashlib.sha1(x.encode('utf-8')).digest()[:128]
+        com = hashlib.sha1(x.encode('utf-8')).digest()[:128]  # nosec B324
 
         dec = x
 
         return (r, com, dec)
 
     def R(self, pub, com, dec):
-        x = hashlib.sha1(str(dec).encode('utf-8')).digest()[:128]
+        x = hashlib.sha1(str(dec).encode('utf-8')).digest()[:128]  # nosec B324
 
         if(x == com):
             m = hashlib.sha256(str(dec).encode('utf-8')).digest()

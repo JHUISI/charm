@@ -30,7 +30,7 @@ import hmac, hashlib, math
 debug = False
 
 def SHA1(bytes1):
-  s1 = hashlib.new('sha1')
+  s1 = hashlib.new('sha1')  # nosec B324 - SHA1 used for historical compatibility
   s1.update(bytes1)
   return s1.digest()
 
