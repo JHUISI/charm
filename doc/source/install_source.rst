@@ -480,3 +480,11 @@ For advanced users who want to use alternative pairing libraries:
 
    miracl
    relic
+
+Deprecated
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   mobile

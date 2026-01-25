@@ -123,7 +123,7 @@ html_theme_options = {
         "color-brand-primary": "#3498db",
         "color-brand-content": "#3498db",
     },
-    "sidebar_hide_name": False,
+    "sidebar_hide_name": True,
     "navigation_with_keys": True,
     "top_of_page_button": "edit",
     "source_repository": "https://github.com/JHUISI/charm",
@@ -133,6 +133,9 @@ html_theme_options = {
 
 # The name for this set of Sphinx documents.
 html_title = "Charm-Crypto v0.60"
+
+# The logo shown in the sidebar
+html_logo = '_static/charm_logo.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
