@@ -93,6 +93,12 @@ make test-schemes    # Cryptographic scheme tests
 make test-zkp        # ZKP compiler tests
 make test-adapters   # Adapter tests
 make test-embed      # C/C++ embed API tests
+
+# Threshold ECDSA (DKLS23) tests
+pytest charm/test/schemes/threshold_test.py -v
+
+# Run with coverage
+pytest --cov=charm charm/test/ -v
 ```
 
 ## Documentation
@@ -191,6 +197,35 @@ assert ecdsa.verify(pk, signature, tx_hash)
 
 > **Note:** Production XRPL implementations should use canonical binary serialization
 > per [XRPL documentation](https://xrpl.org/serialization.html).
+
+### Threshold ECDSA (DKLS23) with XRPL testnet
+
+Charm also includes a threshold ECDSA scheme based on DKLS23, together with an XRPL
+testnet demo that shows how to use it end to end.
+
+```python
+from charm.toolbox.eccurve import secp256k1
+from charm.toolbox.ecgroup import ECGroup
+from charm.core.math.elliptic_curve import G
+from charm.schemes.threshold.dkls23_sign import DKLS23
+from charm.schemes.threshold.xrpl_wallet import (
+    XRPLThresholdWallet,
+    XRPLClient,
+    sign_xrpl_transaction,
+    create_payment_with_memo,
+    get_secp256k1_generator,
+)
+
+group = ECGroup(secp256k1)
+dkls = DKLS23(group, threshold=2, num_parties=3)
+g = get_secp256k1_generator(group)
+key_shares, public_key = dkls.distributed_keygen(g)
+wallet = XRPLThresholdWallet(group, public_key)
+client = XRPLClient(is_testnet=True)
+```
+
+See `examples/xrpl_memo_demo.py` for a complete XRPL testnet flow (fund account, create
+threshold wallet, send payment with memo).
 
 ## Schemes
 
