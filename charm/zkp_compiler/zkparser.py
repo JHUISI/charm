@@ -25,6 +25,20 @@ from charm.toolbox.zknode import *
 import string
 import sys
 
+# Compatibility shim for pyparsing 3.x where upcaseTokens was moved to pyparsing_common
+try:
+    # pyparsing 2.x has upcaseTokens at module level
+    upcaseTokens
+except NameError:
+    # pyparsing 3.x moved it to pyparsing_common
+    try:
+        from pyparsing import pyparsing_common
+        upcaseTokens = pyparsing_common.upcase_tokens
+    except (ImportError, AttributeError):
+        # Fallback: define our own
+        def upcaseTokens(s, loc, toks):
+            return [t.upper() for t in toks]
+
 objStack = []
 
 
