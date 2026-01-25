@@ -59,11 +59,11 @@ If you see this output, the embed API is working correctly. Continue reading for
 
 | Dependency | Version | Purpose | Required |
 |------------|---------|---------|----------|
-| **Python** | 3.8 - 3.12 | Runtime interpreter | ✅ Yes |
+| **Python** | 3.8 - 3.11 | Runtime interpreter | ✅ Yes |
 | **Python dev headers** | Same as Python | `Python.h` for compilation | ✅ Yes |
 | **GMP** | 5.0+ | Big number arithmetic | ✅ Yes |
-| **PBC** | 0.5.14+ | Pairing-based cryptography | ✅ Yes |
-| **OpenSSL** | 1.1+ or 3.x | Elliptic curves, hashing | Optional |
+| **PBC** | 1.0.0 | Pairing-based cryptography | ✅ Yes |
+| **OpenSSL** | 3.x | Elliptic curves, hashing | Optional |
 | **GCC/Clang** | C99 compatible | Compiler | ✅ Yes |
 | **Make** | Any | Build system | ✅ Yes |
 
