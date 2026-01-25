@@ -3,9 +3,11 @@
 Charm-Crypto Docs!
 ========================================
 .. sectionauthor:: J. Ayo Akinyele
+
 Welcome! This is the documentation for the Charm-Crypto framework. Please contact us at jakinye3@jhu.edu if you have any questions and/or comments.
 
-Users:
+Users
+-----
 
 .. toctree::
    :maxdepth: 1
@@ -17,14 +19,17 @@ Users:
    mobile
 
 Development Guide
+-----------------
 
 .. toctree::
    :maxdepth: 1
 
+   tutorial
    cryptographers
    developers
 
 Cryptographic Schemes
+---------------------
 
 .. toctree::
    :maxdepth: 1
@@ -34,11 +39,13 @@ Cryptographic Schemes
    test_schemes
 
 Our Toolbox
+-----------
 
 .. toctree::
    :maxdepth: 1
 
    toolbox
+   zkp_compiler
    test_toolbox
 
 Indices and Tables

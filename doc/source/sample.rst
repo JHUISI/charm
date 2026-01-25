@@ -19,5 +19,5 @@ Some text, *italic text*, **bold text**
 Here's some Python code:
 
 >>> for i in range(10):
-...     print i
+...     print(i)
 

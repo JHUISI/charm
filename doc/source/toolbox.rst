@@ -3,6 +3,13 @@
 Toolbox Classes
 -----------------------------------------
 
+.. sectionauthor:: J. Ayo Akinyele
+
+The Charm toolbox provides building blocks and abstractions for implementing
+cryptographic schemes. This includes group abstractions (pairing groups, elliptic curve
+groups, integer groups), policy parsers, secret sharing utilities, and cryptographic
+primitives like symmetric encryption and hash functions.
+
 .. begin_auto_toolbox_list
 .. toctree::
    :maxdepth: 1
@@ -46,6 +53,6 @@ Toolbox Classes
    toolbox/symcrypto
    toolbox/xmlserialize
    toolbox/zknode
-   toolbox/zkp_compiler
+   toolbox/ZKProof
 
 .. end_auto_toolbox_list

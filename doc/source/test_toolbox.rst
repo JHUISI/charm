@@ -3,6 +3,9 @@
 Toolbox Test Code
 -----------------------------------------
 
+This section contains test code examples for the Charm toolbox modules.
+These tests demonstrate how to use the toolbox components and verify correct functionality.
+
 .. begin_auto_test_toolbox_list
 .. toctree::
    :maxdepth: 1

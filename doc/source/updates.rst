@@ -6,14 +6,14 @@ Integer Module
 
 - ``reduce()`` method no longer a field of integer object, but rather a class method. 
 
-::
+.. code-block:: python
 
-	from charm.core.math.integer import *
+    from charm.core.math.integer import *
 
-	a = integer(7, 5)
-	b = reduce(a)
-	print("a = ", a)
-	print("b = ", b)
+    a = integer(7, 5)
+    b = reduce(a)
+    print("a = ", a)
+    print("b = ", b)
 
 - Note that certain mixing of integer objects and Python ``int`` no longer supported. For example, ``integer(10, 17) * -1`` will generate a runtime exception: 
 

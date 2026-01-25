@@ -3,6 +3,13 @@
 Implemented Schemes
 -----------------------------------------
 
+.. sectionauthor:: J. Ayo Akinyele
+
+This section contains documentation for all cryptographic schemes implemented in Charm.
+Schemes are organized by type: attribute-based encryption (ABE), public-key encryption,
+public-key signatures, identity-based encryption, and more. Each scheme includes
+implementation details, security assumptions, and usage examples.
+
 .. begin_auto_scheme_list
 .. toctree::
    :maxdepth: 1

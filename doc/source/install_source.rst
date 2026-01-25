@@ -17,7 +17,7 @@ The following dependencies are required to build Charm:
 +-------------+------------------+----------+------------------------------------------+
 | Dependency  | Version          | Required | Notes                                    |
 +=============+==================+==========+==========================================+
-| Python      | 3.4+             | Yes      | Python 2.x is not supported              |
+| Python      | 3.8+             | Yes      | Python 2.x is not supported              |
 +-------------+------------------+----------+------------------------------------------+
 | GMP         | 5.x+             | Yes      | GNU Multiple Precision Arithmetic Library|
 +-------------+------------------+----------+------------------------------------------+
@@ -469,3 +469,14 @@ After installation, verify everything works by running the test suite:
 
     # Use pytest directly for more options
     pytest -v
+
+Advanced Pairing Libraries
+--------------------------
+
+For advanced users who want to use alternative pairing libraries:
+
+.. toctree::
+   :maxdepth: 1
+
+   miracl
+   relic
