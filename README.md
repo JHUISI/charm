@@ -102,10 +102,11 @@ make test-embed      # C/C++ embed API tests
 * [API Reference](https://jhuisi.github.io/charm/)
 * [C/C++ Embed API](embed/README.md)
 
-## Quick Example
+## Quick Examples
 
-BLS signatures (Boneh-Lynn-Shacham) — a pairing-based signature scheme standardized in
-[IETF RFC 9380](https://datatracker.ietf.org/doc/rfc9380/) and used in Ethereum 2.0:
+### BLS Signatures (Pairing-Based)
+
+BLS signatures (Boneh-Lynn-Shacham) — standardized in [IETF RFC 9380](https://datatracker.ietf.org/doc/rfc9380/) and used in Ethereum 2.0:
 
 ```python
 from charm.toolbox.pairinggroup import PairingGroup
@@ -115,16 +116,29 @@ from charm.schemes.pksig.pksig_bls04 import BLS01
 group = PairingGroup('BN254')
 bls = BLS01(group)
 
-# Key generation
+# Key generation, signing, and verification
 (pk, sk) = bls.keygen()
+signature = bls.sign(sk['x'], {'msg': 'hello world'})
+assert bls.verify(pk, signature, {'msg': 'hello world'})
+```
 
-# Sign a message
-message = {'msg': 'hello world'}
-signature = bls.sign(sk['x'], message)
+### ECDSA with secp256k1 (Bitcoin, Ethereum, XRPL)
 
-# Verify signature
-assert bls.verify(pk, signature, message)
-print("BLS signature verified!")
+ECDSA on secp256k1 — the curve used by Bitcoin, Ethereum, and XRP Ledger ([SEC 2](https://www.secg.org/sec2-v2.pdf)):
+
+```python
+from charm.toolbox.ecgroup import ECGroup
+from charm.toolbox.eccurve import secp256k1
+from charm.schemes.pksig.pksig_ecdsa import ECDSA
+
+# Initialize secp256k1 curve (used in Bitcoin, Ethereum, XRPL)
+group = ECGroup(secp256k1)
+ecdsa = ECDSA(group)
+
+# Key generation, signing, and verification
+(pk, sk) = ecdsa.keygen(0)
+signature = ecdsa.sign(pk, sk, 'hello world')
+assert ecdsa.verify(pk, signature, 'hello world')
 ```
 
 ## Schemes
