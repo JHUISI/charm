@@ -126,7 +126,7 @@ jobs:
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-gmp
           mingw-w64-x86_64-openssl
-          mingw-w64-x86_64-make
+          make
           flex
           bison
           wget
