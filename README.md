@@ -44,7 +44,7 @@ Charm requires the following system libraries:
 |---------|---------|---------|
 | [GMP](http://gmplib.org/) | 5.0+ | Arbitrary precision arithmetic |
 | [PBC](http://crypto.stanford.edu/pbc/download.html) | 1.0.0 | Pairing-based cryptography |
-| [OpenSSL](http://www.openssl.org/source/) | 1.1+ | Cryptographic primitives |
+| [OpenSSL](http://www.openssl.org/source/) | 3.0+ | Cryptographic primitives |
 
 **Ubuntu/Debian:**
 ```bash
