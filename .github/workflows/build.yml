@@ -137,7 +137,8 @@ jobs:
         wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
         tar -xzf pbc-1.0.0.tar.gz
         cd pbc-1.0.0
-        ./configure --prefix=/mingw64
+        # Use --disable-static --enable-shared to avoid gmp.h conflict on Windows
+        ./configure --prefix=/mingw64 --disable-static --enable-shared
         make -j$(nproc)
         make install
 
