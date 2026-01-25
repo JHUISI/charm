@@ -237,10 +237,10 @@ Charm is released under the **LGPL version 3** license. See [LICENSE.txt](LICENS
 If you use Charm in academic work, please cite:
 
 ```bibtex
-@inproceedings{charm,
-  author = {Akinyele, Joseph A. and others},
+@article{charm,
+  author = {Akinyele, Joseph A. and Garman, Christina and Miers, Ian and Pagano, Matthew W. and Rushanan, Michael and Green, Matthew and Rubin, Aviel D.},
   title = {Charm: A Framework for Rapidly Prototyping Cryptosystems},
-  booktitle = {Journal of Cryptographic Engineering},
+  journal = {Journal of Cryptographic Engineering},
   year = {2013}
 }
 ```
