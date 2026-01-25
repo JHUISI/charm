@@ -1,77 +1,183 @@
-Charm
-=====
+Charm-Crypto
+============
 
 | Branch      | Status                                                                                                          |
 | ----------- | --------------------------------------------------------------------------------------------------------------- |
-| `dev`       | ![Build Status](https://github.com/JHUISI/charm/actions/workflows/ci.yml/badge.svg?branch=dev) |
+| `dev`       | \![Build Status](https://github.com/JHUISI/charm/actions/workflows/ci.yml/badge.svg?branch=dev) |
 
-Charm is a framework for rapidly prototyping advanced cryptosystems.  Based on the Python language, it was designed from the ground up to minimize development time and code complexity while promoting the reuse of components.
+Charm is a framework for rapidly prototyping advanced cryptosystems. Based on the Python language, it was designed from the ground up to minimize development time and code complexity while promoting the reuse of components.
 
-Charm uses a hybrid design: performance intensive mathematical operations are implemented in native C modules, while cryptosystems themselves are written in a readable, high-level language.  Charm additionally provides a number of new components to facilitate the rapid development of new schemes and protocols.
+Charm uses a hybrid design: performance-intensive mathematical operations are implemented in native C modules, while cryptosystems themselves are written in a readable, high-level language. Charm additionally provides a number of new components to facilitate the rapid development of new schemes and protocols.
 
-Features of Charm include:
-* Support for various mathematical settings, including integer rings/fields, bilinear and non-bilinear Elliptic Curve groups
-* Base crypto library, including symmetric encryption schemes, hash functions, PRNGs   
-* Standard APIs for constructions such as digital signature, encryption, commitments
-* A “protocol engine” to simplify the process of implementing multi-party protocols
-* An integrated compiler for interactive and non-interactive ZK proofs
-* Integrated benchmarking capability
+## Features
 
-Documentation
-=============
-For complete install, see our [documentation](https://jhuisi.github.io/charm/install_source.html). 
+* **Mathematical Settings**: Integer rings/fields, bilinear (BN254) and non-bilinear Elliptic Curve groups
+* **Base Crypto Library**: Symmetric encryption, hash functions, PRNGs
+* **Standard APIs**: Digital signatures, encryption, commitments
+* **Protocol Engine**: Simplifies multi-party protocol implementation
+* **ZKP Compiler**: Production-ready compiler for interactive and non-interactive zero-knowledge proofs
+  - Discrete Log Equality (DLEQ) proofs
+  - Knowledge of Representation proofs
+  - AND/OR composition
+  - Range proofs
+  - Batch verification
+* **C/C++ Embed API**: Native applications can embed Charm via the Python C API
+* **Integrated Benchmarking**: Built-in performance measurement
 
-Pull Requests
-=============
+## Installation
 
-We welcome and encourage scheme contributions. If you'd like your scheme implementation included in the Charm distribution, please note a few things.
-Schemes in the dev branch are Python 3.x only and ones in the 2.7-dev branch are Python 2.x. For your scheme to be included in unit tests (`make test`), you must include a doctest at a minimum (see schemes in the charm/schemes directory). 
+### Quick Install (pip)
 
-Schemes
-=======
-We have provided several cryptographic scheme [examples](https://jhuisi.github.io/charm/schemes.html) to get you going. If this doesn't help, then feel free to reach us for questions and/or comments at support@charm-crypto.com.
+Once published to PyPI:
 
-If you're using Charm to implement schemes, we want to know what your experience is with our framework. Your feedback is very valuable to us! 
+```bash
+pip install charm-crypto
+```
 
-Installation
-============
+> **Note:** System libraries (GMP, PBC, OpenSSL) must be installed first. See [Prerequisites](#prerequisites) below.
 
 ### Prerequisites
 
 Charm requires the following system libraries:
-* [GMP 5.x](http://gmplib.org/)
-* [PBC 1.0.0](http://crypto.stanford.edu/pbc/download.html)
-* [OpenSSL](http://www.openssl.org/source/)
 
-**On Ubuntu/Debian:**
+| Library | Version | Purpose |
+|---------|---------|---------|
+| [GMP](http://gmplib.org/) | 5.0+ | Arbitrary precision arithmetic |
+| [PBC](http://crypto.stanford.edu/pbc/download.html) | 0.5.14+ | Pairing-based cryptography |
+| [OpenSSL](http://www.openssl.org/source/) | 1.1+ | Cryptographic primitives |
+
+**Ubuntu/Debian:**
 ```bash
-sudo apt-get install libgmp-dev libssl-dev flex bison
+sudo apt-get install libgmp-dev libssl-dev libpbc-dev flex bison
 ```
 
-**On macOS:**
+**macOS (Homebrew):**
 ```bash
-brew install gmp openssl@3
+brew install gmp openssl@3 pbc
 ```
 
-**PBC Library:** Must be built from source. Download from http://crypto.stanford.edu/pbc/download.html and follow the build instructions.
+**PBC from Source** (if not available via package manager):
+```bash
+wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
+tar xzf pbc-0.5.14.tar.gz
+cd pbc-0.5.14
+./configure && make && sudo make install
+```
 
 ### From Source (Development)
 
-After installing the prerequisites:
-
 ```bash
+git clone https://github.com/JHUISI/charm.git
+cd charm
 ./configure.sh  # add --enable-darwin on macOS
-pip install .
+pip install -e ".[dev]"
 ```
 
-To run tests:
+### Verify Installation
+
 ```bash
-make test
+python -c "from charm.toolbox.pairinggroup import PairingGroup; print('Charm installed successfully\!')"
 ```
 
-If most (or all) Python tests pass, then the Charm installation was successful. Enjoy!
+## Testing
 
-Licensing
-=========
+Charm includes comprehensive test suites:
 
-Charm is released under an LGPL version 3 license due to libraries that we build on. See the `LICENSE.txt` for details.
+```bash
+# Run all tests
+make test-all
+
+# Run specific test categories
+make test-unit       # Unit tests (toolbox, serialize, vectors)
+make test-schemes    # Cryptographic scheme tests
+make test-zkp        # ZKP compiler tests
+make test-adapters   # Adapter tests
+make test-embed      # C/C++ embed API tests
+```
+
+## Documentation
+
+* [Installation Guide](https://jhuisi.github.io/charm/install_source.html)
+* [Scheme Examples](https://jhuisi.github.io/charm/schemes.html)
+* [API Reference](https://jhuisi.github.io/charm/)
+* [C/C++ Embed API](embed/README.md)
+
+## Quick Example
+
+```python
+from charm.toolbox.pairinggroup import PairingGroup, GT
+from charm.schemes.abenc.abenc_bsw07 import CPabe_BSW07
+
+# Initialize pairing group (BN254 curve, ~128-bit security)
+group = PairingGroup('BN254')
+
+# Create CP-ABE scheme instance
+cpabe = CPabe_BSW07(group)
+
+# Setup
+(pk, mk) = cpabe.setup()
+
+# Generate key for attributes
+sk = cpabe.keygen(pk, mk, ['ONE', 'TWO', 'THREE'])
+
+# Encrypt with policy
+msg = group.random(GT)
+ct = cpabe.encrypt(pk, msg, '((ONE and TWO) or THREE)')
+
+# Decrypt
+recovered = cpabe.decrypt(pk, sk, ct)
+assert msg == recovered
+```
+
+## Schemes
+
+Charm includes implementations of many cryptographic schemes:
+
+| Category | Examples |
+|----------|----------|
+| **ABE** | CP-ABE (BSW07), KP-ABE, FAME |
+| **IBE** | Waters05, BB04 |
+| **Signatures** | BLS, Waters, CL04 |
+| **Commitments** | Pedersen |
+| **Group Signatures** | BBS+, PS16 |
+
+See the [schemes directory](charm/schemes/) for all available implementations.
+
+## Contributing
+
+We welcome contributions\! Please note:
+
+* All schemes must include doctests for inclusion in `make test`
+* Follow the existing code style
+* Add tests for new functionality
+* Update documentation as needed
+
+## Security
+
+Charm uses the BN254 curve which provides approximately **128-bit security**. For production use:
+
+* Keep dependencies updated
+* Use the production-ready ZKP compiler (not the legacy `exec()`-based version)
+* Review scheme implementations for your specific security requirements
+
+## Support
+
+* **Issues**: [GitHub Issues](https://github.com/JHUISI/charm/issues)
+* **Email**: jakinye3@jhu.edu
+
+## License
+
+Charm is released under the **LGPL version 3** license. See [LICENSE.txt](LICENSE.txt) for details.
+
+## Citation
+
+If you use Charm in academic work, please cite:
+
+```bibtex
+@inproceedings{charm,
+  author = {Akinyele, Joseph A. and others},
+  title = {Charm: A Framework for Rapidly Prototyping Cryptosystems},
+  booktitle = {Journal of Cryptographic Engineering},
+  year = {2013}
+}
+```
