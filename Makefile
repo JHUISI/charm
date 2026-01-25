@@ -23,6 +23,7 @@ help:
 	@echo "  make test-zkp       - Run ZKP compiler tests only"
 	@echo "  make test-adapters  - Run adapter tests only"
 	@echo "  make test-all       - Run all test categories sequentially"
+	@echo "  make test-embed     - Build and run C/C++ embedding API tests"
 	@echo "  make xmltest        - Run tests and produce XML results"
 
 .PHONY: setup
@@ -143,6 +144,24 @@ test-all:
 	@echo "========================================"
 	@echo "All test categories complete!"
 	@echo "========================================"
+
+.PHONY: test-embed
+test-embed:
+	@echo "========================================"
+	@echo "Running C/C++ Embed API Tests"
+	@echo "========================================"
+	@echo "Building embed test..."
+	@cd embed && $(MAKE) clean
+	@cd embed && $(MAKE)
+	@echo ""
+	@echo "Running embed test..."
+ifeq ($(OS),Windows_NT)
+	@cd embed && PYTHONPATH=.. ./test.exe
+else
+	@cd embed && PYTHONPATH=.. ./test
+endif
+	@echo ""
+	@echo "Embed API tests complete."
 
 # Legacy target alias
 .PHONY: test-charm
