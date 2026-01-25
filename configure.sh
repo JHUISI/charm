@@ -977,6 +977,25 @@ if test "$docs" = "yes" ; then
     echo "SPHINX=$sphinx_build" >> $config_mk
 fi
 
+# Embed API configuration
+# These variables help the embed/Makefile find libraries on different platforms
+echo "" >> $config_mk
+echo "# Embed API configuration" >> $config_mk
+echo "EMBED_PLATFORM=$targetos" >> $config_mk
+echo "EMBED_ARCH=$cpu" >> $config_mk
+
+# Set platform-specific library paths for embed API
+if test "$darwin" = "yes" ; then
+    # macOS: detect Homebrew prefix based on architecture
+    if test "$cpu" = "arm64" -o "$cpu" = "aarch64" ; then
+        echo "EMBED_HOMEBREW_PREFIX=/opt/homebrew" >> $config_mk
+    else
+        echo "EMBED_HOMEBREW_PREFIX=/usr/local" >> $config_mk
+    fi
+elif test "$targetos" = "MINGW32" ; then
+    echo "EMBED_MINGW_PREFIX=/mingw64" >> $config_mk
+fi
+
 # needed for keeping track of crypto libs installed
 cp config.dist.py charm/config.py
 exit 0
