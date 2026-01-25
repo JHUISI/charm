@@ -3,7 +3,7 @@ Charm-Crypto
 
 | Branch      | Status                                                                                                          |
 | ----------- | --------------------------------------------------------------------------------------------------------------- |
-| `dev`       | \![Build Status](https://github.com/JHUISI/charm/actions/workflows/ci.yml/badge.svg?branch=dev) |
+| `dev`       | ![Build Status](https://github.com/JHUISI/charm/actions/workflows/ci.yml/badge.svg?branch=dev) |
 
 Charm is a framework for rapidly prototyping advanced cryptosystems. Based on the Python language, it was designed from the ground up to minimize development time and code complexity while promoting the reuse of components.
 
