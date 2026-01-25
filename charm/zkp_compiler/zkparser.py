@@ -39,6 +39,23 @@ except NameError:
         def upcaseTokens(s, loc, toks):
             return [t.upper() for t in toks]
 
+
+def _set_parse_action(element, action):
+    """Compatibility wrapper for setParseAction/set_parse_action."""
+    if hasattr(element, 'set_parse_action'):
+        return element.set_parse_action(action)
+    else:
+        return element.setParseAction(action)
+
+
+def _parse_string(parser, string):
+    """Compatibility wrapper for parseString/parse_string."""
+    if hasattr(parser, 'parse_string'):
+        return parser.parse_string(string)
+    else:
+        return parser.parseString(string)
+
+
 objStack = []
 
 
@@ -153,8 +170,8 @@ class ZKParser:
             - Parentheses for grouping
         """
         # supported operators => (OR, AND, <
-        OperatorOR = Literal("OR") | Literal("or").setParseAction(upcaseTokens)
-        OperatorAND = Literal("AND") | Literal("and").setParseAction(upcaseTokens)
+        OperatorOR = Literal("OR") | _set_parse_action(Literal("or"), upcaseTokens)
+        OperatorAND = Literal("AND") | _set_parse_action(Literal("and"), upcaseTokens)
         lpar = Literal("(").suppress()
         rpar = Literal(")").suppress()
 
@@ -168,7 +185,7 @@ class ZKParser:
         # Old: Word(alphas, max=1) - only single characters like x, y, g
         # New: Word(alphas, alphanums) - alphanumeric starting with letter
         #      Examples: x, x1, x2, alpha, beta, generator, secret
-        leafNode = Word(alphas, alphanums).setParseAction(createNode)
+        leafNode = _set_parse_action(Word(alphas, alphanums), createNode)
         # describes expressions such as (attr < value)
 #        leafConditional = (Word(alphanums) + ExpOp + Word(nums)).setParseAction( parseNumConditional )
 
@@ -181,20 +198,20 @@ class ZKParser:
         expr = Forward()
         term = Forward()
         factor = Forward()
-        atom = lpar + expr + rpar | (leafNode).setParseAction( pushFirst )
+        atom = lpar + expr + rpar | _set_parse_action(leafNode, pushFirst)
 
         # NEED TO UNDERSTAND THIS SEQUENCE AND WHY IT WORKS FOR PARSING ^ and = in logical order?!?
         # Place more value on atom [ ^ factor}, so gets pushed on the stack before atom [ = factor], right?
         # In other words, adds order of precedence to how we parse the string. This means we are parsing from right
         # to left. a^b has precedence over b = c essentially
-        factor << atom + ZeroOrMore( ( ExpOp + factor ).setParseAction( pushFirst ) )
-        
-        term = atom + ZeroOrMore((Operator + factor).setParseAction( pushFirst ))
+        factor << atom + ZeroOrMore(_set_parse_action(ExpOp + factor, pushFirst))
+
+        term = atom + ZeroOrMore(_set_parse_action(Operator + factor, pushFirst))
         # define placeholder set earlier with a 'term' + Operator + another term, where there can be
         # more than zero or more of the latter. Once we find a term, we first push that into
         # the stack, then if ther's an operand + term, then we first push the term, then the Operator.
         # so on and so forth (follows post fix notation).
-        expr << term + ZeroOrMore((Operator + term).setParseAction( pushFirst ))
+        expr << term + ZeroOrMore(_set_parse_action(Operator + term, pushFirst))
         # final bnf object
         finalPol = expr#.setParseAction( debug )
         return finalPol
@@ -220,7 +237,7 @@ class ZKParser:
     def parse(self, str):
         global objStack
         del objStack[:]
-        tokens = self.finalPol.parseString(str)
+        tokens = _parse_string(self.finalPol, str)
         print("stack =>", objStack)
         return self.evalStack(objStack)
    

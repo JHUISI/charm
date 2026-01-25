@@ -83,7 +83,11 @@ class PolicyParser:
     def parse(self, string):
         global objStack
         del objStack[:]
-        self.finalPol.parseString(string)
+        # Use parse_string (pyparsing 3.x) or parseString (pyparsing 2.x)
+        if hasattr(self.finalPol, 'parse_string'):
+            self.finalPol.parse_string(string)
+        else:
+            self.finalPol.parseString(string)
         return self.evalStack(objStack)
 
     def findDuplicates(self, tree, _dict):
