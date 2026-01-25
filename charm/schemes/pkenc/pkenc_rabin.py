@@ -1,13 +1,23 @@
 '''
-| From: "Digitalized Signatures and Public-Key Functions as Intractable as Factorization".
-| Published in: 1979
-| Security Assumption: Integer Factorization
+**Rabin Public Key Encryption Scheme (Rabin)**
 
-* type:           public-key encryption
-* setting:        Integer
+*Authors:* M. O. Rabin
+
+| **Title:** "Digitalized Signatures and Public-Key Functions as Intractable as Factorization"
+| **Published in:** MIT Laboratory for Computer Science, 1979
+| **Available from:**
+| **Notes:**
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (public key)
+* **Setting:** Integer
+* **Assumption:** Integer Factorization
+
+.. rubric:: Implementation
 
 :Authors: Christina Garman
-:Date:            09/2011
+:Date: 09/2011
 '''
 
 from charm.core.math.integer import integer

@@ -1,16 +1,23 @@
 '''
-Kan Yang, Xiaohua Jia 
- 
-| From: Expressive, Efficient, and Revocable Data Access Control for Multi-Authority Cloud Storage 
-| Published in: Parallel and Distributed Systems, IEEE Transactions on  (Volume: 25,  Issue: 7) 
-| Available From: http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=6620875
-| Notes: 
+**Multi-Authority ABE for Cloud Storage (YJ14)**
 
-* type:      ciphertext-policy attribute-based encryption (public key)
-* setting:   Pairing
+*Authors:* Kan Yang, Xiaohua Jia
 
-:Authors:	artjomb
-:Date:		07/2014
+| **Title:** "Expressive, Efficient, and Revocable Data Access Control for Multi-Authority Cloud Storage"
+| **Published in:** IEEE Transactions on Parallel and Distributed Systems, Volume 25, Issue 7, 2014
+| **Available from:** http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=6620875
+| **Notes:** Supports expressive access policies with efficient revocation
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption (public key)
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Bilinear Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: artjomb
+:Date: 07/2014
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,GT,pair

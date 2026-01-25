@@ -1,19 +1,24 @@
-"""
-Hohenberger-Waters Stateful Signatures (RSA-based)
- 
- | From: "S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions", Section 3.
- | Published in: Eurocrypt 2009
- | Available from: http://eprint.iacr.org/2009/028.pdf
- | Notes: 
+'''
+**Hohenberger-Waters RSA Stateless Signature (HW09-RSA)**
 
- * type:       signature (public key)
- * setting:      RSA
- * assumption:   RSA
+*Authors:* S. Hohenberger, B. Waters
 
-:Author:    J Ayo Akinyele/Christina Garman
-:Date:      12/2011
-:Status:    Needs Improvement.
-"""
+| **Title:** "Realizing Hash-and-Sign Signatures under Standard Assumptions"
+| **Published in:** EUROCRYPT, 2009
+| **Available from:** http://eprint.iacr.org/2009/028.pdf
+| **Notes:** Section 3. Status: Needs improvement.
+
+.. rubric:: Scheme Properties
+
+* **Type:** signature (public key)
+* **Setting:** RSA
+* **Assumption:** RSA
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele, Christina Garman
+:Date: 12/2011
+'''
 
 from charm.core.math.integer import integer,random,randomBits,isPrime,gcd,bitsize,serialize
 from charm.toolbox.PKSig import PKSig
@@ -25,7 +30,7 @@ import hmac, hashlib, math
 debug = False
 
 def SHA1(bytes1):
-  s1 = hashlib.new('sha1')
+  s1 = hashlib.new('sha1')  # nosec B324 - SHA1 used for historical compatibility
   s1.update(bytes1)
   return s1.digest()
 

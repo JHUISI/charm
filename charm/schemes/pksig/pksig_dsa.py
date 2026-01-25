@@ -1,17 +1,24 @@
-""" 
-Digital Signature Algorithm (DSA)
+'''
+**Digital Signature Algorithm (DSA)**
 
-| From: "NIST proposed in Aug 1991 for use in DSS."
-| Published in: FIPS 186
-| Available from: 
-| Notes: 
+*Authors:* NIST
 
-* type:           signature
-* setting:        integer groups
+| **Title:** "Digital Signature Standard (DSS)"
+| **Published in:** FIPS 186, 1994
+| **Available from:** https://csrc.nist.gov/publications/detail/fips/186/4/final
+| **Notes:** Originally proposed by NIST in August 1991.
 
-:Authors:    J. Ayo Akinyele
-:Date:       5/2011
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** signature (public key)
+* **Setting:** integer groups
+* **Assumption:** Discrete Logarithm
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 5/2011
+'''
 
 from charm.toolbox.integergroup import IntegerGroupQ
 from charm.toolbox.PKSig import PKSig

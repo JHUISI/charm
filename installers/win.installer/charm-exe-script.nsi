@@ -33,9 +33,9 @@
 
 ; Constants.
 !define PRODUCT_NAME "charm-crypto"
-!define PRODUCT_VERSION "0.43"
+!define PRODUCT_VERSION "0.60"
 !define PRODUCT_PUBLISHER "Johns Hopkins University, HMS Lab"
-!define PRODUCT_WEB_SITE "http://charm-crypto.com/Main.html"
+!define PRODUCT_WEB_SITE "https://jhuisi.github.io/charm/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
@@ -108,7 +108,7 @@ Function changeLogPage
 	"${__NSD_Text_STYLE}|${WS_VSCROLL}|${WS_HSCROLL}|${ES_MULTILINE}|${ES_WANTRETURN}" \
 	"${__NSD_Text_EXSTYLE}" \
 	0 0 100% 100% \
-	"- Several bug fixes to base modules (mem leaks, interface issues): pairing (PBC & Miracl), ecc, and integer.$\r$\n- Added new base module for RELIC and fixed bugs for MIRACL (Note: unified abstract interface for base modules coming in v0.43).$\r$\n- Refactored charm package structure. This affects schemes, toolbox, adapters, etc.$\r$\n- setup.py now creates Python egg.$\r$\n- Integrated pytest to replace unit testing framework.$\r$\n- Added doctests to all Charm schemes.$\r$\n- Updated documentation.$\r$\n"
+	"Charm-Crypto v0.60 Release Notes:$\r$\n$\r$\n- OpenSSL 3.0+ compatibility fixes$\r$\n- Python 3.9+ support (dropped Python 2.7)$\r$\n- New ZKP compiler with multiple proof types$\r$\n- Comprehensive documentation overhaul$\r$\n- Test vectors for BLS, Pedersen, Schnorr$\r$\n- Modern pip packaging with pyproject.toml$\r$\n- CI/CD workflows added$\r$\n- Bug fixes and stability improvements$\r$\n"
 	Pop $changeLog
 	
 	nsDialogs::Show

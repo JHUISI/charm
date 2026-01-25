@@ -1,17 +1,24 @@
-""" 
-Chow-Yiu-Hui - Identity-based ring signatures
+'''
+**Chow-Yiu-Hui Identity-Based Ring Signature (CYH05)**
 
-| From: "S. Chow, S. Yiu and L. Hui - Efficient identity based ring signature."
-| Published in: ACNS 2005
-| Available from: Vol 3531 of LNCS, pages 499-512
-| Notes: 
+*Authors:* S. Chow, S. Yiu, L. Hui
 
-* type:           signature (ring-based)
-* setting:        bilinear groups (asymmetric)
+| **Title:** "Efficient Identity Based Ring Signature"
+| **Published in:** ACNS, 2005
+| **Available from:** LNCS Vol. 3531, pages 499-512
+| **Notes:**
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** signature (ring-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** CDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2011
+'''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.iterate import dotprod

@@ -1,18 +1,25 @@
 '''
-Unbounded HIBE and Attribute-Based Encryption
+**Lewko-Waters Unbounded Hierarchical Identity-Based Encryption (LW11-HIBE)**
 
-| Original scheme: "A. Lewko, B. Waters Unbounded HIBE and Attribute-Based Encryption"
-| Published in: Advances in Cryptology - EUROCRYPT 2011, Springer Berlin/Heidelberg, 2011
-| Available from: http://eprint.iacr.org/2011/049
-| Modified scheme for prime order groups: "A. Lewko Tools for Simulating Features of Composite Order Bilinear Groups in the Prime Order Setting" Section B.3
-| Published in: Advances in Cryptology - EUROCRYPT 2012, Springer Berlin/Heidelberg, 2012
-| Available from: http://eprint.iacr.org/2011/490
+*Authors:* Allison Lewko, Brent Waters
 
-* type:           identity based encryption
-* setting:        bilinear groups (symmetric)
+| **Title:** "Unbounded HIBE and Attribute-Based Encryption"
+| **Published in:** Advances in Cryptology - EUROCRYPT 2011, Springer Berlin/Heidelberg
+| **Available from:** http://eprint.iacr.org/2011/049
+| **Notes:** Modified for prime order groups using techniques from "Tools for Simulating
+|     Features of Composite Order Bilinear Groups in the Prime Order Setting"
+|     (EUROCRYPT 2012, http://eprint.iacr.org/2011/490, Section B.3)
 
-:Authors:    N. Fotiou
-:Date:       6/2014
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (hierarchical identity-based)
+* **Setting:** bilinear groups (symmetric)
+* **Assumption:** Decisional Linear (DLIN)
+
+.. rubric:: Implementation
+
+:Authors: N. Fotiou
+:Date: 6/2014
 '''
 from charm.toolbox.pairinggroup import ZR,G1,G2,GT,pair
 from charm.core.math.integer import integer,bitsize

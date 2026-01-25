@@ -409,7 +409,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 					free(buffer);
 					return NULL;
 				}
-				if (PyUnicode_GET_SIZE(ctr) != BLOCK_SIZE) {
+				if (PyUnicode_GET_LENGTH(ctr) != BLOCK_SIZE) {
 					PyErr_Format(PyExc_TypeError,
 						     "CTR counter function returned "
 						     "string not of length %i",

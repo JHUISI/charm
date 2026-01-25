@@ -34,7 +34,7 @@ class YLLC15Test(unittest.TestCase):
         proxy_key_user = self.abe.proxy_keygen(self.params, self.msk, pkcs, pku, attrs)
         self.assertEqual({ attr.upper() for attr in set(attrs) }, proxy_key_user['k_attrs'].keys())
 
-    @settings(deadline=500, max_examples=50)
+    @settings(deadline=1000, max_examples=50)  # Increased deadline for CI variability
     @given(policy_str=policy_expressions())
     def test_encrypt_proxy_decrypt_decrypt_round_trip(self, policy_str):
         pkcs, skcs = self.abe.ukgen(self.params)

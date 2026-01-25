@@ -1,15 +1,24 @@
 '''
-NAL16 Proxy Re-Encryption
-| From: Nunez, D., Agudo, I., & Lopez, J. (2016). On the application of generic CCA-secure transformations to proxy re-encryption
-| Published in: Security and Communication Networks
-| Available from: http://onlinelibrary.wiley.com/doi/10.1002/sec.1434/full
-* type:           proxy encryption
-* properties:     CCA_21-secure, unidirectional, single-hop, non-interactive, collusion-resistant
-* setting:        Pairing groups (Type 1 "symmetric")
-* assumption:     3-wDBDHI (3-weak Decisional Bilinear DH Inversion)
-* to-do:          first-level encryption & second-level decryption, type annotations
-:Authors:    D. Nuñez
-:Date:       04/2016
+**NAL Proxy Re-Encryption (NAL16)**
+
+*Authors:* Nuñez, Agudo, Lopez
+
+| **Title:** "On the Application of Generic CCA-Secure Transformations to Proxy Re-Encryption"
+| **Published in:** Security and Communication Networks, 2016
+| **Available from:** http://onlinelibrary.wiley.com/doi/10.1002/sec.1434/full
+| **Notes:** First-level encryption & second-level decryption not yet implemented; type annotations to-do
+
+.. rubric:: Scheme Properties
+
+* **Type:** proxy re-encryption
+* **Setting:** Pairing groups (Type 1 "symmetric")
+* **Assumption:** 3-wDBDHI (3-weak Decisional Bilinear DH Inversion)
+* **Properties:** CCA_21-secure, unidirectional, single-hop, non-interactive, collusion-resistant
+
+.. rubric:: Implementation
+
+:Authors: D. Nuñez
+:Date: 04/2016
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

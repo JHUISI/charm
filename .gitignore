@@ -60,3 +60,13 @@ nosetests.xml
 .idea
 
 .hypothesis
+
+# Dependencies (downloaded/built locally)
+deps/pbc/pbc-*/
+deps/relic/relic-toolkit-*/
+
+# Project management
+BACKLOG.md
+
+# Local pip config
+pip.conf

@@ -1,18 +1,23 @@
 '''
-Yamada, Attrapadung, Hanaoka, Kunihiro
+**Non-monotonic CP-ABE (YAHK14)**
 
-| From: "A Framework and Compact Constructions for Non-monotonic Attribute-Based Encryption"
-| Published in:  Public-Key Cryptography--PKC 2014
-| Pages: 275--292
-| Available from: http://eprint.iacr.org/2014/181 Sec. 7
-| Notes:
+*Authors:* Shota Yamada, Nuttapong Attrapadung, Goichiro Hanaoka, Noboru Kunihiro
 
-* type:          attribute-based encryption (public key)
-* setting:       bilinear pairing group of prime order
-* assumption:    complex q-type assumption
+| **Title:** "A Framework and Compact Constructions for Non-monotonic Attribute-Based Encryption"
+| **Published in:** Public-Key Cryptography (PKC) 2014, Pages 275-292
+| **Available from:** http://eprint.iacr.org/2014/181 (Section 7)
+| **Notes:** Supports non-monotonic access structures (with negation)
 
-:Authors:        al, artjomb
-:Date:          07/15
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption (public key)
+* **Setting:** Bilinear pairing group of prime order
+* **Assumption:** Complex q-type assumption
+
+.. rubric:: Implementation
+
+:Authors: al, artjomb
+:Date: 07/2015
 '''
 
 from charm.toolbox.pairinggroup import *

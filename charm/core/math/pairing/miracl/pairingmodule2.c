@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface over MIRACL's pairing-based operations
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  * 	@remark	 this version of the pairing module uses the MIRACL library (www.shamus.ie).
  *   At the moment, only useful for academic purposes and should be treated as such.
  *   To build into Charm, you'll need to acquire the MIRACL source and compile with the
@@ -315,7 +315,8 @@ void	Element_dealloc(Element* self)
  */
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA256_CTX sha2;
+	EVP_MD_CTX *ctx;
+	unsigned int md_len;
 	int i, new_input_len = input_len + 2; // extra byte for prefix
 	uint8_t first_block = 0;
 	uint8_t new_input[new_input_len+1];
@@ -332,11 +333,14 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 	// prepare output buf
 	memset(output_buf, 0, hash_len);
 
+	ctx = EVP_MD_CTX_new();
+	if (ctx == NULL) return FALSE;
+
 	if (hash_len <= HASH_LEN) {
-		SHA256_Init(&sha2);
-		SHA256_Update(&sha2, new_input, new_input_len);
+		EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+		EVP_DigestUpdate(ctx, new_input, new_input_len);
 		uint8_t md[HASH_LEN+1];
-		SHA256_Final(md, &sha2);
+		EVP_DigestFinal_ex(ctx, md, &md_len);
 		memcpy(output_buf, md, hash_len);
 	}
 	else {
@@ -351,11 +355,11 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
 			target_buf += (i * HASH_LEN);
 			new_input[0] = (uint8_t) i;
-			SHA256_Init(&sha2);
+			EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
 			debug("input %d => ", i);
 			printf_buffer_as_hex(new_input, new_input_len);
-			SHA256_Update(&sha2, new_input, new_input_len);
-			SHA256_Final(md, &sha2);
+			EVP_DigestUpdate(ctx, new_input, new_input_len);
+			EVP_DigestFinal_ex(ctx, md, &md_len);
 			memcpy(target_buf, md, hash_len);
 			debug("block %d => ", i);
 			printf_buffer_as_hex(md, HASH_LEN);
@@ -365,7 +369,7 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 		memcpy(output_buf, md2, hash_len);
 	}
 
-	OPENSSL_cleanse(&sha2,sizeof(sha2));
+	EVP_MD_CTX_free(ctx);
 	return TRUE;
 }
 
@@ -435,7 +439,7 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 {
 	char *params = NULL, *param_string = NULL;
-	size_t b_len = 0;
+	Py_ssize_t b_len = 0;
 	int aes_sec = -1;
     static char *kwlist[] = {"aes_sec", "params", "param_string", NULL};
 	
@@ -1568,7 +1572,7 @@ PyObject *AES_Encrypt(Element *self, PyObject *args)
 {
 	PyObject *keyObj = NULL, *tmp_obj = NULL; // string or bytes object
 	char *messageStr;
-	int m_len = 0;
+	Py_ssize_t m_len = 0;
 
 	if(!PyArg_ParseTuple(args, "Os#", &keyObj, &messageStr, &m_len)) {
 		PyErr_SetString(ElementError, "invalid arguments.");
@@ -1588,7 +1592,7 @@ PyObject *AES_Encrypt(Element *self, PyObject *args)
 		// perform AES encryption using miracl
 		char *cipher = NULL;
 
-		int c_len = aes_encrypt(keyStr, messageStr, m_len, &cipher);
+		int c_len = aes_encrypt(keyStr, messageStr, (int) m_len, &cipher);
 
 		PyObject *str = PyBytes_FromStringAndSize((const char *) cipher, c_len);
 		free(cipher);
@@ -1604,7 +1608,7 @@ PyObject *AES_Decrypt(Element *self, PyObject *args)
 {
 	PyObject *keyObj = NULL, *tmp_obj = NULL; // string or bytes object
 	char *ciphertextStr;
-	int c_len = 0;
+	Py_ssize_t c_len = 0;
 
 	if(!PyArg_ParseTuple(args, "Os#", &keyObj, &ciphertextStr, &c_len)) {
 		PyErr_SetString(ElementError, "invalid arguments.");
@@ -1619,7 +1623,7 @@ PyObject *AES_Decrypt(Element *self, PyObject *args)
 		// perform AES encryption using miracl
 		char *message = NULL;
 
-		int m_len = aes_decrypt(keyStr, ciphertextStr, c_len, &message);
+		int m_len = aes_decrypt(keyStr, ciphertextStr, (int) c_len, &message);
 
 		PyObject *str = PyBytes_FromStringAndSize((const char *) message, m_len);
 		free(message);

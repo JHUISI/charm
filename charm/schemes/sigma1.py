@@ -1,17 +1,37 @@
+'''
+**Sigma Protocol 1 (Sigma1)**
+
+*Authors:* Charm Developers
+
+| **Notes:** Sigma protocol for proving knowledge in pairing-based settings
+
+.. rubric:: Scheme Properties
+
+* **Type:** sigma protocol (zero-knowledge proof)
+* **Setting:** bilinear groups (pairing-based)
+* **Assumption:** DL
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2/2012
+'''
+
+
 from charm.toolbox.sigmaprotocol import Sigma
 from charm.toolbox.pairinggroup import ZR,G2,pair
 
 class SigmaProtocol1(Sigma):
     def __init__(self, groupObj, common_input=None):
         Sigma.__init__(self, groupObj, common_input)
-    
+
     def prover_state1(self):
         (g, h, H) = Sigma.get(self, ['g', 'h', 'H'])
         r = self.group.random(G2)
         a = pair(g, r)
         Sigma.setState(self, 3)
-        return { 'r':r, 'a':a, 'g':g, 'h':h, 'H':H }        
-    
+        return { 'r':r, 'a':a, 'g':g, 'h':h, 'H':H }
+
     def prover_state3(self, input):
         (r, h, c) = Sigma.get(self, ['r','h','c'])
         z = r * (h ** -c)
@@ -27,7 +47,7 @@ class SigmaProtocol1(Sigma):
         c = self.group.random(ZR)
         Sigma.setState(self, 4)
         return {'c':c }
-        
+
     def verifier_state4(self, input):
         (g, H, a, c, z) = Sigma.get(self, ['g','H','a','c','z'])
         if a == (pair(g,z) * (H ** c)):

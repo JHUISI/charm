@@ -12,7 +12,7 @@ installation blocks highlighting each respective implementation.
 
 Before we begin, please note the current dependencies:
     
-- Python2.7 or Python3
+- Python 3.8 or later (Python 2 is no longer supported)
 
 - Pyparsing http://pyparsing.wikispaces.com/
 
@@ -34,50 +34,26 @@ The steps for building in linux this way are:
     2. sudo make
     3. sudo make install
 	
-[Ubuntu 10.04 LTS]
+[Ubuntu 20.04/22.04/24.04 LTS]
 
-1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
+1. Before installing Charm, there are a few prerequisites that need to be installed on your system:
 	1. Git
-		sudo apt-get git
-	2. Python 3 (By default, Ubuntu 10.04 LTS comes with 2.6, this build of charm requires 3.x) and header files/static library
-		sudo apt-get install python3 python3-dev
-	3. m4
-		sudo apt-get install m4
-	4. libssl-dev
-		sudo apt-get install libssl-dev
+		sudo apt-get install git
+	2. Python 3 and header files
+		sudo apt-get install python3 python3-dev python3-pip
+	3. Build tools
+		sudo apt-get install build-essential m4 flex bison
+	4. Required libraries
+		sudo apt-get install libgmp-dev libssl-dev
 
 2. Now we need to obtain a copy of Charm:
-	git clone git://github.com/JHUISI/charm.git
+	git clone https://github.com/JHUISI/charm.git
 
 3. Next, we will install Charm. Navigate to the Charm directory.
 	1. We must first run the configuration script:
-		sudo ./configure.sh
+		./configure.sh
 	2. Now we will build and install Charm:
-		sudo make
-		sudo make install
-	3. And finally we must rebuild the searchpath for libraries
-		sudo ldconfig
-
-[Ubuntu 11.04]
-
-1. Before installing Charm, there are a few prerequisites that need to be installed on your system. These are:
-	1. Git
-		sudo apt-get git
-	2. m4
-		sudo apt-get install m4
-	3. Python 3 and headers/ static library
-		sudo apt-get install python3
-	4. Header files/static library
-		sudo apt-get install python3-dev (if you did install Python 3)
-
-2. Now we need to obtain a copy of Charm:
-	git clone git://github.com/JHUISI/charm.git
-
-3. Next, we will install Charm. Navigate to the Charm directory.
-	1. We must first run the configuration script:
-		sudo ./configure.sh
-	2. Now we will build and install Charm:
-		sudo make
+		make
 		sudo make install
 	3. And finally we must rebuild the searchpath for libraries
 		sudo ldconfig
@@ -345,24 +321,29 @@ Let's first build our dependencies with the following scripts:
 		make install
 
 
-BUILDING IN OS X 
+BUILDING IN OS X
 ------------------------
 
 Note that the entire compilation process is supported by the Charm configure/make scripts.
-The steps for building in os x this way are:
-	1. In a terminal, run configure.sh
-	2. The process will fail out at wget, and will ask you to install.
-	3. Using your package manager of choice (e.g., sudo port install wget), install wget.
-    4. With wget installed, run the configure.sh script again, and it should set up your
-       Make dependencies for you.  
-    5. make
-    6. make install
-    *. Another way to install dependencies is to use macports, homebrew or fink.
-	
-[Snow Leopard]
 
+[macOS (Monterey, Ventura, Sonoma)]
 
-[Lion/Mountain Lion]
+1. Install Homebrew if not already installed:
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-For Lion, run ./configure.sh --enable-darwin in step 1 and follow the steps above for OS X.
+2. Install dependencies via Homebrew:
+	brew install gmp openssl@3 flex bison wget
+
+3. Build and install PBC library:
+	wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+	tar -xzf pbc-1.0.0.tar.gz
+	cd pbc-1.0.0
+	./configure LDFLAGS="-L$(brew --prefix gmp)/lib" CPPFLAGS="-I$(brew --prefix gmp)/include"
+	make
+	sudo make install
+
+4. Configure and build Charm:
+	./configure.sh --enable-darwin
+	make
+	sudo make install
 

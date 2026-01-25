@@ -7,6 +7,11 @@ on:
   pull_request:
     branches:
       - dev
+  schedule:
+    # Run fuzzing weekly on Sundays at 2am UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    # Allow manual triggering for fuzzing
 
 jobs:
   build:
@@ -14,10 +19,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.8'
 
@@ -47,3 +52,95 @@ jobs:
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
         pytest
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install bandit
+      run: pip install bandit
+
+    - name: Run bandit security scan
+      run: |
+        bandit -r charm/ -c .bandit -f json -o bandit-results.json || true
+        bandit -r charm/ -c .bandit -ll -ii
+
+    - name: Upload bandit results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: bandit-security-report
+        path: bandit-results.json
+
+  fuzzing:
+    runs-on: ubuntu-latest
+    name: Fuzzing (Atheris)
+    # Optional job - only runs on schedule or manual trigger
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y flex bison libfl-dev libgmp-dev libssl-dev
+
+    - name: Build and install PBC
+      run: |
+        wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+        tar -xzf pbc-1.0.0.tar.gz
+        cd pbc-1.0.0
+        ./configure LDFLAGS="-lgmp"
+        make
+        sudo make install
+        sudo ldconfig
+
+    - name: Build Charm
+      run: |
+        ./configure.sh
+        make
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pyparsing hypothesis atheris
+
+    - name: Run policy parser fuzzer
+      env:
+        LD_LIBRARY_PATH: /usr/local/lib:$LD_LIBRARY_PATH
+      run: |
+        timeout 360 python charm/test/fuzz/fuzz_policy_parser.py -max_total_time=300 || true
+        echo "Policy parser fuzzing completed"
+
+    - name: Run serialization fuzzer
+      env:
+        LD_LIBRARY_PATH: /usr/local/lib:$LD_LIBRARY_PATH
+      run: |
+        timeout 360 python charm/test/fuzz/fuzz_serialization.py -max_total_time=300 || true
+        echo "Serialization fuzzing completed"
+
+    - name: Upload crash artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: fuzzing-crashes
+        path: |
+          crash-*
+          oom-*
+          timeout-*
+        if-no-files-found: ignore

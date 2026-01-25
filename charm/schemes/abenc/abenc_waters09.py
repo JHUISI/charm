@@ -1,17 +1,23 @@
 '''
-Brent Waters (Pairing-based)
- 
-| From: "Ciphertext-Policy Attribute-Based Encryption: An Expressive, Efficient, and Provably Secure Realization", Appendix C.
-| Published in: 2008
-| Available from: http://eprint.iacr.org/2008/290.pdf
-| Notes: Security Assumption: parallel q-DBDHE. The sole disadvantage of this scheme is the high number of pairings
-| that must be computed during the decryption process (2 + N) for N attributes mathing in the key.
+**Ciphertext-Policy Attribute-Based Encryption (Waters09)**
 
-* type:            ciphertext-policy attribute-based encryption (public key)
-* setting:        Pairing
+*Authors:* Brent Waters
 
-:Authors:    J Ayo Akinyele
-:Date:            11/2010
+| **Title:** "Ciphertext-Policy Attribute-Based Encryption: An Expressive, Efficient, and Provably Secure Realization"
+| **Published in:** Cryptology ePrint Archive, 2008 (Appendix C)
+| **Available from:** http://eprint.iacr.org/2008/290.pdf
+| **Notes:** The sole disadvantage of this scheme is the high number of pairings that must be computed during the decryption process (2 + N) for N attributes matching in the key.
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption (public key)
+* **Setting:** Pairing groups
+* **Assumption:** parallel q-DBDHE
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2010
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil

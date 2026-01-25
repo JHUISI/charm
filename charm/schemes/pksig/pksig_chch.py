@@ -1,17 +1,24 @@
-""" 
-Jae Choon Cha and Jung Hee Cheon - Identity-based Signatures
+'''
+**Cha-Cheon Identity-Based Signature (CHCH03)**
 
-| From: "J. Cha and J. Choen - An identity-based signature from gap Diffie-Hellman groups."
-| Published in: PKC 2003
-| Available from: Vol. 2567. LNCS, pages 18-30
-| Notes: 
+*Authors:* J. C. Cha, J. H. Cheon
 
-* type:           signature (ID-based)
-* setting:        bilinear groups (asymmetric)
+| **Title:** "An Identity-Based Signature from Gap Diffie-Hellman Groups"
+| **Published in:** PKC, 2003
+| **Available from:** LNCS Vol. 2567, pages 18-30
+| **Notes:**
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** Gap-DH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2011
+'''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.PKSig import PKSig
 

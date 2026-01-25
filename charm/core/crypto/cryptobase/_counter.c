@@ -28,23 +28,22 @@
 
 #include "_counter.h"
 
-#include "pycrypto_compat.h"
-
 /* NB: This can be called multiple times for a given object, via the __init__ method.  Be careful. */
 static int
 CounterObject_init(PCT_CounterObject *self, PyObject *args, PyObject *kwargs)
 {
-    PyUnicodeObject *prefix=NULL, *suffix=NULL, *initval=NULL;
+    PyObject *prefix=NULL, *suffix=NULL, *initval=NULL;
     int allow_wraparound = 0;
     int disable_shortcut = 0;
     Py_ssize_t size;
 
     static char *kwlist[] = {"prefix", "suffix", "initval", "allow_wraparound", "disable_shortcut", NULL};
+    /* S format expects PyBytesObject* in Python 3 */
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "SSS|ii", kwlist, &prefix, &suffix, &initval, &allow_wraparound, &disable_shortcut))
         return -1;
 
     /* Check string size and set nbytes */
-    size = PyUnicode_GET_SIZE(initval);
+    size = PyBytes_GET_SIZE(initval);
     if (size < 1) {
         PyErr_SetString(PyExc_ValueError, "initval length too small (must be >= 1 byte)");
         return -1;
@@ -55,7 +54,7 @@ CounterObject_init(PCT_CounterObject *self, PyObject *args, PyObject *kwargs)
     self->nbytes = (uint16_t) size;
 
     /* Check prefix length */
-    size = PyUnicode_GET_SIZE(prefix);
+    size = PyBytes_GET_SIZE(prefix);
     assert(size >= 0);
     if (size > 0xffff) {
         PyErr_SetString(PyExc_ValueError, "prefix length too large (must be <= 65535 bytes)");
@@ -63,7 +62,7 @@ CounterObject_init(PCT_CounterObject *self, PyObject *args, PyObject *kwargs)
     }
 
     /* Check suffix length */
-    size = PyUnicode_GET_SIZE(suffix);
+    size = PyBytes_GET_SIZE(suffix);
     assert(size >= 0);
     if (size > 0xffff) {
         PyErr_SetString(PyExc_ValueError, "suffix length too large (must be <= 65535 bytes)");
@@ -75,7 +74,7 @@ CounterObject_init(PCT_CounterObject *self, PyObject *args, PyObject *kwargs)
     Py_INCREF(prefix);
     self->prefix = prefix;
 
-    /* Set prefix, being careful to properly discard any old reference */
+    /* Set suffix, being careful to properly discard any old reference */
     Py_CLEAR(self->suffix);
     Py_INCREF(suffix);
     self->suffix = suffix;
@@ -89,24 +88,24 @@ CounterObject_init(PCT_CounterObject *self, PyObject *args, PyObject *kwargs)
 
     /* Allocate new buffer */
     /* buf_size won't overflow because the length of each string will always be <= 0xffff */
-    self->buf_size = PyUnicode_GET_SIZE(prefix) + PyUnicode_GET_SIZE(suffix) + self->nbytes;
+    self->buf_size = PyBytes_GET_SIZE(prefix) + PyBytes_GET_SIZE(suffix) + self->nbytes;
     self->val = self->p = PyMem_Malloc(self->buf_size);
     if (self->val == NULL) {
         self->buf_size = 0;
         return -1;
     }
-    self->p = self->val + PyUnicode_GET_SIZE(prefix);
+    self->p = self->val + PyBytes_GET_SIZE(prefix);
 
     /* Sanity-check pointers */
     assert(self->val <= self->p);
     assert(self->p + self->nbytes <= self->val + self->buf_size);
-    assert(self->val + PyUnicode_GET_SIZE(self->prefix) == self->p);
-    assert(PyUnicode_GET_SIZE(self->prefix) + self->nbytes + PyUnicode_GET_SIZE(self->suffix) == self->buf_size);
+    assert(self->val + PyBytes_GET_SIZE(self->prefix) == self->p);
+    assert(PyBytes_GET_SIZE(self->prefix) + self->nbytes + PyBytes_GET_SIZE(self->suffix) == self->buf_size);
 
     /* Copy the prefix, suffix, and initial value into the buffer. */
-    memcpy(self->val, PyUnicode_AS_STRING(prefix), PyUnicode_GET_SIZE(prefix));
-    memcpy(self->p, PyUnicode_AS_STRING(initval), self->nbytes);
-    memcpy(self->p + self->nbytes, PyUnicode_AS_STRING(suffix), PyUnicode_GET_SIZE(suffix));
+    memcpy(self->val, PyBytes_AS_STRING(prefix), PyBytes_GET_SIZE(prefix));
+    memcpy(self->p, PyBytes_AS_STRING(initval), self->nbytes);
+    memcpy(self->p + self->nbytes, PyBytes_AS_STRING(suffix), PyBytes_GET_SIZE(suffix));
 
     /* Set shortcut_disabled and allow_wraparound */
     self->shortcut_disabled = disable_shortcut;
@@ -154,7 +153,7 @@ _CounterObject_next_value(PCT_CounterObject *self, int little_endian)
         goto err_out;
     }
 
-    eight = PyInt_FromLong(8);
+    eight = PyLong_FromLong(8);
     if (!eight)
         goto err_out;
 
@@ -179,7 +178,7 @@ _CounterObject_next_value(PCT_CounterObject *self, int little_endian)
 
         /* ch = ord(p) */
         Py_CLEAR(ch);   /* delete old ch */
-        ch = PyInt_FromLong((long) *p);
+        ch = PyLong_FromLong((long) *p);
         if (!ch)
             goto err_out;
 
@@ -274,7 +273,8 @@ CounterObject_call(PCT_CounterObject *self, PyObject *args, PyObject *kwargs)
         return NULL;
     }
 
-    retval = (PyObject *)PyUnicode_FromStringAndSize((const char *)self->val, self->buf_size);
+    /* Return bytes object for CTR mode counter */
+    retval = PyBytes_FromStringAndSize((const char *)self->val, self->buf_size);
 
     self->inc_func(self);
 
@@ -295,49 +295,54 @@ static PyMethodDef CounterBEObject_methods[] = {
     {NULL} /* sentinel */
 };
 
-/* Python 2.1 doesn't allow us to assign methods or attributes to an object,
- * so we hack it here. */
+/* Custom getattro for accessing carry attribute and shortcut flag */
 static PyObject *
-CounterLEObject_getattr(PyObject *s, char *name)
+CounterLEObject_getattro(PyObject *s, PyObject *name)
 {
     PCT_CounterObject *self = (PCT_CounterObject *)s;
-    if (strcmp(name, "carry") == 0) {
-        return PyInt_FromLong((long)self->carry);
-    } else if (!self->shortcut_disabled && strcmp(name, "__PCT_CTR_SHORTCUT__") == 0) {
+    const char *name_str = PyUnicode_AsUTF8(name);
+    if (name_str == NULL) {
+        return NULL;
+    }
+    if (strcmp(name_str, "carry") == 0) {
+        return PyLong_FromLong((long)self->carry);
+    } else if (!self->shortcut_disabled && strcmp(name_str, "__PCT_CTR_SHORTCUT__") == 0) {
         /* Shortcut hack - See block_template.c */
         Py_INCREF(Py_True);
         return Py_True;
     }
-    return Py_FindMethod(CounterLEObject_methods, (PyObject *)self, name);
+    return PyObject_GenericGetAttr(s, name);
 }
 
 static PyObject *
-CounterBEObject_getattr(PyObject *s, char *name)
+CounterBEObject_getattro(PyObject *s, PyObject *name)
 {
     PCT_CounterObject *self = (PCT_CounterObject *)s;
-    if (strcmp(name, "carry") == 0) {
-        return PyInt_FromLong((long)self->carry);
-    } else if (!self->shortcut_disabled && strcmp(name, "__PCT_CTR_SHORTCUT__") == 0) {
+    const char *name_str = PyUnicode_AsUTF8(name);
+    if (name_str == NULL) {
+        return NULL;
+    }
+    if (strcmp(name_str, "carry") == 0) {
+        return PyLong_FromLong((long)self->carry);
+    } else if (!self->shortcut_disabled && strcmp(name_str, "__PCT_CTR_SHORTCUT__") == 0) {
         /* Shortcut hack - See block_template.c */
         Py_INCREF(Py_True);
         return Py_True;
     }
-
-    return Py_FindMethod(CounterBEObject_methods, (PyObject *)self, name);
+    return PyObject_GenericGetAttr(s, name);
 }
 
 static PyTypeObject
 my_CounterLEType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                              /* ob_size */
-	"_counter.CounterLE",           /* tp_name */
-	sizeof(PCT_CounterObject),       /* tp_basicsize */
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "_counter.CounterLE",           /* tp_name */
+    sizeof(PCT_CounterObject),      /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor)CounterObject_dealloc, /* tp_dealloc */
-    0,                              /* tp_print */
-    CounterLEObject_getattr,        /* tp_getattr */
-    0,                              /* tp_setattr */
-    0,                              /* tp_compare */
+    0,                              /* tp_vectorcall_offset */
+    0,                              /* tp_getattr (deprecated) */
+    0,                              /* tp_setattr (deprecated) */
+    0,                              /* tp_as_async */
     0,                              /* tp_repr */
     0,                              /* tp_as_number */
     0,                              /* tp_as_sequence */
@@ -345,25 +350,31 @@ my_CounterLEType = {
     0,                              /* tp_hash */
     (ternaryfunc)CounterObject_call, /* tp_call */
     0,                              /* tp_str */
-    0,                              /* tp_getattro */
+    CounterLEObject_getattro,       /* tp_getattro */
     0,                              /* tp_setattro */
     0,                              /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,             /* tp_flags */
     "Counter (little endian)",      /* tp_doc */
+    0,                              /* tp_traverse */
+    0,                              /* tp_clear */
+    0,                              /* tp_richcompare */
+    0,                              /* tp_weaklistoffset */
+    0,                              /* tp_iter */
+    0,                              /* tp_iternext */
+    CounterLEObject_methods,        /* tp_methods */
 };
 
 static PyTypeObject
 my_CounterBEType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                              /* ob_size */
-	"_counter.CounterBE",           /* tp_name */
-	sizeof(PCT_CounterObject),       /* tp_basicsize */
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "_counter.CounterBE",           /* tp_name */
+    sizeof(PCT_CounterObject),      /* tp_basicsize */
     0,                              /* tp_itemsize */
     (destructor)CounterObject_dealloc, /* tp_dealloc */
-    0,                              /* tp_print */
-    CounterBEObject_getattr,        /* tp_getattr */
-    0,                              /* tp_setattr */
-    0,                              /* tp_compare */
+    0,                              /* tp_vectorcall_offset */
+    0,                              /* tp_getattr (deprecated) */
+    0,                              /* tp_setattr (deprecated) */
+    0,                              /* tp_as_async */
     0,                              /* tp_repr */
     0,                              /* tp_as_number */
     0,                              /* tp_as_sequence */
@@ -371,11 +382,18 @@ my_CounterBEType = {
     0,                              /* tp_hash */
     (ternaryfunc)CounterObject_call, /* tp_call */
     0,                              /* tp_str */
-    0,                              /* tp_getattro */
+    CounterBEObject_getattro,       /* tp_getattro */
     0,                              /* tp_setattro */
     0,                              /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,             /* tp_flags */
     "Counter (big endian)",         /* tp_doc */
+    0,                              /* tp_traverse */
+    0,                              /* tp_clear */
+    0,                              /* tp_richcompare */
+    0,                              /* tp_weaklistoffset */
+    0,                              /* tp_iter */
+    0,                              /* tp_iternext */
+    CounterBEObject_methods,        /* tp_methods */
 };
 
 /*
@@ -444,21 +462,35 @@ static PyMethodDef module_methods[] = {
     {NULL, NULL, 0, NULL}   /* end-of-list sentinel value */
 };
 
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "_counter",
+    "Fast counter for use with CTR-mode ciphers",
+    -1,
+    module_methods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
 
 PyMODINIT_FUNC
-init_counter(void)
+PyInit__counter(void)
 {
     PyObject *m;
 
-    /* TODO - Is the error handling here correct? */
+    /* Initialize the types */
+    if (PyType_Ready(&my_CounterLEType) < 0)
+        return NULL;
+    if (PyType_Ready(&my_CounterBEType) < 0)
+        return NULL;
 
     /* Initialize the module */
-    m = Py_InitModule("_counter", module_methods);
+    m = PyModule_Create(&moduledef);
     if (m == NULL)
-        return;
+        return NULL;
 
-    my_CounterLEType.ob_type = &PyType_Type;
-    my_CounterBEType.ob_type = &PyType_Type;
+    return m;
 }
 
 /* vim:set ts=4 sw=4 sts=4 expandtab: */

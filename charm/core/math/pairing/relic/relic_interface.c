@@ -23,7 +23,7 @@
 *
 *   @brief   charm interface over RELIC's pairing-based crypto module
 *
-*   @author  ayo.akinyele@charm-crypto.com
+*   @author  jakinye3@jhu.edu
 *   @status  not complete: modular division operations not working correctly (as of 8/6/12)
 *
 ************************************************************************/

@@ -1,0 +1,143 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "charm-crypto"
+dynamic = ["version"]
+description = "Charm is a framework for rapid prototyping of cryptosystems"
+readme = "README.md"
+license = { text = "LGPL-3.0-or-later" }
+requires-python = ">=3.8"
+authors = [
+    { name = "J. Ayo Akinyele", email = "jakinye3@jhu.edu" }
+]
+maintainers = [
+    { name = "J. Ayo Akinyele", email = "jakinye3@jhu.edu" }
+]
+keywords = [
+    "cryptography",
+    "pairing-based cryptography",
+    "attribute-based encryption",
+    "identity-based encryption",
+    "digital signatures",
+    "elliptic curves",
+    "bilinear pairings",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "pyparsing>=2.1.5,<4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "hypothesis>=6.0",
+    "build",
+    "twine",
+]
+docs = [
+    "sphinx>=4.0",
+    "sphinx-rtd-theme",
+]
+
+[project.urls]
+Homepage = "https://charm-crypto.io/"
+Documentation = "https://charm-crypto.io/documentation"
+Repository = "https://github.com/JHUISI/charm"
+Issues = "https://github.com/JHUISI/charm/issues"
+Changelog = "https://github.com/JHUISI/charm/blob/master/CHANGELOG"
+
+[tool.setuptools]
+packages = [
+    "charm",
+    "charm.core",
+    "charm.core.crypto",
+    "charm.core.engine",
+    "charm.core.math",
+    "charm.test",
+    "charm.test.schemes",
+    "charm.test.toolbox",
+    "charm.toolbox",
+    "charm.zkp_compiler",
+    "charm.schemes",
+    "charm.schemes.ibenc",
+    "charm.schemes.abenc",
+    "charm.schemes.pkenc",
+    "charm.schemes.hibenc",
+    "charm.schemes.pksig",
+    "charm.schemes.commit",
+    "charm.schemes.grpsig",
+    "charm.schemes.prenc",
+    "charm.adapters",
+]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
+[tool.pytest.ini_options]
+testpaths = ["charm/test"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | deps
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = ["deps", "build", ".venv"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = ["deps/", "build/", "doc/"]
+
+# pip configuration for this project
+# To use: export PIP_CONFIG_FILE=./pip.conf
+

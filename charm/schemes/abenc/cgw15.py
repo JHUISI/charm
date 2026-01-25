@@ -1,17 +1,23 @@
 '''
-Jie Chen, Romain Gay, and Hoeteck Wee
+**Improved Dual System ABE (CGW15)**
 
-| From: "Improved Dual System ABE in Prime-Order Groups via Predicate Encodings"
-| Published in: 2015
-| Available from: http://eprint.iacr.org/2015/409
-| Notes: Implemented the scheme in Appendix B.2
-| Security Assumption: k-linear
-|
-| type:           ciphertext-policy attribute-based encryption
-| setting:        Pairing
+*Authors:* Jie Chen, Romain Gay, Hoeteck Wee
 
-:Authors:         Shashank Agrawal
-:Date:            5/2016
+| **Title:** "Improved Dual System ABE in Prime-Order Groups via Predicate Encodings"
+| **Published in:** EUROCRYPT, 2015
+| **Available from:** http://eprint.iacr.org/2015/409
+| **Notes:** Implemented the scheme in Appendix B.2
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption
+* **Setting:** Pairing groups (prime order)
+* **Assumption:** k-linear
+
+.. rubric:: Implementation
+
+:Authors: Shashank Agrawal
+:Date: 05/2016
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair

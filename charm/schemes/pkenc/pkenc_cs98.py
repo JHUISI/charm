@@ -1,20 +1,23 @@
 '''
-Cramer-Shoup Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)
- 
-| From: "R. Cramer, V. Shoup: A practical public key cryptosystem provably secure against adaptive chosen ciphertext attack"
-| Published in: CRYPTO 1998
-| Available from: http://knot.kaist.ac.kr/seminar/archive/46/46.pdf
-| Notes: 
+**Cramer-Shoup Public Key Encryption Scheme (CS98)**
 
-* type:			encryption (public key)
-* setting:		DDH-hard EC groups of prime order (F_p) or Integer Groups
-* assumption:	DDH
-* Name:         PKEnc_DDH_CCA_CS98
+*Authors:* R. Cramer, V. Shoup
 
-:Authors:	Matthew Green
-:Date:			1/2011
+| **Title:** "A Practical Public Key Cryptosystem Provably Secure Against Adaptive Chosen Ciphertext Attack"
+| **Published in:** CRYPTO 1998
+| **Available from:** http://knot.kaist.ac.kr/seminar/archive/46/46.pdf
+| **Notes:**
 
+.. rubric:: Scheme Properties
 
+* **Type:** encryption (public key)
+* **Setting:** DDH-hard EC groups of prime order (F_p) or Integer Groups
+* **Assumption:** DDH
+
+.. rubric:: Implementation
+
+:Authors: Matthew Green
+:Date: 1/2011
 '''
 from charm.toolbox.ecgroup import G
 from charm.toolbox.PKEnc import PKEnc

@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface over MIRACL's pairing-based operations
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  * 	@remark	 this version of the pairing module uses the MIRACL library (www.shamus.ie).
  *   At the moment, only useful for academic purposes and should be treated as such.
  *   To build into Charm, you'll need to acquire the MIRACL source and compile with the
@@ -55,9 +55,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "benchmarkmodule.h"
-#include "openssl/objects.h"
-#include "openssl/rand.h"
-#include "openssl/sha.h"
+#include <openssl/objects.h>
+#include <openssl/rand.h>
+#include <openssl/sha.h>
+#include <openssl/evp.h>
 #ifdef BENCHMARK_ENABLED
 #include "benchmark_util.h"
 #endif

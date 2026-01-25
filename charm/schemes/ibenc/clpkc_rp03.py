@@ -1,16 +1,23 @@
 '''
-Boneh-Boyen Identity Based Encryption
- 
-| From: "Certificateless Public Key Cryptography", Section 4.2
-| Published in: Asiacrypt 2003
-| Available from: https://eprint.iacr.org/2003/126.pdf
-| Notes: T
+**Al-Riyami-Paterson Certificateless Public Key Cryptography (RP03)**
 
-* type:     encryption (identity-based)
-* setting:  bilinear groups (symmetric)
+*Authors:* Sattam S. Al-Riyami, Kenneth G. Paterson
 
-:Authors:   Nikos Fotiou (https://www.fotiou.gr)
-:Date:      7/2022
+| **Title:** "Certificateless Public Key Cryptography"
+| **Published in:** Asiacrypt 2003
+| **Available from:** https://eprint.iacr.org/2003/126.pdf
+| **Notes:** Section 4.2 - CL-PKE scheme combining identity-based and public key encryption
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (certificateless, identity-based)
+* **Setting:** bilinear groups (symmetric)
+* **Assumption:** BDH (Bilinear Diffie-Hellman)
+
+.. rubric:: Implementation
+
+:Authors: Nikos Fotiou (https://www.fotiou.gr)
+:Date: 7/2022
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup, ZR,G1,G2,pair

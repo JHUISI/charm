@@ -29,32 +29,20 @@ extern "C" {
 #define debug(...)
 #endif
 
-#if PY_MAJOR_VERSION >= 3
-	#define _PyLong_Check(o1) PyLong_Check(o1)
-	#define ConvertToInt(o) PyLong_AsLong(o)
-	#define PyToLongObj(o) PyLong_FromLong(o)
-	/* check for both unicode and bytes objects */
-	#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
-	/* if unicode then add extra conversion step. two possibilities: unicode or bytes */
-	#define PyBytes_ToString2(a, obj, tmp_obj)	\
+/* Python 3.x definitions */
+#define _PyLong_Check(o1) PyLong_Check(o1)
+#define ConvertToInt(o) PyLong_AsLong(o)
+#define PyToLongObj(o) PyLong_FromLong(o)
+/* check for both unicode and bytes objects */
+#define PyBytes_CharmCheck(obj) PyUnicode_Check(obj) || PyBytes_Check(obj)
+/* if unicode then add extra conversion step. two possibilities: unicode or bytes */
+#define PyBytes_ToString2(a, obj, tmp_obj)	\
 if(PyBytes_Check(obj)) { a = PyBytes_AsString(obj); } \
 else if(PyUnicode_Check(obj)) { tmp_obj = PyUnicode_AsUTF8String(obj); a = PyBytes_AsString(tmp_obj); }	\
 else { tmp_obj = PyObject_Str(obj); a = PyBytes_AsString(tmp_obj); }
 
-  #define _PyUnicode_FromFormat PyUnicode_FromFormat
-  #define _PyUnicode_FromString PyUnicode_FromString
-#else
-	/* python 2.x definitions */
-  #define _PyLong_Check(o) (PyInt_Check(o) || PyLong_Check(o))
-  #define ConvertToInt(o) PyInt_AsLong(o)
-  #define PyToLongObj(o) PyInt_FromSize_t(o)
-  #define _PyUnicode_FromFormat PyString_FromFormat
-  #define _PyUnicode_FromString PyString_FromString
-  /* treat everything as string in 2.x */
-  #define PyBytes_CharmCheck(obj)	PyUnicode_Check(obj) || PyString_Check(obj)
-  #define PyBytes_ToString2(a, obj, tmpObj) a = PyString_AsString(obj);
-
-#endif
+#define _PyUnicode_FromFormat PyUnicode_FromFormat
+#define _PyUnicode_FromString PyUnicode_FromString
 
 #define BENCHMARK_MOD_NAME "charm.core.benchmark._C_API"
 

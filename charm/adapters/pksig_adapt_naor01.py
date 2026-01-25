@@ -1,24 +1,26 @@
 '''
-Naor's generic IBE-to-Signature transform (generic composition)
- 
-| From: "B. Franklin, M. Franklin: Identity-based encryption from the Weil pairing"
-| Published in: Eurocrypt 2009
-| Available from: http://eprint.iacr.org/2009/028.pdf
- 
-Notes:	This transform was first described by Boneh and Franklin but credited to Moni Naor.  It
-   converts any fully-secure IBE sheme into a signature by repurposing the identity key extraction
-   as a signing algorithm.  To verify, encrypt a random value under the message/identity,
-   and attempt to decrypt it using the signature/key.  It may be necessary to repeat this process,
-   depending on the size of the IBE's plaintext space.  Some IBE schemes support a more efficient
-   algorithm for verifying the structure of an identity key --- we will use it if it's available. 
-   *Warning*: this transform is not secure for selectively-secure schemes!
+**Naor's IBE-to-Signature Transform (Naor01)**
 
-* type:			signature (public key)
-* setting:		n/a (any fully-secure IBE scheme)
-* assumption:	n/a (dependent on the IBE scheme)
+*Description:* Transforms a fully-secure Identity-Based Encryption scheme into a
+digital signature scheme using Naor's construction.
 
-:Authors:	J. Ayo Akinyele
-:Date:		05/2011
+| **Based on:** Identity-Based Encryption from the Weil Pairing
+| **Published in:** CRYPTO 2001
+| **Available from:** https://eprint.iacr.org/2001/090.pdf
+| **Notes:** First described by Boneh and Franklin, credited to Moni Naor.
+| Uses IBE key extraction as signing; verification via encrypt-then-decrypt.
+| **Warning:** Not secure for selectively-secure IBE schemes!
+
+.. rubric:: Adapter Properties
+
+* **Type:** IBE-to-signature transform
+* **Underlying Scheme:** any fully-secure IBE scheme
+* **Purpose:** constructs digital signatures from Identity-Based Encryption
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 05/2011
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

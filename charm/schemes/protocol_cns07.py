@@ -1,17 +1,24 @@
-""" 
-Camenisch-Neven-shelat - Oblivious Transfer
+'''
+**Simulatable Adaptive Oblivious Transfer (CNS07)**
 
-| From: "J. Camenisch, G. Neven, a. shelat - Simulatable Adaptive Oblivious Transfer"
-| Published in: EUROCRYPT 2007
-| Available from: http://eprint.iacr.org/2008/014
-| Notes: 
+*Authors:* Jan Camenisch, Gregory Neven, abhi shelat
 
-* type:           signature (ID-based)
-* setting:        bilinear groups (asymmetric)
+| **Title:** "Simulatable Adaptive Oblivious Transfer"
+| **Published in:** EUROCRYPT 2007
+| **Available from:** http://eprint.iacr.org/2008/014
+| **Notes:** Uses sigma protocols for interactive proofs
 
-:Authors:    J. Ayo Akinyele
-:Date:       2/2012
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** oblivious transfer protocol
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** DBDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2/2012
+'''
 from charm.core.engine.protocol import *
 from charm.core.engine.util import *
 from socket import *

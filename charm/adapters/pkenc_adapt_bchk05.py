@@ -1,11 +1,23 @@
 '''
-Boneh-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform
+**Boneh-Canetti-Halevi-Katz IBE-to-PKE Transform (BCHK05)**
 
-| From: "Improved Efficiency for CCA-Secure Cryptosystems Built Using Identity-Based Encryption", Section 4
-| Published In: Topics in Cryptology in CTRSA 2005
-| Available From: eprint.iacr.org/2004/261.pdf
+*Description:* Transforms an Identity-Based Encryption scheme into a CCA-secure
+Public Key Encryption scheme using the BCHK construction.
 
-:Author: Christina Garman
+| **Based on:** Improved Efficiency for CCA-Secure Cryptosystems Built Using Identity-Based Encryption
+| **Published in:** Topics in Cryptology, CT-RSA 2005
+| **Available from:** https://eprint.iacr.org/2004/261.pdf
+| **Notes:** Section 4 of the paper; more efficient than CHK04 transform
+
+.. rubric:: Adapter Properties
+
+* **Type:** IBE-to-PKE transform
+* **Underlying Scheme:** any selective-ID secure IBE scheme
+* **Purpose:** constructs CCA-secure public key encryption from IBE
+
+.. rubric:: Implementation
+
+:Authors: Christina Garman
 :Date: 12/2011
 '''
 from charm.core.engine.util import pickleObject, serializeObject 
@@ -102,7 +114,7 @@ class BCHKIBEnc(IBEnc):
 
         C1prime = pickleObject(serializeObject(c['C1'], group))
         
-        if(c['tag'] == hmac.new(k, C1prime+c['C2'], hashlib.sha256).digest()):
+        if hmac.compare_digest(c['tag'], hmac.new(k, C1prime+c['C2'], hashlib.sha256).digest()):
             return bytes(m2.split(':')[0], 'utf8')
         else:
             return b'FALSE'

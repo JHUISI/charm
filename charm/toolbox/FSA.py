@@ -759,15 +759,25 @@ def toFSA(arg):
         return singleton(arg)
 
 def view(str):
-    import os, tempfile
-    dotfile = tempfile.mktemp()
-    psfile = tempfile.mktemp()
-    open(dotfile, 'w').write(str)
+    import os, tempfile, subprocess
+    # Use NamedTemporaryFile for secure temp file creation (avoids race conditions)
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.dot', delete=False) as dotf:
+        dotfile = dotf.name
+        dotf.write(str)
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.ps', delete=False) as psf:
+        psfile = psf.name
     dotter = 'dot'
     psviewer = 'gv'
     psoptions = '-antialias'
-    os.system("%s -Tps %s -o %s" % (dotter, dotfile, psfile))
-    os.system("%s %s %s&" % (psviewer, psoptions, psfile))
+    try:
+        subprocess.run([dotter, '-Tps', dotfile, '-o', psfile], check=False)
+        subprocess.run([psviewer, psoptions, psfile], check=False)
+    finally:
+        # Clean up temp files
+        if os.path.exists(dotfile):
+            os.unlink(dotfile)
+        if os.path.exists(psfile):
+            os.unlink(psfile)
 
 
 #

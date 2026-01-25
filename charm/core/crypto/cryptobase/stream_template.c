@@ -33,6 +33,10 @@
 #include <string.h>
 #endif
 
+#ifndef PY_SSIZE_T_CLEAN
+#define PY_SSIZE_T_CLEAN
+#endif
+
 #include "Python.h"
 #include "modsupport.h"
 
@@ -87,10 +91,10 @@ ALGnew(PyObject *self, PyObject *args, PyObject *kwdict)
 {
 	unsigned char *key;
 	ALGobject * new;
-	int keylen;
+	Py_ssize_t keylen;
 
 	new = newALGobject();
-	if (!PyArg_ParseTupleAndKeywords(args, kwdict, "s#", kwlist, 
+	if (!PyArg_ParseTupleAndKeywords(args, kwdict, "s#", kwlist,
 					 &key, &keylen))
 	{
 		Py_DECREF(new);
@@ -99,19 +103,19 @@ ALGnew(PyObject *self, PyObject *args, PyObject *kwdict)
 
 	if (KEY_SIZE!=0 && keylen != KEY_SIZE)
 	{
-		PyErr_SetString(PyExc_ValueError, 
+		PyErr_SetString(PyExc_ValueError,
 				_MODULE_STRING " key must be "
 				"KEY_SIZE bytes long");
 		return NULL;
 	}
 	if (KEY_SIZE== 0 && keylen == 0)
 	{
-		PyErr_SetString(PyExc_ValueError, 
+		PyErr_SetString(PyExc_ValueError,
 				_MODULE_STRING " key cannot be "
 				"the null string (0 bytes long)");
 		return NULL;
 	}
-	stream_init(&(new->st), key, keylen);
+	stream_init(&(new->st), key, (int) keylen);
 	if (PyErr_Occurred())
 	{
 		Py_DECREF(new);
@@ -127,7 +131,7 @@ static PyObject *
 ALG_Encrypt(ALGobject *self, PyObject *args)
 {
 	unsigned char *buffer, *str;
-	int len;
+	Py_ssize_t len;
 	PyObject *result;
 
 	if (!PyArg_Parse(args, "s#", &str, &len))
@@ -145,7 +149,7 @@ ALG_Encrypt(ALGobject *self, PyObject *args)
 	}
 	Py_BEGIN_ALLOW_THREADS;
 	memcpy(buffer, str, len);
-	stream_encrypt(&(self->st), buffer, len);
+	stream_encrypt(&(self->st), buffer, (int) len);
 	Py_END_ALLOW_THREADS;
 	result = PyString_FromStringAndSize((char *)buffer, len);
 	free(buffer);
@@ -159,7 +163,7 @@ static PyObject *
 ALG_Decrypt(ALGobject *self, PyObject *args)
 {
 	unsigned char *buffer, *str;
-	int len;
+	Py_ssize_t len;
 	PyObject *result;
 
 	if (!PyArg_Parse(args, "s#", &str, &len))
@@ -177,7 +181,7 @@ ALG_Decrypt(ALGobject *self, PyObject *args)
 	}
 	Py_BEGIN_ALLOW_THREADS;
 	memcpy(buffer, str, len);
-	stream_decrypt(&(self->st), buffer, len);
+	stream_decrypt(&(self->st), buffer, (int) len);
 	Py_END_ALLOW_THREADS;
 	result = PyString_FromStringAndSize((char *)buffer, len);
 	free(buffer);

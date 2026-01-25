@@ -130,7 +130,7 @@ def MGF1(seed, maskBytes, hashFn, hLen):
 class hashFunc:
     def __init__(self, _hash_type=None):
         if _hash_type == None:
-            self.hashObj = hashlib.new('sha1')
+            self.hashObj = hashlib.new('sha1')  # nosec B324 - SHA1 default for historical compatibility
         else:
             self.hashObj = hashlib.new(_hash_type)
         

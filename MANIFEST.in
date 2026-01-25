@@ -1,5 +1,12 @@
-include VERSION README INSTALL configure.sh Makefile CHANGELOG setup.cfg
+include VERSION README.md INSTALL configure.sh Makefile CHANGELOG setup.cfg
+include LICENSE.txt pyproject.toml config.dist.py pytest.ini
 graft doc
 graft doc/source
 recursive-include charm *.h *.c *.py
-include config.dist.py pytest.ini
+prune build
+prune deps/pbc
+prune deps/relic
+prune *.egg-info
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so

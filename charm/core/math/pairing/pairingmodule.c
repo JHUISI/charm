@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface over PBC library
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  *
  ************************************************************************/
 
@@ -177,12 +177,22 @@ void longObjToMPZ (mpz_t m, PyLongObject * p)
 char *convert_buffer_to_hex(uint8_t * data, size_t len)
 {
 	size_t i;
-	char *tmp = (char *) malloc(len*2 + 2);
+	size_t buf_size = len*2 + 2;
+	char *tmp = (char *) malloc(buf_size);
+	if (tmp == NULL) {
+		return NULL;
+	}
 	char *tmp2 = tmp;
-	memset(tmp, 0, len*2+1);
+	memset(tmp, 0, buf_size);
 
-	for(i = 0; i < len; i++)
-		tmp += sprintf(tmp, "%02x", data[i]);
+	for(i = 0; i < len; i++) {
+		size_t remaining = buf_size - (size_t)(tmp - tmp2);
+		int written = snprintf(tmp, remaining, "%02x", data[i]);
+		if (written < 0 || (size_t)written >= remaining) {
+			break;  /* Prevent buffer overflow */
+		}
+		tmp += written;
+	}
 
 	return tmp2;
 }
@@ -379,7 +389,8 @@ char * init_pbc_param(char *file, pairing_t *pairing)
  */
 int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int hash_len, uint8_t hash_prefix)
 {
-	SHA256_CTX sha2;
+	EVP_MD_CTX *ctx = NULL;
+	unsigned int md_len = 0;
 	const int new_input_len = input_len + 2; // extra byte for prefix
 	uint8_t new_input[new_input_len];
 //	printf("orig input => \n");
@@ -394,11 +405,14 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 	// prepare output buf
 	memset(output_buf, 0, hash_len);
 
+	ctx = EVP_MD_CTX_new();
+	if (ctx == NULL) return FALSE;
+
 	if (hash_len <= HASH_LEN) {
-		SHA256_Init(&sha2);
-		SHA256_Update(&sha2, new_input, new_input_len);
+		EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+		EVP_DigestUpdate(ctx, new_input, new_input_len);
 		uint8_t md[HASH_LEN];
-		SHA256_Final(md, &sha2);
+		EVP_DigestFinal_ex(ctx, md, &md_len);
 		memcpy(output_buf, md, hash_len);
 	}
 	else {
@@ -410,17 +424,17 @@ int hash_to_bytes(uint8_t *input_buf, int input_len, uint8_t *output_buf, int ha
 			/* compute digest = SHA-2( i || prefix || input_buf ) || ... || SHA-2( n-1 || prefix || input_buf ) */
 			uint8_t md[HASH_LEN];
 			new_input[0] = (uint8_t)(i+1);
-			SHA256_Init(&sha2);
+			EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
 			int size = new_input_len;
-			SHA256_Update(&sha2, new_input, size);
-			SHA256_Final(md, &sha2);
+			EVP_DigestUpdate(ctx, new_input, size);
+			EVP_DigestFinal_ex(ctx, md, &md_len);
 			memcpy(md2 +(i * HASH_LEN), md, HASH_LEN);
 		}
-		
+
 		// copy back to caller
 		memcpy(output_buf, md2, hash_len);
 	}
-	OPENSSL_cleanse(&sha2,sizeof(sha2));
+	EVP_MD_CTX_free(ctx);
 	return TRUE;
 }
 
@@ -463,14 +477,18 @@ int hash2_element_to_bytes(element_t *element, uint8_t* last_buf, int hash_size,
 	unsigned int buf_len = element_length_in_bytes(*element);
 
 	uint8_t* temp_buf = (uint8_t *) malloc(buf_len + 1);
-	memset(temp_buf, '\0', buf_len);
 	if(temp_buf == NULL) {
 		return FALSE;
 	}
+	memset(temp_buf, '\0', buf_len);
 
 	element_to_bytes((unsigned char *) temp_buf, *element);
 	// create output buffer
 	uint8_t* temp2_buf = (uint8_t *) malloc(last_buflen + buf_len + 1);
+	if(temp2_buf == NULL) {
+		free(temp_buf);
+		return FALSE;
+	}
 	memset(temp2_buf, 0, (last_buflen + buf_len));
 	int i;
 	for(i = 0; i < last_buflen; i++)
@@ -561,7 +579,7 @@ int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 	char *param_buf2 = NULL;
 	PyObject *n = NULL, *short_val = NULL;
 	int qbits = 0, rbits = 0;
-	size_t b_len = 0;
+	Py_ssize_t b_len = 0;
 	int seed = -1;
 	uint8_t hash_id[HASH_LEN+1];
 	
@@ -722,6 +740,9 @@ PyObject *Element_print(Element* self)
 {
 	PyObject *strObj;
 	char *tmp = (char *) malloc(MAX_LEN);
+	if(tmp == NULL) {
+		return NULL;
+	}
 	memset(tmp, 0, MAX_LEN);
 	size_t max = MAX_LEN;
 	debug("Contents of element object\n");
@@ -1565,6 +1586,9 @@ static long Element_index(Element *o1) {
 		size_t len;
 		len = element_length_in_bytes(o1->e);
 		buff = (uint8_t*) malloc(len);
+		if(buff == NULL) {
+			return -1;
+		}
 		element_to_bytes(buff, o1->e);
 		result = PyObject_Hash(PyBytes_FromStringAndSize((char*)buff, len));
 		free(buff);
@@ -1702,6 +1726,9 @@ void print_mpz(mpz_t x, int base) {
 	if(base <= 2 || base > 64) return;
 	size_t x_size = mpz_sizeinbase(x, base) + 2;
 	char *x_str = (char *) malloc(x_size);
+	if(x_str == NULL) {
+		return;
+	}
 	x_str = mpz_get_str(x_str, base, x);
 	printf("Element => '%s'\n", x_str);
 	printf("Order of Element => '%zd'\n", x_size);

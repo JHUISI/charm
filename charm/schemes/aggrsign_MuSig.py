@@ -1,12 +1,23 @@
-''' MuSig: Key Aggregation for Schnorr Signatures
+'''
+**MuSig: Key Aggregation for Schnorr Signatures (MuSig)**
 
- | From: "Gregory Maxwell and Andrew Poelstra and Yannick Seurin and Pieter Wuille. Simple Schnorr Multi-Signatures with Applications to Bitcoin".
- | Available from: https://eprint.iacr.org/2018/068
+*Authors:* Gregory Maxwell, Andrew Poelstra, Yannick Seurin, Pieter Wuille
 
- * type:         Aggregate signatures
+| **Title:** "Simple Schnorr Multi-Signatures with Applications to Bitcoin"
+| **Published in:** ePrint Archive, 2018
+| **Available from:** https://eprint.iacr.org/2018/068
+| **Notes:** Designed for Bitcoin multi-signature applications
+
+.. rubric:: Scheme Properties
+
+* **Type:** aggregate signature (Schnorr-based)
+* **Setting:** elliptic curve groups
+* **Assumption:** DL
+
+.. rubric:: Implementation
 
 :Authors: Lovesh Harchandani
-:Date:    6/2018
+:Date: 6/2018
 '''
 
 from functools import reduce

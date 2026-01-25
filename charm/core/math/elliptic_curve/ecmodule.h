@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface over OpenSSL Ellipic-curve module
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  *
  ************************************************************************/
 
@@ -55,6 +55,7 @@
 #include <openssl/rand.h>
 #include <openssl/bn.h>
 #include <openssl/sha.h>
+#include <openssl/evp.h>
 #ifdef BENCHMARK_ENABLED
 #include "benchmark_util.h"
 #endif
@@ -124,13 +125,8 @@ typedef struct {
 	int point_init;
 } ECElement;
 
-#if PY_MAJOR_VERSION >= 3
 #define PyLong_ToUnsignedLong(o) PyLong_AsUnsignedLong(o)
 #define PyLongCheck(o) PyLong_Check(o)
-#else
-#define PyLong_ToUnsignedLong(o) PyInt_AsUnsignedLongMask(o)
-#define PyLongCheck(o) PyInt_Check(o) || PyLong_Check(o)
-#endif
 
 #define ErrorMsg(msg) \
 	PyErr_SetString(PyECErrorObject, msg); \

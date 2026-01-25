@@ -1,16 +1,23 @@
 '''
-Xuanxia Yao, Zhi Chen, Ye Tian
- 
-| From: A lightweight attribute-based encryption scheme for the Internet of things
-| Published in: Future Generation Computer Systems
-| Available From: http://www.sciencedirect.com/science/article/pii/S0167739X14002039
-| Notes: 
+**Lightweight Key-Policy ABE for IoT (YCT14)**
 
-* type:           key-policy attribute-based encryption (public key)
-* setting:        No Pairing
+*Authors:* Xuanxia Yao, Zhi Chen, Ye Tian
 
-:Authors:    artjomb
-:Date:       10/2014
+| **Title:** "A lightweight attribute-based encryption scheme for the Internet of things"
+| **Published in:** Future Generation Computer Systems, 2014
+| **Available from:** http://www.sciencedirect.com/science/article/pii/S0167739X14002039
+| **Notes:** Designed for resource-constrained IoT devices
+
+.. rubric:: Scheme Properties
+
+* **Type:** key-policy attribute-based encryption (public key)
+* **Setting:** No Pairing (lightweight)
+* **Assumption:** Computational Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: artjomb
+:Date: 10/2014
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil

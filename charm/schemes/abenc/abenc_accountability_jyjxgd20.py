@@ -1,21 +1,23 @@
 '''
-Jiguo Li, Yichen Zhang, Jianting Ning, Xinyi Huang, Geong Sen Poh, Debang Wang (Pairing-based)
+**ABE with Privacy Protection and Accountability (JYJXGD20)**
 
-| From: "Attribute Based Encryption with Privacy Protection and Accountability for CloudIoT".
-| Published in: 2020
-| Available from: https://ieeexplore.ieee.org/abstract/document/9003205
-| Notes: The paper presents two schemes. The first one is for CP policy hiding in Section 3, which is implemented in
-         the class 'CP_Hiding_ABE' and tested in the function 'CP_policy_hiding_ABE_test'.
-          The second one is CP policy hiding with accountability under the white box
-          assumption, which is implemented in the class 'CP_Hiding_Accountability_ABE' and tested in the function
-          'CP_policy_hiding_with_accountability_test'
-| Security Assumption:
-|
-| type:           ciphertext-policy attribute-based encryption (public key)
-| setting:        Pairing
-|
-| Authors:        Ahmed Bakr
-| Date:           08/2023
+*Authors:* Jiguo Li, Yichen Zhang, Jianting Ning, Xinyi Huang, Geong Sen Poh, Debang Wang
+
+| **Title:** "Attribute Based Encryption with Privacy Protection and Accountability for CloudIoT"
+| **Published in:** IEEE Transactions on Cloud Computing, 2020
+| **Available from:** https://ieeexplore.ieee.org/abstract/document/9003205
+| **Notes:** Two schemes implemented: (1) CP policy hiding (class CP_Hiding_ABE), (2) CP policy hiding with accountability under white box assumption (class CP_Hiding_Accountability_ABE)
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption (public key)
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Bilinear Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: Ahmed Bakr
+:Date: 08/2023
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

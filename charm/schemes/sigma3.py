@@ -1,16 +1,36 @@
+'''
+**Sigma Protocol 3 - Proof of Membership (Sigma3)**
+
+*Authors:* Charm Developers
+
+| **Notes:** Proof of membership: {(h): H = e(g,h) and W = e(h,V)}
+
+.. rubric:: Scheme Properties
+
+* **Type:** sigma protocol (zero-knowledge proof of membership)
+* **Setting:** bilinear groups (pairing-based)
+* **Assumption:** DL
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2/2012
+'''
+
+
 from charm.toolbox.sigmaprotocol import Sigma
 from charm.toolbox.pairinggroup import ZR,G2,pair
 
 # Proof of Membership {(h): H = e(g,h) /and/ W = e(h,V)}
 class SigmaProtocol3(Sigma):
-    def __init__(self, groupObj=None, common_input=None):        
+    def __init__(self, groupObj=None, common_input=None):
         Sigma.__init__(self, groupObj, common_input)
-        # dict to hold variables from interaction        
-        
+        # dict to hold variables from interaction
+
 #    def gen_common(self):
 #        if self.__gen_setup:
 #            x = self.group.random(ZR)
-#            v = self.group.random(ZR) 
+#            v = self.group.random(ZR)
 #            g = self.group.random(G1) # , self.group.random(G2)
 #            index = self.group.init(ZR, 1) # testing message 0 at index 1
 #            V = (g ** ~(x+index)) ** v
@@ -19,7 +39,7 @@ class SigmaProtocol3(Sigma):
 #            print("check: rhs = e(V,g)^-o * e(g,g)^v =>", (pair(V,g) ** -index) * (pair(g,g) ** v))
 #            Protocol.store(self, ('g', g), ('V', V), ('v',v), ('y',y), ('sigma', index) )
 #            return None
-        
+
     def prover_state1(self):
         print("PROVER 1: ")
         (g, V) = Sigma.get(self, ['g', 'V'])
@@ -34,22 +54,22 @@ class SigmaProtocol3(Sigma):
         Sigma.store(self, ('r',r) )
         Sigma.setState(self, 3)
         return { 'a1':a1, 'a2':a2, 'pk':pk }
-    
+
     def prover_state3(self, input):
         print("PROVER 3: ")
         (r, h, c) = Sigma.get(self, ['r', 'h', 'c'])
         print("input c =>", c)
         z = r * (h ** -c)
         Sigma.setState(self, 5)
-        # need store and get functions for db        
+        # need store and get functions for db
         return {'z':z }
-    
+
     def prover_state5(self, input):
         print("PROVER 5: result =>", input)
         Sigma.setState(self, None)
         Sigma.setErrorCode(self, input)
         return None
-    
+
     def verifier_state2(self, input):
         print("VERIFIER 2: ")
         c = self.group.random(ZR)
@@ -68,7 +88,7 @@ class SigmaProtocol3(Sigma):
         Sigma.setState(self, 6)
         Sigma.setErrorCode(self, result)
         return result
-    
+
     def verifier_state6(self, input):
         print("VERIFIER 6: done.")
         Sigma.setState(self, None)
@@ -96,11 +116,11 @@ class SigmaProtocol3(Sigma):
 #    else:
 #        print("Usage: %s -v or -p" % sys.argv[0])
 #        exit(-1)
-#    
+#
 #    group = PairingGroup('a.param')
 #    sp = SigmaProtocol3(group)
 #    sp.setup( {'name':_name, 'type':_type, 'socket':_sock} )
 #    # run as a thread...
 #    sp.execute(_type)
 #    print("Result of protocol =>", sp.result)
-#    
+#

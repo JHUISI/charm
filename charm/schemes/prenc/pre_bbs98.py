@@ -1,14 +1,23 @@
 '''
-BBS Proxy Re-Encryption
-| From: Blaze, M., Bleumer, G., & Strauss, M. (1998). Divertible protocols and atomic proxy cryptography.
-| Published in: Advances in Cryptology-EUROCRYPT'98 (pp. 127-144). Springer Berlin Heidelberg.
-| Available from: http://link.springer.com/chapter/10.1007/BFb0054122
-* type:           proxy encryption
-* properties:     CPA-secure, bidirectional, multihop, not collusion-resistant, interactive, transitive
-* setting:        DDH-hard EC groups of prime order (F_p) or Integer Groups
-* assumption:     DDH
-:Authors:    D. Nuñez (dnunez@lcc.uma.es)
-:Date:       04/2016
+**BBS Proxy Re-Encryption (BBS98)**
+
+*Authors:* Blaze, Bleumer, Strauss
+
+| **Title:** "Divertible Protocols and Atomic Proxy Cryptography"
+| **Published in:** Advances in Cryptology - EUROCRYPT'98, 1998
+| **Available from:** http://link.springer.com/chapter/10.1007/BFb0054122
+
+.. rubric:: Scheme Properties
+
+* **Type:** proxy re-encryption
+* **Setting:** DDH-hard EC groups of prime order (F_p) or Integer Groups
+* **Assumption:** DDH (Decisional Diffie-Hellman)
+* **Properties:** CPA-secure, bidirectional, multihop, interactive, transitive, not collusion-resistant
+
+.. rubric:: Implementation
+
+:Authors: D. Nuñez (dnunez@lcc.uma.es)
+:Date: 04/2016
 '''
 
 from charm.toolbox.ecgroup import G

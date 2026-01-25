@@ -1,16 +1,23 @@
 '''
-Boneh-Franklin Identity Based Encryption
-  
-| From: "D. Boneh, M. Franklin Identity-Based Encryption from the Weil Pairing", Section 4.2.
-| Published in: Crypto 2003
-| Available from: http://.../bfibe.pdf
-| Notes: This is the IBE .
+**Boneh-Franklin Identity-Based Encryption (BF-IBE)**
 
-* type:           encryption (identity-based)
-* setting:        bilinear groups (asymmetric)
+*Authors:* Dan Boneh, Matthew Franklin
 
-:Authors:    J. Ayo Akinyele
-:Date:       2/2011
+| **Title:** "Identity-Based Encryption from the Weil Pairing"
+| **Published in:** Crypto 2001
+| **Available from:** https://crypto.stanford.edu/~dabo/papers/bfibe.pdf
+| **Notes:** Section 4.2 - BasicIdent scheme with Fujisaki-Okamoto transformation
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** BDH (Bilinear Diffie-Hellman)
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2/2011
 '''
 from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.core.math.integer import randomBits,integer,bitsize

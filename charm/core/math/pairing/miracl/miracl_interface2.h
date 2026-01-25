@@ -23,7 +23,7 @@
 *
 *   @brief   charm interface over MIRACL's pairing-based crypto C++ classes
 *
-*   @author  ayo.akinyele@charm-crypto.com
+*   @author  jakinye3@jhu.edu
 *
 ************************************************************************/
 #include <gmp.h>

@@ -1,15 +1,23 @@
 '''
-El Gamal Public Key Encryption Scheme (Decisional Diffie-Hellman Assumption in groups of prime order)
+**ElGamal Public Key Encryption Scheme (ElGamal85)**
 
-| Available from: http://en.wikipedia.org/wiki/ElGamal_encryption
-| Notes: 
+*Authors:* T. ElGamal
 
-* type:          encryption (public key)
-* setting:       DDH-hard prime order group
-* assumption:    DDH
+| **Title:** "A Public Key Cryptosystem and a Signature Scheme Based on Discrete Logarithms"
+| **Published in:** CRYPTO 1984
+| **Available from:** http://en.wikipedia.org/wiki/ElGamal_encryption
+| **Notes:**
 
-:Authors: J Ayo Akinyele
-:Date:           3/2011
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (public key)
+* **Setting:** DDH-hard prime order group
+* **Assumption:** DDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 3/2011
 '''
 
 from charm.toolbox.PKEnc import PKEnc

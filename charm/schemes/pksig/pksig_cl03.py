@@ -1,17 +1,24 @@
 '''
- A Signature Scheme with Efficient Protocols
- 
-| From: "J. Camenisch, A. Lysyanskaya."
-| Published in: 2003
-| Available from: http://cs.brown.edu/~anna/papers/camlys02b.pdf 
-| Notes: Schemes 2.2 (on page 4) and 4 (on page 8). 
+**Camenisch-Lysyanskaya Signature (CL03)**
 
-* type:           signature
-* setting:        integer groups 
+*Authors:* J. Camenisch, A. Lysyanskaya
 
-:Authors:    Christina Garman/Antonio de la Piedra
-:Date:       11/2013
- '''
+| **Title:** "A Signature Scheme with Efficient Protocols"
+| **Published in:** SCN, 2003
+| **Available from:** http://cs.brown.edu/~anna/papers/camlys02b.pdf
+| **Notes:** Schemes 2.2 (on page 4) and 4 (on page 8).
+
+.. rubric:: Scheme Properties
+
+* **Type:** signature (public key)
+* **Setting:** integer groups
+* **Assumption:** Strong RSA
+
+.. rubric:: Implementation
+
+:Authors: Christina Garman, Antonio de la Piedra
+:Date: 11/2013
+'''
 from charm.toolbox.PKSig import PKSig
 from charm.core.math.integer import integer,isPrime,random,randomPrime,randomBits
 import hashlib

@@ -3,7 +3,7 @@
 Building RELIC for Charm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The first step is to obtain the RELIC library source from https://code.google.com/p/relic-toolkit/. We provide instructions for how to compile RELIC and the charm pairing module. 
+The first step is to obtain the RELIC library source from https://github.com/relic-toolkit/relic. We provide instructions for how to compile RELIC and the charm pairing module.
 
         1. Download the latest version of RELIC and untar in the ``charm/charm/core/math/pairing/relic/``
 

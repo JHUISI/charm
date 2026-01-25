@@ -1,3 +1,24 @@
+'''
+**Hybrid Encryption Adapter for KP-ABE (KP-ABE Hybrid)**
+
+*Description:* Converts a Key-Policy Attribute-Based Encryption scheme into a hybrid
+encryption scheme capable of encrypting arbitrary-length messages.
+
+| **Notes:** Uses symmetric encryption (AES) with a randomly generated session key.
+| The session key is encrypted using the underlying KP-ABE scheme.
+
+.. rubric:: Adapter Properties
+
+* **Type:** hybrid encryption adapter
+* **Underlying Scheme:** any Key-Policy ABE scheme
+* **Purpose:** enables KP-ABE schemes to encrypt arbitrary-length byte messages
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2011
+'''
+
 
 from charm.toolbox.pairinggroup import PairingGroup,GT,extract_key
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
@@ -20,20 +41,20 @@ class HybridABEnc(ABEnc):
     >>> hyb_abe.decrypt(cipher_text, secret_key)
     b'hello world this is an important message.'
     """
-    
+
     def __init__(self, scheme, groupObj):
         ABEnc.__init__(self)
         global abenc
         # check properties (TODO)
         abenc = scheme
         self.group = groupObj
-            
+
     def setup(self):
         return abenc.setup()
-    
+
     def keygen(self, pk, mk, object):
         return abenc.keygen(pk, mk, object)
-    
+
     def encrypt(self, pk, M, object):
         key = self.group.random(GT)
         c1 = abenc.encrypt(pk, key, object)
@@ -41,13 +62,13 @@ class HybridABEnc(ABEnc):
         cipher = AuthenticatedCryptoAbstraction(extract_key(key))
         c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
-    
+
     def decrypt(self, ct, sk):
         c1, c2 = ct['c1'], ct['c2']
         key = abenc.decrypt(c1, sk)
         cipher = AuthenticatedCryptoAbstraction(extract_key(key))
         return cipher.decrypt(c2)
-    
+
 def main():
     groupObj = PairingGroup('SS512')
     kpabe = KPabe(groupObj)

@@ -1,16 +1,23 @@
 '''
-Boneh-Boyen Hierarchical Identity Based Encryption
- 
-| From: "D. Boneh, X. Boyen.  Efficient Selective Identity-Based Encryption Without Random Oracles", Section 4.1.
-| Published in: Eurocrypt 2004
-| Available from: http://crypto.stanford.edu/~dabo/pubs/papers/bbibe.pdf
-| Notes: Core HIBE implementation
+**Boneh-Boyen Hierarchical Identity-Based Encryption (BB04-HIBE)**
 
-* type:            encryption (identity-based)
-* setting:        bilinear groups (asymmetric)
+*Authors:* Dan Boneh, Xavier Boyen
 
-:Authors:    J Ayo Akinyele
-:Date:       3/2012
+| **Title:** "Efficient Selective Identity-Based Encryption Without Random Oracles"
+| **Published in:** Eurocrypt 2004
+| **Available from:** http://crypto.stanford.edu/~dabo/pubs/papers/bbibe.pdf
+| **Notes:** Section 4.1 - Core HIBE implementation
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (hierarchical identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** Decisional Bilinear Diffie-Hellman (DBDH)
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 3/2012
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.iterate import dotprod2

@@ -502,7 +502,7 @@ if [ -n "$python_path" ]; then
             exit 1
         fi 
 else
-        for pyversion in python python3 python3.8 python3.7 python3.6 python3.5 python3.4 python3.3 python3.2 python3.1 
+        for pyversion in python python3 python3.12 python3.11 python3.10 python3.9 python3.8
         do 
             if (is_python_version `which $pyversion`); then
                 python3_found="yes"
@@ -975,6 +975,25 @@ echo "HAVE_LIBCRYPTO=$libcrypto_found" >> $config_mk
 echo "PYPARSING=$pyparse_found" >> $config_mk
 if test "$docs" = "yes" ; then
     echo "SPHINX=$sphinx_build" >> $config_mk
+fi
+
+# Embed API configuration
+# These variables help the embed/Makefile find libraries on different platforms
+echo "" >> $config_mk
+echo "# Embed API configuration" >> $config_mk
+echo "EMBED_PLATFORM=$targetos" >> $config_mk
+echo "EMBED_ARCH=$cpu" >> $config_mk
+
+# Set platform-specific library paths for embed API
+if test "$darwin" = "yes" ; then
+    # macOS: detect Homebrew prefix based on architecture
+    if test "$cpu" = "arm64" -o "$cpu" = "aarch64" ; then
+        echo "EMBED_HOMEBREW_PREFIX=/opt/homebrew" >> $config_mk
+    else
+        echo "EMBED_HOMEBREW_PREFIX=/usr/local" >> $config_mk
+    fi
+elif test "$targetos" = "MINGW32" ; then
+    echo "EMBED_MINGW_PREFIX=/mingw64" >> $config_mk
 fi
 
 # needed for keeping track of crypto libs installed

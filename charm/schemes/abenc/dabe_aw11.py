@@ -1,15 +1,23 @@
 '''
-Lewko-Waters Decentralized Attribute-Based Encryption 
- 
-| Lewko, Allison, and Brent Waters, "Decentralizing Attribute-Based Encryption.", Appendix D
-| Published in: Eurocrypt 2011
-| Available from: http://eprint.iacr.org/2010/351.pdf
+**Decentralized Attribute-Based Encryption (AW11)**
 
-* type:           encryption (identity-based)
-* setting:        bilinear groups (asymmetric)
+*Authors:* Allison Lewko, Brent Waters
 
-:Authors:    Gary Belvin
-:Date:           06/2011 
+| **Title:** "Decentralizing Attribute-Based Encryption"
+| **Published in:** EUROCRYPT, 2011 (Appendix D)
+| **Available from:** http://eprint.iacr.org/2010/351.pdf
+| **Notes:** Decentralized multi-authority ABE construction
+
+.. rubric:: Scheme Properties
+
+* **Type:** decentralized attribute-based encryption
+* **Setting:** Bilinear groups (asymmetric)
+* **Assumption:** Decisional Bilinear Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: Gary Belvin
+:Date: 06/2011
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

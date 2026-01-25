@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface for C/C++ applications
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  *
  ************************************************************************/
 
@@ -102,7 +102,14 @@ void CheckError(char *error_msg)
 
 result_t getType(PyObject *o)
 {
-	PyTypeObject *t = o->ob_type;
+	PyTypeObject *t;
+
+	/* Null pointer check */
+	if (o == NULL) {
+		return NONE_T;
+	}
+
+	t = o->ob_type;
 	//debug("Object type: '%s'\n", t->tp_name);
 
 	if(strcmp(t->tp_name, INTEGER_TYPE) == 0)
@@ -124,8 +131,8 @@ result_t getType(PyObject *o)
 	else if(strcmp(t->tp_name, PYNONE_TYPE) == 0)
 		return NONE_T;
 	else {
-		printf("%s: unrecognized type.\n", __FUNCTION__);
-		printf("%s: type => '%s'\n", __FUNCTION__, t->tp_name);
+		debug("%s: unrecognized type.\n", __FUNCTION__);
+		debug("%s: type => '%s'\n", __FUNCTION__, t->tp_name);
 	}
 
 	return NONE_T;
@@ -137,43 +144,44 @@ Charm_t *InitPairingGroup(Charm_t *pModule, const char *param_id)
 
 	pName = PyUnicode_FromString("charm.toolbox.pairinggroup");
 
-	if(pModule != NULL) PyObject_Del(pModule);
+	if(pModule != NULL) Free(pModule);
 	pModule = PyImport_Import(pName);
 	if(pModule != NULL)
 		debug("import module ok: '%s'\n", pModule->ob_type->tp_name);
-    Free(pName);
+	Free(pName);
 
-    if (pModule != NULL) {
-        pFunc = PyObject_GetAttrString(pModule, "PairingGroup");
-    	debug("got attr string: '%s'\n", pFunc->ob_type->tp_name);
+	if (pModule != NULL) {
+		pFunc = PyObject_GetAttrString(pModule, "PairingGroup");
+		if (pFunc)
+			debug("got attr string: '%s'\n", pFunc->ob_type->tp_name);
 
-        if (pFunc && PyCallable_Check(pFunc)) {
-            pArgs = PyTuple_New(1);
-            tmp = PyUnicode_FromString(param_id);
-            if (!tmp) {
-                Py_DECREF(pArgs);
-                Py_DECREF(pModule);
-                fprintf(stderr, "Cannot convert argument\n");
-                return NULL;
-            }
-            /* tmp reference stolen here: */
-            PyTuple_SetItem(pArgs, 0, tmp);
-        	pValue = PyObject_CallObject(pFunc, pArgs);
-        	Free(pArgs);
-        }
-        else {}
+		if (pFunc && PyCallable_Check(pFunc)) {
+			pArgs = PyTuple_New(1);
+			tmp = PyUnicode_FromString(param_id);
+			if (!tmp) {
+				Free(pArgs);
+				Free(pFunc);
+				Free(pModule);
+				fprintf(stderr, "Cannot convert argument\n");
+				return NULL;
+			}
+			/* tmp reference stolen here: */
+			PyTuple_SetItem(pArgs, 0, tmp);
+			pValue = PyObject_CallObject(pFunc, pArgs);
+			Free(pArgs);
+		}
 
-        Free(pFunc);
-        return (Charm_t *) pValue;
-    }
-    else {
+		Free(pFunc);
+		Free(pModule);
+		return (Charm_t *) pValue;
+	}
+	else {
 		if (PyErr_Occurred())
 			PyErr_Print();
 		fprintf(stderr, "Cannot find function.\n");
+	}
 
-    }
-
-    return NULL;
+	return NULL;
 }
 
 Charm_t *InitECGroup(Charm_t *pModule, int param_id)
@@ -182,43 +190,44 @@ Charm_t *InitECGroup(Charm_t *pModule, int param_id)
 
 	pName = PyUnicode_FromString("charm.toolbox.ecgroup");
 
-	if(pModule != NULL) PyObject_Del(pModule);
+	if(pModule != NULL) Free(pModule);
 	pModule = PyImport_Import(pName);
 	if(pModule != NULL)
 		debug("import module ok: '%s'\n", pModule->ob_type->tp_name);
-    Free(pName);
+	Free(pName);
 
-    if (pModule != NULL) {
-        pFunc = PyObject_GetAttrString(pModule, "ECGroup");
-    	debug("got attr string: '%s'\n", pFunc->ob_type->tp_name);
+	if (pModule != NULL) {
+		pFunc = PyObject_GetAttrString(pModule, "ECGroup");
+		if (pFunc)
+			debug("got attr string: '%s'\n", pFunc->ob_type->tp_name);
 
-        if (pFunc && PyCallable_Check(pFunc)) {
-            pArgs = PyTuple_New(1);
-            pValue = PyLong_FromLong(param_id);
-            if (!pValue) {
-                Free(pArgs);
-                Free(pModule);
-                fprintf(stderr, "Cannot convert argument\n");
-                return NULL;
-            }
-            /* pValue reference stolen here: */
-            PyTuple_SetItem(pArgs, 0, pValue);
-        	pValue = PyObject_CallObject(pFunc, pArgs);
-        	Free(pArgs);
-        }
-        else {}
+		if (pFunc && PyCallable_Check(pFunc)) {
+			pArgs = PyTuple_New(1);
+			pValue = PyLong_FromLong(param_id);
+			if (!pValue) {
+				Free(pArgs);
+				Free(pFunc);
+				Free(pModule);
+				fprintf(stderr, "Cannot convert argument\n");
+				return NULL;
+			}
+			/* pValue reference stolen here: */
+			PyTuple_SetItem(pArgs, 0, pValue);
+			pValue = PyObject_CallObject(pFunc, pArgs);
+			Free(pArgs);
+		}
 
-        Free(pFunc);
-        return (Charm_t *) pValue;
-    }
-    else {
+		Free(pFunc);
+		Free(pModule);
+		return (Charm_t *) pValue;
+	}
+	else {
 		if (PyErr_Occurred())
 			PyErr_Print();
 		fprintf(stderr, "Cannot find function.\n");
+	}
 
-    }
-
-    return NULL;
+	return NULL;
 }
 
 Charm_t *InitIntegerGroup(Charm_t *pModule, int param_id)
@@ -227,43 +236,44 @@ Charm_t *InitIntegerGroup(Charm_t *pModule, int param_id)
 
 	pName = PyUnicode_FromString("charm.toolbox.integergroup");
 
-	if(pModule != NULL) PyObject_Del(pModule);
+	if(pModule != NULL) Free(pModule);
 	pModule = PyImport_Import(pName);
 	if(pModule != NULL)
 		debug("import module ok: '%s'\n", pModule->ob_type->tp_name);
 	Free(pName);
 
-    if (pModule != NULL) {
-        pFunc = PyObject_GetAttrString(pModule, "IntegerGroup");
-    	debug("got attr string: '%s'\n", pFunc->ob_type->tp_name);
+	if (pModule != NULL) {
+		pFunc = PyObject_GetAttrString(pModule, "IntegerGroup");
+		if (pFunc)
+			debug("got attr string: '%s'\n", pFunc->ob_type->tp_name);
 
-        if (pFunc && PyCallable_Check(pFunc)) {
-            pArgs = PyTuple_New(1);
-            pValue = PyLong_FromLong(param_id);
-            if (!pValue) {
-            	Free(pArgs);
-            	Free(pModule);
-                fprintf(stderr, "Cannot convert argument\n");
-                return NULL;
-            }
-            /* pValue reference stolen here: */
-            PyTuple_SetItem(pArgs, 0, pValue);
-        	pValue = PyObject_CallObject(pFunc, pArgs);
-        	Free(pArgs);
-        }
-        else {}
+		if (pFunc && PyCallable_Check(pFunc)) {
+			pArgs = PyTuple_New(1);
+			pValue = PyLong_FromLong(param_id);
+			if (!pValue) {
+				Free(pArgs);
+				Free(pFunc);
+				Free(pModule);
+				fprintf(stderr, "Cannot convert argument\n");
+				return NULL;
+			}
+			/* pValue reference stolen here: */
+			PyTuple_SetItem(pArgs, 0, pValue);
+			pValue = PyObject_CallObject(pFunc, pArgs);
+			Free(pArgs);
+		}
 
-        Free(pFunc);
-        return (Charm_t *) pValue;
-    }
-    else {
+		Free(pFunc);
+		Free(pModule);
+		return (Charm_t *) pValue;
+	}
+	else {
 		if (PyErr_Occurred())
 			PyErr_Print();
 		fprintf(stderr, "Cannot find function.\n");
+	}
 
-    }
-
-    return NULL;
+	return NULL;
 }
 
 
@@ -285,7 +295,8 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
 
     	if (pFunc && PyCallable_Check(pFunc)) {
             pArgs = PyTuple_New(1);
-            /* pValue reference stolen here: */
+            /* PyTuple_SetItem steals reference, so incref to keep pObject valid */
+            Py_INCREF(pObject);
             PyTuple_SetItem(pArgs, 0, pObject);
             debug("calling class init.\n");
         	// instantiate pValue = ClassName( pObject )
@@ -320,36 +331,44 @@ Charm_t *InitAdapter(const char *class_file, const char *class_name, Charm_t *pO
 	pClassFile = PyUnicode_FromString(class_file);
 
 	pModule = PyImport_Import(pClassFile);
-    Free(pClassFile);
-    debug("successful import: '%s'\n", pModule->ob_type->tp_name);
+	Free(pClassFile);
 
-    if(pModule != NULL) {
-    	pFunc = PyObject_GetAttrString(pModule, class_name);
-    	debug("got attr string: '%s'\n", pFunc->ob_type->tp_name);
+	if(pModule != NULL) {
+		debug("successful import: '%s'\n", pModule->ob_type->tp_name);
+		pFunc = PyObject_GetAttrString(pModule, class_name);
+		if (pFunc)
+			debug("got attr string: '%s'\n", pFunc->ob_type->tp_name);
 
-    	if (pFunc && PyCallable_Check(pFunc)) {
-            pArgs = PyTuple_New(2);
-            /* pObject1 & pObject2 reference stolen here: note might need to Py_INCREF before this point. */
-            PyTuple_SetItem(pArgs, 0, pObject1);
-            PyTuple_SetItem(pArgs, 1, pObject2);
-            debug("calling class init.\n");
-        	// instantiate pValue = ClassName( pObject )
-            pValue = PyObject_CallObject(pFunc, pArgs);
-            debug("success: \n");
-        	Free(pArgs);
-    	}
-    	else {
-    		// call failed
-    		if (PyErr_Occurred())
-    			PyErr_Print();
-    		fprintf(stderr, "Cannot find function.\n");
-    	}
-        Free(pFunc);
-        Free(pModule);
-    	return (Charm_t *) pValue;
-    }
+		if (pFunc && PyCallable_Check(pFunc)) {
+			pArgs = PyTuple_New(2);
+			/* PyTuple_SetItem steals references, so incref to keep pObjects valid */
+			Py_INCREF(pObject1);
+			Py_INCREF(pObject2);
+			PyTuple_SetItem(pArgs, 0, pObject1);
+			PyTuple_SetItem(pArgs, 1, pObject2);
+			debug("calling class init.\n");
+			// instantiate pValue = ClassName( pObject )
+			pValue = PyObject_CallObject(pFunc, pArgs);
+			debug("success: \n");
+			Free(pArgs);
+		}
+		else {
+			// call failed
+			if (PyErr_Occurred())
+				PyErr_Print();
+			fprintf(stderr, "Cannot find function.\n");
+		}
+		Free(pFunc);
+		Free(pModule);
+		return (Charm_t *) pValue;
+	}
+	else {
+		if (PyErr_Occurred())
+			PyErr_Print();
+		fprintf(stderr, "Cannot complete import.\n");
+	}
 
-    return NULL;
+	return NULL;
 }
 
 
@@ -407,8 +426,9 @@ Charm_t *CallMethod(Charm_t *pObject, const char *func_name, char *types, ...)
 					   free(list2);
 					   break;
 			case 'O':  o = va_arg(arg_list, PyObject *);
+					   /* Note: PyList_Append does NOT steal reference, so don't Free(o)
+					    * The caller owns the object and is responsible for freeing it */
 					   PyList_Append(pArgs, o);
-					   Free(o);
 					   break;
 			default:
 					 break;
@@ -417,13 +437,16 @@ Charm_t *CallMethod(Charm_t *pObject, const char *func_name, char *types, ...)
 
 	va_end(arg_list);
 
-	/* fetch the attribtue from the object context - function in this case */
+	/* fetch the attribute from the object context - function in this case */
 	pFunc = PyObject_GetAttrString(pObject, func_name);
 	/* pFunc is a new reference */
 
 	if (pFunc && PyCallable_Check(pFunc)) {
-		/* call the function and pass the tuple since ar*/
-		pValue = PyObject_CallObject(pFunc, PyList_AsTuple(pArgs));
+		/* Convert list to tuple for function call.
+		 * PyList_AsTuple returns a NEW reference that we must free. */
+		PyObject *pTuple = PyList_AsTuple(pArgs);
+		pValue = PyObject_CallObject(pFunc, pTuple);
+		Free(pTuple);  /* Free the tuple created by PyList_AsTuple */
 		if(pValue == NULL) {
 			if (PyErr_Occurred())
 				PyErr_Print();
@@ -432,19 +455,28 @@ Charm_t *CallMethod(Charm_t *pObject, const char *func_name, char *types, ...)
 		Free(pArgs);
 		return (Charm_t *) pValue;
 	}
+	Free(pArgs);  /* Free pArgs even if pFunc is not callable */
 	return NULL;
 }
 
 Charm_t *GetIndex(Charm_t *pObject, int index)
 {
+	PyObject *item = NULL;
 	if(PyTuple_Check(pObject)) {
 		if(index < PyTuple_Size(pObject)) {
-		   /* return borrowed reference */
-		   return PyTuple_GetItem(pObject, index);
+		   /* PyTuple_GetItem returns borrowed reference, so incref for caller */
+		   item = PyTuple_GetItem(pObject, index);
+		   if (item) Py_INCREF(item);
+		   return item;
 		}
 	}
 	else if(PyList_Check(pObject)) {
-		/* handle this case too */
+		if(index < PyList_Size(pObject)) {
+		   /* PyList_GetItem returns borrowed reference, so incref for caller */
+		   item = PyList_GetItem(pObject, index);
+		   if (item) Py_INCREF(item);
+		   return item;
+		}
 	}
 
 	return NULL;
@@ -453,7 +485,10 @@ Charm_t *GetIndex(Charm_t *pObject, int index)
 Charm_t *GetDict(Charm_t *pObject, char *key)
 {
 	if(PyDict_Check(pObject)) {
-		return PyDict_GetItemString(pObject, key);
+		/* PyDict_GetItemString returns borrowed reference, so incref for caller */
+		PyObject *item = PyDict_GetItemString(pObject, key);
+		if (item) Py_INCREF(item);
+		return item;
 	}
 
 	return NULL;

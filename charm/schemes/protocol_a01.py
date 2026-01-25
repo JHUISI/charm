@@ -1,17 +1,24 @@
 '''
-:Blind Signature Scheme
- 
-| From: "M. Abe A Secure Three-move Blind Signature Scheme for Polynomially 
-| 	Many Signatures"
-| Published in: EUROCRYPT 2001
-| Available from: http://www.iacr.org/archive/eurocrypt2001/20450135.pdf
+**Abe Blind Signature Scheme (A01)**
 
-* type:           signature 
-* setting:        integer groups
+*Authors:* Masayuki Abe
 
-:Authors:    Antonio de la Piedra
-:Date:       12/2013
- '''
+| **Title:** "A Secure Three-move Blind Signature Scheme for Polynomially Many Signatures"
+| **Published in:** EUROCRYPT 2001
+| **Available from:** http://www.iacr.org/archive/eurocrypt2001/20450135.pdf
+| **Notes:** Three-move interactive blind signature protocol
+
+.. rubric:: Scheme Properties
+
+* **Type:** blind signature
+* **Setting:** integer groups
+* **Assumption:** DL
+
+.. rubric:: Implementation
+
+:Authors: Antonio de la Piedra
+:Date: 12/2013
+'''
 from charm.toolbox.integergroup import integer, IntegerGroupQ, randomBits
 from charm.toolbox.conversion import Conversion
 from charm.core.engine.protocol import *

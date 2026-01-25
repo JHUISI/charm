@@ -33,16 +33,16 @@
 
 typedef struct {
     PyObject_HEAD
-    PyUnicodeObject *prefix;     /* Prefix (useful for a nonce) */
-    PyUnicodeObject *suffix;     /* Suffix (useful for a nonce) */
-    uint8_t *val;       /* Buffer for our output string */
-    uint32_t buf_size;  /* Size of the buffer */
-    uint8_t *p;         /* Pointer to the part of the buffer that we're allowed to update */
-    uint16_t nbytes;    /* The number of bytes that from .p that are part of the counter */
+    PyObject *prefix;           /* Prefix bytes (useful for a nonce) */
+    PyObject *suffix;           /* Suffix bytes (useful for a nonce) */
+    uint8_t *val;               /* Buffer for our output string */
+    uint32_t buf_size;          /* Size of the buffer */
+    uint8_t *p;                 /* Pointer to the part of the buffer that we're allowed to update */
+    uint16_t nbytes;            /* The number of bytes that from .p that are part of the counter */
     void (*inc_func)(void *);   /* Pointer to the counter increment function */
-    int shortcut_disabled;  /* This gets set to a non-zero value when the shortcut mechanism is disabled */
-    int carry;         /* This gets set by Counter*Object_increment when the counter wraps around */
-    int allow_wraparound;   /* When this is false, we raise OverflowError on next_value() or __call__() when the counter wraps around */
+    int shortcut_disabled;      /* This gets set to a non-zero value when the shortcut mechanism is disabled */
+    int carry;                  /* This gets set by Counter*Object_increment when the counter wraps around */
+    int allow_wraparound;       /* When this is false, we raise OverflowError on next_value() or __call__() when the counter wraps around */
 } PCT_CounterObject;
 
 #endif /* PCT__COUNTER_H */

@@ -23,7 +23,7 @@
  *
  *   @brief   charm interface over RELIC's pairing-based crypto module
  *
- *   @author  ayo.akinyele@charm-crypto.com
+ *   @author  jakinye3@jhu.edu
  *
  ************************************************************************/
 
@@ -437,7 +437,8 @@ int Element_init(Element *self, PyObject *args, PyObject *kwds)
 
 int Pairing_init(Pairing *self, PyObject *args, PyObject *kwds)
 {
-	int bits = 0, string_len = 0;
+	int bits = 0;
+	Py_ssize_t string_len = 0;
 	int seed = -1;
 	char *string = NULL;
 	

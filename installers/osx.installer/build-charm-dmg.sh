@@ -27,25 +27,19 @@ test -d "./build/" || {
     exit 1;
 }
 
-# Maybe there is a better way to do this, for now just ask.
-echo "Please type the path of the top level directory of Charm, python 2.x build, e.g. /Users/you/charm-2.7/charm:"
-read CHARM27
-echo "Please type the path of the top level directory of Charm, python 3.x build, surrounding input in quotes:"
-read CHARM32
+# Charm-Crypto v0.60 - Python 3.9+ only (Python 2.7 support dropped)
+echo "Please type the path of the top level directory of Charm, Python 3.x build, e.g. /Users/you/charm/charm:"
+read CHARM3
 
 
-mkdir -p charmDMG/charm-usr2.7 charmDMG/charm-usr3.2 charmDMG/.background charmDMG/charm-usr2.7/adapters charmDMG/charm-usr3.2/adapters
+mkdir -p charmDMG/charm-usr charmDMG/.background charmDMG/charm-usr/adapters
 
 cp -R "./build/Charm Crypto.mpkg" ./charmDMG/"Charm Crypto.mpkg"
 
 
-cp -R ${CHARM27}/schemes/ ./charmDMG/charm-usr2.7/schemes
-cp -R ${CHARM27}/adapters/ ./charmDMG/charm-usr2.7/adapters
-cp -R ${CHARM27}/test/ ./charmDMG/charm-usr2.7/test
-
-cp -R ${CHARM32}/schemes/ ./charmDMG/charm-usr3.2/schemes
-cp -R ${CHARM32}/adapters/ ./charmDMG/charm-usr3.2/adapters
-cp -R ${CHARM32}/test/ ./charmDMG/charm-usr3.2/test
+cp -R ${CHARM3}/schemes/ ./charmDMG/charm-usr/schemes
+cp -R ${CHARM3}/adapters/ ./charmDMG/charm-usr/adapters
+cp -R ${CHARM3}/test/ ./charmDMG/charm-usr/test
 
 cp ./packages-src/README-OSX.rtf ./charmDMG/
 cp ./packages-src/charm-dmg-background.png ./charmDMG/.background/charm-dmg-background.png
@@ -82,8 +76,7 @@ set background picture of theViewOptions to file ".background:'charm-dmg-backgro
 make new alias file at container window to POSIX file "'${APPDIR}'" with properties {name:"Applications"}
 set position of item "'Charm  Crypto.mpkg'" of container window to {100, 100}
 set position of item "Applications" of container window to {685, 120}
-set position of item "'charm-usr2.7'" of container window to {50,25}
-set position of item "'charm-usr3.2'" of container window to {50,25}
+set position of item "'charm-usr'" of container window to {50,25}
 set position of item "'README-OSX.rtf'" of container window to {385,120}
 update without registering applications
 delay 5

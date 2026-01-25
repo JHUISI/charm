@@ -1,16 +1,23 @@
 '''
-Chandran-Chase-Vaikuntanathan : Obsfucated and Functional Re-encryption
- 
-Chandran, N. and Chase, M. and Vaikuntanathan V., "Collusion-Resistant Obfuscation and Functional Re-encryption"
-Published in: 
-Available from: http://eprint.iacr.org/2011/337
+**Collusion-Resistant Obfuscation and Functional Re-encryption (CCV11)**
 
-* type:           encryption (functional-re-encryption)
-* setting:        bilinear groups (asymmetric)
+*Authors:* Nishanth Chandran, Melissa Chase, Vinod Vaikuntanathan
 
-:Authors:    J Ayo Akinyele
-:Date:       03/2012 
-:Status:     NOT FINISHED/DOESN'T EXECUTE
+| **Title:** "Collusion-Resistant Obfuscation and Functional Re-encryption"
+| **Published in:** ePrint Archive, 2011
+| **Available from:** http://eprint.iacr.org/2011/337
+| **Notes:** Status: NOT FINISHED/DOESN'T EXECUTE
+
+.. rubric:: Scheme Properties
+
+* **Type:** functional re-encryption
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** DBDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 03/2012
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair as e
 

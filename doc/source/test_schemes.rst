@@ -1,7 +1,10 @@
-.. _toolbox:
+.. _test_schemes:
 
 Scheme Test Code
 -----------------------------------------
+
+This section contains test code examples for the implemented cryptographic schemes.
+These tests demonstrate how to use each scheme and verify correct functionality.
 
 .. begin_auto_test_schemes_list
 .. toctree::
