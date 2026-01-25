@@ -1,27 +1,32 @@
 '''
-Brent Waters (Pairing-based)
- 
-| From: "Dual System Encryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions"
-| Published in: CRYPTO 2009
-| Available from: http://eprint.iacr.org/2009/385.pdf
-| Notes: fully secure IBE Construction 
+**Waters Dual System Encryption - Optimized (Waters09-Z)**
 
-* type:           identity-based encryption (public key)
-* setting:        Pairing
+*Authors:* Brent Waters
 
-:Authors:    J Ayo Akinyele
-:Date:       03/2012
+| **Title:** "Dual System Encryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions"
+| **Published in:** CRYPTO 2009
+| **Available from:** http://eprint.iacr.org/2009/385.pdf
+| **Notes:** Fully secure IBE construction - optimized for asymmetric groups
 
-:Improved by: Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based)
+* **Setting:** bilinear groups (asymmetric pairings, MNT curves)
+* **Assumption:** DLIN (Decisional Linear) and related assumptions
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 03/2012
+
+:Improved by: Fan Zhang (zfwise@gwu.edu), supported by GWU computer science department
 :Date: 3/2013
 :Notes:
-1. It works under MNT curve now. However, the size of pk and msk are larger since I need
-have some duplicate elements in G2.
-2. u,w, and h has two copies now. One in G1, the other one in G2. They all stored as public params
-3. pre-calculated g2^-alpha, g2^b and stored in msk. This makes the keygen() faster.
-4. The size of public param and msk should be minimal now.
-5. The extract() takes one more params now, which is the mpk. We don't want to
-increse the size of msk by store redundant elements.
+    1. Works with MNT curves (asymmetric pairings).
+    2. Elements u, w, h duplicated in both G1 and G2 in public params.
+    3. Pre-calculated g2^{-alpha} and g2^b stored in msk for faster keygen.
+    4. Minimal size for public params and msk.
+    5. extract() takes mpk as additional parameter.
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import *

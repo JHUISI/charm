@@ -1,14 +1,23 @@
 '''
-Lamport's One-time Signature
+**Lamport One-Time Signature (Lamport79)**
 
-| From: "L. Lamport. Constructing Digital Signatures from One Way Function"
-| Published in: 1979
-| Available: http://lamport.azurewebsites.net/pubs/dig-sig.pdf
+*Authors:* L. Lamport
 
-*type:      signature(public key)
+| **Title:** "Constructing Digital Signatures from a One Way Function"
+| **Published in:** Technical Report, 1979
+| **Available from:** http://lamport.azurewebsites.net/pubs/dig-sig.pdf
+| **Notes:** One-time signature scheme based on one-way functions.
 
-:Authors:   Jonas Thuresson & Martin Örndahl
-:Date       03/2018
+.. rubric:: Scheme Properties
+
+* **Type:** signature (public key)
+* **Setting:** hash functions
+* **Assumption:** One-Way Function
+
+.. rubric:: Implementation
+
+:Authors: Jonas Thuresson, Martin Örndahl
+:Date: 03/2018
 '''
 from charm.toolbox.PKSig import PKSig
 from hashlib import sha256

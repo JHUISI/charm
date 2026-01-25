@@ -1,17 +1,24 @@
-""" 
-Digital Signature Algorithm (DSA)
+'''
+**Elliptic Curve Digital Signature Algorithm (ECDSA)**
 
-| From: "NIST proposed in Aug 1991 for use in DSS."
-| Published in: FIPS 186
-| Available from: 
-| Notes: 
+*Authors:* NIST
 
-* type:           signature
-* setting:        elliptic curve groups
+| **Title:** "Digital Signature Standard (DSS)"
+| **Published in:** FIPS 186, 1994
+| **Available from:** https://csrc.nist.gov/publications/detail/fips/186/4/final
+| **Notes:** Elliptic curve variant of DSA.
 
-:Authors:    J. Ayo Akinyele
-:Date:       5/2011
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** signature (public key)
+* **Setting:** elliptic curve groups
+* **Assumption:** ECDLP (Elliptic Curve Discrete Logarithm)
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 5/2011
+'''
 from charm.toolbox.ecgroup import ECGroup,ZR,G
 from charm.toolbox.PKSig import PKSig
 

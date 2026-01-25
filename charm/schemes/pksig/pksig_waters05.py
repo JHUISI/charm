@@ -1,24 +1,24 @@
-'''David Naccache based Identity-Based Encryption
- 
-| From: "David Naccache Secure and Practical Identity-Based Encryption Section 4"
-| Available from: http://eprint.iacr.org/2005/369.pdf
+'''
+**Naccache Identity-Based Signature (N04)**
 
-* type:			encryption (identity-based)
-* setting:		bilinear groups (asymmetric)
+*Authors:* D. Naccache
 
-:Authors:	Gary Belvin
-:Date:		06/2011
+| **Title:** "Secure and Practical Identity-Based Encryption"
+| **Published in:** IET Information Security, 2005
+| **Available from:** http://eprint.iacr.org/2005/369.pdf
+| **Notes:** Section 4. Optimized with pre-computed pairings and swapped g1/g2.
 
-:Improved by: Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
-:Date: 3/2013
-:Notes:
-1. e(g1,g2) is pre-calculated as part of public parameters.
-2. g1 and g2 have been swapped. In the original scheme, signature happens in G2
-but now, it happens in G1.
-3. I stored U_z and u as part of mk. This will speed up the sign() a lot.
-The trick is that, instead of doing exponential operation and then multiply
-all together, I compute the exponent first and then do one exponential operation
-''' 
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** DBDH
+
+.. rubric:: Implementation
+
+:Authors: Gary Belvin (original), Fan Zhang (improvements)
+:Date: 06/2011 (original), 3/2013 (improvements)
+'''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.PKSig import PKSig

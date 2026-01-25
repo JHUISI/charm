@@ -1,17 +1,23 @@
 '''
-John Bethencourt, Amit Sahai, Brent Waters
+**Ciphertext-Policy Attribute-Based Encryption (BSW07) - Asymmetric**
 
-| From: "Ciphertext-Policy Attribute-Based Encryption"
-| Published in: 2007
-| Available from: https://doi.org/10.1109/SP.2007.11
-| Notes: Implemented an asymmetric version of the scheme in Section 4.2
-| Security Assumption: Generic group model
-|
-| type:           ciphertext-policy attribute-based encryption
-| setting:        Pairing
+*Authors:* John Bethencourt, Amit Sahai, Brent Waters
 
-:Authors:         Shashank Agrawal
-:Date:            05/2016
+| **Title:** "Ciphertext-Policy Attribute-Based Encryption"
+| **Published in:** IEEE Symposium on Security and Privacy, 2007
+| **Available from:** https://doi.org/10.1109/SP.2007.11
+| **Notes:** Asymmetric version of the scheme in Section 4.2
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption
+* **Setting:** Pairing groups
+* **Assumption:** Generic group model
+
+.. rubric:: Implementation
+
+:Authors: Shashank Agrawal
+:Date: 05/2016
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair

@@ -1,32 +1,24 @@
 '''
-| From: "David Pointcheval, Olivier Sanders: Short Randomizable Signatures"
-| Published in: Proceedings of the RSA Conference on Topics in Cryptology 2016
-| Available from: https://dl.acm.org/doi/10.1007/978-3-319-29485-8_7
-| Notes:
-* type:           signature (blind signature)
-* setting:        bilinear groups (asymmetric)
-:Authors:    Ahmed Bakr
-:Date:       04/2023
-Description:
-This file implements the four schemes:
-    - Single Message Signature
-        - Implemented in the class `PS_SigSingleMessage`
-        - Tested in the function `single_message_main`
-    - Multi Messages Signature
-        - Implemented in the class `PS_SigMultiMessage`
-        - Tested in the function `multi_message_main`
-    - Blinded Single Message Signature
-        - Implemented in the class `PS_BlindSingleMessageSig`
-        - Tested in the function `blinded_single_message_main`
-    - Blinded Multi Messages Signature
-        - Implemented in the class `PS_SigMultiMessage`
-        - Tested in the function `blinded_multi_message_main`
-Notes:
-    - The class `PS_Sig` defines four generic stubs functions that have to be implemented in every signature scheme, which are: keygen, sign, verify
-    - The class `PS_BlindSig` inherits from `PS_Sig` and defines four generic stubs functions that have to be implemented in every signature scheme, which are: keygen, blind, proof_of_knowledge_of_commitment_secrets, sign, unblind, verify
-    - The classes `PS_SigSingleMessage` and `PS_SigMultiMessage` inherit from `PS_Sig`
-    - The classes `PS_BlindSingleMessageSig` and `PS_BlindMultiMessageSig` inherit from `PS_BlindSig`
- '''
+**Pointcheval-Sanders Short Randomizable Signatures (PS16)**
+
+*Authors:* David Pointcheval, Olivier Sanders
+
+| **Title:** "Short Randomizable Signatures"
+| **Published in:** RSA Conference on Topics in Cryptology, 2016
+| **Available from:** https://dl.acm.org/doi/10.1007/978-3-319-29485-8_7
+| **Notes:** Implements single/multi message signatures and blind signatures
+
+.. rubric:: Scheme Properties
+
+* **Type:** blind signature
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** PS assumption
+
+.. rubric:: Implementation
+
+:Authors: Ahmed Bakr
+:Date: 04/2023
+'''
 
 import sys
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, pair

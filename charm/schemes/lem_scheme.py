@@ -1,17 +1,23 @@
 '''
-Iraklis Leontiadis, Kaoutar Elkhiyaoui, Refik Molva(Aggregation Scheme)
-   
-| From: "Private and Dynamic Time-Series Data Aggregation with Trust Relaxation" 
-| Published in: CANS 2014
-| Available from: http://eprint.iacr.org/2014/256.pdf
- 
+**Private and Dynamic Time-Series Data Aggregation (LEM14)**
 
-   
-type:           Plaintext Evaluation of the sum from encrypted values. 
-setting:        Integer
+*Authors:* Iraklis Leontiadis, Kaoutar Elkhiyaoui, Refik Molva
 
-Authors:    Iraklis Leontiadis
-Date:            2/2015
+| **Title:** "Private and Dynamic Time-Series Data Aggregation with Trust Relaxation"
+| **Published in:** CANS 2014
+| **Available from:** http://eprint.iacr.org/2014/256.pdf
+| **Notes:** Enables plaintext evaluation of sums from encrypted time-series values
+
+.. rubric:: Scheme Properties
+
+* **Type:** aggregation (privacy-preserving)
+* **Setting:** integer groups
+* **Assumption:** Paillier
+
+.. rubric:: Implementation
+
+:Authors: Iraklis Leontiadis
+:Date: 2/2015
 '''
                           
 #!/usr/bin/env python3

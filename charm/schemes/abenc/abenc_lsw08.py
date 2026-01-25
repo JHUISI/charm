@@ -1,16 +1,23 @@
 '''
-Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
- 
-| From: "Revocation Systems with Very Small Private Keys", Large Universe Construction
-| Published in: IEEE S&P 2010
-| Available from: http://eprint.iacr.org/2008/309.pdf
-| Notes: 
+**Key-Policy Attribute-Based Encryption (LSW08)**
 
-* type:           key-policy attribute-based encryption (public key)
-* setting:        Pairing
+*Authors:* Allison Lewko, Amit Sahai, Brent Waters
 
-:Authors:    J Ayo Akinyele
-:Date:            12/2010
+| **Title:** "Revocation Systems with Very Small Private Keys"
+| **Published in:** IEEE Symposium on Security and Privacy, 2010
+| **Available from:** http://eprint.iacr.org/2008/309.pdf
+| **Notes:** Large Universe Construction
+
+.. rubric:: Scheme Properties
+
+* **Type:** key-policy attribute-based encryption (public key)
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Bilinear Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 12/2010
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

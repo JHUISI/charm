@@ -1,4 +1,24 @@
-'''Takes an public-key encryption scheme and builds a hybrid encryption scheme.'''
+'''
+**Hybrid Encryption Adapter for PKE (PKE Hybrid)**
+
+*Description:* Converts a Public Key Encryption scheme into a hybrid encryption
+scheme capable of encrypting arbitrary-length messages.
+
+| **Notes:** Uses symmetric encryption (AES) with a randomly generated session key.
+| The session key is encrypted using the underlying PKE scheme.
+| Works with ElGamal and CS98 schemes.
+
+.. rubric:: Adapter Properties
+
+* **Type:** hybrid encryption adapter
+* **Underlying Scheme:** any public key encryption scheme (e.g., ElGamal, CS98)
+* **Purpose:** enables PKE schemes to encrypt arbitrary-length byte messages
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2011
+'''
 
 # Works for ElGamal and CS98 schemes
 from charm.toolbox.PKEnc import PKEnc

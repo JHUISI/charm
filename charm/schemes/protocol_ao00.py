@@ -1,16 +1,24 @@
 '''
-:Partially Blind Signature Scheme
- 
-| From: "M. Abe, T. Okamoto Provably Secure Partially Blind Signatures"
-| Published in: CRYPTO 2000
-| Available from: http://www.iacr.org/archive/crypto2000/18800272/18800272.pdf
+**Abe-Okamoto Partially Blind Signature Scheme (AO00)**
 
-* type:           signature (partially blind)
-* setting:        integer groups
+*Authors:* Masayuki Abe, Tatsuaki Okamoto
 
-:Authors:    Antonio de la Piedra
-:Date:       12/2013
- '''
+| **Title:** "Provably Secure Partially Blind Signatures"
+| **Published in:** CRYPTO 2000
+| **Available from:** http://www.iacr.org/archive/crypto2000/18800272/18800272.pdf
+| **Notes:** Interactive partially blind signature protocol
+
+.. rubric:: Scheme Properties
+
+* **Type:** partially blind signature
+* **Setting:** integer groups
+* **Assumption:** DL
+
+.. rubric:: Implementation
+
+:Authors: Antonio de la Piedra
+:Date: 12/2013
+'''
 from charm.toolbox.integergroup import integer, IntegerGroupQ
 from charm.core.engine.protocol import *
 from charm.toolbox.enum import Enum

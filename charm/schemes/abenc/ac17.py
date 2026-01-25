@@ -1,17 +1,23 @@
 '''
-Shashank Agrawal, Melissa Chase
+**FAME: Fast Attribute-based Message Encryption (AC17)**
 
-| From: "FAME: Fast Attribute-based Message Encryption"
-| Published in: 2017
-| Available from: https://eprint.iacr.org/2017/807
-| Notes: Implemented the scheme in Section 3
-| Security Assumption: a variant of k-linear, k>=2
-|
-| type:           ciphertext-policy attribute-based encryption
-| setting:        Pairing
+*Authors:* Shashank Agrawal, Melissa Chase
 
-:Authors:         Shashank Agrawal
-:Date:            05/2016
+| **Title:** "FAME: Fast Attribute-based Message Encryption"
+| **Published in:** ACM CCS, 2017
+| **Available from:** https://eprint.iacr.org/2017/807
+| **Notes:** Implemented the scheme in Section 3; fast and practical ABE
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption
+* **Setting:** Pairing groups
+* **Assumption:** Variant of k-linear (k >= 2)
+
+.. rubric:: Implementation
+
+:Authors: Shashank Agrawal
+:Date: 05/2016
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair

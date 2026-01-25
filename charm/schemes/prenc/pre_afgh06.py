@@ -1,15 +1,24 @@
 '''
-AFGH Proxy Re-Encryption
-| From: Ateniese, G., Fu, K., Green, M., & Hohenberger, S. (2006). Improved proxy re-encryption schemes with applications to secure distributed storage. 
-| Published in: ACM Transactions on Information and System Security (TISSEC), 9(1), 1-30.
-| Available from: http://dl.acm.org/citation.cfm?id=1127346
-* type:           proxy encryption
-* properties:     CPA-secure, unidirectional, single-hop, non-interactive, collusion-resistant
-* setting:        Pairing groups (Type 1 "symmetric")
-* assumption:     eDBDH (Extended Decisional Bilinear DH)
-* to-do:          first-level encryption & second-level decryption
-:Authors:    D. Nuñez
-:Date:       04/2016
+**AFGH Proxy Re-Encryption (AFGH06)**
+
+*Authors:* Ateniese, Fu, Green, Hohenberger
+
+| **Title:** "Improved Proxy Re-Encryption Schemes with Applications to Secure Distributed Storage"
+| **Published in:** ACM Transactions on Information and System Security (TISSEC), 2006
+| **Available from:** http://dl.acm.org/citation.cfm?id=1127346
+| **Notes:** First-level encryption & second-level decryption not yet implemented
+
+.. rubric:: Scheme Properties
+
+* **Type:** proxy re-encryption
+* **Setting:** Pairing groups (Type 1 "symmetric")
+* **Assumption:** eDBDH (Extended Decisional Bilinear DH)
+* **Properties:** CPA-secure, unidirectional, single-hop, non-interactive, collusion-resistant
+
+.. rubric:: Implementation
+
+:Authors: D. Nuñez
+:Date: 04/2016
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

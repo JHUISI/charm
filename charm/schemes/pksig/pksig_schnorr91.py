@@ -1,3 +1,24 @@
+'''
+**Schnorr Signature (Schnorr91)**
+
+*Authors:* C. P. Schnorr
+
+| **Title:** "Efficient Signature Generation by Smart Cards"
+| **Published in:** Journal of Cryptology, 1991
+| **Available from:** https://link.springer.com/article/10.1007/BF00196725
+| **Notes:**
+
+.. rubric:: Scheme Properties
+
+* **Type:** signature (public key)
+* **Setting:** integer groups
+* **Assumption:** Discrete Logarithm
+
+.. rubric:: Implementation
+
+:Authors: Charm Developers
+:Date: 2011
+'''
 from charm.toolbox.integergroup import IntegerGroupQ
 from charm.toolbox.PKSig import PKSig
 

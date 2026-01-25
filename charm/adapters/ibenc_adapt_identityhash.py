@@ -1,3 +1,24 @@
+'''
+**Identity Hashing Adapter for IBE (HashID Adapter)**
+
+*Description:* Converts an Identity-Based Encryption scheme that requires ZR (integer)
+identities into one that accepts arbitrary string identities via cryptographic hashing.
+
+| **Notes:** Hashes string identities to ZR elements using the pairing group's hash function.
+| Transforms security from selective-ID (IND-sID-CPA) to full-ID (IND-ID-CPA) under ROM.
+
+.. rubric:: Adapter Properties
+
+* **Type:** identity transform adapter
+* **Underlying Scheme:** any IBE scheme with ZR identity space
+* **Purpose:** enables use of human-readable string identities (e.g., email addresses)
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2011
+'''
+
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import *
 
@@ -44,9 +65,9 @@ class HashIDAdapter(IBEnc):
             return sk
         else:
             assert False, "invalid type on ID."
-    
+
     def encrypt(self, pk, ID, msg):
-        assert ibe != None, "IBEnc alg not set"        
+        assert ibe != None, "IBEnc alg not set"
         if type(ID) in [str, bytes]:
             ID2 = self.group.hash(ID)
             return ibe.encrypt(pk, ID2, msg)
@@ -54,6 +75,6 @@ class HashIDAdapter(IBEnc):
             assert False, "invalid type on ID."
 
     def decrypt(self, pk, sk, ct):
-        assert ibe != None, "IBEnc alg not set"        
+        assert ibe != None, "IBEnc alg not set"
         return ibe.decrypt(pk, sk, ct)
 

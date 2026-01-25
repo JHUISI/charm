@@ -1,16 +1,23 @@
 '''
-Kan Yang, Xiaohua Jia 
- 
-| From: DAC-MACS: Effective Data Access Control for Multi-Authority Cloud Storage Systems 
-| Published in:  Security for Cloud Storage Systems  - SpringerBriefs in Computer Science 2014
-| Available From: http://link.springer.com/chapter/10.1007/978-1-4614-7873-7_4
-| Notes: 
+**DAC-MACS: Data Access Control for Multi-Authority Cloud Storage (YJ14)**
 
-* type:           ciphertext-policy attribute-based encryption (public key)
-* setting:        Pairing
+*Authors:* Kan Yang, Xiaohua Jia
 
-:Authors:   artjomb
-:Date:      07/2014
+| **Title:** "DAC-MACS: Effective Data Access Control for Multi-Authority Cloud Storage Systems"
+| **Published in:** Security for Cloud Storage Systems - SpringerBriefs in Computer Science, 2014
+| **Available from:** http://link.springer.com/chapter/10.1007/978-1-4614-7873-7_4
+| **Notes:** Multi-authority scheme with efficient attribute revocation
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption (public key)
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Bilinear Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: artjomb
+:Date: 07/2014
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,GT,pair

@@ -1,13 +1,22 @@
-''' BLS Multi-Signatures
+'''
+**BLS Multi-Signatures (BLS)**
 
- | From: "Dan Boneh, Manu Drijvers, Gregory Neven. BLS Multi-Signatures With Public-Key Aggregation".
- | Available from: https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html
+*Authors:* Dan Boneh, Manu Drijvers, Gregory Neven
 
- * type:         signature (identity-based)
- * setting:      bilinear groups (asymmetric)
+| **Title:** "BLS Multi-Signatures With Public-Key Aggregation"
+| **Available from:** https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html
+| **Notes:** Includes both vulnerable and rogue-public-key-resistant aggregation methods
+
+.. rubric:: Scheme Properties
+
+* **Type:** aggregate signature
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** CDH in G1
+
+.. rubric:: Implementation
 
 :Authors: Lovesh Harchandani
-:Date:    5/2018
+:Date: 5/2018
 '''
 
 from functools import reduce

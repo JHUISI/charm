@@ -1,14 +1,24 @@
-'''David Naccache based Identity-Based Encryption
- 
-| From: "David Naccache Secure and Practical Identity-Based Encryption Section 4"
-| Available from: http://eprint.iacr.org/2005/369.pdf
+'''
+**Waters Identity-Based Encryption (Waters05)**
 
-* type:			encryption (identity-based)
-* setting:		bilinear groups (asymmetric)
+*Authors:* Brent Waters
 
-:Authors:	Gary Belvin
-:Date:			06/2011
-''' 
+| **Title:** "Efficient Identity-Based Encryption Without Random Oracles"
+| **Published in:** Eurocrypt 2005
+| **Available from:** http://eprint.iacr.org/2005/369.pdf
+| **Notes:** Section 4 - Secure and practical IBE without random oracles
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** DBDH (Decisional Bilinear Diffie-Hellman)
+
+.. rubric:: Implementation
+
+:Authors: Gary Belvin
+:Date: 06/2011
+'''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import *

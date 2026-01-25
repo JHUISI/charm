@@ -1,23 +1,33 @@
-r'''David Naccache based Identity-Based Encryption
- 
-| From: "David Naccache Secure and Practical Identity-Based Encryption Section 4"
-| Available from: http://eprint.iacr.org/2005/369.pdf
+r'''
+**Waters Identity-Based Encryption - Optimized (Waters05-Z)**
 
-* type:			encryption (identity-based)
-* setting:		bilinear groups (asymmetric)
+*Authors:* Brent Waters
 
-:Authors:	Gary Belvin
-:Date:			06/2011
+| **Title:** "Efficient Identity-Based Encryption Without Random Oracles"
+| **Published in:** Eurocrypt 2005
+| **Available from:** http://eprint.iacr.org/2005/369.pdf
+| **Notes:** Section 4 - Optimized implementation for asymmetric groups
 
-:Improved by: Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** DBDH (Decisional Bilinear Diffie-Hellman)
+
+.. rubric:: Implementation
+
+:Authors: Gary Belvin
+:Date: 06/2011
+
+:Improved by: Fan Zhang (zfwise@gwu.edu), supported by GWU computer science department
 :Date: 3/2013
 :Notes:
-1.e(g_1, g_2) is pre-calculated  as part of public parameters.
-2.Previous implementation was trying to do: d1 = mk[`U'][i] ** v[i], we fixed the problem by having $\vec{\omega}$ as a vector in Z_q and u = g^{\vec{\omega}} as U. 
-3. We stored \vec{\omega}  as part of msk. This will speed up the extract() a lot. The trick is that, instead of doing exponential operation and then multiply all together, we will compute the exponent first and then do one exponential operation
-4 The code works perfectly under asymmetric groups now.
-5.All elements in sk_id is now in G2 and ct_id in G1. Before that, we have one element in G1 and the other in G2 in both sk_id and ct_id.
-''' 
+    1. e(g_1, g_2) is pre-calculated as part of public parameters.
+    2. Fixed exponentiation by using omega vector in Z_q with u = g^omega.
+    3. Stored omega in msk to speed up extract() by computing exponent first.
+    4. Works with asymmetric groups (MNT curves).
+    5. All sk_id elements in G2 and ct_id elements in G1.
+'''
 from __future__ import print_function
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import IBEnc

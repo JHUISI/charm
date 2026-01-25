@@ -1,18 +1,23 @@
 '''
-Jan Camenisch, Markulf Kohlweiss, Alfredo Rial, and Caroline Sheedy (Pairing-based)
- 
-| From: "Blind and Anonymous Identity-Based Encryption and 
-Authorised Private Searches on Public Key Encrypted Data".
-| Published in: PKC 2009
-| Available from: http://www.iacr.org/archive/pkc2009/54430202/54430202.pdf
-| Notes: section 4.1, first blind and anonymous IBE scheme
-| Security Assumptions: 
-|
-| type:           identity-based encryption (public key)
-| setting:        Pairing
+**Camenisch-Kohlweiss-Rial-Sheedy Blind Anonymous IBE (CKRS09)**
 
-:Authors:    J Ayo Akinyele/Mike Rushanan
-:Date:       02/2012
+*Authors:* Jan Camenisch, Markulf Kohlweiss, Alfredo Rial, Caroline Sheedy
+
+| **Title:** "Blind and Anonymous Identity-Based Encryption and Authorised Private Searches on Public Key Encrypted Data"
+| **Published in:** PKC 2009
+| **Available from:** http://www.iacr.org/archive/pkc2009/54430202/54430202.pdf
+| **Notes:** Section 4.1 - First blind and anonymous IBE scheme
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based, blind, anonymous)
+* **Setting:** bilinear groups (symmetric pairings)
+* **Assumption:** DBDH and related assumptions
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele, Mike Rushanan
+:Date: 02/2012
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import IBEnc

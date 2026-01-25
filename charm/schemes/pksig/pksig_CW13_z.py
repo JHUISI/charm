@@ -1,17 +1,23 @@
 '''
-| From:  J.Chen and H. Wee, Dual System Groups and its Applications - Compact HIBE and More, Manuscript.
-| Published in: Manuscript
-| Available from: Manuscript
-| Notes: 
+**Chen-Wee Dual System Signature (CW13)**
 
-* type: signature (identity-based)
-* setting: bilinear groups (asymmetric)
+*Authors:* J. Chen, H. Wee
 
-:Authors:    Fan Zhang(zfwise@gwu.edu) and Hoeteck Wee, supported by GWU computer science department
-:Date:       5/2013
-:Note:  The paper is not published yet. One has to notice that the implementation is different with the
-paper. The code is designed to optimize the performance by reducing Exponentional operation and Multiplication
-operation as much as possible.
+| **Title:** "Dual System Groups and its Applications - Compact HIBE and More"
+| **Published in:** Manuscript, 2013
+| **Available from:** Manuscript
+| **Notes:** Optimized implementation reducing exponential and multiplication operations.
+
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** SXDH
+
+.. rubric:: Implementation
+
+:Authors: Fan Zhang (zfwise@gwu.edu), Hoeteck Wee
+:Date: 5/2013
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.crypto.cryptobase import *

@@ -1,17 +1,23 @@
 '''
-Susan Hohenberger and Brent Waters (Pairing-based)
- 
-| From: "Constructing Verifiable Random Functions with Large Input Spaces"
-| Published in: ePrint
-| Available from: http://eprint.iacr.org/2010/102.pdf
-| Notes: applications to resetable ZK proofs, micropayment schemes, updatable ZK DBs
-         and verifiable transaction escrow schemes to name a few
+**Verifiable Random Functions with Large Input Spaces (HW10)**
 
-* type:           verifiable random functions (family of pseudo random functions)
-* setting:        Pairing
+*Authors:* Susan Hohenberger, Brent Waters
 
-:Authors:    J Ayo Akinyele
-:Date:       1/2012
+| **Title:** "Constructing Verifiable Random Functions with Large Input Spaces"
+| **Published in:** ePrint Archive, 2010
+| **Available from:** http://eprint.iacr.org/2010/102.pdf
+| **Notes:** Applications to resettable ZK proofs, micropayment schemes, updatable ZK DBs
+
+.. rubric:: Scheme Properties
+
+* **Type:** verifiable random function (VRF)
+* **Setting:** bilinear groups (pairing-based)
+* **Assumption:** q-DBDHI
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 1/2012
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.iterate import dotprod 

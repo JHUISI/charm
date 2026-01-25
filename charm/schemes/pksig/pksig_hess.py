@@ -1,17 +1,24 @@
-""" 
-Hess - Identity-based Signatures
+'''
+**Hess Identity-Based Signature (Hess02)**
 
-| From: "Hess - Efficient identity based signature schemes based on pairings."
-| Published in: Selected Areas in Cryptography
-| Available from: Vol. 2595. LNCS, pages 310-324
-| Notes: 
+*Authors:* F. Hess
 
-* type:           signature (ID-based)
-* setting:        bilinear groups (asymmetric)
+| **Title:** "Efficient Identity Based Signature Schemes Based on Pairings"
+| **Published in:** Selected Areas in Cryptography, 2002
+| **Available from:** LNCS Vol. 2595, pages 310-324
+| **Notes:**
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** BDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2011
+'''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.PKSig import PKSig
 #import gc

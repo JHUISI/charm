@@ -1,17 +1,24 @@
-""" 
-Camenisch-Hohenberger-Pedersen - Identity-based Signatures
+'''
+**Camenisch-Hohenberger-Pedersen Signature (CHP07)**
 
-| From: "Camenisch, S. Hohenberger, M. Pedersen - Batch Verification of short signatures."
-| Published in: EUROCRYPT 2007
-| Available from: http://epring.iacr.org/2007/172.pdf
-| Notes: 
+*Authors:* J. Camenisch, S. Hohenberger, M. Pedersen
 
-* type:           signature (ID-based)
-* setting:        bilinear groups (asymmetric)
+| **Title:** "Batch Verification of Short Signatures"
+| **Published in:** EUROCRYPT, 2007
+| **Available from:** http://eprint.iacr.org/2007/172.pdf
+| **Notes:**
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** CDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2011
+'''
 from charm.toolbox.pairinggroup import G1,G2,ZR,pair
 from charm.toolbox.PKSig import PKSig
 

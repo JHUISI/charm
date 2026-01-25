@@ -1,18 +1,24 @@
-"""
-Yanjiang Yang, Joseph K Liu, Kaitai Liang, Kim Kwang Raymond Choo, Jianying Zhou
+'''
+**Extended Proxy-Assisted Revocable CP-ABE (YLLC15)**
 
-| From: "Extended Proxy-Assisted Approach: Achieving Revocable Fine-Grained Encryption of Cloud Data".
-| Published in: 2015
-| Available from:
-| Notes: adapted from BSW07
-| Security Assumption:
-|
-| type:           ciphertext-policy attribute-based encryption
-| setting:
+*Authors:* Yanjiang Yang, Joseph K Liu, Kaitai Liang, Kim Kwang Raymond Choo, Jianying Zhou
 
-:Authors:    Douglas Hellinger
-:Date:       11/2018
-"""
+| **Title:** "Extended Proxy-Assisted Approach: Achieving Revocable Fine-Grained Encryption of Cloud Data"
+| **Published in:** 2015
+| **Available from:** N/A
+| **Notes:** Adapted from BSW07, provides revocable fine-grained encryption for cloud data
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Bilinear Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: Douglas Hellinger
+:Date: 11/2018
+'''
 
 from charm.toolbox.ABEnc import ABEnc, Output
 from charm.toolbox.pairinggroup import ZR, G1, G2, GT, pair

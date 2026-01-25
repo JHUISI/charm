@@ -1,18 +1,23 @@
-''' 
-Hohenberger-Waters Chameleon Hash (RSA-based)
-based on the scheme of Ateneise and de Medeiros
- 
- | From: "S. Hohenberger, B. Waters. Realizing Hash-and-Sign Signatures under Standard Assumptions", Appendix A.
- | Published in: Eurocrypt 2009
- | Available from: http://eprint.iacr.org/2009/028.pdf
- | Notes: 
+'''
+**Hohenberger-Waters Chameleon Hash (HW09)**
 
- * type:       hash function (chameleon)
- * setting:      RSA
- * assumption:   RSA
+*Authors:* Susan Hohenberger, Brent Waters
 
-:Author:    J. Ayo Akinyele
-:Date:      1/2011
+| **Title:** "Realizing Hash-and-Sign Signatures under Standard Assumptions"
+| **Published in:** Eurocrypt 2009
+| **Available from:** http://eprint.iacr.org/2009/028.pdf
+| **Notes:** Appendix A, based on Ateniese-de Medeiros scheme
+
+.. rubric:: Scheme Properties
+
+* **Type:** chameleon hash function
+* **Setting:** RSA
+* **Assumption:** RSA
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 1/2011
 '''
 
 from charm.toolbox.Hash import ChamHash,Hash

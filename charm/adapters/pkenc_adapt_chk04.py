@@ -1,17 +1,24 @@
 '''
-Canetti-Halevi-Katz Public Key Encryption, IBE-to-PKE transform (generic composition of IBE+signature -> PKE)
- 
-| From: "R. Canneti, S. Halevi, J. Katz: Chosen-Ciphertext Security from Identity-Based Encryption"
-| Published in: CRYPTO 2004
-| Available from: http://eprint.iacr.org/2003/182
-| Notes: 
+**Canetti-Halevi-Katz IBE-to-PKE Transform (CHK04)**
 
-* type:         encryption (public key)
-* setting:      n/a --- requires a selective-ID secure IBE scheme an EU-CMA one-time signature (OTS) scheme
-* assumption:   n/a --- dependent on the underlying primitives
+*Description:* Transforms an Identity-Based Encryption scheme into a CCA-secure
+Public Key Encryption scheme using generic composition of IBE + one-time signature.
 
-:Authors:  J. Ayo Akinyele
-:Date:         1/2011
+| **Based on:** Chosen-Ciphertext Security from Identity-Based Encryption
+| **Published in:** CRYPTO 2004
+| **Available from:** https://eprint.iacr.org/2003/182
+| **Notes:** Requires a selective-ID secure IBE scheme and an EU-CMA one-time signature scheme
+
+.. rubric:: Adapter Properties
+
+* **Type:** IBE-to-PKE transform
+* **Underlying Scheme:** selective-ID secure IBE + EU-CMA one-time signature
+* **Purpose:** constructs CCA-secure public key encryption from IBE and signatures
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 1/2011
 '''
 from charm.toolbox.PKEnc import *
 from charm.toolbox.IBSig import *

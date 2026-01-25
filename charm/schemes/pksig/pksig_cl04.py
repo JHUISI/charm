@@ -1,17 +1,24 @@
 '''
- Identity Based Signature
- 
-| From: "J. Camenisch, A. Lysyanskaya. Signature Schemes and Anonymous Credentials from Bilinear Maps"
-| Published in: 2004
-| Available from: http://www.cs.brown.edu/~anna/papers/cl04.pdf
-| Notes: Scheme A on page 5 section 3.1.
+**Camenisch-Lysyanskaya Signature (CL04)**
 
-* type:           signature (identity-based)
-* setting:        bilinear groups (asymmetric)
+*Authors:* J. Camenisch, A. Lysyanskaya
 
-:Authors:    J. Ayo Akinyele
-:Date:       1/2012
- '''
+| **Title:** "Signature Schemes and Anonymous Credentials from Bilinear Maps"
+| **Published in:** CRYPTO, 2004
+| **Available from:** http://www.cs.brown.edu/~anna/papers/cl04.pdf
+| **Notes:** Scheme A on page 5, section 3.1.
+
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** LRSW
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 1/2012
+'''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.PKSig import PKSig
 

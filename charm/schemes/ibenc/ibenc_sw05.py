@@ -1,16 +1,23 @@
 '''
-Sahai-Waters Fuzzy Identity-Based Encryption, Original Construction
+**Sahai-Waters Fuzzy Identity-Based Encryption (SW05)**
 
-| From: "A. Sahai, B. Waters Fuzzy Identity-Based Encryption.
-| Published in: Eurocrypt 2005
-| Available from: eprint.iacr.org/2004/086.pdf
-| Notes: Original construction (Section 4) and large universe construction (Section 6). 
+*Authors:* Amit Sahai, Brent Waters
 
-* type:            encryption (identity-based)
-* setting:        bilinear groups
+| **Title:** "Fuzzy Identity-Based Encryption"
+| **Published in:** Eurocrypt 2005
+| **Available from:** http://eprint.iacr.org/2004/086.pdf
+| **Notes:** Original construction (Section 4) and large universe construction (Section 6)
 
-:Authors:    Christina Garman
-:Date:       10/2011
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based, fuzzy/attribute-based)
+* **Setting:** bilinear groups (symmetric)
+* **Assumption:** DBDH (Decisional Bilinear Diffie-Hellman)
+
+.. rubric:: Implementation
+
+:Authors: Christina Garman
+:Date: 10/2011
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

@@ -1,16 +1,23 @@
 '''
-Allison Lewko, Amit Sahai and Brent Waters (Pairing-based)
- 
-| From: "Revocation Systems with Very Small Private Keys"
-| Published in: IEEE S&P 2010
-| Available from: http://eprint.iacr.org/2008/309.pdf
-| Notes: fully secure IBE Construction with revocable keys.
+**Lewko-Sahai-Waters Revocable IBE (LSW08)**
 
-* type:           identity-based encryption (public key)
-* setting:        Pairing
+*Authors:* Allison Lewko, Amit Sahai, Brent Waters
 
-:Authors:    J Ayo Akinyele
-:Date:       1/2012
+| **Title:** "Revocation Systems with Very Small Private Keys"
+| **Published in:** IEEE S&P 2010
+| **Available from:** http://eprint.iacr.org/2008/309.pdf
+| **Notes:** Fully secure IBE construction with revocable keys
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based, revocable)
+* **Setting:** bilinear groups (symmetric pairings)
+* **Assumption:** DLIN and related assumptions
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 1/2012
 '''
 from charm.toolbox.pairinggroup import ZR,G1,pair
 from charm.toolbox.IBEnc import *

@@ -1,16 +1,23 @@
 '''
-Dan Boneh, Xavier Boyen, and Hovav Shacham
+**Short Group Signatures (BBS04)**
 
-| From: "Short Group Signatures
-| Published in: CRYPTO 2004
-| Available from: n/a
-| Notes: An extended abstract of this paper appeared in Advances in Cryptology (2004)
+*Authors:* Dan Boneh, Xavier Boyen, Hovav Shacham
 
-* type:           digital signature scheme
-* setting:        Pairing
+| **Title:** "Short Group Signatures"
+| **Published in:** CRYPTO 2004
+| **Available from:** n/a
+| **Notes:** An extended abstract of this paper appeared in Advances in Cryptology (2004)
 
-:Authors:    J Ayo Akinyele
-:Date:           12/2010
+.. rubric:: Scheme Properties
+
+* **Type:** group signature
+* **Setting:** Pairing groups
+* **Assumption:** Strong Diffie-Hellman (SDH) and Decision Linear
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 12/2010
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.PKSig import PKSig

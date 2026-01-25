@@ -1,21 +1,24 @@
 '''
-Shorter IBE and Signatures via Asymmetric Pairings
-  
-| From: "J. Chen, H. Lim, S. Ling, H. Wang, H. Wee Shorter IBE and Signatures via Asymmetric Pairings", Section 5.
-| Published in: Pairing 2012
-| Available from: http://eprint.iacr.org/2012/224
-| Notes: This is a shorter IBE construction based on SXDH construction.
+**Chen-Lim-Ling-Wang-Wee Signature (CLLWW12)**
 
-* type:           signature (identity-based)
-* setting:        bilinear groups (asymmetric)
+*Authors:* J. Chen, H. Lim, S. Ling, H. Wang, H. Wee
 
-:Improved by: Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
-:Date: 	      3/2013
-:Notes:
-1. We swapped g1 and g2 to make signature faster.
-2. Change all the pair($params_1$, $params_2$) to pair($params_2$, $params_1$) is required.
-3.The code is similar with the encryption scheme, especially in setup() function.
-4. Same trick in the encryption scheme applied here.
+| **Title:** "Shorter IBE and Signatures via Asymmetric Pairings"
+| **Published in:** Pairing, 2012
+| **Available from:** http://eprint.iacr.org/2012/224
+| **Notes:** Section 5. Shorter IBE construction based on SXDH.
+
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** SXDH
+
+.. rubric:: Implementation
+
+:Authors: Fan Zhang (zfwise@gwu.edu)
+:Date: 3/2013
+:Notes: Swapped g1 and g2 to make signature faster. Optimized pairing operations.
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.crypto.cryptobase import *

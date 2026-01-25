@@ -1,17 +1,24 @@
-""" 
-Waters - Identity-based signatures
+'''
+**Waters Identity-Based Signature (Waters05)**
 
-| From: "B. Waters - Efficient identity-based encryption without random oracles"
-| Published in: EUROCRYPT 2005
-| Available from: Vol 3494 of LNCS, pages 320-329
-| Notes: 
+*Authors:* B. Waters
 
-* type:           signature (ID-based)
-* setting:        bilinear groups (asymmetric)
+| **Title:** "Efficient Identity-Based Encryption Without Random Oracles"
+| **Published in:** EUROCRYPT, 2005
+| **Available from:** LNCS Vol. 3494, pages 320-329
+| **Notes:**
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** DBDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2011
+'''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.iterate import dotprod
 from charm.toolbox.hash_module import Waters

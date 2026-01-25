@@ -1,21 +1,26 @@
 r'''
-Shorter IBE and Signatures via Asymmetric Pairings
-  
-| From: "J. Chen, H. Lim, S. Ling, H. Wang, H. Wee Shorter IBE and Signatures via Asymmetric Pairings", Section 4.
-| Published in: Pairing 2012
-| Available from: http://eprint.iacr.org/2012/224
-| Notes: This is a shorter IBE construction based on SXDH construction.
+**Chen-Lim-Ling-Wang-Wee Shorter IBE (CLLWW12)**
 
-* type:           encryption (identity-based)
-* setting:        bilinear groups (asymmetric)
+*Authors:* Jie Chen, Hoon Wei Lim, San Ling, Huaxiong Wang, Hoeteck Wee
 
-:Authors:    Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
-:Date:       3/2013
-:Note: The implementation is different from what the paper described. 
-       Generally speaking,  instead of storing msk= { \alpha, g_2^{d_1^*}, g_2^{d_2^*} } as the master secret key, 
-       we stored \msk= \{ \alpha, d_1^*, d_2^* \}. And for the computation of sk_id, we first compute 
-       (\alpha + r ID)d_1^* - r \d_2^*$ then apply the exponential operation. This reduce the G2 exponentials from 8 to 4. 
-       This is the same trick we used in improving N04(Waters05) scheme.
+| **Title:** "Shorter IBE and Signatures via Asymmetric Pairings"
+| **Published in:** Pairing 2012
+| **Available from:** http://eprint.iacr.org/2012/224
+| **Notes:** Section 4 - Shorter IBE construction based on SXDH assumption
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** SXDH (Symmetric External Diffie-Hellman)
+
+.. rubric:: Implementation
+
+:Authors: Fan Zhang (zfwise@gwu.edu), supported by GWU computer science department
+:Date: 3/2013
+:Notes: Optimized implementation stores msk = {alpha, d_1*, d_2*} instead of
+    pre-computed group elements. Computes (alpha + r*ID)*d_1* - r*d_2* before
+    exponentiation, reducing G2 exponentials from 8 to 4.
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.matrixops import *

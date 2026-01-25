@@ -1,16 +1,22 @@
-''' Ateneise-Medeiros (Schnorr group-based)
- 
- | From: "Ateneise-Breno de Medeiros On the Key Exposure Problem in Chameleon Hashes", Section 4.
- | Published in: SCN 2004
- | Available from:
- | Notes: 
+'''
+**Ateniese-Medeiros Chameleon Hash (ADM05)**
 
- * type:         hash function (chameleon)
- * setting:      Schnorr groups
- * assumption:   DL-Hard
+*Authors:* Giuseppe Ateniese, Breno de Medeiros
 
-:Authors: J Ayo Akinyele
-:Date:    4/2011
+| **Title:** "On the Key Exposure Problem in Chameleon Hashes"
+| **Published in:** SCN 2004
+| **Notes:** Section 4, Schnorr group-based construction
+
+.. rubric:: Scheme Properties
+
+* **Type:** chameleon hash function
+* **Setting:** Schnorr groups
+* **Assumption:** DL
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 4/2011
 '''
 from charm.toolbox.Hash import ChamHash
 from charm.toolbox.integergroup import IntegerGroupQ

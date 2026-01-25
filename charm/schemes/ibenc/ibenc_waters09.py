@@ -1,16 +1,23 @@
 '''
-Brent Waters (Pairing-based)
- 
-| From: "Dual System Encryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions"
-| Published in: CRYPTO 2009
-| Available from: http://eprint.iacr.org/2009/385.pdf
-| Notes: fully secure IBE Construction 
+**Waters Dual System Encryption (Waters09)**
 
-* type:           identity-based encryption (public key)
-* setting:        Pairing
+*Authors:* Brent Waters
 
-:Authors:    J Ayo Akinyele
-:Date:       03/2012
+| **Title:** "Dual System Encryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions"
+| **Published in:** CRYPTO 2009
+| **Available from:** http://eprint.iacr.org/2009/385.pdf
+| **Notes:** Fully secure IBE construction using dual system encryption
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based)
+* **Setting:** bilinear groups (symmetric pairings)
+* **Assumption:** DLIN (Decisional Linear) and related assumptions
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 03/2012
 '''
 from charm.toolbox.pairinggroup import ZR,G1,pair
 from charm.toolbox.IBEnc import *

@@ -1,3 +1,25 @@
+'''
+**Schnorr Zero-Knowledge Protocol (Schnorr91)**
+
+*Authors:* Claus-Peter Schnorr
+
+| **Title:** "Efficient Signature Generation by Smart Cards"
+| **Published in:** Journal of Cryptology, 1991
+| **Notes:** Classic three-move zero-knowledge proof of knowledge of discrete log
+
+.. rubric:: Scheme Properties
+
+* **Type:** sigma protocol (zero-knowledge proof)
+* **Setting:** elliptic curve groups
+* **Assumption:** DL
+
+.. rubric:: Implementation
+
+:Authors: Charm Developers
+:Date: Unknown
+'''
+
+
 from charm.core.engine.protocol import *
 from charm.toolbox.ecgroup import ECGroup,G
 from socket import socket,AF_INET,SOCK_STREAM
@@ -11,7 +33,7 @@ HOST, PORT = "", 8082
 
 class SchnorrZK(Protocol):
     def __init__(self, builtin_cv, common_input=None):
-        Protocol.__init__(self, None)        
+        Protocol.__init__(self, None)
         verifier_states = { 2:self.verifier_state2, 4:self.verifier_state4, 6:self.verifier_state6 }
         prover_states = { 1:self.prover_state1, 3:self.prover_state3, 5:self.prover_state5 }
 
@@ -24,17 +46,17 @@ class SchnorrZK(Protocol):
         self.group = ECGroup(builtin_cv)
         #db = {}
         Protocol.setSubclassVars(self, self.group) #, db)
-        
+
     # PROVER states
     def prover_state1(self):
         x = self.group.random()
         r, g = self.group.random(), self.group.random(G)
-        t = g ** r 
+        t = g ** r
         print('prover: ',"hello to verifier.")
         Protocol.store(self, ('r',r), ('x',x))
         Protocol.setState(self, 3)
         return {'t':t, 'g':g, 'y':g ** x } # output goes to the next state.
-     
+
     def prover_state3( self, input):
         print("state3 => ", input)
         (r, x, c) = Protocol.get(self, ['r', 'x', 'c'])
@@ -56,27 +78,27 @@ class SchnorrZK(Protocol):
         c = self.group.random()
         print("state2 generate c :=", c)
         Protocol.store(self, ('c',c))
-        Protocol.setState(self, 4)        
+        Protocol.setState(self, 4)
         return {'c':c}
 
     def verifier_state4( self, input ):
         (t,g,y,c,s) = Protocol.get(self, ['t','g','y','c','s'])
         print("state4: s :=", s)
-        
+
         if (g ** s == t * (y ** c)):
            print("SUCCESSFUL VERIFICATION!!!")
            output = "verifier : ACCEPTED!"
         else:
-            print("FAILED TO VERIFY!!!")            
+            print("FAILED TO VERIFY!!!")
             output = "verifier : FAILED!"
         Protocol.setState(self, 6)
         return output
-    
+
     def verifier_state6(self, input ):
         print("state6: => ", input)
         Protocol.setState(self, None)
         return None
-    
+
 if __name__ == "__main__":
     sp = SchnorrZK(prime192v1)
 

@@ -1,19 +1,23 @@
 '''
-Brent Waters (Pairing-based)
- 
-| From: "Dual System ENcryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions"
-| Published in: CRYPTO 2009
-| Available from: http://eprint.iacr.org/2009/385.pdf
-| Notes: 
+**Waters Dual System Signature (Waters09)**
 
-* type:           identity-based encryption (public key)
-* setting:        Pairing
+*Authors:* B. Waters
 
-:Authors:    J Ayo Akinyele
-:Date:       2/2012
+| **Title:** "Dual System Encryption: Realizing Fully Secure IBE and HIBE under Simple Assumptions"
+| **Published in:** CRYPTO, 2009
+| **Available from:** http://eprint.iacr.org/2009/385.pdf
+| **Notes:** Minor improvements: removed alpha from msk, added g2^-alpha.
 
-:Improved by: Fan Zhang, 3/2013
-:Notes: Only minor changes has been made. Deleted the alpha from msk and added g2^-alpha into it.
+.. rubric:: Scheme Properties
+
+* **Type:** signature (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** DLIN
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele (original), Fan Zhang (improvements)
+:Date: 2/2012 (original), 3/2013 (improvements)
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.IBEnc import IBEnc

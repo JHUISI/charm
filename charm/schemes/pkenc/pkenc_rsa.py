@@ -1,13 +1,23 @@
 '''
-| From: "Rivest-Shamir-Adleman Standard algorithm".
-| Published in: 1978
-| Security Assumption: RSA factoring
+**RSA Public Key Encryption Scheme (RSA)**
 
-* type:           public-key encryption
-* setting:        Integer
+*Authors:* R. Rivest, A. Shamir, L. Adleman
 
-:Authors: J Ayo Akinyele, Gary Belvin
-:Date:            07/2011
+| **Title:** "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems"
+| **Published in:** Communications of the ACM, 1978
+| **Available from:**
+| **Notes:**
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (public key)
+* **Setting:** Integer
+* **Assumption:** RSA (Integer Factorization)
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele, Gary Belvin
+:Date: 07/2011
 '''
 
 from charm.core.math.integer import integer,isPrime,gcd,random,randomPrime,toInt

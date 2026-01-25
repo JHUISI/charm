@@ -1,17 +1,24 @@
-""" 
-Hohenberger-Waters - Realizing hash-and-sign signatures
+'''
+**Hohenberger-Waters Hash-and-Sign Signature (HW09)**
 
-| From: "S. Hohenberger and B. Waters - Realizing hash-and-sign signatures under standard assumptions."
-| Published in: EUROCRYPT 2009
-| Available from: pages 333-350
-| Notes: CDH construction
+*Authors:* S. Hohenberger, B. Waters
 
-* type:           signature
-* setting:        bilinear groups (asymmetric)
+| **Title:** "Realizing Hash-and-Sign Signatures under Standard Assumptions"
+| **Published in:** EUROCRYPT, 2009
+| **Available from:** pages 333-350
+| **Notes:** CDH construction.
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
-"""
+.. rubric:: Scheme Properties
+
+* **Type:** signature (public key)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** CDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2011
+'''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair
 from charm.toolbox.PKSig import PKSig
 from math import ceil, log 

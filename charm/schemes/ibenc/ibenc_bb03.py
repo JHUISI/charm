@@ -1,16 +1,23 @@
 '''
-Boneh-Boyen Identity Based Encryption
- 
-| From: "D. Boneh, X. Boyen.  Efficient Selective Identity-Based Encryption Without Random Oracles", Section 5.1.
-| Published in: Eurocrypt 2004
-| Available from: http://crypto.stanford.edu/~dabo/pubs/papers/bbibe.pdf
-| Notes: This is the IBE (1-level HIBE) implementation of the HIBE scheme BB_2.
+**Boneh-Boyen Identity-Based Encryption (BB-IBE)**
 
-* type:     encryption (identity-based)
-* setting:  bilinear groups (asymmetric)
+*Authors:* Dan Boneh, Xavier Boyen
 
-:Authors:   J Ayo Akinyele
-:Date:      11/2010
+| **Title:** "Efficient Selective-ID Secure Identity-Based Encryption Without Random Oracles"
+| **Published in:** Eurocrypt 2004
+| **Available from:** http://crypto.stanford.edu/~dabo/pubs/papers/bbibe.pdf
+| **Notes:** Section 5.1 - IBE (1-level HIBE) implementation of the BB_2 scheme
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** DBDH (Decisional Bilinear Diffie-Hellman)
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2010
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair

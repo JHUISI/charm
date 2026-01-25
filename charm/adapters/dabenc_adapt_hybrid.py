@@ -1,3 +1,24 @@
+'''
+**Hybrid Encryption Adapter for Multi-Authority ABE (MA-ABE Hybrid)**
+
+*Description:* Converts a Decentralized/Multi-Authority Attribute-Based Encryption scheme
+into a hybrid encryption scheme capable of encrypting arbitrary-length messages.
+
+| **Notes:** Uses symmetric encryption (AES) with a randomly generated session key.
+| The session key is encrypted using the underlying Multi-Authority ABE scheme.
+
+.. rubric:: Adapter Properties
+
+* **Type:** hybrid encryption adapter
+* **Underlying Scheme:** any Decentralized/Multi-Authority ABE scheme
+* **Purpose:** enables Multi-Authority ABE schemes to encrypt arbitrary-length byte messages
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2011
+'''
+
 from charm.core.math.pairing import hashPair as sha2
 from charm.schemes.abenc.dabe_aw11 import Dabe
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
@@ -27,8 +48,8 @@ class HybridABEncMA(ABEncMultiAuth):
     >>> (jhmi_secret_key, jhmi_public_key) = hyb_abema.authsetup(global_parameters, jhmi_attributes)
 
         To encrypt messages we need all of the authorities' public keys.
-    >>> allAuth_public_key = {}; 
-    >>> allAuth_public_key.update(jhu_public_key); 
+    >>> allAuth_public_key = {};
+    >>> allAuth_public_key.update(jhu_public_key);
     >>> allAuth_public_key.update(jhmi_public_key)
 
         An example user, Bob, who is both a professor at JHU and a researcher at JHMI.
@@ -52,10 +73,10 @@ class HybridABEncMA(ABEncMultiAuth):
 
     def setup(self):
         return abencma.setup()
-    
+
     def authsetup(self, gp, attributes):
         return abencma.authsetup(gp, attributes)
-    
+
     def keygen(self, gp, sk, i, gid, pkey):
         return abencma.keygen(gp, sk, i, gid, pkey)
 
@@ -68,7 +89,7 @@ class HybridABEncMA(ABEncMultiAuth):
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
         c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
-    
+
     def decrypt(self, gp, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = abencma.decrypt(gp, sk, c1)
@@ -76,7 +97,7 @@ class HybridABEncMA(ABEncMultiAuth):
             raise Exception("failed to decrypt!")
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
         return cipher.decrypt(c2)
-        
+
 def main():
     groupObj = PairingGroup('SS512')
     dabe = Dabe(groupObj)

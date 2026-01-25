@@ -1,12 +1,32 @@
+'''
+**Sigma Protocol 2 (Sigma2)**
+
+*Authors:* Charm Developers
+
+| **Notes:** Sigma protocol for proving knowledge with pairing-based verification
+
+.. rubric:: Scheme Properties
+
+* **Type:** sigma protocol (zero-knowledge proof)
+* **Setting:** bilinear groups (pairing-based)
+* **Assumption:** DL
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2/2012
+'''
+
+
 from charm.toolbox.sigmaprotocol import Sigma
 from charm.toolbox.pairinggroup import ZR,G1,pair
 
 class SigmaProtocol2(Sigma):
     def __init__(self, groupObj, common_input=None):
         Sigma.__init__(self, groupObj, common_input)
-        if common_input == None: 
+        if common_input == None:
             self.gen_common()
-        
+
     def gen_common(self):
         x, v = self.group.random(ZR, 2)
         g = self.group.random(G1)
@@ -17,7 +37,7 @@ class SigmaProtocol2(Sigma):
         print("check: rhs = e(V,g)^-o * e(g,g)^v =>", (pair(V,g) ** -index) * (pair(g,g) ** v))
         Protocol.store(self, ('g', g), ('V', V), ('v',v), ('y',y), ('sigma', index) )
         return None
-        
+
     def prover_state1(self):
         print("PROVER 1: ")
         (g, V) = Sigma.get(self, ['g', 'V'])
@@ -34,24 +54,24 @@ class SigmaProtocol2(Sigma):
         Sigma.store(self, ('r1',r1), ('r2',r2) )
         Sigma.setState(self, 3)
         return { 'a':a, 'pk':pk }
-    
+
     def prover_state3(self, input):
         print("PROVER 3: ")
         (r1, r2, v, sigma, c) = Sigma.get(self, ['r1','r2','v','sigma', 'c'])
         print("input c =>", c)
         z1 = r1 - sigma * c # need a way to get sigma index as part of init index (1..N)
-        z2 = r2 - v * c 
+        z2 = r2 - v * c
         print("send z1 =>", z1)
         print("send z2 =>", z2)
         Sigma.setState(self, 5)
         return {'z1':z1, 'z2':z2 }
-    
+
     def prover_state5(self, input):
         print("PROVER 5: result =>", input)
         Sigma.setState(self, None)
         Sigma.setErrorCode(self, input)
         return None
-    
+
     def verifier_state2(self, input):
         print("VERIFIER 2: ")
         c = self.group.random(ZR)
@@ -71,7 +91,7 @@ class SigmaProtocol2(Sigma):
         Sigma.setState(self, 6)
         Sigma.setErrorCode(self, result)
         return result
-    
+
     def verifier_state6(self, input):
         print("VERIFIER 6: done.")
         Sigma.setState(self, None)
@@ -99,11 +119,11 @@ class SigmaProtocol2(Sigma):
 #    else:
 #        print("Usage: %s -v or -p" % sys.argv[0])
 #        exit(-1)
-#    
+#
 #    group = PairingGroup('library/a.param')
 #    sp = SigmaProtocol2(group)
 #    sp.setup( {'name':_name, 'type':_type, 'socket':_sock} )
 #    # run as a thread...
 #    sp.execute(_type)
 #    print("Result of protocol =>", sp.result)
-#    
+#

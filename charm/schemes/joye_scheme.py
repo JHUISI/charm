@@ -1,17 +1,23 @@
 '''
-   Marc Joye, Benoit Libert  (Aggregation Scheme)
-    
-   | From: "A Scalable Scheme for Privacy-Preserving Aggregation of Time-Series Data" 
-   | Published in: Financial Crypto 2013
-   | Available from: http://joye.site88.net/papers/JL13aggreg.pdf
+**Privacy-Preserving Aggregation Scheme (JL13)**
 
-   | Notes: 
-   
-   * type:           Plaintext Evaluation of the sum from encrypted values. 
-   * setting:        Integer
-  
-  :Authors:    Iraklis Leontiadis
-  :Date:            12/2013
+*Authors:* Marc Joye, Benoit Libert
+
+| **Title:** "A Scalable Scheme for Privacy-Preserving Aggregation of Time-Series Data"
+| **Published in:** Financial Crypto 2013
+| **Available from:** http://joye.site88.net/papers/JL13aggreg.pdf
+| **Notes:** Enables plaintext evaluation of sums from encrypted values
+
+.. rubric:: Scheme Properties
+
+* **Type:** aggregation (privacy-preserving)
+* **Setting:** integer groups
+* **Assumption:** Paillier
+
+.. rubric:: Implementation
+
+:Authors: Iraklis Leontiadis
+:Date: 12/2013
 '''
  
 from charm.toolbox.integergroup import RSAGroup 

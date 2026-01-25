@@ -1,18 +1,24 @@
-""" 
-Xavier Boyen - Anonymous Ring Signatures
+'''
+**Boyen Mesh Signatures (Boyen07)**
 
-| From: "X. Boyen. Mesh Signatures: How to Leak a Secret with Unwitting and Unwilling Participants"
-| Published in: EUROCRYPT 2007
-| Available from: http://eprint.iacr.org/2007/094.pdf
-| Notes: 
+*Authors:* X. Boyen
 
-* type:           signature (ring-based)
-* setting:        bilinear groups (asymmetric)
+| **Title:** "Mesh Signatures: How to Leak a Secret with Unwitting and Unwilling Participants"
+| **Published in:** EUROCRYPT, 2007
+| **Available from:** http://eprint.iacr.org/2007/094.pdf
+| **Notes:**
 
-:Authors:    J. Ayo Akinyele
-:Date:       11/2011
+.. rubric:: Scheme Properties
 
-"""
+* **Type:** signature (ring-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** q-SDH
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 11/2011
+'''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.PKSig import PKSig
 

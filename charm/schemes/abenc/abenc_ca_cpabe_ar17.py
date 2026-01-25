@@ -1,17 +1,23 @@
 '''
-Jiguo Li, Wei Yao, Jinguang Han, Yichen Zhang, Jian Shen (Pairing-based)
+**User Collusion Avoidance CP-ABE (AR17)**
 
-| From: "User Collusion Avoidance CP-ABE With Efficient Attribute Revocation for Cloud Storage".
-| Published in: 2017
-| Available from: https://ieeexplore.ieee.org/abstract/document/7867082
-| Notes:
-| Security Assumption:
-|
-| type:           ciphertext-policy attribute-based encryption (public key)
-| setting:        Pairing
-|
-| Authors:        Ahmed Bakr
-| Date:           07/2023
+*Authors:* Jiguo Li, Wei Yao, Jinguang Han, Yichen Zhang, Jian Shen
+
+| **Title:** "User Collusion Avoidance CP-ABE With Efficient Attribute Revocation for Cloud Storage"
+| **Published in:** IEEE Systems Journal, 2017
+| **Available from:** https://ieeexplore.ieee.org/abstract/document/7867082
+| **Notes:** Supports user collusion avoidance with efficient attribute revocation
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption (public key)
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Bilinear Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: Ahmed Bakr
+:Date: 07/2023
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil

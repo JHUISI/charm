@@ -1,16 +1,23 @@
 '''
-Pascal Paillier (Public-Key)
- 
-| From: "Public-Key Cryptosystems Based on Composite Degree Residuosity Classes" 
-| Published in: EUROCRYPT 1999
-| Available from: http://link.springer.com/chapter/10.1007%2F3-540-48910-X_16
-| Notes: 
+**Paillier Public Key Encryption Scheme (Paillier99)**
 
-* type       public-key encryption (public key)
-* setting:   Integer
+*Authors:* P. Paillier
 
-:Authors:    J Ayo Akinyele
-:Date:       4/2011 (updated 2/2016)
+| **Title:** "Public-Key Cryptosystems Based on Composite Degree Residuosity Classes"
+| **Published in:** EUROCRYPT 1999
+| **Available from:** http://link.springer.com/chapter/10.1007%2F3-540-48910-X_16
+| **Notes:** Additively homomorphic encryption scheme
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (public key)
+* **Setting:** Integer
+* **Assumption:** Composite Residuosity
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 4/2011 (updated 2/2016)
 '''
 from charm.toolbox.integergroup import lcm,integer,toInt
 from charm.toolbox.PKEnc import PKEnc

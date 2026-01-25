@@ -1,16 +1,23 @@
 '''
-Qin Liu, Guojun Wang, Jie Wu
- 
-| From: Time-based proxy re-encryption scheme for secure data sharing in a cloud environment
-| Published in: Information Sciences (Volume: 258, year: 2014)
-| Available From: http://www.sciencedirect.com/science/article/pii/S0020025512006275
-| Notes: 
+**Time-Based Proxy Re-Encryption (LWW14)**
 
-* type:      ciphertext-policy attribute-based encryption (public key)
-* setting:   Pairing
+*Authors:* Qin Liu, Guojun Wang, Jie Wu
 
-:Author:	artjomb
-:Date:		07/2014
+| **Title:** "Time-based proxy re-encryption scheme for secure data sharing in a cloud environment"
+| **Published in:** Information Sciences, Volume 258, 2014
+| **Available from:** http://www.sciencedirect.com/science/article/pii/S0020025512006275
+| **Notes:** Time-based access control with proxy re-encryption for cloud storage
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption (public key)
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Bilinear Diffie-Hellman
+
+.. rubric:: Implementation
+
+:Authors: artjomb
+:Date: 07/2014
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,GT,pair

@@ -1,15 +1,23 @@
 '''
-Identity-Based Proxy Re-Encryption
+**Identity-Based Proxy Re-Encryption (MG07)**
 
-| From: "M. Green, G. Ateniese Identity-Based Proxy Re-Encryption", Section 4.3.
-| Published in: Applied Cryptography and Network Security. Springer Berlin/Heidelberg, 2007
-| Available from: http://link.springer.com/chapter/10.1007%2F978-3-540-72738-5_19
+*Authors:* Matthew Green, Giuseppe Ateniese
 
-* type:           proxy encryption (identity-based)
-* setting:        bilinear groups (symmetric)
+| **Title:** "Identity-Based Proxy Re-Encryption"
+| **Published in:** Applied Cryptography and Network Security, 2007
+| **Available from:** http://link.springer.com/chapter/10.1007%2F978-3-540-72738-5_19
+| **Notes:** Section 4.3
 
-:Authors:    N. Fotiou
-:Date:       11/2012
+.. rubric:: Scheme Properties
+
+* **Type:** proxy re-encryption (identity-based)
+* **Setting:** bilinear groups (symmetric)
+* **Assumption:** DBDH
+
+.. rubric:: Implementation
+
+:Authors: N. Fotiou
+:Date: 11/2012
 '''
 from charm.toolbox.pairinggroup import pc_element,ZR,G1,G2,GT,pair
 from charm.core.math.integer import integer,bitsize, int2Bytes, randomBits

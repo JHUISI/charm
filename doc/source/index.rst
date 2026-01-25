@@ -30,6 +30,7 @@ Cryptographic Schemes
    :maxdepth: 1
 
    schemes
+   adapters
    test_schemes
 
 Our Toolbox

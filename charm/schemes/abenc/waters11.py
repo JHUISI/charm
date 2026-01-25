@@ -1,17 +1,23 @@
 '''
-Brent Waters
+**Ciphertext-Policy ABE: Expressive and Efficient (Waters11)**
 
-| From: "Ciphertext-Policy Attribute-Based Encryption: An Expressive, Efficient, and Provably Secure Realization"
-| Published in: 2011
-| Available from: https://doi.org/10.1007/978-3-642-19379-8_4
-| Notes: Implemented an asymmetric version of the scheme in Section 3
-| Security Assumption: Decisional Parallel Bilinear Diffie-Hellman Exponent
-|
-| type:           ciphertext-policy attribute-based encryption
-| setting:        Pairing
+*Authors:* Brent Waters
 
-:Authors:         Shashank Agrawal
-:Date:            05/2016
+| **Title:** "Ciphertext-Policy Attribute-Based Encryption: An Expressive, Efficient, and Provably Secure Realization"
+| **Published in:** Public Key Cryptography (PKC), 2011
+| **Available from:** https://doi.org/10.1007/978-3-642-19379-8_4
+| **Notes:** Asymmetric version of the scheme in Section 3
+
+.. rubric:: Scheme Properties
+
+* **Type:** ciphertext-policy attribute-based encryption
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Parallel Bilinear Diffie-Hellman Exponent
+
+.. rubric:: Implementation
+
+:Authors: Shashank Agrawal
+:Date: 05/2016
 '''
 
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair

@@ -1,3 +1,24 @@
+'''
+**Hybrid Encryption Adapter for IBE (IBE Hybrid)**
+
+*Description:* Converts an Identity-Based Encryption scheme into a hybrid encryption
+scheme capable of encrypting arbitrary-length messages.
+
+| **Notes:** Uses symmetric encryption (AES) with a randomly generated session key.
+| The session key is encrypted using the underlying IBE scheme.
+
+.. rubric:: Adapter Properties
+
+* **Type:** hybrid encryption adapter
+* **Underlying Scheme:** any Identity-Based Encryption scheme
+* **Purpose:** enables IBE schemes to encrypt arbitrary-length byte messages
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2011
+'''
+
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.math.pairing import hashPair as sha2
@@ -30,22 +51,22 @@ class HybridIBEnc(IBEnc):
 
     def setup(self):
         return ibenc.setup()
-    
+
     def extract(self, mk, ID):
         return ibenc.extract(mk, ID)
-    
+
     def encrypt(self, pk, ID, M):
-        if type(M) != bytes: raise "message not right type!"        
+        if type(M) != bytes: raise "message not right type!"
         key = group.random(GT)
         c1 = ibenc.encrypt(pk, ID, key)
         # instantiate a symmetric enc scheme from this key
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
         c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
-    
+
     def decrypt(self, pk, ID, ct):
         c1, c2 = ct['c1'], ct['c2']
-        key = ibenc.decrypt(pk, ID, c1)        
+        key = ibenc.decrypt(pk, ID, c1)
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
         return cipher.decrypt(c2)
-    
+

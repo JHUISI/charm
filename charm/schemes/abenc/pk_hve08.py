@@ -1,16 +1,23 @@
 '''
-Vincenzo Iovino, Giuseppe Persiano (Pairing-based)
- 
-| From: "Hidden-Vector Encryption with Groups of Prime Order"
-| Published in: Pairing 2008
-| Available from: http://dl.acm.org/citation.cfm?id=1431889
-| Notes: 
+**Hidden-Vector Encryption (HVE08)**
 
-* type:        predicate encryption (public key)
-* setting:     Pairing
+*Authors:* Vincenzo Iovino, Giuseppe Persiano
 
-:Authors:    Matthew W. Pagano
-:Date:       12/2012
+| **Title:** "Hidden-Vector Encryption with Groups of Prime Order"
+| **Published in:** Pairing-Based Cryptography (Pairing), 2008
+| **Available from:** http://dl.acm.org/citation.cfm?id=1431889
+| **Notes:** Predicate encryption supporting hidden-vector queries
+
+.. rubric:: Scheme Properties
+
+* **Type:** predicate encryption (public key)
+* **Setting:** Pairing groups (prime order)
+* **Assumption:** Decisional Linear
+
+.. rubric:: Implementation
+
+:Authors: Matthew W. Pagano
+:Date: 12/2012
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 

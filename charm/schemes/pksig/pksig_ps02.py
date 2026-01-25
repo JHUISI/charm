@@ -1,16 +1,24 @@
-"""
-Identity Based Signature
- 
-| From: "David Pointcheval and Olivier Sanders. Short Randomizable Signatures"
-| Published in: 2015
-| Available from: https://eprint.iacr.org/2015/525.pdf
+'''
+**Pointcheval-Sanders Signature (PS16) - Sequential Aggregate**
 
-* type:           signature (identity-based)
-* setting:        bilinear groups (asymmetric)
+*Authors:* D. Pointcheval, O. Sanders
 
-:Authors:    Lovesh Harchandani
-:Date:       6/2018
-"""
+| **Title:** "Short Randomizable Signatures"
+| **Published in:** CT-RSA, 2016
+| **Available from:** https://eprint.iacr.org/2015/525.pdf
+| **Notes:** Section 5 - Sequential aggregate signatures over known messages.
+
+.. rubric:: Scheme Properties
+
+* **Type:** signature (public key)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** PS assumption
+
+.. rubric:: Implementation
+
+:Authors: Lovesh Harchandani
+:Date: 6/2018
+'''
 from functools import reduce
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,pair

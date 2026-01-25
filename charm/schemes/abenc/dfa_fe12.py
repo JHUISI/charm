@@ -1,17 +1,23 @@
 '''
-Brent Waters (Pairing-based)
- 
-| From: "Functional Encryption for Regular Languages".
-| Published in: 2012
-| Available from: http://eprint.iacr.org/2012/384
-| Notes: 
-| Security Assumption: 
-|
-| type:           functional encryption ("public index")
-| setting:        Pairing
+**Functional Encryption for Regular Languages (FE12)**
 
-:Authors:    J Ayo Akinyele
-:Date:       12/2012
+*Authors:* Brent Waters
+
+| **Title:** "Functional Encryption for Regular Languages"
+| **Published in:** CRYPTO, 2012
+| **Available from:** http://eprint.iacr.org/2012/384
+| **Notes:** DFA-based functional encryption with public index
+
+.. rubric:: Scheme Properties
+
+* **Type:** functional encryption (public index)
+* **Setting:** Pairing groups
+* **Assumption:** Decisional Linear
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 12/2012
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.DFA import DFA

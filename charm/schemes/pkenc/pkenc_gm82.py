@@ -1,16 +1,20 @@
 '''
-Goldwasser-Micali Public Key Encryption Scheme (Quadratic Residuosity problem)
+**Goldwasser-Micali Public Key Encryption Scheme (GM82)**
 
+*Authors:* S. Goldwasser, S. Micali
 
-| From: "S. Goldwasser, S. Micali: Probabilistic encryption and how to play
-|        mental poker keeping secret all partial information"
-| Published in: 14th Symposium on Theory of Computing (1982)
-| Available from: http://groups.csail.mit.edu/cis/pubs/shafi/1982-stoc.pdf
-| Notes:
+| **Title:** "Probabilistic Encryption and How to Play Mental Poker Keeping Secret All Partial Information"
+| **Published in:** 14th Symposium on Theory of Computing (STOC), 1982
+| **Available from:** http://groups.csail.mit.edu/cis/pubs/shafi/1982-stoc.pdf
+| **Notes:**
 
-* type:          encryption (public key)
-* setting:       Integer
-* assumption:    Quadratic Residuosity
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (public key)
+* **Setting:** Integer
+* **Assumption:** Quadratic Residuosity
+
+.. rubric:: Implementation
 
 :Authors: Guillermo Ramos
 :Date: 01/2015

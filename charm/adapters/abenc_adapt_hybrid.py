@@ -1,3 +1,24 @@
+'''
+**Hybrid Encryption Adapter for CP-ABE (CP-ABE Hybrid)**
+
+*Description:* Converts a Ciphertext-Policy Attribute-Based Encryption scheme into a hybrid
+encryption scheme capable of encrypting arbitrary-length messages.
+
+| **Notes:** Uses symmetric encryption (AES) with a randomly generated session key.
+| The session key is encrypted using the underlying CP-ABE scheme.
+
+.. rubric:: Adapter Properties
+
+* **Type:** hybrid encryption adapter
+* **Underlying Scheme:** any Ciphertext-Policy ABE scheme
+* **Purpose:** enables CP-ABE schemes to encrypt arbitrary-length byte messages
+
+.. rubric:: Implementation
+
+:Authors: J. Ayo Akinyele
+:Date: 2011
+'''
+
 
 from charm.toolbox.ABEnc import ABEnc
 from charm.schemes.abenc.abenc_bsw07 import CPabe_BSW07
@@ -25,13 +46,13 @@ class HybridABEnc(ABEnc):
         # check properties (TODO)
         self.abenc = scheme
         self.group = groupObj
-            
+
     def setup(self):
         return self.abenc.setup()
-    
+
     def keygen(self, pk, mk, object):
         return self.abenc.keygen(pk, mk, object)
-    
+
     def encrypt(self, pk, M, object):
         key = self.group.random(GT)
         c1 = self.abenc.encrypt(pk, key, object)
@@ -39,7 +60,7 @@ class HybridABEnc(ABEnc):
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
         c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
-    
+
     def decrypt(self, pk, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
         key = self.abenc.decrypt(pk, sk, c1)
@@ -47,7 +68,7 @@ class HybridABEnc(ABEnc):
             raise Exception("failed to decrypt!")
         cipher = AuthenticatedCryptoAbstraction(sha2(key))
         return cipher.decrypt(c2)
-    
+
 def main():
     groupObj = PairingGroup('SS512')
     cpabe = CPabe_BSW07(groupObj)

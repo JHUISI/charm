@@ -1,17 +1,25 @@
-"""
-| From:  J.Chen and H. Wee, Dual System Groups and its Applications, A Compact HIBE and More, Manuscript.
-| Published in: Manuscript
-| Available from: Manuscript
-| Notes: 
+'''
+**Chen-Wee Dual System Groups IBE (CW13)**
 
-* type:           encryption (identity-based)
-* setting:        bilinear groups (asymmetric)
+*Authors:* Jie Chen, Hoeteck Wee
 
-:Authors:    Fan Zhang(zfwise@gwu.edu), supported by GWU computer science department
-:Date:       5/2013
-:Note:  The paper is not published yet. One has to notice that the implementation is different with the paper. 
-The code is designed to optimize the performance by reducing Exponentiation and Multiplication operations as much as possible.
-"""
+| **Title:** "Dual System Groups and its Applications - Compact HIBE and More"
+| **Published in:** CRYPTO 2013
+| **Available from:** http://eprint.iacr.org/2013/394.pdf
+| **Notes:** Compact IBE using dual system groups methodology
+
+.. rubric:: Scheme Properties
+
+* **Type:** encryption (identity-based)
+* **Setting:** bilinear groups (asymmetric)
+* **Assumption:** SXDH (Symmetric External Diffie-Hellman)
+
+.. rubric:: Implementation
+
+:Authors: Fan Zhang (zfwise@gwu.edu), supported by GWU computer science department
+:Date: 5/2013
+:Notes: Implementation optimized to reduce exponentiation and multiplication operations.
+'''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.crypto.cryptobase import *
 from charm.toolbox.IBEnc import IBEnc
