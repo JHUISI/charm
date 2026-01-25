@@ -103,13 +103,19 @@ def pickleObject(Object):
     return encoded
 
 def unpickleObject(Object):
+    """Unpickle a base64-encoded object.
+
+    WARNING: This function uses pickle.loads() which can execute arbitrary code
+    when deserializing untrusted data. Only use this with trusted input.
+    This is kept for backward compatibility with existing serialized data.
+    """
     if type(Object) == str or type(Object) == bytes:
        byte_object = Object
     else:
        return None
     decoded = b64decode(byte_object)
     if type(decoded) == bytes and len(decoded) > 0:
-        return pickle.loads(decoded)
+        return pickle.loads(decoded)  # nosec B301 - intentional use for trusted data
     return None
 
 # JSON does not support 'bytes' objects, so these from/to_json 
