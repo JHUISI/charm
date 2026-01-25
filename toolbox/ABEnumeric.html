@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="bitstring" href="bitstring.html"><link rel="prev" title="ABEncMultiAuth - Multi-Authority Attribute-Based Encryption" href="ABEncMultiAuth.html">
         <link rel="prefetch" href="../_static/charm_logo.png" as="image">
 
-    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
         <title>ABEnumeric - Numeric Attribute Encoding - Charm-Crypto v0.60</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
@@ -483,7 +483,7 @@ be evaluated using standard ABE schemes.</p>
 <h2>NumericAttributeHelper Class<a class="headerlink" href="#numericattributehelper-class" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="charm.toolbox.ABEnumeric.NumericAttributeHelper">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">NumericAttributeHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_bits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#NumericAttributeHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.NumericAttributeHelper" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">NumericAttributeHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_bits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#NumericAttributeHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.NumericAttributeHelper" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Helper class for working with numeric attributes in CP-ABE.</p>
 <p>This class provides a high-level interface for:
@@ -734,31 +734,31 @@ value: The numeric value in the comparison</p>
 <h2>Exception Classes<a class="headerlink" href="#exception-classes" title="Link to this heading">¶</a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py" id="charm.toolbox.ABEnumeric.NumericAttributeError">
-<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">NumericAttributeError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#NumericAttributeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.NumericAttributeError" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">NumericAttributeError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#NumericAttributeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.NumericAttributeError" title="Link to this definition">¶</a></dt>
 <dd><p>Base exception for numeric attribute encoding errors.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="charm.toolbox.ABEnumeric.BitOverflowError">
-<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">BitOverflowError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#BitOverflowError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.BitOverflowError" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">BitOverflowError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#BitOverflowError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.BitOverflowError" title="Link to this definition">¶</a></dt>
 <dd><p>Raised when a value exceeds the representable range for the given bit width.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="charm.toolbox.ABEnumeric.InvalidBitWidthError">
-<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">InvalidBitWidthError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#InvalidBitWidthError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.InvalidBitWidthError" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">InvalidBitWidthError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#InvalidBitWidthError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.InvalidBitWidthError" title="Link to this definition">¶</a></dt>
 <dd><p>Raised when an invalid bit width is specified.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="charm.toolbox.ABEnumeric.InvalidOperatorError">
-<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">InvalidOperatorError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#InvalidOperatorError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.InvalidOperatorError" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">InvalidOperatorError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#InvalidOperatorError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.InvalidOperatorError" title="Link to this definition">¶</a></dt>
 <dd><p>Raised when an unsupported comparison operator is used.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="charm.toolbox.ABEnumeric.AttributeNameConflictError">
-<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">AttributeNameConflictError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#AttributeNameConflictError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.AttributeNameConflictError" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">charm.toolbox.ABEnumeric.</span></span><span class="sig-name descname"><span class="pre">AttributeNameConflictError</span></span><a class="reference internal" href="../_modules/charm/toolbox/ABEnumeric.html#AttributeNameConflictError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.toolbox.ABEnumeric.AttributeNameConflictError" title="Link to this definition">¶</a></dt>
 <dd><p>Raised when an attribute name conflicts with the bit encoding format.</p>
 </dd></dl>
 
@@ -939,8 +939,8 @@ InvalidBitWidthError: If num_bits is invalid</p>
     </aside>
   </div>
 </div><script src="../_static/documentation_options.js?v=7366d2df"></script>
-    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>
