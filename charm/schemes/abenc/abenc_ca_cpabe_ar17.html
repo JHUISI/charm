@@ -1,0 +1,909 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html"><link rel="next" title="abenc_dacmacs_yj14" href="abenc_dacmacs_yj14.html"><link rel="prev" title="abenc_bsw07" href="abenc_bsw07.html">
+        <link rel="prefetch" href="../../../_static/charm_logo.png" as="image">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>abenc_ca_cpabe_ar17 - Charm-Crypto v0.60</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #2980b9;
+  --color-brand-content: #2980b9;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">Charm-Crypto v0.60</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../../_static/charm_logo.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../miracl.html">Building MIRACL for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../mobile.html">Android Build (Deprecated)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">How To Get Started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cryptographers.html">For Cryptographers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers.html">For App Developers</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../aggrsign_bls.html">aggrsign_bls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../aggrsign_MuSig.html">aggrsign_MuSig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../blindsig_ps16.html">blindsig_ps16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../chamhash_adm05.html">chamhash_adm05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../chamhash_rsa_hw09.html">chamhash_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encap_bchk05.html">encap_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../joye_scheme.html">joye_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lem_scheme.html">lem_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pk_vrf.html">pk_vrf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pre_mg07.html">pre_mg07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../protocol_a01.html">protocol_a01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../protocol_ao00.html">protocol_ao00</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../protocol_cns07.html">protocol_cns07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../protocol_schnorr91.html">protocol_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sigma1.html">sigma1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sigma2.html">sigma2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sigma3.html">sigma3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_accountability_jyjxgd20.html">abenc_accountability_jyjxgd20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_bsw07.html">abenc_bsw07</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">abenc_ca_cpabe_ar17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_dacmacs_yj14.html">abenc_dacmacs_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_lsw08.html">abenc_lsw08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_maabe_rw15.html">abenc_maabe_rw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_maabe_yj14.html">abenc_maabe_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_tbpre_lww14.html">abenc_tbpre_lww14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_unmcpabe_yahk14.html">abenc_unmcpabe_yahk14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_waters09.html">abenc_waters09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_yct14.html">abenc_yct14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abenc_yllc15.html">abenc_yllc15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ac17.html">ac17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bsw07.html">bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cgw15.html">cgw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dabe_aw11.html">dabe_aw11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dfa_fe12.html">dfa_fe12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pk_hve08.html">pk_hve08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="waters11.html">waters11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pkenc/pkenc_cs98.html">pkenc_cs98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pkenc/pkenc_elgamal85.html">pkenc_elgamal85</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pkenc/pkenc_gm82.html">pkenc_gm82</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pkenc/pkenc_paillier99.html">pkenc_paillier99</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pkenc/pkenc_rabin.html">pkenc_rabin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pkenc/pkenc_rsa.html">pkenc_rsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_bls04.html">pksig_bls04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_boyen.html">pksig_boyen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_chch.html">pksig_chch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_chp.html">pksig_chp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_cl03.html">pksig_cl03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_cl04.html">pksig_cl04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_cllww12_z.html">pksig_cllww12_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_CW13_z.html">pksig_CW13_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_cyh.html">pksig_cyh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_dsa.html">pksig_dsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_ecdsa.html">pksig_ecdsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_hess.html">pksig_hess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_hw.html">pksig_hw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_lamport.html">pksig_lamport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_ps01.html">pksig_ps01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_ps02.html">pksig_ps02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_ps03.html">pksig_ps03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_rsa_hw09.html">pksig_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_schnorr91.html">pksig_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_waters.html">pksig_waters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_waters05.html">pksig_waters05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pksig/pksig_waters09.html">pksig_waters09</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../test_vectors.html">Schemes with Test Vectors</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/dabenc_adapt_hybrid.html">dabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/ibenc_adapt_hybrid.html">ibenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/ibenc_adapt_identityhash.html">ibenc_adapt_identityhash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/kpabenc_adapt_hybrid.html">kpabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/pkenc_adapt_bchk05.html">pkenc_adapt_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/pkenc_adapt_chk04.html">pkenc_adapt_chk04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/pkenc_adapt_hybrid.html">pkenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/bitstring.html">bitstring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/Commit.html">Commit - Commitment Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/conversion.html">conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/DFA.html">DFA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/eccurve.html">eccurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/ecgroup.html">ecgroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/enum.html">enum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/FSA.html">FSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/Hash.html">Hash - Hash Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/hash_module.html">hash_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/IBEnc.html">IBEnc - Identity-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/IBSig.html">IBSig - Identity-Based Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/integergroup.html">integergroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/iterate.html">iterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/matrixops.html">matrixops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/msp.html">msp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/node.html">node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/pairingcurves.html">pairingcurves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/pairinggroup.html">pairinggroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/PKEnc.html">PKEnc - Public-Key Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/PKSig.html">PKSig - Public-Key Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/policy_expression_spec.html">policy_expression_spec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/policytree.html">policytree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/PREnc.html">PREnc - Proxy Re-Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/reCompiler.html">reCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/redundancyschemes.html">redundancyschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/schemebase.html">schemebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/secretshare.html">secretshare - Secret Sharing Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/secretutil.html">secretutil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/securerandom.html">securerandom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/specialprimes.html">specialprimes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/xmlserialize.html">xmlserialize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/zknode.html">zknode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../toolbox/ZKProof.html">ZKProof</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/rsa_alg_test.html">rsa_alg_test</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/conversion_test.html">conversion_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/ecgroup_test.html">ecgroup_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/paddingschemes_test.html">paddingschemes_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/policy_parser_stress_test.html">policy_parser_stress_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/secretshare_test.html">secretshare_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/symcrypto_test.html">symcrypto_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../test/test_policy_expression.html">test_policy_expression</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../updates.html">Changes in v0.43</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/blob/dev/doc/source/charm/schemes/abenc/abenc_ca_cpabe_ar17.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/edit/dev/doc/source/charm/schemes/abenc/abenc_ca_cpabe_ar17.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-abenc_ca_cpabe_ar17">
+<span id="abenc-ca-cpabe-ar17"></span><h1>abenc_ca_cpabe_ar17<a class="headerlink" href="#module-abenc_ca_cpabe_ar17" title="Link to this heading">¶</a></h1>
+<p><strong>User Collusion Avoidance CP-ABE (AR17)</strong></p>
+<p><em>Authors:</em> Jiguo Li, Wei Yao, Jinguang Han, Yichen Zhang, Jian Shen</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “User Collusion Avoidance CP-ABE With Efficient Attribute Revocation for Cloud Storage”</div>
+<div class="line"><strong>Published in:</strong> IEEE Systems Journal, 2017</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/7867082">https://ieeexplore.ieee.org/abstract/document/7867082</a></div>
+<div class="line"><strong>Notes:</strong> Supports user collusion avoidance with efficient attribute revocation</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption (public key)</p></li>
+<li><p><strong>Setting:</strong> Pairing groups</p></li>
+<li><p><strong>Assumption:</strong> Decisional Bilinear Diffie-Hellman</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ahmed Bakr</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>07/2023</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.AM">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">abenc_ca_cpabe_ar17.</span></span><span class="sig-name descname"><span class="pre">AM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#AM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.AM" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Attribute Manager (AM)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.AM.add_attr_to_user">
+<span class="sig-name descname"><span class="pre">add_attr_to_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#AM.add_attr_to_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.AM.add_attr_to_user" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.AM.get_minimum_nodes_list_that_represent_users_list">
+<span class="sig-name descname"><span class="pre">get_minimum_nodes_list_that_represent_users_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_names_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode" title="abenc_ca_cpabe_ar17.TreeNode"><span class="pre">TreeNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#AM.get_minimum_nodes_list_that_represent_users_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.AM.get_minimum_nodes_list_that_represent_users_list" title="Link to this definition">¶</a></dt>
+<dd><p>This is represented in the paper as calculating node(Gi)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.AM.get_user_assignation_to_leafs_dict">
+<span class="sig-name descname"><span class="pre">get_user_assignation_to_leafs_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode" title="abenc_ca_cpabe_ar17.TreeNode"><span class="pre">TreeNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#AM.get_user_assignation_to_leafs_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.AM.get_user_assignation_to_leafs_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.AM.get_user_path">
+<span class="sig-name descname"><span class="pre">get_user_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_name</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode" title="abenc_ca_cpabe_ar17.TreeNode"><span class="pre">TreeNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#AM.get_user_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.AM.get_user_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.AM.get_user_path_intersection_with_node_gi">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_user_path_intersection_with_node_gi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode" title="abenc_ca_cpabe_ar17.TreeNode"><span class="pre">TreeNode</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_gi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode" title="abenc_ca_cpabe_ar17.TreeNode"><span class="pre">TreeNode</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode" title="abenc_ca_cpabe_ar17.TreeNode"><span class="pre">TreeNode</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#AM.get_user_path_intersection_with_node_gi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.AM.get_user_path_intersection_with_node_gi" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.AM.remove_attr_from_user">
+<span class="sig-name descname"><span class="pre">remove_attr_from_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#AM.remove_attr_from_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.AM.remove_attr_from_user" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">abenc_ca_cpabe_ar17.</span></span><span class="sig-name descname"><span class="pre">CaCpabeAr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEnc</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.add_attribute">
+<span class="sig-name descname"><span class="pre">add_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM" title="abenc_ca_cpabe_ar17.AM"><span class="pre">AM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">PP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UMK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">users_kek_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MMK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.add_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.add_attribute" title="Link to this definition">¶</a></dt>
+<dd><p>This function is executed by AM when an attribute is added to a user.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>user_name: The name of the user who has an attribute to be added.</p></li>
+<li><p>attribute_name: To be added attribute name.</p></li>
+<li><p>attributes_manager: AM.</p></li>
+<li><p>PP: Public Parameters from the system setup algorithm.</p></li>
+<li><p>UMK: User Master Key. A value stored privately by TA for each user. Represented as a dictionary, where the
+user_name is the key and a group element is the value.</p></li>
+<li><p>users_kek_i: A list privately acquired by AM from TA as part of key_generation function.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Inputs/Outputs:</dt><dd><ul class="simple">
+<li><p>MMK: Manager master key represented as a dictionary.</p></li>
+<li><p>MPK: Manager public key represented as a dictionary.</p></li>
+</ul>
+</dd>
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>updated_KEK_dict: The key is the user-name of the user whose KEK key is updated and the value is the</dt><dd><p>updated KEK key value.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CT_tilde</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Hdr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DSK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">KEK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM" title="abenc_ca_cpabe_ar17.AM"><span class="pre">AM</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used by any user who has sufficient, non revoked attributes to decrypted a message under a
+specific access policy.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>PP: Public Parameters from the system setup algorithm.</p></li>
+<li><p>CT_tilde: Ciphertext after re-encryption by the AM.</p></li>
+<li><p>Hdr: Header message.</p></li>
+<li><p>DSK: Attributes decryption keys as in the original CP-ABE paper (abenc_bsw07.py). (shared with the user).</p></li>
+<li><p>KEK: Key Encryption Keys generated for each attribute hold by the user using the users binary tree</p></li>
+<li><p>user_name: Username who is decrypting the ciphertext.</p></li>
+<li><p>attributes_manager: AM.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>M: Recovered message, if the user has the decryption keys of the attributes that satisfy the policy.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MMK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM" title="abenc_ca_cpabe_ar17.AM"><span class="pre">AM</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>This function is executed by anyone who wants to encrypt a message with an access policy, then by AM to
+perform the re-encryption.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>PP: Public Parameters from the system setup algorithm.</p></li>
+<li><p>MMK: Manager master key represented as a dictionary.</p></li>
+<li><p>M: Message to by encrypted.</p></li>
+<li><p>A: Access policy represented as a boolean expression string.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>CT_dash: Ciphertext.</p></li>
+<li><p>Hdr: Header message.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.generate_kek_for_user_with_attr">
+<span class="sig-name descname"><span class="pre">generate_kek_for_user_with_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">TA_KEK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.generate_kek_for_user_with_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.generate_kek_for_user_with_attr" title="Link to this definition">¶</a></dt>
+<dd><p>This function is executed by AM and considered as part of key generation procedure.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>TA_KEK: Preliminary KEK list generated by TA.</p></li>
+<li><p>attributes_manager: AM.</p></li>
+<li><p>user_attribute_names_list: Attribute names hold by the user.</p></li>
+<li><p>user_name: User name.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>KEK: Key Encryption Key generated for a specific attribute hold by the user using the users binary tree
+generated by AM.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.key_generation">
+<span class="sig-name descname"><span class="pre">key_generation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_attribute_names_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM" title="abenc_ca_cpabe_ar17.AM"><span class="pre">AM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">UMK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">users_TA_KEK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.key_generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.key_generation" title="Link to this definition">¶</a></dt>
+<dd><p>This function is responsible for generating the decryption keys used by the user according to his list of
+attributes.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>PP: Public Parameters from the system setup algorithm.</p></li>
+<li><p>MK: TA’s master secret key.</p></li>
+<li><p>MPK: Manager public key represented as a dictionary.</p></li>
+<li><p>user_attribute_names_list: Attribute names hold by the user.</p></li>
+<li><p>user_name: User name.</p></li>
+<li><p>attributes_manager: AM.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Inputs/outputs:</dt><dd><ul class="simple">
+<li><p>UMK: User Master Key. A value stored privately by TA for each user. Represented as a dictionary, where the
+user_name is the key and a group element is the value.</p></li>
+</ul>
+</dd>
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>DSK: Attributes decryption keys as in the original CP-ABE paper (abenc_bsw07.py). (shared with the user)</p></li>
+<li><p>KEK: Key Encryption Keys generated for each attribute hold by the user using the users binary tree
+generated by AM. (shared with the user)</p></li>
+<li><p>users_TA_KEK: A dictionary that holds the TA KEK for each user. (stored privately by AM)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.local_encryption">
+<span class="sig-name descname"><span class="pre">local_encryption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PP</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.local_encryption"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.local_encryption" title="Link to this definition">¶</a></dt>
+<dd><p>This function is executed by anyone who wants to encrypt a message with an access policy.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A: Access policy represented as a boolean expression string.</p></li>
+<li><p>M: Message to by encrypted.</p></li>
+<li><p>PP: Public Parameters from the system setup algorithm.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>CT: Ciphertext.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.manager_setup">
+<span class="sig-name descname"><span class="pre">manager_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PP</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">{'g':</span> <span class="pre">1,</span> <span class="pre">'g_beta':</span> <span class="pre">1,</span> <span class="pre">'g_1_over_beta':</span> <span class="pre">1,</span> <span class="pre">'e_gg_alpha':</span> <span class="pre">3}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.manager_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.manager_setup" title="Link to this definition">¶</a></dt>
+<dd><p>Manager Setup algorithm performed by AM.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>attribute_names: The name of attributes that AM is responsible for.</p></li>
+<li><p>PP: Public Parameters from the system setup algorithm.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>MMK: Manager master key represented as a dictionary.</p></li>
+<li><p>MPK: Manager public key represented as a dictionary.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.reencryption">
+<span class="sig-name descname"><span class="pre">reencryption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MMK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_manager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.reencryption"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.reencryption" title="Link to this definition">¶</a></dt>
+<dd><p>This function is performed by AM and it is the second part of the encryption procedure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.revoke_attribute">
+<span class="sig-name descname"><span class="pre">revoke_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">revoked_user_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM" title="abenc_ca_cpabe_ar17.AM"><span class="pre">AM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">PP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">users_kek_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MMK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.revoke_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.revoke_attribute" title="Link to this definition">¶</a></dt>
+<dd><p>This function is executed by AM when an attribute is revoked from a user.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>revoked_user_name: The name of the revoked user.</p></li>
+<li><p>attribute_name: revoked attribute name.</p></li>
+<li><p>attributes_manager: AM.</p></li>
+<li><p>PP: Public Parameters from the system setup algorithm.</p></li>
+<li><p>users_kek_i: A list privately acquired by AM from TA as part of key_generation function.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Inputs/Outputs:</dt><dd><ul class="simple">
+<li><p>MMK: Manager master key represented as a dictionary.</p></li>
+<li><p>MPK: Manager public key represented as a dictionary.</p></li>
+</ul>
+</dd>
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>updated_KEK_dict: The key is the user-name of the user whose KEK key is updated and the value is the</dt><dd><p>updated KEK key value.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.system_setup">
+<span class="sig-name descname"><span class="pre">system_setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.system_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.system_setup" title="Link to this definition">¶</a></dt>
+<dd><p>System Setup algorithm. This algorithm is performed by TA
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>None</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>MK: TA’s master secret key.</p></li>
+<li><p>PP: Public Parameters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.user_attributes_kek_generation">
+<span class="sig-name descname"><span class="pre">user_attributes_kek_generation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">TA_KEK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_attribute_names_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.user_attributes_kek_generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.user_attributes_kek_generation" title="Link to this definition">¶</a></dt>
+<dd><p>This function is executed by AM and considered as part of key generation procedure.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>TA_KEK: Preliminary KEK list generated by TA.</p></li>
+<li><p>attributes_manager: AM.</p></li>
+<li><p>user_attribute_names_list: Attribute names hold by the user.</p></li>
+<li><p>user_name: User name.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>KEK: Key Encryption Keys generated for each attribute hold by the user using the users binary tree
+generated by AM.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.CaCpabeAr.user_attributes_key_gen">
+<span class="sig-name descname"><span class="pre">user_attributes_key_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MPK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_attribute_names_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UMK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#CaCpabeAr.user_attributes_key_gen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.CaCpabeAr.user_attributes_key_gen" title="Link to this definition">¶</a></dt>
+<dd><p>This function is executed by TA and considered as part of key generation procedure.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>MK: TA’s master secret key.</p></li>
+<li><p>MPK: Manager public key represented as a dictionary.</p></li>
+<li><p>PP: Public Parameters from the system setup algorithm.</p></li>
+<li><p>user_attribute_names_list: Attribute names hold by the user.</p></li>
+<li><p>user_name: User name.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Inputs/outputs:</dt><dd><ul class="simple">
+<li><p>UMK: User Master Key. A value stored privately by TA for each user. Represented as a dictionary, where the
+user_name is the key and a group element is the value.</p></li>
+</ul>
+</dd>
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>DSK: Attributes decryption keys as in the original CP-ABE paper (abenc_bsw07.py). (shared with the user)</p></li>
+<li><p>KEK: Key Encryption Keys generated for each attribute hold by the user using the users binary tree
+generated by AM. It is a preliminary one that will be changed by AM in the next algorithm.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.TreeNode">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">abenc_ca_cpabe_ar17.</span></span><span class="sig-name descname"><span class="pre">TreeNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#TreeNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.TreeNode" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.UsersBinaryTree">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">abenc_ca_cpabe_ar17.</span></span><span class="sig-name descname"><span class="pre">UsersBinaryTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#UsersBinaryTree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.UsersBinaryTree" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A binary tree that is used to assign users to leafs in a deterministic way.
+The tree is created and maintained by the AM.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.UsersBinaryTree.add_node_to_tree">
+<span class="sig-name descname"><span class="pre">add_node_to_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode" title="abenc_ca_cpabe_ar17.TreeNode"><span class="pre">TreeNode</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#UsersBinaryTree.add_node_to_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.UsersBinaryTree.add_node_to_tree" title="Link to this definition">¶</a></dt>
+<dd><p>Add a node to the tree.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>tree_node: a node to be added to the tree</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.UsersBinaryTree.create_node">
+<span class="sig-name descname"><span class="pre">create_node</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode" title="abenc_ca_cpabe_ar17.TreeNode"><span class="pre">TreeNode</span></a></span></span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#UsersBinaryTree.create_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.UsersBinaryTree.create_node" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.UsersBinaryTree.print_tree">
+<span class="sig-name descname"><span class="pre">print_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#UsersBinaryTree.print_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.UsersBinaryTree.print_tree" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_ca_cpabe_ar17.main">
+<span class="sig-prename descclassname"><span class="pre">abenc_ca_cpabe_ar17.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_ca_cpabe_ar17.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_ca_cpabe_ar17.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="abenc_dacmacs_yj14.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">abenc_dacmacs_yj14</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="abenc_bsw07.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">abenc_bsw07</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2013-2026, Johns Hopkins University ISI
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Jan 25, 2026</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">abenc_ca_cpabe_ar17</a><ul>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM"><code class="docutils literal notranslate"><span class="pre">AM</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM.add_attr_to_user"><code class="docutils literal notranslate"><span class="pre">AM.add_attr_to_user()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM.get_minimum_nodes_list_that_represent_users_list"><code class="docutils literal notranslate"><span class="pre">AM.get_minimum_nodes_list_that_represent_users_list()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM.get_user_assignation_to_leafs_dict"><code class="docutils literal notranslate"><span class="pre">AM.get_user_assignation_to_leafs_dict()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM.get_user_path"><code class="docutils literal notranslate"><span class="pre">AM.get_user_path()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM.get_user_path_intersection_with_node_gi"><code class="docutils literal notranslate"><span class="pre">AM.get_user_path_intersection_with_node_gi()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.AM.remove_attr_from_user"><code class="docutils literal notranslate"><span class="pre">AM.remove_attr_from_user()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.add_attribute"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.add_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.decrypt"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.encrypt"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.generate_kek_for_user_with_attr"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.generate_kek_for_user_with_attr()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.key_generation"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.key_generation()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.local_encryption"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.local_encryption()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.manager_setup"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.manager_setup()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.reencryption"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.reencryption()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.revoke_attribute"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.revoke_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.system_setup"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.system_setup()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.user_attributes_kek_generation"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.user_attributes_kek_generation()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.CaCpabeAr.user_attributes_key_gen"><code class="docutils literal notranslate"><span class="pre">CaCpabeAr.user_attributes_key_gen()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.TreeNode"><code class="docutils literal notranslate"><span class="pre">TreeNode</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.UsersBinaryTree"><code class="docutils literal notranslate"><span class="pre">UsersBinaryTree</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.UsersBinaryTree.add_node_to_tree"><code class="docutils literal notranslate"><span class="pre">UsersBinaryTree.add_node_to_tree()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.UsersBinaryTree.create_node"><code class="docutils literal notranslate"><span class="pre">UsersBinaryTree.create_node()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.UsersBinaryTree.print_tree"><code class="docutils literal notranslate"><span class="pre">UsersBinaryTree.print_tree()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_ca_cpabe_ar17.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=7366d2df"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

@@ -1,0 +1,928 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="xmlserialize" href="xmlserialize.html"><link rel="prev" title="specialprimes" href="specialprimes.html">
+        <link rel="prefetch" href="../_static/charm_logo.png" as="image">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>symcrypto - Symmetric Cryptography - Charm-Crypto v0.60</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #2980b9;
+  --color-brand-content: #2980b9;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Charm-Crypto v0.60</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/charm_logo.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../miracl.html">Building MIRACL for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cryptographers.html">For Cryptographers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">For App Developers</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/blindsig_ps16.html">blindsig_ps16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/chamhash_adm05.html">chamhash_adm05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/chamhash_rsa_hw09.html">chamhash_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/encap_bchk05.html">encap_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/joye_scheme.html">joye_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/lem_scheme.html">lem_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pk_vrf.html">pk_vrf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pre_mg07.html">pre_mg07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_a01.html">protocol_a01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_ao00.html">protocol_ao00</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_cns07.html">protocol_cns07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_schnorr91.html">protocol_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma1.html">sigma1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma2.html">sigma2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma3.html">sigma3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html">abenc_accountability_jyjxgd20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_bsw07.html">abenc_bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_ca_cpabe_ar17.html">abenc_ca_cpabe_ar17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html">abenc_dacmacs_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_lsw08.html">abenc_lsw08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_maabe_rw15.html">abenc_maabe_rw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_maabe_yj14.html">abenc_maabe_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_tbpre_lww14.html">abenc_tbpre_lww14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_unmcpabe_yahk14.html">abenc_unmcpabe_yahk14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_waters09.html">abenc_waters09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_yct14.html">abenc_yct14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_yllc15.html">abenc_yllc15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/ac17.html">ac17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/bsw07.html">bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/cgw15.html">cgw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/dabe_aw11.html">dabe_aw11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/dfa_fe12.html">dfa_fe12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/pk_hve08.html">pk_hve08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/waters11.html">waters11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_cs98.html">pkenc_cs98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_elgamal85.html">pkenc_elgamal85</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_gm82.html">pkenc_gm82</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_paillier99.html">pkenc_paillier99</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_rabin.html">pkenc_rabin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_rsa.html">pkenc_rsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_bls04.html">pksig_bls04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_boyen.html">pksig_boyen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_chch.html">pksig_chch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_chp.html">pksig_chp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cl03.html">pksig_cl03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cl04.html">pksig_cl04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cllww12_z.html">pksig_cllww12_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_CW13_z.html">pksig_CW13_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cyh.html">pksig_cyh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_dsa.html">pksig_dsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ecdsa.html">pksig_ecdsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_hess.html">pksig_hess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_hw.html">pksig_hw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_lamport.html">pksig_lamport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps01.html">pksig_ps01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps02.html">pksig_ps02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps03.html">pksig_ps03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_rsa_hw09.html">pksig_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_schnorr91.html">pksig_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters.html">pksig_waters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters05.html">pksig_waters05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../test_vectors.html">Schemes with Test Vectors</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/dabenc_adapt_hybrid.html">dabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/ibenc_adapt_hybrid.html">ibenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/ibenc_adapt_identityhash.html">ibenc_adapt_identityhash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/kpabenc_adapt_hybrid.html">kpabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_bchk05.html">pkenc_adapt_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_chk04.html">pkenc_adapt_chk04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_hybrid.html">pkenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitstring.html">bitstring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Commit.html">Commit - Commitment Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conversion.html">conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA.html">DFA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eccurve.html">eccurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ecgroup.html">ecgroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enum.html">enum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSA.html">FSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Hash.html">Hash - Hash Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hash_module.html">hash_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IBEnc.html">IBEnc - Identity-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IBSig.html">IBSig - Identity-Based Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integergroup.html">integergroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iterate.html">iterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrixops.html">matrixops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="msp.html">msp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="node.html">node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pairingcurves.html">pairingcurves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pairinggroup.html">pairinggroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PKEnc.html">PKEnc - Public-Key Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PKSig.html">PKSig - Public-Key Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policy_expression_spec.html">policy_expression_spec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policytree.html">policytree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PREnc.html">PREnc - Proxy Re-Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reCompiler.html">reCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="redundancyschemes.html">redundancyschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schemebase.html">schemebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secretshare.html">secretshare - Secret Sharing Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secretutil.html">secretutil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="securerandom.html">securerandom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specialprimes.html">specialprimes</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">symcrypto - Symmetric Cryptography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xmlserialize.html">xmlserialize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zknode.html">zknode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ZKProof.html">ZKProof</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/conversion_test.html">conversion_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/ecgroup_test.html">ecgroup_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/paddingschemes_test.html">paddingschemes_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/policy_parser_stress_test.html">policy_parser_stress_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/secretshare_test.html">secretshare_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/symcrypto_test.html">symcrypto_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/test_policy_expression.html">test_policy_expression</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/blob/dev/doc/source/toolbox/symcrypto.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/edit/dev/doc/source/toolbox/symcrypto.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-charm.toolbox.symcrypto">
+<span id="symcrypto-symmetric-cryptography"></span><h1>symcrypto - Symmetric Cryptography<a class="headerlink" href="#module-charm.toolbox.symcrypto" title="Link to this heading">¶</a></h1>
+<p>This module provides symmetric cryptography abstractions in the Charm cryptographic
+library, including authenticated encryption (AEAD) and message authentication.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Symmetric cryptography uses the same secret key for both encryption and decryption.
+This module provides high-level abstractions for symmetric encryption that are
+commonly used in hybrid encryption schemes, where an asymmetric scheme encrypts
+a session key that is then used for efficient bulk encryption.</p>
+<p><strong>Main Classes:</strong></p>
+<ul class="simple">
+<li><p><strong>SymmetricCryptoAbstraction</strong>: Basic symmetric encryption using AES-CBC with
+PKCS7 padding</p></li>
+<li><p><strong>AuthenticatedCryptoAbstraction</strong>: Authenticated encryption providing both
+confidentiality and integrity (AEAD)</p></li>
+<li><p><strong>MessageAuthenticator</strong>: HMAC-based message authentication</p></li>
+</ul>
+<p><strong>How It Works:</strong></p>
+<ol class="arabic simple">
+<li><p>A symmetric key is derived (often from a group element via hashing)</p></li>
+<li><p>Messages are encrypted using AES in CBC mode with random IV</p></li>
+<li><p>For authenticated encryption, an HMAC is computed over the ciphertext</p></li>
+<li><p>The IV and ciphertext are encoded in JSON format for easy serialization</p></li>
+</ol>
+</section>
+<section id="security-properties">
+<h2>Security Properties<a class="headerlink" href="#security-properties" title="Link to this heading">¶</a></h2>
+<p>The symmetric encryption classes provide the following security guarantees:</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Security Property</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>IND-CPA</strong></p></td>
+<td><p>Indistinguishability under chosen-plaintext attack. Ciphertexts reveal
+nothing about which plaintext was encrypted (via random IV).</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>IND-CCA2</strong></p></td>
+<td><p>AuthenticatedCryptoAbstraction provides chosen-ciphertext security.
+Adversaries cannot create valid ciphertexts without the key.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>INT-CTXT</strong></p></td>
+<td><p>Integrity of ciphertexts. Any modification to the ciphertext is detected
+during decryption (for AuthenticatedCryptoAbstraction).</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>AEAD</strong></p></td>
+<td><p>Authenticated Encryption with Associated Data. Supports binding
+additional context data to the ciphertext without encrypting it.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Underlying Primitives:</strong></p>
+<ul class="simple">
+<li><p><strong>AES-128-CBC</strong>: Block cipher in CBC mode with random IV</p></li>
+<li><p><strong>HMAC-SHA256</strong>: Message authentication code for integrity</p></li>
+<li><p><strong>PKCS7</strong>: Padding scheme for block alignment</p></li>
+</ul>
+</section>
+<section id="typical-use-cases">
+<h2>Typical Use Cases<a class="headerlink" href="#typical-use-cases" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p><strong>Hybrid Encryption</strong></p>
+<p>Combine asymmetric encryption (for key transport) with symmetric encryption
+(for data). The asymmetric scheme encrypts a random session key, which is
+used with symcrypto for efficient bulk encryption.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span> <span class="n">extract_key</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.symcrypto</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticatedCryptoAbstraction</span>
+
+<span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+
+<span class="c1"># Session key from group element (e.g., ABE decryption result)</span>
+<span class="n">session_element</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+<span class="n">sym_key</span> <span class="o">=</span> <span class="n">extract_key</span><span class="p">(</span><span class="n">session_element</span><span class="p">)</span>
+
+<span class="c1"># Encrypt large data with symmetric key</span>
+<span class="n">cipher</span> <span class="o">=</span> <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">sym_key</span><span class="p">)</span>
+<span class="n">ciphertext</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Large document contents...&quot;</span><span class="p">)</span>
+
+<span class="c1"># Decrypt</span>
+<span class="n">plaintext</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Authenticated Channel</strong></p>
+<p>After key agreement, use authenticated encryption to protect messages
+against both eavesdropping and tampering.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hashlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">sha256</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.symcrypto</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticatedCryptoAbstraction</span>
+
+<span class="c1"># Derive key from shared secret</span>
+<span class="n">shared_secret</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;key_from_DH_exchange&quot;</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">sha256</span><span class="p">(</span><span class="n">shared_secret</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+
+<span class="n">cipher</span> <span class="o">=</span> <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+<span class="c1"># Encrypt with associated data (e.g., message counter)</span>
+<span class="n">ad</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;msg_id:12345&quot;</span>
+<span class="n">ct</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="s2">&quot;Secret message&quot;</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+
+<span class="c1"># Decrypt (must provide same associated data)</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Message Authentication</strong></p>
+<p>Authenticate messages without encryption when confidentiality is not needed
+but integrity is required.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.symcrypto</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageAuthenticator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span> <span class="n">extract_key</span>
+
+<span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">extract_key</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">))</span>
+
+<span class="n">mac</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="n">authenticated_msg</span> <span class="o">=</span> <span class="n">mac</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s2">&quot;Important announcement&quot;</span><span class="p">)</span>
+
+<span class="c1"># Verify integrity</span>
+<span class="n">is_authentic</span> <span class="o">=</span> <span class="n">mac</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">authenticated_msg</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading">¶</a></h2>
+<p><strong>Basic Authenticated Encryption:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span> <span class="n">GT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.core.math.pairing</span><span class="w"> </span><span class="kn">import</span> <span class="n">hashPair</span> <span class="k">as</span> <span class="n">sha2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.symcrypto</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticatedCryptoAbstraction</span>
+
+<span class="c1"># Setup - derive key from group element</span>
+<span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="n">element</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">sha2</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>  <span class="c1"># 32-byte key</span>
+
+<span class="c1"># Create cipher</span>
+<span class="n">cipher</span> <span class="o">=</span> <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+<span class="c1"># Encrypt</span>
+<span class="n">plaintext</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Hello, World!&quot;</span>
+<span class="n">ciphertext</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">plaintext</span><span class="p">)</span>
+
+<span class="c1"># Decrypt</span>
+<span class="n">recovered</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">recovered</span> <span class="o">==</span> <span class="n">plaintext</span>
+</pre></div>
+</div>
+<p><strong>With Associated Data (AEAD):</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hashlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">sha256</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.symcrypto</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticatedCryptoAbstraction</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="n">sha256</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;secret key&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+<span class="n">cipher</span> <span class="o">=</span> <span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+<span class="c1"># Associated data is authenticated but not encrypted</span>
+<span class="n">header</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">x01</span><span class="se">\\</span><span class="s1">x02</span><span class="se">\\</span><span class="s1">x03</span><span class="se">\\</span><span class="s1">x04&#39;</span>  <span class="c1"># e.g., protocol header</span>
+<span class="n">ct</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="s1">&#39;Payload data&#39;</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+
+<span class="c1"># Must provide correct associated data to decrypt</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+
+<span class="c1"># Wrong associated data causes verification failure</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;wrong&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tampered or wrong context!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="module-symcrypto">
+<span id="api-reference"></span><h2>API Reference<a class="headerlink" href="#module-symcrypto" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="symcrypto.AuthenticatedCryptoAbstraction">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">symcrypto.</span></span><span class="sig-name descname"><span class="pre">AuthenticatedCryptoAbstraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#symcrypto.SymmetricCryptoAbstraction" title="symcrypto.SymmetricCryptoAbstraction"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymmetricCryptoAbstraction</span></code></a></p>
+<p>Implements Authenticated Encryption with Associated Data (AEAD) abstraction. The associated data is optional, and this version is backwards compatible
+with the same class without the associated data option.</p>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hashlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">sha256</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">charm.toolbox.symcrypto</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span> <span class="o">=</span> <span class="n">sha256</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;shameful secret key&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span> <span class="o">=</span> <span class="n">charm</span><span class="o">.</span><span class="n">toolbox</span><span class="o">.</span><span class="n">symcrypto</span><span class="o">.</span><span class="n">AuthenticatedCryptoAbstraction</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="s1">&#39;My age is 42.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span>
+<span class="go">b&#39;My age is 42.&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext2</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;My age is 42.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertext2</span><span class="p">)</span>
+<span class="go">b&#39;My age is 42.&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertextAssociatedData</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="s1">&#39;Some network PDU.&#39;</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertextAssociatedData</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;./charm/toolbox/symcrypto.py&quot;</span>, line <span class="m">233</span>, in <span class="n">decrypt</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mac. Your data was tampered with or your key is wrong&quot;</span><span class="p">)</span>
+<span class="gr">ValueError</span>: <span class="n">Invalid mac. Your data was tampered with or your key is wrong</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertextAssociatedData</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="s1">&#39;wrong data&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;./charm/toolbox/symcrypto.py&quot;</span>, line <span class="m">233</span>, in <span class="n">decrypt</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mac. Your data was tampered with or your key is wrong&quot;</span><span class="p">)</span>
+<span class="gr">ValueError</span>: <span class="n">Invalid mac. Your data was tampered with or your key is wrong</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ciphertextAssociatedData</span><span class="p">,</span> <span class="n">associatedData</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="go">b&#39;Some network PDU.&#39;</span>
+<span class="gp">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="symcrypto.AuthenticatedCryptoAbstraction.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipherText</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">associatedData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypts a ciphertext in AEAD mode (Authenticated Encryption with Associated Data) using the superclass symmetric encryption parameters.
+The MAC is computed with both the ciphertext and associated data (and other cryptosystem parameters), but the associated data is not encrypted, nor
+available within the ciphertext structure.</p>
+<section id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>ciphertext<span class="classifier">str or byte str</span></dt><dd><p>The message to be decrypted.</p>
+</dd>
+<dt>associatedData<span class="classifier">str or byte str, optional</span></dt><dd><p>Associated data that will be MACed together with the ciphertext and algorithm. This associated text must be in plaintext.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>byte str</dt><dd><p>The decrypted plaintext, if the ciphertext was successfuly authenticated. Raise exception otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h4>Raises<a class="headerlink" href="#raises" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the MAC is invalid.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h4>Notes<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h4>
+<p>The IV is included in the computation of the MAC. In fact, all cipher parameters are included: the encryption function returns a JSON object from
+a dictionary composed of the cipher parameters (e.g., algorithm, mode, IV), and the ciphertext. The MAC function uses the whole JSON object/string
+to compute the MAC, prepended with the HMAC algorithm + associatedData.</p>
+<p>The MAC key is computed as sha2(b’Poor Mans Key Extractor” + key).</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="symcrypto.AuthenticatedCryptoAbstraction.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">associatedData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#AuthenticatedCryptoAbstraction.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.AuthenticatedCryptoAbstraction.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Encrypts a message in AEAD mode (Authenticated Encryption with Associated Data) using the superclass symmetric encryption parameters.
+The MAC is computed with both the ciphertext and associated data (and other cryptosystem parameters), but the associated data is not encrypted, nor
+saved within the ciphertext structure.</p>
+<section id="id1">
+<h4>Parameters<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>msg<span class="classifier">str or byte str</span></dt><dd><p>The message to be encrypted.</p>
+</dd>
+<dt>associatedData<span class="classifier">str or byte str, optional</span></dt><dd><p>Associated data that will be MACed together with the ciphertext and algorithm; the associated data will not be encrypted.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h4>Returns<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
+<dl>
+<dt>dict</dt><dd><dl>
+<dt>Dictionary structure containing:</dt><dd><dl>
+<dt>msg: {‘ALG’: symmetric cryptosystem.</dt><dd><blockquote>
+<div><p>‘MODE’: symmetric encryption mode.
+‘IV’: the IV for the encryption algorithm.
+‘CipherText’: the padded ciphertext (padding according to PKCS 7).</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+<p>“alg”: The HMAC algorithm.
+“digest”: The MAC computed as MAC = HMAC(key, alg + associatedData + msg)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h4>Notes<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
+<p>The IV is included in the computation of the MAC. In fact, all cipher parameters are included: the encryption function returns a JSON object from
+a dictionary composed of the cipher parameters (e.g., algorithm, mode, IV), and the ciphertext. The MAC function uses the whole JSON object/string
+to compute the MAC, prepended with the HMAC algorithm + associatedData.</p>
+<p>The MAC key is computed as sha2(b’Poor Mans Key Extractor” + key).</p>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="symcrypto.MessageAuthenticator">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">symcrypto.</span></span><span class="sig-name descname"><span class="pre">MessageAuthenticator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'HMAC_SHA2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstraction for constructing and verifying authenticated messages</p>
+<blockquote>
+<div><p>A large number of the schemes can only encrypt group elements
+and do not provide an efficient mechanism for encoding byte in
+those elements. As such we don’t pick a symmetric key and encrypt
+it asymmetrically. Rather, we hash a random group element to get the
+symmetric key.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">extract_key</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span> <span class="o">=</span> <span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">MessageAuthenticator</span><span class="p">(</span><span class="n">extract_key</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AuthenticatedMessage</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">mac</span><span class="p">(</span><span class="s1">&#39;Hello World&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">AuthenticatedMessage</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="symcrypto.MessageAuthenticator.mac">
+<span class="sig-name descname"><span class="pre">mac</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">associatedData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator.mac"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator.mac" title="Link to this definition">¶</a></dt>
+<dd><p>Authenticates (MAC) a message. The MAC is computed as:
+MAC = HMAC(key, algorithm + associatedData + message).</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>msg<span class="classifier">str or byte str</span></dt><dd><p>The message serving as input to the HMAC algorithm, in addition to the HMAC algorithm and associated data.</p>
+</dd>
+<dt>associatedData<span class="classifier">str or byte str, optional</span></dt><dd><p>Associated data that will be MACed together with the ciphertext and algorithm; the associated data will not be encrypted.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>Dictionary composed of the MAC algorithm, the MACed message (or ciphertext), and the digest computed by MACing HMAC_algorithm + associatedData + msg.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="symcrypto.MessageAuthenticator.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msgAndDigest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">associatedData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#MessageAuthenticator.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.MessageAuthenticator.verify" title="Link to this definition">¶</a></dt>
+<dd><p>Verifies whether the MAC digest from input ciphertext and digest matches the computed one over ciphertext and associated data.</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>msgAndDigest<span class="classifier">dict</span></dt><dd><p>Dictionary composed of the MAC algorithm, the MACed message (or ciphertext), and the digest computed by MACing HMAC_algorithm + associatedData + msg.
+It is the format generated by the mac() function within this class.</p>
+</dd>
+<dt>associatedData<span class="classifier">str or byte str, optional</span></dt><dd><p>Associated data that will be MACed together with the ciphertext and algorithm; the associated data will not be encrypted.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the digests match, False otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Raises<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the HMAC algorithm is not supported.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="symcrypto.SymmetricCryptoAbstraction">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">symcrypto.</span></span><span class="sig-name descname"><span class="pre">SymmetricCryptoAbstraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstraction for symmetric encryption and decryption of data.
+Ideally provide an INDCCA2 secure symmetric container for arbitrary data.
+Currently only supports primitives that JSON can encode and decode.</p>
+<p>A large number of the schemes can only encrypt group elements
+and do not provide an efficient mechanism for encoding byte in
+those elements. As such we don’t pick a symmetric key and encrypt
+it asymmetrically. Rather, we hash a random group element to get the
+symmetric key.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">extract_key</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">SymmetricCryptoAbstraction</span><span class="p">(</span><span class="n">extract_key</span><span class="p">(</span><span class="n">groupObj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Friendly Fire Isn&#39;t&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+<span class="go">b&quot;Friendly Fire Isn&#39;t&quot;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="symcrypto.SymmetricCryptoAbstraction.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipherText</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction.decrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="symcrypto.SymmetricCryptoAbstraction.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/symcrypto.html#SymmetricCryptoAbstraction.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#symcrypto.SymmetricCryptoAbstraction.encrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="PKEnc.html#module-charm.toolbox.PKEnc" title="charm.toolbox.PKEnc: Base class for Public-Key Encryption schemes"><code class="xref py py-mod docutils literal notranslate"><span class="pre">charm.toolbox.PKEnc</span></code></a> - Public-key encryption (for hybrid schemes)</p></li>
+<li><p><a class="reference internal" href="ABEnc.html#module-charm.toolbox.ABEnc" title="charm.toolbox.ABEnc: Base class for Attribute-Based Encryption schemes"><code class="xref py py-mod docutils literal notranslate"><span class="pre">charm.toolbox.ABEnc</span></code></a> - Attribute-based encryption using symcrypto</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">charm.toolbox.paddingschemes</span></code> - Padding schemes (PKCS7, OAEP)</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">charm.toolbox.securerandom</span></code> - Secure random number generation</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="xmlserialize.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">xmlserialize</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="specialprimes.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">specialprimes</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2013-2026, Johns Hopkins University ISI
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Jan 25, 2026</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">symcrypto - Symmetric Cryptography</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#security-properties">Security Properties</a></li>
+<li><a class="reference internal" href="#typical-use-cases">Typical Use Cases</a></li>
+<li><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li><a class="reference internal" href="#module-symcrypto">API Reference</a><ul>
+<li><a class="reference internal" href="#symcrypto.AuthenticatedCryptoAbstraction"><code class="docutils literal notranslate"><span class="pre">AuthenticatedCryptoAbstraction</span></code></a><ul>
+<li><a class="reference internal" href="#symcrypto.AuthenticatedCryptoAbstraction.decrypt"><code class="docutils literal notranslate"><span class="pre">AuthenticatedCryptoAbstraction.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#symcrypto.AuthenticatedCryptoAbstraction.encrypt"><code class="docutils literal notranslate"><span class="pre">AuthenticatedCryptoAbstraction.encrypt()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#symcrypto.MessageAuthenticator"><code class="docutils literal notranslate"><span class="pre">MessageAuthenticator</span></code></a><ul>
+<li><a class="reference internal" href="#symcrypto.MessageAuthenticator.mac"><code class="docutils literal notranslate"><span class="pre">MessageAuthenticator.mac()</span></code></a></li>
+<li><a class="reference internal" href="#symcrypto.MessageAuthenticator.verify"><code class="docutils literal notranslate"><span class="pre">MessageAuthenticator.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#symcrypto.SymmetricCryptoAbstraction"><code class="docutils literal notranslate"><span class="pre">SymmetricCryptoAbstraction</span></code></a><ul>
+<li><a class="reference internal" href="#symcrypto.SymmetricCryptoAbstraction.decrypt"><code class="docutils literal notranslate"><span class="pre">SymmetricCryptoAbstraction.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#symcrypto.SymmetricCryptoAbstraction.encrypt"><code class="docutils literal notranslate"><span class="pre">SymmetricCryptoAbstraction.encrypt()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=7366d2df"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

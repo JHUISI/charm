@@ -1,0 +1,1230 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Hash - Hash Functions" href="Hash.html"><link rel="prev" title="enum" href="enum.html">
+        <link rel="prefetch" href="../_static/charm_logo.png" as="image">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>FSA - Charm-Crypto v0.60</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #2980b9;
+  --color-brand-content: #2980b9;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Charm-Crypto v0.60</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/charm_logo.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../miracl.html">Building MIRACL for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cryptographers.html">For Cryptographers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">For App Developers</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/blindsig_ps16.html">blindsig_ps16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/chamhash_adm05.html">chamhash_adm05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/chamhash_rsa_hw09.html">chamhash_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/encap_bchk05.html">encap_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/joye_scheme.html">joye_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/lem_scheme.html">lem_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pk_vrf.html">pk_vrf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pre_mg07.html">pre_mg07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_a01.html">protocol_a01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_ao00.html">protocol_ao00</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_cns07.html">protocol_cns07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_schnorr91.html">protocol_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma1.html">sigma1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma2.html">sigma2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma3.html">sigma3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html">abenc_accountability_jyjxgd20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_bsw07.html">abenc_bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_ca_cpabe_ar17.html">abenc_ca_cpabe_ar17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html">abenc_dacmacs_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_lsw08.html">abenc_lsw08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_maabe_rw15.html">abenc_maabe_rw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_maabe_yj14.html">abenc_maabe_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_tbpre_lww14.html">abenc_tbpre_lww14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_unmcpabe_yahk14.html">abenc_unmcpabe_yahk14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_waters09.html">abenc_waters09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_yct14.html">abenc_yct14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_yllc15.html">abenc_yllc15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/ac17.html">ac17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/bsw07.html">bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/cgw15.html">cgw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/dabe_aw11.html">dabe_aw11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/dfa_fe12.html">dfa_fe12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/pk_hve08.html">pk_hve08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/waters11.html">waters11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_cs98.html">pkenc_cs98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_elgamal85.html">pkenc_elgamal85</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_gm82.html">pkenc_gm82</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_paillier99.html">pkenc_paillier99</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_rabin.html">pkenc_rabin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_rsa.html">pkenc_rsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_bls04.html">pksig_bls04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_boyen.html">pksig_boyen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_chch.html">pksig_chch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_chp.html">pksig_chp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cl03.html">pksig_cl03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cl04.html">pksig_cl04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cllww12_z.html">pksig_cllww12_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_CW13_z.html">pksig_CW13_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cyh.html">pksig_cyh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_dsa.html">pksig_dsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ecdsa.html">pksig_ecdsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_hess.html">pksig_hess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_hw.html">pksig_hw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_lamport.html">pksig_lamport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps01.html">pksig_ps01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps02.html">pksig_ps02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps03.html">pksig_ps03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_rsa_hw09.html">pksig_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_schnorr91.html">pksig_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters.html">pksig_waters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters05.html">pksig_waters05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../test_vectors.html">Schemes with Test Vectors</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/dabenc_adapt_hybrid.html">dabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/ibenc_adapt_hybrid.html">ibenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/ibenc_adapt_identityhash.html">ibenc_adapt_identityhash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/kpabenc_adapt_hybrid.html">kpabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_bchk05.html">pkenc_adapt_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_chk04.html">pkenc_adapt_chk04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_hybrid.html">pkenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bitstring.html">bitstring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Commit.html">Commit - Commitment Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conversion.html">conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DFA.html">DFA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eccurve.html">eccurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ecgroup.html">ecgroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enum.html">enum</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">FSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Hash.html">Hash - Hash Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hash_module.html">hash_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IBEnc.html">IBEnc - Identity-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IBSig.html">IBSig - Identity-Based Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integergroup.html">integergroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iterate.html">iterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrixops.html">matrixops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="msp.html">msp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="node.html">node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pairingcurves.html">pairingcurves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pairinggroup.html">pairinggroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PKEnc.html">PKEnc - Public-Key Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PKSig.html">PKSig - Public-Key Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policy_expression_spec.html">policy_expression_spec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="policytree.html">policytree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PREnc.html">PREnc - Proxy Re-Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reCompiler.html">reCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="redundancyschemes.html">redundancyschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schemebase.html">schemebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secretshare.html">secretshare - Secret Sharing Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secretutil.html">secretutil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="securerandom.html">securerandom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specialprimes.html">specialprimes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xmlserialize.html">xmlserialize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zknode.html">zknode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ZKProof.html">ZKProof</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/conversion_test.html">conversion_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/ecgroup_test.html">ecgroup_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/paddingschemes_test.html">paddingschemes_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/policy_parser_stress_test.html">policy_parser_stress_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/secretshare_test.html">secretshare_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/symcrypto_test.html">symcrypto_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/test_policy_expression.html">test_policy_expression</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/blob/dev/doc/source/toolbox/FSA.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/edit/dev/doc/source/toolbox/FSA.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-FSA">
+<span id="fsa"></span><h1>FSA<a class="headerlink" href="#module-FSA" title="Link to this heading">¶</a></h1>
+<p>This module defines an FSA class, for representing and operating on
+finite-state automata (FSAs). FSAs can be used to represent regular
+expressions and to test sequences for membership in the languages
+described by regular expressions.</p>
+<p>FSAs can be deterministic or nondeterministic, and they can contain
+epsilon transitions. Methods to determinize an automaton (also
+eliminating its epsilon transitions), and to minimize an automaton,
+are provided.</p>
+<p>The transition labels for an FSA can be symbols from an alphabet, as
+in the standard formal definition of an FSA, but they can also be
+instances which represent predicates. If these instances implement
+instance.matches(), then the FSA nextState() function and accepts()
+predicate can be used. If they implement instance.complement() and
+instance.intersection(), the FSA can be be determinized and minimized,
+to find a minimal deterministic FSA that accepts an equivalent
+language.</p>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
+<p>Instances of FSA can be created out of labels (for instance, strings)
+by the singleton() function, and combined to create more complex FSAs
+through the complement(), closure(), concatenation(), union(), and
+other constructors. For example, concatenation(singleton(‘a’),
+union(singleton(‘b’), closure(singleton(‘c’)))) creates an FSA that
+accepts the strings ‘a’, ‘ab’, ‘ac’, ‘acc’, ‘accc’, and so on.</p>
+<p>Instances of FSA can also be created with the compileRE() function,
+which compiles a simple regular expression (using only ‘*’, ‘?’, ‘+’,
+‘|’, ‘(’, and ‘)’ as metacharacters) into an FSA. For example,
+compileRE(‘a(b|c*)’) returns an FSA equivalent to the example in the
+previous paragraph.</p>
+<p>FSAs can be determinized, to create equivalent FSAs (FSAs accepting
+the same language) with unique successor states for each input, and
+minimized, to create an equivalent deterministic FSA with the smallest
+number of states. FSAs can also be complemented, intersected, unioned,
+and so forth as described under ‘FSA Functions’ below.</p>
+</section>
+<section id="fsa-methods">
+<h2>FSA Methods<a class="headerlink" href="#fsa-methods" title="Link to this heading">¶</a></h2>
+<p>The class FSA defines the following methods.</p>
+<section id="acceptance">
+<h3>Acceptance<a class="headerlink" href="#acceptance" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>fsa.nextStates(state, input)</dt><dd><p>returns a list of states</p>
+</dd>
+<dt>fsa.nextState(state, input)</dt><dd><p>returns None or a single state if
+<a href="#id5"><span class="problematic" id="id6">|nextStates|</span></a> &lt;= 1, otherwise it raises an exception</p>
+</dd>
+<dt>fsa.nextStateSet(states, input)</dt><dd><p>returns a list of states</p>
+</dd>
+<dt>fsa.accepts(sequence)</dt><dd><p>returns true or false</p>
+</dd>
+</dl>
+</section>
+<section id="accessors-and-predicates">
+<h3>Accessors and predicates<a class="headerlink" href="#accessors-and-predicates" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>isEmpty()</dt><dd><p>returns true iff the language accepted by the FSA is the empty language</p>
+</dd>
+<dt>labels()</dt><dd><p>returns a list of labels that are used in any transition</p>
+</dd>
+<dt>nextAvailableState()</dt><dd><p>returns an integer n such that no states in the FSA
+are numeric values &gt;= n</p>
+</dd>
+</dl>
+</section>
+<section id="reductions">
+<h3>Reductions<a class="headerlink" href="#reductions" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>sorted(initial=0)</dt><dd><p>returns an equivalent FSA whose states are numbered
+upwards from 0</p>
+</dd>
+<dt>determinized()</dt><dd><p>returns an equivalent deterministic FSA</p>
+</dd>
+<dt>minimized()</dt><dd><p>returns an equivalent minimal FSA</p>
+</dd>
+<dt>trimmed()</dt><dd><p>returns an equivalent FSA that contains no unreachable or dead
+states</p>
+</dd>
+</dl>
+</section>
+<section id="presentation">
+<h3>Presentation<a class="headerlink" href="#presentation" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>toDotString()</dt><dd><p>returns a string suitable as <a href="#id1"><span class="problematic" id="id2">*</span></a>.dot file for the ‘dot’
+program from AT&amp;T GraphViz</p>
+</dd>
+<dt>view()</dt><dd><p>views the FSA with a gs viewer, if gs and dot are installed</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="fsa-functions">
+<h2>FSA Functions<a class="headerlink" href="#fsa-functions" title="Link to this heading">¶</a></h2>
+<section id="construction-from-fsas">
+<h3>Construction from FSAs<a class="headerlink" href="#construction-from-fsas" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>complement(a)</dt><dd><p>returns an fsa that accepts exactly those sequences that its
+argument does not</p>
+</dd>
+<dt>closure(a)</dt><dd><p>returns an fsa that accepts sequences composed of zero or more
+concatenations of sequences accepted by the argument</p>
+</dd>
+<dt>concatenation(a, b)</dt><dd><p>returns an fsa that accepts sequences composed of a
+sequence accepted by a, followed by a sequence accepted by b</p>
+</dd>
+<dt>containment(a, occurrences=1)</dt><dd><p>returns an fsa that accepts sequences that
+contain at least occurrences occurrences of a subsequence recognized by the
+argument.</p>
+</dd>
+<dt>difference(a, b)</dt><dd><p>returns an fsa that accepts those sequences accepted by a
+but not b</p>
+</dd>
+<dt>intersection(a, b)</dt><dd><p>returns an fsa that accepts sequences accepted by both a
+and b</p>
+</dd>
+<dt>iteration(a, min=1, max=None)</dt><dd><p>returns an fsa that accepts sequences
+consisting of from min to max (or any number, if max is None) of sequences
+accepted by its first argument</p>
+</dd>
+<dt>option(a)</dt><dd><p>equivalent to union(a, EMPTY_STRING_FSA)</p>
+</dd>
+<dt>reverse(a)</dt><dd><p>returns an fsa that accepts strings whose reversal is accepted by
+the argument</p>
+</dd>
+<dt>union(a, b)</dt><dd><p>returns an fsa that accepts sequences accepted by both a and b</p>
+</dd>
+</dl>
+</section>
+<section id="predicates">
+<h3>Predicates<a class="headerlink" href="#predicates" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>equivalent(a, b)</dt><dd><p>returns true iff a and b accept the same language</p>
+</dd>
+</dl>
+</section>
+<section id="reductions-these-equivalent-to-the-similarly-named-methods">
+<h3>Reductions (these equivalent to the similarly-named methods)<a class="headerlink" href="#reductions-these-equivalent-to-the-similarly-named-methods" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>determinize(fsa)</dt><dd><p>returns an equivalent deterministic FSA</p>
+</dd>
+<dt>minimize(fsa)</dt><dd><p>returns an equivalent minimal FSA</p>
+</dd>
+<dt>sort(fsa, initial=0)</dt><dd><p>returns an equivalent FSA whose states are numbered from
+initial</p>
+</dd>
+<dt>trim(fsa)</dt><dd><p>returns an equivalent FSA that contains no dead or unreachable
+states</p>
+</dd>
+</dl>
+</section>
+<section id="construction-from-labels">
+<h3>Construction from labels<a class="headerlink" href="#construction-from-labels" title="Link to this heading">¶</a></h3>
+<dl>
+<dt>compileRE(string)</dt><dd><p>returns an FSA that accepts the language described by
+string, where string is a list of symbols and ‘*’, ‘+’, ‘?’, and ‘|’ operators,</p>
+<blockquote>
+<div><p>with ‘(’ and ‘)’ to control precedence.</p>
+</div></blockquote>
+</dd>
+<dt>sequence(sequence)</dt><dd><p>returns an fsa that accepts sequences that are matched by
+the elements of the argument. For example, sequence(‘abc’) returns an fsa that
+accepts ‘abc’ and [‘a’, ‘b’, ‘c’].</p>
+</dd>
+<dt>singleton(label)</dt><dd><p>returns an fsa that accepts singletons whose elements are
+matched by label. For example, singleton(‘a’) returns an fsa that accepts only
+the string ‘a’.</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="fsa-constants">
+<h2>FSA Constants<a class="headerlink" href="#fsa-constants" title="Link to this heading">¶</a></h2>
+<p>EMPTY_STRING_FSA is an FSA that accepts the language consisting only
+of the empty string.</p>
+<p>NULL_FSA is an FSA that accepts the null language.</p>
+<p>UNIVERSAL_FSA is an FSA that accepts S*, where S is any object.</p>
+</section>
+<section id="fsa-instance-creation">
+<h2>FSA instance creation<a class="headerlink" href="#fsa-instance-creation" title="Link to this heading">¶</a></h2>
+<p>FSA is initialized with a list of states, an alphabet, a list of
+transition, an initial state, and a list of final states. If fsa is an
+FSA, fsa.tuple() returns these values in that order, i.e. (states,
+alphabet, transitions, initialState, finalStates). They’re also
+available as fields of fsa with those names.</p>
+<p>Each element of transition is a tuple of a start state, an end state,
+and a label: (startState, endSTate, label).</p>
+<p>If the list of states is None, it’s computed from initialState,
+finalStates, and the states in transitions.</p>
+<p>If alphabet is None, an open alphabet is used: labels are assumed to
+be objects that implements label.matches(input), label.complement(),
+and label.intersection() as follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>label.matches(input) returns true iff label matches input</p></li>
+<li><dl class="simple">
+<dt>label.complement() returnseither a label or a list of labels which,</dt><dd><p>together with the receiver, partition the input alphabet</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>label.intersection(other) returns either None (if label and other don’t</dt><dd><p>both match any symbol), or a label that matches the set of symbols that
+both label and other match</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>As a special case, strings can be used as labels. If a strings ‘a’ and
+‘b’ are used as a label and there’s no alphabet, ‘~a’ and ‘~b’ are
+their respective complements, and ‘~a&amp;~b’ is the intersection of ‘~a’
+and ‘~b’. (The intersections of ‘a’ and ‘b’, ‘a’ and ‘~b’, and ‘~a’
+and ‘b’ are, respectively, None, ‘a’, and ‘b’.)</p>
+</section>
+<section id="goals">
+<h2>Goals<a class="headerlink" href="#goals" title="Link to this heading">¶</a></h2>
+<p>Design Goals:</p>
+<ul class="simple">
+<li><p>easy to use</p></li>
+<li><p>easy to read (simple implementation, direct expression of algorithms)</p></li>
+<li><p>extensible</p></li>
+</ul>
+<p>Non-Goals:</p>
+<ul class="simple">
+<li><p>efficiency</p></li>
+</ul>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="FSA.FSA">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">FSA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphabet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transitions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialState</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finalStates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arcMetadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.accepts">
+<span class="sig-name descname"><span class="pre">accepts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.accepts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.accepts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.addArcMetadata">
+<span class="sig-name descname"><span class="pre">addArcMetadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.addArcMetadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.addArcMetadata" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.addArcMetadataFor">
+<span class="sig-name descname"><span class="pre">addArcMetadataFor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.addArcMetadataFor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.addArcMetadataFor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.additionalTransitionInfoString">
+<span class="sig-name descname"><span class="pre">additionalTransitionInfoString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.additionalTransitionInfoString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.additionalTransitionInfoString" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.coerce">
+<span class="sig-name descname"><span class="pre">coerce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">klass</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.coerce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.coerce" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.collectStates">
+<span class="sig-name descname"><span class="pre">collectStates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transitions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialState</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">finalStates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.collectStates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.collectStates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.complement">
+<span class="sig-name descname"><span class="pre">complement</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.complement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.complement" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.computeEpsilonClosure">
+<span class="sig-name descname"><span class="pre">computeEpsilonClosure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.computeEpsilonClosure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.computeEpsilonClosure" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.computeEpsilonClosures">
+<span class="sig-name descname"><span class="pre">computeEpsilonClosures</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.computeEpsilonClosures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.computeEpsilonClosures" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.copy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.create" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.creationArgs">
+<span class="sig-name descname"><span class="pre">creationArgs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.creationArgs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.creationArgs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.determinized">
+<span class="sig-name descname"><span class="pre">determinized</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.determinized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.determinized" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a deterministic FSA that accepts the same language.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.epsilonClosure">
+<span class="sig-name descname"><span class="pre">epsilonClosure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.epsilonClosure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.epsilonClosure" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.getArcMetadata">
+<span class="sig-name descname"><span class="pre">getArcMetadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.getArcMetadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.getArcMetadata" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.getArcMetadataFor">
+<span class="sig-name descname"><span class="pre">getArcMetadataFor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.getArcMetadataFor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.getArcMetadataFor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.getTransitions">
+<span class="sig-name descname"><span class="pre">getTransitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.getTransitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.getTransitions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.hasArcMetadata">
+<span class="sig-name descname"><span class="pre">hasArcMetadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.hasArcMetadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.hasArcMetadata" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.initializeTransitionTables">
+<span class="sig-name descname"><span class="pre">initializeTransitionTables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.initializeTransitionTables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.initializeTransitionTables" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.isEmpty">
+<span class="sig-name descname"><span class="pre">isEmpty</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.isEmpty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.isEmpty" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.isFSA">
+<span class="sig-name descname"><span class="pre">isFSA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.isFSA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.isFSA" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.labelMatches">
+<span class="sig-name descname"><span class="pre">labelMatches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.labelMatches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.labelMatches" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.labels">
+<span class="sig-name descname"><span class="pre">labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.labels" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a list of transition labels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.makeStateTable">
+<span class="sig-name descname"><span class="pre">makeStateTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.makeStateTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.makeStateTable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.minimized">
+<span class="sig-name descname"><span class="pre">minimized</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.minimized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.minimized" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a minimal FSA that accepts the same language.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.nextAvailableState">
+<span class="sig-name descname"><span class="pre">nextAvailableState</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.nextAvailableState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.nextAvailableState" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.nextState">
+<span class="sig-name descname"><span class="pre">nextState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.nextState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.nextState" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.nextStateSet">
+<span class="sig-name descname"><span class="pre">nextStateSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.nextStateSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.nextStateSet" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.nextStates">
+<span class="sig-name descname"><span class="pre">nextStates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.nextStates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.nextStates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.setArcMetadata">
+<span class="sig-name descname"><span class="pre">setArcMetadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.setArcMetadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.setArcMetadata" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.setArcMetadataFor">
+<span class="sig-name descname"><span class="pre">setArcMetadataFor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.setArcMetadataFor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.setArcMetadataFor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.sorted">
+<span class="sig-name descname"><span class="pre">sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.sorted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.sorted" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.stateLabelString">
+<span class="sig-name descname"><span class="pre">stateLabelString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.stateLabelString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.stateLabelString" title="Link to this definition">¶</a></dt>
+<dd><p>A template method for specifying a state’s label, for use in dot
+diagrams. If this returns None, the default (the string representation
+of the state) is used.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.toDotString">
+<span class="sig-name descname"><span class="pre">toDotString</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.toDotString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.toDotString" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a string that can be printed by the DOT tool at
+<a class="reference external" href="http://www.research.att.com/sw/tools/graphviz/">http://www.research.att.com/sw/tools/graphviz/</a> .</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.transitionsFrom">
+<span class="sig-name descname"><span class="pre">transitionsFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.transitionsFrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.transitionsFrom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.trimmed">
+<span class="sig-name descname"><span class="pre">trimmed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.trimmed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.trimmed" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an equivalent FSA that doesn’t include unreachable states,
+or states that only lead to dead states.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.tuple">
+<span class="sig-name descname"><span class="pre">tuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.tuple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.tuple" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.view">
+<span class="sig-name descname"><span class="pre">view</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.view" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="FSA.FSA.withoutEpsilons">
+<span class="sig-name descname"><span class="pre">withoutEpsilons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#FSA.withoutEpsilons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.FSA.withoutEpsilons" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.closure">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">closure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#closure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.closure" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.compileConjunction">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">compileConjunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#compileConjunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.compileConjunction" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.compileItem">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">compileItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#compileItem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.compileItem" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.compileRE">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">compileRE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#compileRE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.compileRE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.compileREExpr">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">compileREExpr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#compileREExpr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.compileREExpr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.compileSequence">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">compileSequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#compileSequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.compileSequence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.complement">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">complement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#complement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.complement" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an FSA that accepts exactly those strings that the argument does
+not.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.complementLabelSet">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">complementLabelSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphabet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#complementLabelSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.complementLabelSet" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.completion">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">completion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#completion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.completion" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an FSA that accepts the same language as the argument, but that
+lands in a defined state for every input.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.concatenation">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">concatenation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#concatenation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.concatenation" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an FSA that accepts the language consisting of the concatenation
+of strings recognized by the arguments.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.consolidateTransitions">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">consolidateTransitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transitions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#consolidateTransitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.consolidateTransitions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.constructLabelMap">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">constructLabelMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphabet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeComplements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#constructLabelMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.constructLabelMap" title="Link to this definition">¶</a></dt>
+<dd><p>Return a list of (newLabel, positives), where newLabel is an
+intersection of elements from labels and their complemens, and positives is
+a list of labels that have non-empty intersections with newLabel.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.containment">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">containment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occurrences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#containment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.containment" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an FSA that matches sequences containing at least _count_
+occurrences
+of _symbol_.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.determinize">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">determinize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#determinize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.determinize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.difference">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#difference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.difference" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an FSA that accepts those strings accepted by the first
+argument, but not the second.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.equivalent">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">equivalent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#equivalent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.equivalent" title="Link to this definition">¶</a></dt>
+<dd><p>Return true ifff a and b accept the same language.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.intersectLabelSets">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">intersectLabelSets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#intersectLabelSets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.intersectLabelSets" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.intersection">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.intersection" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the intersection of two FSAs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.iteration">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.iteration" title="Link to this definition">¶</a></dt>
+<dd><p>### equivalent(iteration(singleton(‘a’, 0, 2)), compileRE(’<a href="#id3"><span class="problematic" id="id4">|</span></a>a|aa’))
+### equivalent(iteration(singleton(‘a’, 1, 2)), compileRE(‘a|aa’))
+### equivalent(iteration(singleton(‘a’, 1)), compileRE(‘aa*’))</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.labelComplement">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">labelComplement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphabet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#labelComplement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.labelComplement" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.labelComplements">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">labelComplements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphabet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#labelComplements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.labelComplements" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.labelIntersection">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">labelIntersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#labelIntersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.labelIntersection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.labelMatches">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">labelMatches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#labelMatches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.labelMatches" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.labelString">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">labelString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#labelString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.labelString" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.minimize">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">minimize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#minimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.minimize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.option">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">option</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#option"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.option" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.removeDuplicates">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">removeDuplicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#removeDuplicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.removeDuplicates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.reverse">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">reverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#reverse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.reverse" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.sequence">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphabet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.sequence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.singleton">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">singleton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphabet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arcMetadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#singleton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.singleton" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.sort">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#sort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.sort" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.symbolComplement">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">symbolComplement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#symbolComplement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.symbolComplement" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.symbolIntersection">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">symbolIntersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#symbolIntersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.symbolIntersection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.toFSA">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">toFSA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#toFSA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.toFSA" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.trim">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">trim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#trim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.trim" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.union">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#union"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.union" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.unionLabelSets">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">unionLabelSets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alphabet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#unionLabelSets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.unionLabelSets" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="FSA.view">
+<span class="sig-prename descclassname"><span class="pre">FSA.</span></span><span class="sig-name descname"><span class="pre">view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/FSA.html#view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#FSA.view" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="Hash.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Hash - Hash Functions</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="enum.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">enum</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2013-2026, Johns Hopkins University ISI
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Jan 25, 2026</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">FSA</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#fsa-methods">FSA Methods</a><ul>
+<li><a class="reference internal" href="#acceptance">Acceptance</a></li>
+<li><a class="reference internal" href="#accessors-and-predicates">Accessors and predicates</a></li>
+<li><a class="reference internal" href="#reductions">Reductions</a></li>
+<li><a class="reference internal" href="#presentation">Presentation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fsa-functions">FSA Functions</a><ul>
+<li><a class="reference internal" href="#construction-from-fsas">Construction from FSAs</a></li>
+<li><a class="reference internal" href="#predicates">Predicates</a></li>
+<li><a class="reference internal" href="#reductions-these-equivalent-to-the-similarly-named-methods">Reductions (these equivalent to the similarly-named methods)</a></li>
+<li><a class="reference internal" href="#construction-from-labels">Construction from labels</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fsa-constants">FSA Constants</a></li>
+<li><a class="reference internal" href="#fsa-instance-creation">FSA instance creation</a></li>
+<li><a class="reference internal" href="#goals">Goals</a></li>
+<li><a class="reference internal" href="#FSA.FSA"><code class="docutils literal notranslate"><span class="pre">FSA</span></code></a><ul>
+<li><a class="reference internal" href="#FSA.FSA.accepts"><code class="docutils literal notranslate"><span class="pre">FSA.accepts()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.addArcMetadata"><code class="docutils literal notranslate"><span class="pre">FSA.addArcMetadata()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.addArcMetadataFor"><code class="docutils literal notranslate"><span class="pre">FSA.addArcMetadataFor()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.additionalTransitionInfoString"><code class="docutils literal notranslate"><span class="pre">FSA.additionalTransitionInfoString()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.coerce"><code class="docutils literal notranslate"><span class="pre">FSA.coerce()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.collectStates"><code class="docutils literal notranslate"><span class="pre">FSA.collectStates()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.complement"><code class="docutils literal notranslate"><span class="pre">FSA.complement()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.computeEpsilonClosure"><code class="docutils literal notranslate"><span class="pre">FSA.computeEpsilonClosure()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.computeEpsilonClosures"><code class="docutils literal notranslate"><span class="pre">FSA.computeEpsilonClosures()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.copy"><code class="docutils literal notranslate"><span class="pre">FSA.copy()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.create"><code class="docutils literal notranslate"><span class="pre">FSA.create()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.creationArgs"><code class="docutils literal notranslate"><span class="pre">FSA.creationArgs()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.determinized"><code class="docutils literal notranslate"><span class="pre">FSA.determinized()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.epsilonClosure"><code class="docutils literal notranslate"><span class="pre">FSA.epsilonClosure()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.getArcMetadata"><code class="docutils literal notranslate"><span class="pre">FSA.getArcMetadata()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.getArcMetadataFor"><code class="docutils literal notranslate"><span class="pre">FSA.getArcMetadataFor()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.getTransitions"><code class="docutils literal notranslate"><span class="pre">FSA.getTransitions()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.hasArcMetadata"><code class="docutils literal notranslate"><span class="pre">FSA.hasArcMetadata()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.initializeTransitionTables"><code class="docutils literal notranslate"><span class="pre">FSA.initializeTransitionTables()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.isEmpty"><code class="docutils literal notranslate"><span class="pre">FSA.isEmpty()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.isFSA"><code class="docutils literal notranslate"><span class="pre">FSA.isFSA()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.labelMatches"><code class="docutils literal notranslate"><span class="pre">FSA.labelMatches()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.labels"><code class="docutils literal notranslate"><span class="pre">FSA.labels()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.makeStateTable"><code class="docutils literal notranslate"><span class="pre">FSA.makeStateTable()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.minimized"><code class="docutils literal notranslate"><span class="pre">FSA.minimized()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.nextAvailableState"><code class="docutils literal notranslate"><span class="pre">FSA.nextAvailableState()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.nextState"><code class="docutils literal notranslate"><span class="pre">FSA.nextState()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.nextStateSet"><code class="docutils literal notranslate"><span class="pre">FSA.nextStateSet()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.nextStates"><code class="docutils literal notranslate"><span class="pre">FSA.nextStates()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.setArcMetadata"><code class="docutils literal notranslate"><span class="pre">FSA.setArcMetadata()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.setArcMetadataFor"><code class="docutils literal notranslate"><span class="pre">FSA.setArcMetadataFor()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.sorted"><code class="docutils literal notranslate"><span class="pre">FSA.sorted()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.stateLabelString"><code class="docutils literal notranslate"><span class="pre">FSA.stateLabelString()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.toDotString"><code class="docutils literal notranslate"><span class="pre">FSA.toDotString()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.transitionsFrom"><code class="docutils literal notranslate"><span class="pre">FSA.transitionsFrom()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.trimmed"><code class="docutils literal notranslate"><span class="pre">FSA.trimmed()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.tuple"><code class="docutils literal notranslate"><span class="pre">FSA.tuple()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.view"><code class="docutils literal notranslate"><span class="pre">FSA.view()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.FSA.withoutEpsilons"><code class="docutils literal notranslate"><span class="pre">FSA.withoutEpsilons()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#FSA.closure"><code class="docutils literal notranslate"><span class="pre">closure()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.compileConjunction"><code class="docutils literal notranslate"><span class="pre">compileConjunction()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.compileItem"><code class="docutils literal notranslate"><span class="pre">compileItem()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.compileRE"><code class="docutils literal notranslate"><span class="pre">compileRE()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.compileREExpr"><code class="docutils literal notranslate"><span class="pre">compileREExpr()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.compileSequence"><code class="docutils literal notranslate"><span class="pre">compileSequence()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.complement"><code class="docutils literal notranslate"><span class="pre">complement()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.complementLabelSet"><code class="docutils literal notranslate"><span class="pre">complementLabelSet()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.completion"><code class="docutils literal notranslate"><span class="pre">completion()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.concatenation"><code class="docutils literal notranslate"><span class="pre">concatenation()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.consolidateTransitions"><code class="docutils literal notranslate"><span class="pre">consolidateTransitions()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.constructLabelMap"><code class="docutils literal notranslate"><span class="pre">constructLabelMap()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.containment"><code class="docutils literal notranslate"><span class="pre">containment()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.determinize"><code class="docutils literal notranslate"><span class="pre">determinize()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.difference"><code class="docutils literal notranslate"><span class="pre">difference()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.equivalent"><code class="docutils literal notranslate"><span class="pre">equivalent()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.intersectLabelSets"><code class="docutils literal notranslate"><span class="pre">intersectLabelSets()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.intersection"><code class="docutils literal notranslate"><span class="pre">intersection()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.iteration"><code class="docutils literal notranslate"><span class="pre">iteration()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.labelComplement"><code class="docutils literal notranslate"><span class="pre">labelComplement()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.labelComplements"><code class="docutils literal notranslate"><span class="pre">labelComplements()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.labelIntersection"><code class="docutils literal notranslate"><span class="pre">labelIntersection()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.labelMatches"><code class="docutils literal notranslate"><span class="pre">labelMatches()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.labelString"><code class="docutils literal notranslate"><span class="pre">labelString()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.minimize"><code class="docutils literal notranslate"><span class="pre">minimize()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.option"><code class="docutils literal notranslate"><span class="pre">option()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.removeDuplicates"><code class="docutils literal notranslate"><span class="pre">removeDuplicates()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.reverse"><code class="docutils literal notranslate"><span class="pre">reverse()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.sequence"><code class="docutils literal notranslate"><span class="pre">sequence()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.singleton"><code class="docutils literal notranslate"><span class="pre">singleton()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.sort"><code class="docutils literal notranslate"><span class="pre">sort()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.symbolComplement"><code class="docutils literal notranslate"><span class="pre">symbolComplement()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.symbolIntersection"><code class="docutils literal notranslate"><span class="pre">symbolIntersection()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.toFSA"><code class="docutils literal notranslate"><span class="pre">toFSA()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.trim"><code class="docutils literal notranslate"><span class="pre">trim()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.union"><code class="docutils literal notranslate"><span class="pre">union()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.unionLabelSets"><code class="docutils literal notranslate"><span class="pre">unionLabelSets()</span></code></a></li>
+<li><a class="reference internal" href="#FSA.view"><code class="docutils literal notranslate"><span class="pre">view()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=7366d2df"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

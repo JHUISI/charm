@@ -1,0 +1,1166 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+        <link rel="prefetch" href="../_static/charm_logo.png" as="image">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>abenc_accountability_jyjxgd20 - Charm-Crypto v0.60</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #2980b9;
+  --color-brand-content: #2980b9;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Charm-Crypto v0.60</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/charm_logo.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../miracl.html">Building MIRACL for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mobile.html">Android Build (Deprecated)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">How To Get Started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cryptographers.html">For Cryptographers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers.html">For App Developers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/blindsig_ps16.html">blindsig_ps16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/chamhash_adm05.html">chamhash_adm05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/chamhash_rsa_hw09.html">chamhash_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/encap_bchk05.html">encap_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/joye_scheme.html">joye_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/lem_scheme.html">lem_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pk_vrf.html">pk_vrf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pre_mg07.html">pre_mg07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_a01.html">protocol_a01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_ao00.html">protocol_ao00</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_cns07.html">protocol_cns07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/protocol_schnorr91.html">protocol_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma1.html">sigma1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma2.html">sigma2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/sigma3.html">sigma3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html">abenc_accountability_jyjxgd20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_bsw07.html">abenc_bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_ca_cpabe_ar17.html">abenc_ca_cpabe_ar17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_dacmacs_yj14.html">abenc_dacmacs_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_lsw08.html">abenc_lsw08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_maabe_rw15.html">abenc_maabe_rw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_maabe_yj14.html">abenc_maabe_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_tbpre_lww14.html">abenc_tbpre_lww14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_unmcpabe_yahk14.html">abenc_unmcpabe_yahk14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_waters09.html">abenc_waters09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_yct14.html">abenc_yct14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/abenc_yllc15.html">abenc_yllc15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/ac17.html">ac17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/bsw07.html">bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/cgw15.html">cgw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/dabe_aw11.html">dabe_aw11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/dfa_fe12.html">dfa_fe12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/pk_hve08.html">pk_hve08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/abenc/waters11.html">waters11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_cs98.html">pkenc_cs98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_elgamal85.html">pkenc_elgamal85</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_gm82.html">pkenc_gm82</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_paillier99.html">pkenc_paillier99</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_rabin.html">pkenc_rabin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pkenc/pkenc_rsa.html">pkenc_rsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_bls04.html">pksig_bls04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_boyen.html">pksig_boyen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_chch.html">pksig_chch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_chp.html">pksig_chp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cl03.html">pksig_cl03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cl04.html">pksig_cl04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cllww12_z.html">pksig_cllww12_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_CW13_z.html">pksig_CW13_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_cyh.html">pksig_cyh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_dsa.html">pksig_dsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ecdsa.html">pksig_ecdsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_hess.html">pksig_hess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_hw.html">pksig_hw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_lamport.html">pksig_lamport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps01.html">pksig_ps01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps02.html">pksig_ps02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_ps03.html">pksig_ps03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_rsa_hw09.html">pksig_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_schnorr91.html">pksig_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters.html">pksig_waters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters05.html">pksig_waters05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../test_vectors.html">Schemes with Test Vectors</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/dabenc_adapt_hybrid.html">dabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/ibenc_adapt_hybrid.html">ibenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/ibenc_adapt_identityhash.html">ibenc_adapt_identityhash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/kpabenc_adapt_hybrid.html">kpabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_bchk05.html">pkenc_adapt_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_chk04.html">pkenc_adapt_chk04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pkenc_adapt_hybrid.html">pkenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/bitstring.html">bitstring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/Commit.html">Commit - Commitment Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/conversion.html">conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/DFA.html">DFA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/eccurve.html">eccurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/ecgroup.html">ecgroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/enum.html">enum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/FSA.html">FSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/Hash.html">Hash - Hash Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/hash_module.html">hash_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/IBEnc.html">IBEnc - Identity-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/IBSig.html">IBSig - Identity-Based Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/integergroup.html">integergroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/iterate.html">iterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/matrixops.html">matrixops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/msp.html">msp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/node.html">node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/pairingcurves.html">pairingcurves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/pairinggroup.html">pairinggroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/PKEnc.html">PKEnc - Public-Key Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/PKSig.html">PKSig - Public-Key Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/policy_expression_spec.html">policy_expression_spec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/policytree.html">policytree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/PREnc.html">PREnc - Proxy Re-Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/reCompiler.html">reCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/redundancyschemes.html">redundancyschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/schemebase.html">schemebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/secretshare.html">secretshare - Secret Sharing Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/secretutil.html">secretutil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/securerandom.html">securerandom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/specialprimes.html">specialprimes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/xmlserialize.html">xmlserialize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/zknode.html">zknode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/ZKProof.html">ZKProof</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../test/conversion_test.html">conversion_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/ecgroup_test.html">ecgroup_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/paddingschemes_test.html">paddingschemes_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/policy_parser_stress_test.html">policy_parser_stress_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/secretshare_test.html">secretshare_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/symcrypto_test.html">symcrypto_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/test_policy_expression.html">test_policy_expression</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../updates.html">Changes in v0.43</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for abenc_accountability_jyjxgd20</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">**ABE with Privacy Protection and Accountability (JYJXGD20)**</span>
+
+<span class="sd">*Authors:* Jiguo Li, Yichen Zhang, Jianting Ning, Xinyi Huang, Geong Sen Poh, Debang Wang</span>
+
+<span class="sd">| **Title:** &quot;Attribute Based Encryption with Privacy Protection and Accountability for CloudIoT&quot;</span>
+<span class="sd">| **Published in:** IEEE Transactions on Cloud Computing, 2020</span>
+<span class="sd">| **Available from:** https://ieeexplore.ieee.org/abstract/document/9003205</span>
+<span class="sd">| **Notes:** Two schemes implemented: (1) CP policy hiding (class CP_Hiding_ABE), (2) CP policy hiding with accountability under white box assumption (class CP_Hiding_Accountability_ABE)</span>
+
+<span class="sd">.. rubric:: Scheme Properties</span>
+
+<span class="sd">* **Type:** ciphertext-policy attribute-based encryption (public key)</span>
+<span class="sd">* **Setting:** Pairing groups</span>
+<span class="sd">* **Assumption:** Decisional Bilinear Diffie-Hellman</span>
+
+<span class="sd">.. rubric:: Implementation</span>
+
+<span class="sd">:Authors: Ahmed Bakr</span>
+<span class="sd">:Date: 08/2023</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">,</span><span class="n">GT</span><span class="p">,</span><span class="n">pair</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ABEnc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABEnc</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+
+<div class="viewcode-block" id="Attribute">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.Attribute">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Attribute</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">values_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
+        <span class="c1"># Validation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validate_attribute_values_name</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">value_str</span> <span class="ow">in</span> <span class="n">values_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__validate_attribute_values_name</span><span class="p">(</span><span class="n">value_str</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">attr_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values_list</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__validate_attribute_values_name</span><span class="p">(</span><span class="n">attr_value_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">attr_value_name</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Attribute name cannot contain an &#39;_&#39;&quot;</span>
+
+<div class="viewcode-block" id="Attribute.add_value">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.Attribute.add_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validate_attribute_values_name</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># Validation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Attribute.set_values">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.Attribute.set_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values_list</span></div>
+
+
+<div class="viewcode-block" id="Attribute.get_attribute_values_full_name">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.Attribute.get_attribute_values_full_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_attribute_values_full_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attribute values full name is in the following format: &#39;attrName_value&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">full_names_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="n">full_names_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">full_names_list</span></div>
+
+
+<div class="viewcode-block" id="Attribute.get_full_attribute_value_name">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.Attribute.get_full_attribute_value_name">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_full_attribute_value_name</span><span class="p">(</span><span class="n">attr_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">Attribute</span><span class="o">.</span><span class="n">__validate_attribute_values_name</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>  <span class="c1"># Validation</span>
+        <span class="n">Attribute</span><span class="o">.</span><span class="n">__validate_attribute_values_name</span><span class="p">(</span><span class="n">value_name</span><span class="p">)</span>  <span class="c1"># Validation</span>
+        <span class="k">return</span> <span class="n">attr_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">value_name</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CP_Hiding_ABE">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_ABE">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CP_Hiding_ABE</span><span class="p">(</span><span class="n">ABEnc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cipher text policy hiding attribute based encryption (Section 3 in the paper).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_obj</span><span class="p">):</span>
+        <span class="n">ABEnc</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">group_obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="CP_Hiding_ABE.setup">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_ABE.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributes_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        System Setup algorithm. This algorithm is performed by TA.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - None</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - MSK: TA&#39;s master secret key.</span>
+<span class="sd">            - PK: Public Parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes_dict</span> <span class="o">=</span> <span class="n">attributes_dict</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+        <span class="n">MSK</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="n">PK</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="n">g</span><span class="p">,</span>
+              <span class="s1">&#39;e_gg&#39;</span><span class="p">:</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+              <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">,</span>
+              <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span>
+              <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span>
+              <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
+              <span class="s1">&#39;e_gg_alpha&#39;</span><span class="p">:</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="n">alpha</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span></div>
+
+
+<div class="viewcode-block" id="CP_Hiding_ABE.key_gen">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_ABE.key_gen">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">key_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">attributes_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Key generation for a user based on his list of attributes. This algorithm is performed by TA.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - MSK: Master Secret Key of the TA.</span>
+<span class="sd">            - PK: Public parameters and the public key of the TA.</span>
+<span class="sd">            - attributes_list: List of attributes held by this user, where each attribute is in the format:</span>
+<span class="sd">                               &#39;attrName_value&#39;</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - SK: User&#39;s secret key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_attributes_list</span><span class="p">(</span><span class="n">attributes_list</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">MSK</span>
+
+        <span class="n">K_0</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">w</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">K_1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">r</span>
+        <span class="n">K_2</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">K_3</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">full_attr_value_name</span> <span class="ow">in</span> <span class="n">attributes_list</span><span class="p">:</span>
+            <span class="c1"># attr_name = full_attr_value_name.split(&#39;_&#39;)[0]</span>
+            <span class="n">r_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">K_i_2</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">r_i</span>
+            <span class="n">hash_attr_val_in_z_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">full_attr_value_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">K_i_3</span> <span class="o">=</span> <span class="p">(((</span><span class="n">u</span> <span class="o">**</span> <span class="n">hash_attr_val_in_z_p</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">**</span> <span class="n">r_i</span><span class="p">)</span> <span class="o">*</span> <span class="n">v</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">r</span><span class="p">)</span>
+            <span class="n">K_2</span><span class="p">[</span><span class="n">full_attr_value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">K_i_2</span>
+            <span class="n">K_3</span><span class="p">[</span><span class="n">full_attr_value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">K_i_3</span>
+        <span class="n">SK</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;attributes_list&#39;</span><span class="p">:</span> <span class="n">attributes_list</span><span class="p">,</span> <span class="s1">&#39;K_0&#39;</span><span class="p">:</span> <span class="n">K_0</span><span class="p">,</span> <span class="s1">&#39;K_1&#39;</span><span class="p">:</span> <span class="n">K_1</span><span class="p">,</span> <span class="s1">&#39;K_2&#39;</span><span class="p">:</span> <span class="n">K_2</span><span class="p">,</span> <span class="s1">&#39;K_3&#39;</span><span class="p">:</span> <span class="n">K_3</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">SK</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_attributes_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributes_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        each attribute is in the format: &#39;attrName_value&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">attributes_list</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">attr_value</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">attr_value</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr_value</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;The format is &#39;attrName_value&#39;&quot;</span><span class="p">)</span>
+            <span class="n">splitted_str</span> <span class="o">=</span> <span class="n">attr_value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted_str</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">splitted_str</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;The format is &#39;attrName_value&#39;&quot;</span>
+
+<div class="viewcode-block" id="CP_Hiding_ABE.encrypt">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_ABE.encrypt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Encrypt a message using an access policy. This function is performed by a data user who wants to encrypt his </span>
+<span class="sd">        message with an access policy. They consider only and-gates in their policy.</span>
+<span class="sd">        Note: The access policy is hidden into the ciphertext.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - PK: Public parameters and the public key of the TA.</span>
+<span class="sd">            - m: Message to be encrypted in G_T.</span>
+<span class="sd">            - access_policy: Access policy that will be used to encrypt the message. It has to be and gated policy,</span>
+<span class="sd">                             which means that each attribute can have only one value.</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - CT: Cipher text. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">s_n</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">access_policy_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">access_policy</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">m</span> <span class="o">*</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;e_gg_alpha&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="n">C_1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="n">C_i_1</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">C_i_3</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">C_i_2</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">access_policy</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">access_policy_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">s_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+                <span class="n">s_n</span> <span class="o">=</span> <span class="n">s_n</span> <span class="o">-</span> <span class="n">s_i</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s_i</span> <span class="o">=</span> <span class="n">s_n</span>
+            <span class="n">t_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">C_i_1</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">**</span> <span class="n">s_i</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span> <span class="o">**</span> <span class="n">t_i</span><span class="p">)</span>
+            <span class="n">C_i_3</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">t_i</span>
+
+            <span class="k">for</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes_dict</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]:</span>
+                <span class="n">full_attr_value_name</span> <span class="o">=</span> <span class="n">Attribute</span><span class="o">.</span><span class="n">get_full_attribute_value_name</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">access_policy</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]:</span>
+                    <span class="n">hash_attr_val_in_z_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">full_attr_value_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">ZR</span><span class="p">)</span>
+                    <span class="n">C_i_ai_2</span> <span class="o">=</span> <span class="p">((</span><span class="n">u</span> <span class="o">**</span> <span class="n">hash_attr_val_in_z_p</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">t_i</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">C_i_ai_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+                <span class="n">C_i_2</span><span class="p">[</span><span class="n">full_attr_value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">C_i_ai_2</span>
+        <span class="n">CT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="n">C</span><span class="p">,</span>
+              <span class="s1">&#39;C_1&#39;</span><span class="p">:</span> <span class="n">C_1</span><span class="p">,</span>
+              <span class="s1">&#39;C_i_1&#39;</span><span class="p">:</span> <span class="n">C_i_1</span><span class="p">,</span>
+              <span class="s1">&#39;C_i_3&#39;</span><span class="p">:</span> <span class="n">C_i_3</span><span class="p">,</span>
+              <span class="s1">&#39;C_i_ai_2&#39;</span><span class="p">:</span> <span class="n">C_i_2</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">CT</span></div>
+
+
+<div class="viewcode-block" id="CP_Hiding_ABE.decrypt">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_ABE.decrypt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">SK</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decrypt a cipher text. This algorithm is performed by a data user who has the required attributes to decipher</span>
+<span class="sd">        the ciphertext that was encrypted using an access policy.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - CT: Cipher text.</span>
+<span class="sd">            - PK: Public parameters and the public key of the TA.</span>
+<span class="sd">            - SK: User&#39;s secret key.</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - m: The original decrypted message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nominator</span> <span class="o">=</span> <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_1&#39;</span><span class="p">],</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_0&#39;</span><span class="p">])</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_i_1&#39;</span><span class="p">]:</span>
+            <span class="c1"># Find the attribute value that exists inside both the user&#39;s key for attr_name</span>
+            <span class="n">found_attribute_value_full_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">attr_value_full_name</span> <span class="ow">in</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_2&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">attr_value_full_name</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">found_attribute_value_full_name</span> <span class="o">=</span> <span class="n">attr_value_full_name</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">found_attribute_value_full_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span> <span class="c1"># The user does not have the necessary attributes to decrypt</span>
+
+            <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="n">denominator</span> <span class="o">*</span> <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_i_1&#39;</span><span class="p">][</span><span class="n">attr_name</span><span class="p">],</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_1&#39;</span><span class="p">])</span> <span class="o">*</span>
+                           <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_i_ai_2&#39;</span><span class="p">][</span><span class="n">found_attribute_value_full_name</span><span class="p">],</span>
+                                <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_2&#39;</span><span class="p">][</span><span class="n">found_attribute_value_full_name</span><span class="p">])</span> <span class="o">*</span>
+                           <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_i_3&#39;</span><span class="p">][</span><span class="n">attr_name</span><span class="p">],</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_3&#39;</span><span class="p">][</span><span class="n">found_attribute_value_full_name</span><span class="p">]))</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">nominator</span> <span class="o">/</span> <span class="n">denominator</span>
+        <span class="n">recovered_message</span> <span class="o">=</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">B</span>
+        <span class="k">return</span> <span class="n">recovered_message</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CP_Hiding_Accountability_ABE">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CP_Hiding_Accountability_ABE</span><span class="p">(</span><span class="n">CP_Hiding_ABE</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cipher text policy hiding attribute based encryption (Section 4 in the paper).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_obj</span><span class="p">):</span>
+        <span class="n">CP_Hiding_ABE</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_obj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_ID_to_w_pow_k_dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Updated inside the key generation function to map the user ID to his</span>
+        <span class="c1"># associated R = w ** k.</span>
+
+<div class="viewcode-block" id="CP_Hiding_Accountability_ABE.setup">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributes_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        System Setup algorithm. This algorithm is performed by TA.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - None</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - MSK: TA&#39;s master secret key.</span>
+<span class="sd">            - PK: Public Parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes_dict</span> <span class="o">=</span> <span class="n">attributes_dict</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">y</span>
+
+        <span class="n">MSK</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+            <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y</span>
+        <span class="p">}</span>
+        <span class="n">PK</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="n">g</span><span class="p">,</span>
+              <span class="s1">&#39;e_gg&#39;</span><span class="p">:</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+              <span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">,</span>
+              <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span>
+              <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span>
+              <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
+              <span class="s1">&#39;e_gg_alpha&#39;</span><span class="p">:</span> <span class="n">pair</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="o">**</span> <span class="n">alpha</span><span class="p">,</span>
+              <span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="n">X</span><span class="p">,</span>
+              <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="n">Y</span>
+              <span class="p">}</span>
+        <span class="k">return</span> <span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span></div>
+
+
+<div class="viewcode-block" id="CP_Hiding_Accountability_ABE.key_gen">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.key_gen">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">key_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">attributes_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Key generation for a user based on his list of attributes. This algorithm is performed by TA and the user.</span>
+<span class="sd">        Part of the key generation is executed as an interaction between the user and the TA, as the user generates</span>
+<span class="sd">        a random number (k) that he does not share with the TA. However, he shares with it w**k, and proves knowledge of</span>
+<span class="sd">        (k) to TA using any ZKP algorithm.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - MSK: Master Secret Key of the TA.</span>
+<span class="sd">            - PK: Public parameters and the public key of the TA.</span>
+<span class="sd">            - ID: User&#39;s unique identifier.</span>
+<span class="sd">            - attributes_list: List of attributes held by this user, where each attribute is in the format:</span>
+<span class="sd">                               &#39;attrName_value&#39;</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - SK: User&#39;s secret key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+
+        <span class="c1"># The part executed by the user</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>  <span class="c1"># Select a secret KFN (Key Family Number).</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">w</span> <span class="o">**</span> <span class="n">k</span>
+
+        <span class="c1"># User is going to send R to the TA and prove knowledge of k using Shnorr&#39;s ZKP.</span>
+        <span class="n">zkp_prover</span> <span class="o">=</span> <span class="n">ShnorrInteractiveZKP</span><span class="o">.</span><span class="n">Prover</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>  <span class="c1"># The user.</span>
+        <span class="n">zkp_verifier</span> <span class="o">=</span> <span class="n">ShnorrInteractiveZKP</span><span class="o">.</span><span class="n">Verifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>  <span class="c1"># The TA.</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="n">w</span><span class="p">}</span>  <span class="c1"># Work around to user (w) as the group point instead of (g)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">zkp_prover</span><span class="o">.</span><span class="n">create_prover_commitments</span><span class="p">(</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">zkp_verifier</span><span class="o">.</span><span class="n">create_verifier_challenge</span><span class="p">()</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">zkp_prover</span><span class="o">.</span><span class="n">create_proof</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">zkp_verifier</span><span class="o">.</span><span class="n">is_proof_verified</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">R</span><span class="p">),</span> \
+            <span class="s2">&quot;User failed to proof knowledge of (k) that is used to calculate R&quot;</span>
+
+        <span class="n">SK</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_gen_TA</span><span class="p">(</span><span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">attributes_list</span><span class="p">)</span>
+
+        <span class="c1"># The user gets the SK and adds his secret KFN to it.</span>
+        <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="k">return</span> <span class="n">SK</span></div>
+
+
+<div class="viewcode-block" id="CP_Hiding_Accountability_ABE.key_gen_TA">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.key_gen_TA">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">key_gen_TA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">attributes_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Key generation for a user based on his list of attributes. This algorithm is performed by TA and the user.</span>
+<span class="sd">        Part of the key generation is executed as an interaction between the user and the TA, as the user generates</span>
+<span class="sd">        a random number (k) that he does not share with the TA. However, he shares with it w**k, and proves knowledge of</span>
+<span class="sd">        (k) to TA using any ZKP algorithm.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - MSK: Master Secret Key of the TA.</span>
+<span class="sd">            - PK: Public parameters and the public key of the TA.</span>
+<span class="sd">            - ID: User&#39;s unique identifier.</span>
+<span class="sd">            - R: w ** k, where (w) is a public point on the curve, and (k) is the secret KFN selected by the user.</span>
+<span class="sd">            - attributes_list: List of attributes held by this user, where each attribute is in the format:</span>
+<span class="sd">                               &#39;attrName_value&#39;</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - SK: User&#39;s secret key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_attributes_list</span><span class="p">(</span><span class="n">attributes_list</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">MSK</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">MSK</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">MSK</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>  <span class="c1"># TODO: AB: If (x + ID + y * d) mod p = 0, then choose another d</span>
+
+        <span class="n">K_0</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">**</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">ID</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">d</span><span class="p">)))</span> <span class="o">*</span> <span class="p">(</span><span class="n">R</span> <span class="o">**</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">K_1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">r</span>
+        <span class="n">K_2</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">K_3</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span>
+        <span class="n">T1</span> <span class="o">=</span> <span class="n">ID</span>
+        <span class="n">T3</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="n">K_i_2</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">K_i_3</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">full_attr_value_name</span> <span class="ow">in</span> <span class="n">attributes_list</span><span class="p">:</span>
+            <span class="c1"># attr_name = full_attr_value_name.split(&#39;_&#39;)[0]</span>
+            <span class="n">r_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">K_i_2</span><span class="p">[</span><span class="n">full_attr_value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">r_i</span>
+            <span class="n">hash_attr_val_in_z_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">full_attr_value_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">K_i_3</span><span class="p">[</span><span class="n">full_attr_value_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(((</span><span class="n">u</span> <span class="o">**</span> <span class="n">hash_attr_val_in_z_p</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">**</span> <span class="n">r_i</span><span class="p">)</span> <span class="o">*</span> <span class="n">v</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">ID</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">d</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_ID_to_w_pow_k_dict</span><span class="p">[</span><span class="n">T1</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span>
+
+        <span class="n">SK</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;attributes_list&#39;</span><span class="p">:</span> <span class="n">attributes_list</span><span class="p">,</span> <span class="s1">&#39;K_0&#39;</span><span class="p">:</span> <span class="n">K_0</span><span class="p">,</span> <span class="s1">&#39;K_1&#39;</span><span class="p">:</span> <span class="n">K_1</span><span class="p">,</span> <span class="s1">&#39;K_2&#39;</span><span class="p">:</span> <span class="n">K_2</span><span class="p">,</span> <span class="s1">&#39;K_3&#39;</span><span class="p">:</span> <span class="n">K_3</span><span class="p">,</span> <span class="s1">&#39;K_i_2&#39;</span><span class="p">:</span> <span class="n">K_i_2</span><span class="p">,</span>
+              <span class="s1">&#39;K_i_3&#39;</span><span class="p">:</span> <span class="n">K_i_3</span><span class="p">,</span> <span class="s1">&#39;T1&#39;</span><span class="p">:</span> <span class="n">T1</span><span class="p">,</span> <span class="s1">&#39;T3&#39;</span><span class="p">:</span> <span class="n">T3</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">SK</span></div>
+
+
+<div class="viewcode-block" id="CP_Hiding_Accountability_ABE.encrypt">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.encrypt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Encrypt a message using an access policy. This function is performed by a data user who wants to encrypt his </span>
+<span class="sd">        message with an access policy. They consider only and-gates in their policy.</span>
+<span class="sd">        Note: The access policy is hidden into the ciphertext.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - PK: Public parameters and the public key of the TA.</span>
+<span class="sd">            - m: Message to be encrypted in G_T.</span>
+<span class="sd">            - access_policy: Access policy that will be used to encrypt the message. It has to be and gated policy,</span>
+<span class="sd">                             which means that each attribute can have only one value.</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - CT: Cipher text. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;h&#39;</span><span class="p">]</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">]</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">s_n</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">access_policy_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">access_policy</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">m</span> <span class="o">*</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;e_gg_alpha&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="n">C_1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="n">C_2</span> <span class="o">=</span> <span class="n">X</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="n">C_3</span> <span class="o">=</span> <span class="n">Y</span> <span class="o">**</span> <span class="n">s</span>
+        <span class="n">C_i_1</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">C_i_3</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">C_i_2</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">access_policy</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">access_policy_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">s_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+                <span class="n">s_n</span> <span class="o">=</span> <span class="n">s_n</span> <span class="o">-</span> <span class="n">s_i</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s_i</span> <span class="o">=</span> <span class="n">s_n</span>
+            <span class="n">t_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+            <span class="n">C_i_1</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">**</span> <span class="n">s_i</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span> <span class="o">**</span> <span class="n">t_i</span><span class="p">)</span>
+            <span class="n">C_i_3</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">t_i</span>
+
+            <span class="k">for</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes_dict</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]:</span>
+                <span class="n">full_attr_value_name</span> <span class="o">=</span> <span class="n">Attribute</span><span class="o">.</span><span class="n">get_full_attribute_value_name</span><span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">access_policy</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]:</span>
+                    <span class="n">hash_attr_val_in_z_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">full_attr_value_name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">ZR</span><span class="p">)</span>
+                    <span class="n">C_i_ai_2</span> <span class="o">=</span> <span class="p">((</span><span class="n">u</span> <span class="o">**</span> <span class="n">hash_attr_val_in_z_p</span><span class="p">)</span> <span class="o">*</span> <span class="n">h</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">t_i</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">C_i_ai_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+                <span class="n">C_i_2</span><span class="p">[</span><span class="n">full_attr_value_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">C_i_ai_2</span>
+        <span class="n">CT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="n">C</span><span class="p">,</span>
+              <span class="s1">&#39;C_1&#39;</span><span class="p">:</span> <span class="n">C_1</span><span class="p">,</span>
+              <span class="s1">&#39;C_2&#39;</span><span class="p">:</span> <span class="n">C_2</span><span class="p">,</span>
+              <span class="s1">&#39;C_3&#39;</span><span class="p">:</span> <span class="n">C_3</span><span class="p">,</span>
+              <span class="s1">&#39;C_i_1&#39;</span><span class="p">:</span> <span class="n">C_i_1</span><span class="p">,</span>
+              <span class="s1">&#39;C_i_3&#39;</span><span class="p">:</span> <span class="n">C_i_3</span><span class="p">,</span>
+              <span class="s1">&#39;C_i_ai_2&#39;</span><span class="p">:</span> <span class="n">C_i_2</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">CT</span></div>
+
+
+<div class="viewcode-block" id="CP_Hiding_Accountability_ABE.decrypt">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.decrypt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CT</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">SK</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decrypt a cipher text. This algorithm is performed by a data user who has the required attributes to decipher</span>
+<span class="sd">        the ciphertext that was encrypted using an access policy.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - CT: Cipher text.</span>
+<span class="sd">            - PK: Public parameters and the public key of the TA.</span>
+<span class="sd">            - SK: User&#39;s secret key.</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - m: The original decrypted message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nominator</span> <span class="o">=</span> <span class="n">pair</span><span class="p">((</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;T1&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_3&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;T3&#39;</span><span class="p">]),</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_0&#39;</span><span class="p">])</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">GT</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_i_1&#39;</span><span class="p">]:</span>
+            <span class="c1"># Find the attribute value that exists inside both the user&#39;s key for attr_name</span>
+            <span class="n">found_attribute_value_full_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">attr_value_full_name</span> <span class="ow">in</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_i_2&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">attr_value_full_name</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">found_attribute_value_full_name</span> <span class="o">=</span> <span class="n">attr_value_full_name</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">found_attribute_value_full_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span> <span class="c1"># The user does not have the necessary attributes to decrypt</span>
+
+            <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="n">denominator</span> <span class="o">*</span> <span class="p">((</span><span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_i_1&#39;</span><span class="p">][</span><span class="n">attr_name</span><span class="p">],</span> <span class="p">(</span><span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_1&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;T1&#39;</span><span class="p">])</span> <span class="o">*</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_3&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;T3&#39;</span><span class="p">]))</span> <span class="o">*</span>
+                           <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_i_ai_2&#39;</span><span class="p">][</span><span class="n">found_attribute_value_full_name</span><span class="p">],</span>
+                                <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_i_2&#39;</span><span class="p">][</span><span class="n">found_attribute_value_full_name</span><span class="p">])</span> <span class="o">*</span>
+                           <span class="n">pair</span><span class="p">(</span><span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C_i_3&#39;</span><span class="p">][</span><span class="n">attr_name</span><span class="p">],</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;K_i_3&#39;</span><span class="p">][</span><span class="n">found_attribute_value_full_name</span><span class="p">]))</span> <span class="o">**</span> <span class="n">SK</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]))</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">nominator</span> <span class="o">/</span> <span class="n">denominator</span>
+        <span class="n">recovered_message</span> <span class="o">=</span> <span class="n">CT</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">B</span>
+        <span class="k">return</span> <span class="n">recovered_message</span></div>
+
+
+<div class="viewcode-block" id="CP_Hiding_Accountability_ABE.trace">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.trace">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SK_suspected</span><span class="p">,</span> <span class="n">authentic_user_IDs_list</span><span class="p">,</span> <span class="n">PK</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trace function is executed by the auditor. The auditor checks the suspected SK and determines who is misbehaving</span>
+<span class="sd">        : the user who owns SK or the TA. If this function is called, it means that either the user or the TA is</span>
+<span class="sd">          misbehaving. The trigger how this function is triggered and how the malicious activity is detected is out of</span>
+<span class="sd">          this paper&#39;s scope.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            - SK_suspected: Secret key of the suspected user under the white box model, which means that it has access</span>
+<span class="sd">                            to the full secret key of the user.</span>
+<span class="sd">            - authentic_user_IDs_list: A list of the authentic user IDs issued by a trusted third party outside the</span>
+<span class="sd">                                       system.</span>
+<span class="sd">            - PK: Public parameters and the public key of the TA.</span>
+<span class="sd">        Outputs:</span>
+<span class="sd">            - {&#39;user&#39;: True/False,</span>
+<span class="sd">               &#39;TA&#39;: True/False} ; Only one of them will be true and the other will be false.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_SK_well_formed</span><span class="p">(</span><span class="n">SK_suspected</span><span class="p">),</span> <span class="s2">&quot;SK is not well formed.&quot;</span>
+        <span class="n">user_id</span> <span class="o">=</span> <span class="n">SK_suspected</span><span class="p">[</span><span class="s1">&#39;T1&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">authentic_user_IDs_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;TA&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>  <span class="c1"># The TA issued a fake ID for a fake or not illegible user.</span>
+        <span class="n">w_pow_k_ID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_ID_to_w_pow_k_dict</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">SK_suspected</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">PK</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">w</span><span class="o">**</span><span class="n">k</span> <span class="o">!=</span> <span class="n">w_pow_k_ID</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;TA&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>  <span class="c1"># User is misbehaving and gave his keys to someone else.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;TA&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>  <span class="c1"># The TA is misbehaving.</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_SK_well_formed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SK</span><span class="p">):</span>
+        <span class="n">search_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;attributes_list&#39;</span><span class="p">,</span> <span class="s1">&#39;K_0&#39;</span><span class="p">,</span> <span class="s1">&#39;K_1&#39;</span><span class="p">,</span> <span class="s1">&#39;K_2&#39;</span><span class="p">,</span> <span class="s1">&#39;K_3&#39;</span><span class="p">,</span> <span class="s1">&#39;K_i_2&#39;</span><span class="p">,</span> <span class="s1">&#39;K_i_3&#39;</span><span class="p">,</span> <span class="s1">&#39;T1&#39;</span><span class="p">,</span> <span class="s1">&#39;T3&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">a_search_key</span> <span class="ow">in</span> <span class="n">search_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">a_search_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SK</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+
+<div class="viewcode-block" id="ShnorrInteractiveZKP">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShnorrInteractiveZKP</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shnorr&#39;s Interactive ZKP</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ShnorrInteractiveZKP.Prover">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Prover</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secret_x</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__r</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__x</span> <span class="o">=</span> <span class="n">secret_x</span>
+
+<div class="viewcode-block" id="ShnorrInteractiveZKP.Prover.create_prover_commitments">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover.create_prover_commitments">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">create_prover_commitments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            1) This function is executed by the prover to send a random value to the verifier</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">__r</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">u</span></div>
+
+
+<div class="viewcode-block" id="ShnorrInteractiveZKP.Prover.create_proof">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover.create_proof">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">create_proof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            3) This function is executed by the prover after he received the challenge value (c) from the verifier</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__r</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__x</span>
+            <span class="k">return</span> <span class="n">z</span>  <span class="c1"># proof</span></div>
+</div>
+
+
+<div class="viewcode-block" id="ShnorrInteractiveZKP.Verifier">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Verifier</span><span class="p">:</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupObj</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">groupObj</span>
+
+<div class="viewcode-block" id="ShnorrInteractiveZKP.Verifier.create_verifier_challenge">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier.create_verifier_challenge">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">create_verifier_challenge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            2) This function is executed by the verifier after he had received the value u from the prover to send a challenge value to the prover.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span></div>
+
+
+<div class="viewcode-block" id="ShnorrInteractiveZKP.Verifier.is_proof_verified">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier.is_proof_verified">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">is_proof_verified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            4) This function is executed by the verifier to verify the authenticity of the proof sent by the prover</span>
+<span class="sd">            z: Created by the prover in create_proof function</span>
+<span class="sd">            u: Created by the prover in create_prover_commitments function</span>
+<span class="sd">            h: g^x, where x is the secret key of the prover that he wants to prove that he knows it.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pk</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">**</span> <span class="n">z</span><span class="p">)</span> <span class="o">==</span> <span class="n">u</span> <span class="o">*</span> <span class="n">h</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+</div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">CP_policy_hiding_ABE_test</span><span class="p">()</span>
+    <span class="n">CP_policy_hiding_with_accountability_test</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="CP_policy_hiding_ABE_test">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_policy_hiding_ABE_test">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">CP_policy_hiding_ABE_test</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;************************************* CP policy hiding ABE test *******************************************&quot;</span><span class="p">)</span>
+    <span class="n">attr1_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;val1&#39;</span><span class="p">,</span> <span class="s1">&#39;val2&#39;</span><span class="p">,</span> <span class="s1">&#39;val3&#39;</span><span class="p">]</span>
+    <span class="n">attr2_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;val1&#39;</span><span class="p">,</span> <span class="s1">&#39;val4&#39;</span><span class="p">]</span>
+    <span class="n">attributes_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;attr1&#39;</span><span class="p">:</span> <span class="n">attr1_values</span><span class="p">,</span>
+        <span class="s1">&#39;attr2&#39;</span><span class="p">:</span> <span class="n">attr2_values</span>
+    <span class="p">}</span>
+    <span class="n">user1_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;attr1_val2&#39;</span><span class="p">,</span> <span class="s1">&#39;attr2_val4&#39;</span><span class="p">]</span>
+    <span class="n">user2_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;attr1_val2&#39;</span><span class="p">,</span> <span class="s1">&#39;attr2_val1&#39;</span><span class="p">]</span>
+    <span class="c1"># The access policy that will be used to encrypt the message</span>
+    <span class="n">access_policy</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;attr1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;val1&#39;</span><span class="p">,</span> <span class="s1">&#39;val2&#39;</span><span class="p">],</span>  <span class="c1"># Set of attributes allowed for &#39;attr1&#39; in the access policy.</span>
+                     <span class="s1">&#39;attr2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;val4&#39;</span><span class="p">]</span>  <span class="c1"># Set of attributes allowed for &#39;attr2&#39; in the access policy.</span>
+                     <span class="p">}</span>
+    <span class="n">attr1</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;attr1&#39;</span><span class="p">,</span> <span class="n">attr1_values</span><span class="p">)</span>
+    <span class="n">attr2</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;attr2&#39;</span><span class="p">,</span> <span class="n">attr2_values</span><span class="p">)</span>
+    <span class="n">attr1_values</span> <span class="o">=</span> <span class="n">attr1</span><span class="o">.</span><span class="n">get_attribute_values_full_name</span><span class="p">()</span>
+    <span class="n">attr2_values</span> <span class="o">=</span> <span class="n">attr2</span><span class="o">.</span><span class="n">get_attribute_values_full_name</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;attribute 1 full values names: &quot;</span><span class="p">,</span> <span class="n">attr1_values</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;attribute 2 full values names: &quot;</span><span class="p">,</span> <span class="n">attr2_values</span><span class="p">)</span>
+    <span class="n">group_obj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">cp_hiding_ABE</span> <span class="o">=</span> <span class="n">CP_Hiding_ABE</span><span class="p">(</span><span class="n">group_obj</span><span class="p">)</span>
+    <span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">attributes_dict</span><span class="p">)</span>  <span class="c1"># TA&#39;s MSK, PK</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MSK: &quot;</span><span class="p">,</span> <span class="n">MSK</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PK: &quot;</span><span class="p">,</span> <span class="n">PK</span><span class="p">)</span>
+    <span class="n">user1_SK</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">key_gen</span><span class="p">(</span><span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">user1_attributes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;user1 SK: &#39;</span><span class="p">,</span> <span class="n">user1_SK</span><span class="p">)</span>
+    <span class="n">user2_SK</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">key_gen</span><span class="p">(</span><span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">user2_attributes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;user2 SK: &#39;</span><span class="p">,</span> <span class="n">user1_SK</span><span class="p">)</span>
+    <span class="n">rand_msg</span> <span class="o">=</span> <span class="n">group_obj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="n">CT</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">rand_msg</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CT: &quot;</span><span class="p">,</span> <span class="n">CT</span><span class="p">)</span>
+    <span class="n">recovered_message</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">user1_SK</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;recovered message: &quot;</span><span class="p">,</span> <span class="n">recovered_message</span><span class="p">)</span>
+    <span class="c1"># No error is generated since user 1&#39;s attributes matches the access policy embedded inside the CT.</span>
+    <span class="k">assert</span> <span class="n">recovered_message</span> <span class="o">==</span> <span class="n">rand_msg</span><span class="p">,</span> <span class="s2">&quot;Random message does not match the recovered message&quot;</span>
+    <span class="c1"># User 2 tries to decrypt CT.</span>
+    <span class="n">recovered_message</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">user2_SK</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;recovered message: &quot;</span><span class="p">,</span> <span class="n">recovered_message</span><span class="p">)</span>
+    <span class="c1"># An error is generated since user 2 does not have the required attributes to decrypt CT.</span>
+    <span class="c1"># assert recovered_message == rand_msg, &quot;Random message does not match the recovered message&quot;  # Uncomment to raise the error.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***********************************************************************************************************&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CP_policy_hiding_with_accountability_test">
+<a class="viewcode-back" href="../charm/schemes/abenc/abenc_accountability_jyjxgd20.html#abenc_accountability_jyjxgd20.CP_policy_hiding_with_accountability_test">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">CP_policy_hiding_with_accountability_test</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*************************** CP policy hiding ABE with accountability test *********************************&quot;</span><span class="p">)</span>
+    <span class="n">attr1_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;val1&#39;</span><span class="p">,</span> <span class="s1">&#39;val2&#39;</span><span class="p">,</span> <span class="s1">&#39;val3&#39;</span><span class="p">]</span>
+    <span class="n">attr2_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;val1&#39;</span><span class="p">,</span> <span class="s1">&#39;val4&#39;</span><span class="p">]</span>
+    <span class="n">attributes_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;attr1&#39;</span><span class="p">:</span> <span class="n">attr1_values</span><span class="p">,</span>
+        <span class="s1">&#39;attr2&#39;</span><span class="p">:</span> <span class="n">attr2_values</span>
+    <span class="p">}</span>
+    <span class="n">user1_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;attr1_val2&#39;</span><span class="p">,</span> <span class="s1">&#39;attr2_val4&#39;</span><span class="p">]</span>
+    <span class="n">user2_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;attr1_val2&#39;</span><span class="p">,</span> <span class="s1">&#39;attr2_val1&#39;</span><span class="p">]</span>
+
+    <span class="n">user1_ID</span> <span class="o">=</span> <span class="mi">123</span>
+    <span class="n">user2_ID</span> <span class="o">=</span> <span class="mi">57534</span>
+    <span class="c1"># The access policy that will be used to encrypt the message</span>
+    <span class="n">access_policy</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;attr1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;val1&#39;</span><span class="p">,</span> <span class="s1">&#39;val2&#39;</span><span class="p">],</span>  <span class="c1"># Set of attributes allowed for &#39;attr1&#39; in the access policy.</span>
+                     <span class="s1">&#39;attr2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;val4&#39;</span><span class="p">]</span>  <span class="c1"># Set of attributes allowed for &#39;attr2&#39; in the access policy.</span>
+                     <span class="p">}</span>
+    <span class="n">attr1</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;attr1&#39;</span><span class="p">,</span> <span class="n">attr1_values</span><span class="p">)</span>
+    <span class="n">attr2</span> <span class="o">=</span> <span class="n">Attribute</span><span class="p">(</span><span class="s1">&#39;attr2&#39;</span><span class="p">,</span> <span class="n">attr2_values</span><span class="p">)</span>
+    <span class="n">attr1_values</span> <span class="o">=</span> <span class="n">attr1</span><span class="o">.</span><span class="n">get_attribute_values_full_name</span><span class="p">()</span>
+    <span class="n">attr2_values</span> <span class="o">=</span> <span class="n">attr2</span><span class="o">.</span><span class="n">get_attribute_values_full_name</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;attribute 1 full values names: &quot;</span><span class="p">,</span> <span class="n">attr1_values</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;attribute 2 full values names: &quot;</span><span class="p">,</span> <span class="n">attr2_values</span><span class="p">)</span>
+    <span class="n">group_obj</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+    <span class="n">cp_hiding_ABE</span> <span class="o">=</span> <span class="n">CP_Hiding_Accountability_ABE</span><span class="p">(</span><span class="n">group_obj</span><span class="p">)</span>
+    <span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">attributes_dict</span><span class="p">)</span>  <span class="c1"># TA&#39;s MSK, PK</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MSK: &quot;</span><span class="p">,</span> <span class="n">MSK</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PK: &quot;</span><span class="p">,</span> <span class="n">PK</span><span class="p">)</span>
+
+    <span class="n">user1_ID</span> <span class="o">=</span> <span class="n">group_obj</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">user1_ID</span><span class="p">)</span>
+    <span class="n">user2_ID</span> <span class="o">=</span> <span class="n">group_obj</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">user2_ID</span><span class="p">)</span>
+
+    <span class="n">user1_SK</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">key_gen</span><span class="p">(</span><span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">user1_ID</span><span class="p">,</span> <span class="n">user1_attributes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;user1 SK: &#39;</span><span class="p">,</span> <span class="n">user1_SK</span><span class="p">)</span>
+    <span class="n">user2_SK</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">key_gen</span><span class="p">(</span><span class="n">MSK</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">user2_ID</span><span class="p">,</span> <span class="n">user2_attributes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;user2 SK: &#39;</span><span class="p">,</span> <span class="n">user1_SK</span><span class="p">)</span>
+    <span class="n">rand_msg</span> <span class="o">=</span> <span class="n">group_obj</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+    <span class="n">CT</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">rand_msg</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CT: &quot;</span><span class="p">,</span> <span class="n">CT</span><span class="p">)</span>
+    <span class="n">recovered_message</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">user1_SK</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;recovered message: &quot;</span><span class="p">,</span> <span class="n">recovered_message</span><span class="p">)</span>
+    <span class="c1"># No error is generated since user 1&#39;s attributes matches the access policy embedded inside the CT.</span>
+    <span class="k">assert</span> <span class="n">recovered_message</span> <span class="o">==</span> <span class="n">rand_msg</span><span class="p">,</span> <span class="s2">&quot;Random message does not match the recovered message&quot;</span>
+
+    <span class="c1"># User 2 tries to decrypt CT.</span>
+    <span class="n">recovered_message</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CT</span><span class="p">,</span> <span class="n">PK</span><span class="p">,</span> <span class="n">user2_SK</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;recovered message: &quot;</span><span class="p">,</span> <span class="n">recovered_message</span><span class="p">)</span>
+    <span class="c1"># An error is generated since user 2 does not have the required attributes to decrypt CT.</span>
+    <span class="c1"># assert recovered_message == rand_msg, &quot;Random message does not match the recovered message&quot;  # Uncomment to raise the error.</span>
+
+    <span class="n">authentic_user_IDs_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">123</span><span class="p">]</span>
+    <span class="c1"># User 2&#39;s ID is not in the authentic list, which means that his ID is fabricated and this malicious action is</span>
+    <span class="c1"># traced to the TA.</span>
+    <span class="n">misbehaving_result</span> <span class="o">=</span> <span class="n">cp_hiding_ABE</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">user2_SK</span><span class="p">,</span> <span class="n">authentic_user_IDs_list</span><span class="p">,</span> <span class="n">PK</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Misbehaving result for user2 SK: &quot;</span><span class="p">,</span> <span class="n">misbehaving_result</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***********************************************************************************************************&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2013-2026, Johns Hopkins University ISI
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Jan 25, 2026</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=7366d2df"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
