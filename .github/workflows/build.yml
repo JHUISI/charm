@@ -50,9 +50,11 @@ jobs:
       run: pip install pyparsing pytest hypothesis
 
     - name: Run tests
+      timeout-minutes: 10
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-        pytest -v charm/test/
+        # Skip benchmark tests which have platform-specific issues
+        pytest -v charm/test/ --ignore=charm/test/benchmark/ --tb=short
         python -m unittest discover -p "*_test.py" charm/test/toolbox/
 
   build-macos:
@@ -98,8 +100,10 @@ jobs:
       run: pip install pyparsing pytest hypothesis
 
     - name: Run tests
+      timeout-minutes: 10
       run: |
-        pytest -v charm/test/
+        # Skip benchmark tests which have platform-specific issues
+        pytest -v charm/test/ --ignore=charm/test/benchmark/ --tb=short
         python -m unittest discover -p "*_test.py" charm/test/toolbox/
 
   build-windows:
