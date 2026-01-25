@@ -1,0 +1,79 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+    branches: [main, dev, explore/pip-charm-crypto]
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgmp-dev libssl-dev flex bison libfl-dev
+
+    - name: Build and install PBC library
+      run: |
+        wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
+        tar -xzf pbc-1.0.0.tar.gz
+        cd pbc-1.0.0
+        ./configure
+        make -j$(nproc)
+        sudo make install
+        sudo ldconfig
+
+    - name: Configure charm-crypto
+      run: ./configure.sh
+
+    - name: Build C extensions
+      run: |
+        pip install --upgrade pip setuptools wheel
+        python setup.py build_ext --inplace
+
+    - name: Install Python dependencies
+      run: |
+        pip install pyparsing sphinx furo
+
+    - name: Build documentation
+      run: |
+        cd doc
+        make html
+      env:
+        LD_LIBRARY_PATH: /usr/local/lib
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: doc/build/html
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build-docs
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
