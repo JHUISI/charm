@@ -1050,7 +1050,7 @@
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.42</string>
+				<string>.60</string>
 			</dict>
 			<key>UUID</key>
 			<string>0E0E1076-412E-4E09-8CA8-1BCF8565C1E0</string>
@@ -27371,11 +27371,11 @@
 				<key>LOCATION</key>
 				<integer>0</integer>
 				<key>NAME</key>
-				<string>Python 3.2 Installer</string>
+				<string>Python 3.x Installer</string>
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.42</string>
+				<string>.60</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -33036,11 +33036,11 @@
 				<key>LOCATION</key>
 				<integer>0</integer>
 				<key>NAME</key>
-				<string>Python 2.7 Lion</string>
+				<string>Python 2.7 Lion (Deprecated)</string>
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>VERSION</key>
-				<string>.42</string>
+				<string>.60</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -33695,9 +33695,9 @@
 							<key>LANGUAGE</key>
 							<string>English</string>
 							<key>SECONDARY_VALUE</key>
-							<string>Please install either of the above Python versions via Mac Ports (recommended) or by Python Installers found on python.org.  Then run this installer again.</string>
+							<string>Please install Python 3.9 or later via Homebrew (recommended) or from python.org. Then run this installer again.</string>
 							<key>VALUE</key>
-							<string>Python 2.7 or 3.2 required for this installation!</string>
+							<string>Python 3.9+ required for this installation!</string>
 						</dict>
 					</array>
 					<key>NAME</key>
