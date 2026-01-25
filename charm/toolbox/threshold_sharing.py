@@ -1,20 +1,57 @@
-"""
+'''
 Threshold Secret Sharing for DKLS23 and Threshold ECDSA
+
+| From: "How to Share a Secret" (Shamir Secret Sharing)
+| By:   Adi Shamir
+| Published: Communications of the ACM, 1979
+| URL:  https://dl.acm.org/doi/10.1145/359168.359176
+|
+| Feldman VSS from:
+| "A Practical Scheme for Non-interactive Verifiable Secret Sharing"
+| By:   Paul Feldman
+| Published: FOCS 1987
+| URL:  https://ieeexplore.ieee.org/document/4568297
+|
+| Pedersen Commitments from:
+| "Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing"
+| By:   Torben Pryds Pedersen
+| Published: CRYPTO 1991
+| URL:  https://link.springer.com/chapter/10.1007/3-540-46766-1_9
+
+* type:          secret sharing
+* setting:       Elliptic Curve group
+* assumption:    DLP (for Feldman VSS)
 
 This module extends Shamir secret sharing for threshold ECDSA requirements,
 providing Feldman VSS, Pedersen commitments, and EC group element support.
-"""
+'''
+
+from typing import Dict, List, Tuple, Any, Optional
 
 from charm.toolbox.ecgroup import ECGroup, ZR, G
 from charm.toolbox.eccurve import secp256k1
 from charm.toolbox.secretshare import SecretShare
 
+# Type alias for ZR elements (scalar field elements)
+ZRElement = Any
+# Type alias for G elements (group/curve points)
+GElement = Any
+# Type alias for ECGroup objects
+ECGroupType = Any
+# Type alias for party identifiers
+PartyId = int
+
 
 class ThresholdSharing:
     """
     Enhanced secret sharing for threshold ECDSA
-    
-    Supports Feldman VSS and operations on EC groups
+
+    Supports Feldman VSS and operations on EC groups.
+
+    Curve Agnostic
+    --------------
+    This implementation supports any elliptic curve group that is DDH-hard.
+    The curve is specified via the groupObj parameter.
     
     >>> from charm.toolbox.eccurve import secp256k1
     >>> group = ECGroup(secp256k1)
@@ -33,51 +70,67 @@ class ThresholdSharing:
     True
     """
     
-    def __init__(self, groupObj):
+    def __init__(self, groupObj: ECGroupType) -> None:
         """
         Initialize threshold sharing with an EC group
-        
+
         Args:
             groupObj: An ECGroup instance (e.g., ECGroup(secp256k1))
+
+        Raises:
+            ValueError: If groupObj is None
         """
+        if groupObj is None:
+            raise ValueError("groupObj cannot be None")
         self.group = groupObj
         self.order = groupObj.order()
         
-    def _eval_polynomial(self, coeffs, x):
+    def _eval_polynomial(self, coeffs: List[ZRElement], x: Any) -> ZRElement:
         """
-        Evaluate polynomial at point x
-        
+        Evaluate polynomial at point x using Horner's method
+
+        This method computes f(x) = a_0 + a_1*x + a_2*x^2 + ... + a_{t-1}*x^{t-1}
+        using Horner's method for optimal efficiency.
+
+        Horner's method rewrites the polynomial as:
+        f(x) = a_0 + x*(a_1 + x*(a_2 + ... + x*a_{t-1}))
+
+        This reduces the number of multiplications from 2n to n-1.
+
         Args:
             coeffs: List of coefficients [a_0, a_1, ..., a_{t-1}]
             x: Point to evaluate at (ZR element or int)
-        
+
         Returns:
             Polynomial value at x
         """
+        if not coeffs:
+            return self.group.init(ZR, 0)
+
         if isinstance(x, int):
             x = self.group.init(ZR, x)
-        
-        result = self.group.init(ZR, 0)
-        x_power = self.group.init(ZR, 1)
-        
-        for coeff in coeffs:
-            result = result + (coeff * x_power)
-            x_power = x_power * x
-            
+
+        # Start with the highest degree coefficient
+        result = coeffs[-1]
+
+        # Work backwards through coefficients: result = result * x + a_i
+        for i in range(len(coeffs) - 2, -1, -1):
+            result = result * x + coeffs[i]
+
         return result
     
-    def share(self, secret, threshold, num_parties):
+    def share(self, secret: ZRElement, threshold: int, num_parties: int) -> Dict[int, ZRElement]:
         """
         Basic Shamir secret sharing
-        
+
         Args:
             secret: The secret to share (ZR element)
             threshold: Minimum number of shares needed to reconstruct (t)
             num_parties: Total number of parties (n)
-            
+
         Returns:
             Dictionary mapping party_id (1 to n) to share values
-            
+
         >>> from charm.toolbox.eccurve import secp256k1
         >>> group = ECGroup(secp256k1)
         >>> ts = ThresholdSharing(group)
@@ -93,6 +146,8 @@ class ThresholdSharing:
             raise ValueError("threshold cannot exceed num_parties")
         if threshold < 1:
             raise ValueError("threshold must be at least 1")
+        if threshold > 256:
+            raise ValueError(f"Threshold {threshold} exceeds safe limit of 256 for polynomial evaluation")
             
         # Generate random polynomial coefficients: a_0 = secret, a_1...a_{t-1} random
         coeffs = [secret]
@@ -106,7 +161,7 @@ class ThresholdSharing:
             
         return shares
     
-    def share_with_verification(self, secret, generator, threshold, num_parties):
+    def share_with_verification(self, secret: ZRElement, generator: GElement, threshold: int, num_parties: int) -> Tuple[Dict[int, ZRElement], List[GElement]]:
         """
         Feldman VSS - shares with public commitments for verification
         
@@ -154,7 +209,7 @@ class ThresholdSharing:
             
         return shares, commitments
     
-    def verify_share(self, party_id, share, commitments, generator):
+    def verify_share(self, party_id: int, share: ZRElement, commitments: List[GElement], generator: GElement) -> bool:
         """
         Verify a share against Feldman commitments
         
@@ -182,7 +237,7 @@ class ThresholdSharing:
             
         return lhs == rhs
 
-    def reconstruct(self, shares, threshold):
+    def reconstruct(self, shares: Dict[int, ZRElement], threshold: int) -> ZRElement:
         """
         Reconstruct secret from threshold shares using Lagrange interpolation
 
@@ -218,7 +273,7 @@ class ThresholdSharing:
 
         return secret
 
-    def lagrange_coefficient(self, party_ids, i, x=0):
+    def lagrange_coefficient(self, party_ids: List[int], i: int, x: int = 0) -> ZRElement:
         """
         Compute Lagrange coefficient for party i at point x
 
@@ -252,7 +307,7 @@ class ThresholdSharing:
 
         return result
 
-    def add_shares(self, shares1, shares2):
+    def add_shares(self, shares1: Dict[int, ZRElement], shares2: Dict[int, ZRElement]) -> Dict[int, ZRElement]:
         """
         Add two sets of shares (for additive share combination)
 
@@ -285,7 +340,7 @@ class ThresholdSharing:
 
         return combined
 
-    def refresh_shares(self, shares, threshold):
+    def refresh_shares(self, shares: Dict[int, ZRElement], threshold: int) -> Dict[int, ZRElement]:
         """
         Refresh shares for proactive security
 
@@ -351,7 +406,7 @@ class PedersenVSS(ThresholdSharing):
     True
     """
 
-    def share_with_blinding(self, secret, g, h, threshold, num_parties):
+    def share_with_blinding(self, secret: ZRElement, g: GElement, h: GElement, threshold: int, num_parties: int) -> Tuple[Dict[int, ZRElement], Dict[int, ZRElement], List[GElement]]:
         """
         Share with Pedersen commitments (information-theoretically hiding)
 
@@ -415,7 +470,7 @@ class PedersenVSS(ThresholdSharing):
 
         return shares, blindings, commitments
 
-    def verify_pedersen_share(self, party_id, share, blinding, commitments, g, h):
+    def verify_pedersen_share(self, party_id: int, share: ZRElement, blinding: ZRElement, commitments: List[GElement], g: GElement, h: GElement) -> bool:
         """
         Verify a share against Pedersen commitments
 
@@ -454,7 +509,7 @@ class PedersenVSS(ThresholdSharing):
 
         return lhs == rhs
 
-    def combine_pedersen_commitments(self, commitments_list):
+    def combine_pedersen_commitments(self, commitments_list: List[List[GElement]]) -> List[GElement]:
         """
         Combine multiple Pedersen commitments (for DKG)
 
