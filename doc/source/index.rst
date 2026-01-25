@@ -6,8 +6,8 @@ Charm-Crypto Docs!
 
 Welcome! This is the documentation for the Charm-Crypto framework. Please contact us at jakinye3@jhu.edu if you have any questions and/or comments.
 
-Users
------
+What's New
+----------
 
 .. toctree::
    :maxdepth: 1
@@ -35,6 +35,7 @@ Cryptographic Schemes
    :maxdepth: 1
 
    schemes
+   test_vectors
    adapters
    test_schemes
 
