@@ -124,9 +124,9 @@ signature = bls.sign(sk['x'], attestation)
 assert bls.verify(pk, signature, attestation)
 ```
 
-### ECDSA with secp256k1 (Bitcoin, Ethereum, XRPL)
+### ECDSA with secp256k1 (Bitcoin)
 
-ECDSA on secp256k1 — the curve used by Bitcoin, Ethereum, and XRP Ledger ([SEC 2](https://www.secg.org/sec2-v2.pdf)):
+ECDSA on secp256k1 — the curve used by Bitcoin ([SEC 2](https://www.secg.org/sec2-v2.pdf), [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki)):
 
 ```python
 import hashlib
@@ -135,7 +135,39 @@ from charm.toolbox.ecgroup import ECGroup
 from charm.toolbox.eccurve import secp256k1
 from charm.schemes.pksig.pksig_ecdsa import ECDSA
 
-# Initialize secp256k1 curve (used in Bitcoin, Ethereum, XRPL)
+group = ECGroup(secp256k1)
+ecdsa = ECDSA(group)
+
+# Bitcoin transaction (simplified)
+tx = {
+    'inputs': [{'txid': 'a1b2c3...', 'vout': 0, 'address': '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'}],
+    'outputs': [{'address': '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy', 'satoshis': 50000}],
+    'fee': 1000
+}
+
+# Serialize and double SHA-256 (SHA-256d) per Bitcoin protocol
+tx_bytes = json.dumps(tx, sort_keys=True).encode('utf-8')
+tx_hash = hashlib.sha256(hashlib.sha256(tx_bytes).digest()).hexdigest()
+
+(pk, sk) = ecdsa.keygen(0)
+signature = ecdsa.sign(pk, sk, tx_hash)
+assert ecdsa.verify(pk, signature, tx_hash)
+```
+
+> **Note:** Production Bitcoin implementations should use proper transaction serialization
+> per [Bitcoin Developer Documentation](https://developer.bitcoin.org/reference/transactions.html).
+
+### ECDSA with secp256k1 (XRPL)
+
+ECDSA on secp256k1 — also used by XRP Ledger ([SEC 2](https://www.secg.org/sec2-v2.pdf)):
+
+```python
+import hashlib
+import json
+from charm.toolbox.ecgroup import ECGroup
+from charm.toolbox.eccurve import secp256k1
+from charm.schemes.pksig.pksig_ecdsa import ECDSA
+
 group = ECGroup(secp256k1)
 ecdsa = ECDSA(group)
 
@@ -158,7 +190,7 @@ assert ecdsa.verify(pk, signature, tx_hash)
 ```
 
 > **Note:** Production XRPL implementations should use canonical binary serialization
-> and the full signing process per [XRPL documentation](https://xrpl.org/serialization.html).
+> per [XRPL documentation](https://xrpl.org/serialization.html).
 
 ## Schemes
 
