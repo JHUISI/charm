@@ -44,7 +44,7 @@ extern "C" {
 #include <stdlib.h>
 #include <errno.h>
 
-#define DEBUG	1
+/* DEBUG is now controlled via compiler flag -DDEBUG=1 */
 
 #if defined(BUILD_PAIR) && defined(BUILD_PBC)
 
@@ -100,11 +100,28 @@ typedef enum _result_type {
 
 typedef PyObject Charm_t; // user facing abstraction for Python
 
-#ifdef DEBUG
+/*
+ * Debug output macro - disabled by default for production.
+ * To enable debug output, compile with -DDEBUG=1
+ */
+#if defined(DEBUG) && DEBUG
 #define debug(...)	printf("DEBUG: "__VA_ARGS__)
 #else
 #define debug(...)
 #endif
+
+/*
+ * Thread Safety Warning:
+ * The Charm embed API is NOT thread-safe. The Python GIL (Global Interpreter
+ * Lock) must be held when calling any Charm API functions. If using multiple
+ * threads, you must use PyGILState_Ensure() and PyGILState_Release() to
+ * acquire and release the GIL around Charm API calls.
+ *
+ * Example:
+ *   PyGILState_STATE gstate = PyGILState_Ensure();
+ *   // ... call Charm API functions ...
+ *   PyGILState_Release(gstate);
+ */
 
 
 /* wrappers to initialize/tear down Python environment & paths */

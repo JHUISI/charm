@@ -1,3 +1,34 @@
+/*
+ * Charm-Crypto is a framework for rapidly prototyping cryptosystems.
+ *
+ * Charm-Crypto is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * Charm-Crypto is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Charm-Crypto. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Please contact the charm-crypto dev team at support@charm-crypto.com
+ * for any questions.
+ */
+
+/*
+ *   @file    test.c
+ *
+ *   @brief   Example usage of the Charm embed API for C/C++ applications
+ *
+ *   @author  ayo.akinyele@charm-crypto.com
+ *
+ *   This file demonstrates how to use the Charm embed API to perform
+ *   attribute-based encryption (ABE) operations from C code.
+ *
+ ************************************************************************/
 
 #define DEBUG 1
 #include "charm_embed_api.h"
@@ -49,6 +80,8 @@ int runABETest(Charm_t *pGroup)
     Free(pValue2);
     Free(pValue3);
     Free(pValue4);
+    Free(msg);
+    Free(ctDict);
     Free(skDict);
     Free(pkDict);
     Free(mskDict);
@@ -116,8 +149,8 @@ int runHybridABETest(Charm_t *pGroup)
     Free(pValue);
     Free(pValue1);
     Free(pValue2);
-    //Free(pValue3);
     Free(rec_msg);
+    Free(ctDict);
     Free(skDict);
     Free(pkDict);
     Free(mskDict);
