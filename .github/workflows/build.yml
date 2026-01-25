@@ -139,7 +139,8 @@ jobs:
         cd pbc-1.0.0
         # Use --disable-static --enable-shared to avoid gmp.h conflict on Windows
         # Add /usr/lib to LDFLAGS so configure can find libfl (flex library) from MSYS
-        ./configure --prefix=/mingw64 --disable-static --enable-shared LDFLAGS="-L/usr/lib"
+        # Add --disable-dependency-tracking to fix autotools issue on Windows
+        ./configure --prefix=/mingw64 --disable-static --enable-shared --disable-dependency-tracking LDFLAGS="-L/usr/lib"
         make -j$(nproc)
         make install
 
