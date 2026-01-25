@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
     InitializeCharm();
 
-    pGroup = InitPairingGroup(pModule, "SS512");
+    pGroup = InitPairingGroup(pModule, "BN254");
     if(pGroup == NULL) {
         printf("could not import pairing group.\n");
         return -1;

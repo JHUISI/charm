@@ -285,7 +285,8 @@ Charm_t *InitScheme(const char *class_file, const char *class_name, Charm_t *pOb
 
     	if (pFunc && PyCallable_Check(pFunc)) {
             pArgs = PyTuple_New(1);
-            /* pValue reference stolen here: */
+            /* PyTuple_SetItem steals reference, so incref to keep pObject valid */
+            Py_INCREF(pObject);
             PyTuple_SetItem(pArgs, 0, pObject);
             debug("calling class init.\n");
         	// instantiate pValue = ClassName( pObject )
@@ -329,7 +330,9 @@ Charm_t *InitAdapter(const char *class_file, const char *class_name, Charm_t *pO
 
     	if (pFunc && PyCallable_Check(pFunc)) {
             pArgs = PyTuple_New(2);
-            /* pObject1 & pObject2 reference stolen here: note might need to Py_INCREF before this point. */
+            /* PyTuple_SetItem steals references, so incref to keep pObjects valid */
+            Py_INCREF(pObject1);
+            Py_INCREF(pObject2);
             PyTuple_SetItem(pArgs, 0, pObject1);
             PyTuple_SetItem(pArgs, 1, pObject2);
             debug("calling class init.\n");
@@ -407,8 +410,9 @@ Charm_t *CallMethod(Charm_t *pObject, const char *func_name, char *types, ...)
 					   free(list2);
 					   break;
 			case 'O':  o = va_arg(arg_list, PyObject *);
+					   /* Note: PyList_Append does NOT steal reference, so don't Free(o)
+					    * The caller owns the object and is responsible for freeing it */
 					   PyList_Append(pArgs, o);
-					   Free(o);
 					   break;
 			default:
 					 break;
@@ -437,14 +441,22 @@ Charm_t *CallMethod(Charm_t *pObject, const char *func_name, char *types, ...)
 
 Charm_t *GetIndex(Charm_t *pObject, int index)
 {
+	PyObject *item = NULL;
 	if(PyTuple_Check(pObject)) {
 		if(index < PyTuple_Size(pObject)) {
-		   /* return borrowed reference */
-		   return PyTuple_GetItem(pObject, index);
+		   /* PyTuple_GetItem returns borrowed reference, so incref for caller */
+		   item = PyTuple_GetItem(pObject, index);
+		   if (item) Py_INCREF(item);
+		   return item;
 		}
 	}
 	else if(PyList_Check(pObject)) {
-		/* handle this case too */
+		if(index < PyList_Size(pObject)) {
+		   /* PyList_GetItem returns borrowed reference, so incref for caller */
+		   item = PyList_GetItem(pObject, index);
+		   if (item) Py_INCREF(item);
+		   return item;
+		}
 	}
 
 	return NULL;
@@ -453,7 +465,10 @@ Charm_t *GetIndex(Charm_t *pObject, int index)
 Charm_t *GetDict(Charm_t *pObject, char *key)
 {
 	if(PyDict_Check(pObject)) {
-		return PyDict_GetItemString(pObject, key);
+		/* PyDict_GetItemString returns borrowed reference, so incref for caller */
+		PyObject *item = PyDict_GetItemString(pObject, key);
+		if (item) Py_INCREF(item);
+		return item;
 	}
 
 	return NULL;

@@ -1,10 +1,13 @@
 CONFIG_FILE=../config.mk
 include ${CONFIG_FILE}
 
-LIBS=-L/usr/local/lib -L/opt/local/lib -lpthread -ldl  -lutil -lm -lgmp -lpbc
+# Get Python library from python-config
+PY_LIB=$(shell python3-config --ldflags --embed 2>/dev/null || python3-config --ldflags)
+LIBS=-L/usr/local/lib -L/opt/local/lib -lpthread -ldl -lutil -lm -lgmp -lpbc ${PY_LIB}
 OPTS=-DDYNAMIC_ANNOTATIONS_ENABLED=1 -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes
 
-CFLAGS+=${PY_CFLAGS}
+# Include CPPFLAGS for GMP/OpenSSL headers from config.mk
+CFLAGS+=${PY_CFLAGS} ${CPPFLAGS}
 
 LDFLAGS+=${PY_LDFLAGS}
 LDFLAGS+=${LIBS}
