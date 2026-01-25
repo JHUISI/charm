@@ -129,6 +129,8 @@ assert bls.verify(pk, signature, attestation)
 ECDSA on secp256k1 — the curve used by Bitcoin, Ethereum, and XRP Ledger ([SEC 2](https://www.secg.org/sec2-v2.pdf)):
 
 ```python
+import hashlib
+import json
 from charm.toolbox.ecgroup import ECGroup
 from charm.toolbox.eccurve import secp256k1
 from charm.schemes.pksig.pksig_ecdsa import ECDSA
@@ -137,13 +139,20 @@ from charm.schemes.pksig.pksig_ecdsa import ECDSA
 group = ECGroup(secp256k1)
 ecdsa = ECDSA(group)
 
-# Sign a blockchain transaction
-tx = '{"from":"0x1a2b...","to":"0x3c4d...","value":"1.5","nonce":42}'
+# Ethereum-style transaction
+tx = {'from': '0x1a2b...', 'to': '0x3c4d...', 'value': 1.5, 'nonce': 42}
+
+# Serialize and hash (Ethereum uses RLP + Keccak256; simplified here)
+tx_bytes = json.dumps(tx, sort_keys=True).encode('utf-8')
+tx_hash = hashlib.sha256(tx_bytes).hexdigest()
 
 (pk, sk) = ecdsa.keygen(0)
-signature = ecdsa.sign(pk, sk, tx)
-assert ecdsa.verify(pk, signature, tx)
+signature = ecdsa.sign(pk, sk, tx_hash)
+assert ecdsa.verify(pk, signature, tx_hash)
 ```
+
+> **Note:** Production implementations should use chain-specific serialization
+> (e.g., RLP for Ethereum, Bitcoin Script for Bitcoin) and hashing (Keccak-256, SHA-256d).
 
 ## Schemes
 
