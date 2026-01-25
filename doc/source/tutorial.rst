@@ -204,4 +204,4 @@ If you would like to define your own custom serialization routine in conjunction
 	orig_pk = bytesToObject(pk_bytes, serObject) 
 
 			
-Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com. Thank you!
+Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at jakinye3@jhu.edu. Thank you!

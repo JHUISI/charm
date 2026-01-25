@@ -263,5 +263,5 @@ For the pairing base module, we now support pre-computation tables for group exp
 	
 
 
-Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at support@charm-crypto.com.
+Feel free to send us suggestions, bug reports, issues and scheme implementation experiences within Charm at jakinye3@jhu.edu.
 

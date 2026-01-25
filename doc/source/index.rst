@@ -3,7 +3,7 @@
 Charm-Crypto Docs!
 ========================================
 .. sectionauthor:: J. Ayo Akinyele
-Welcome! This is the documenation for the Charm-Crypto framework. Please contact us at support@charm-crypto.com, if you have any questions and/or comments.
+Welcome! This is the documentation for the Charm-Crypto framework. Please contact us at jakinye3@jhu.edu if you have any questions and/or comments.
 
 Users:
 

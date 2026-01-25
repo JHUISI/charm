@@ -7,7 +7,7 @@ This guide provides installation instructions for building Charm-Crypto from sou
 on various platforms. Charm automates much of the build process through its configure
 and make scripts.
 
-If you encounter any issues not covered here, please contact us at support@charm-crypto.com.
+If you encounter any issues not covered here, please contact us at jakinye3@jhu.edu.
 
 Dependencies
 ------------
