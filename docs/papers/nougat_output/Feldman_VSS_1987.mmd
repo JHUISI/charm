@@ -1,0 +1,389 @@
+**A Practical Scheme for Non-interactive Verifiable Secret Sharing**
+
+Paul Feldman
+
+Massachusetts Institute of Technology
+
+**Abstract: This paper presents an extremely efficient, non-interactive protocol for verifiable secret sharing. Verifiable secret sharing (VSS) is a way of bequeathing information to a set of processors such that a quorum of processors is needed to access the information. VSS is a fundamental tool of cryptography and distributed computing. Seemingly difficult problems such as secret bidding, fair voting, leader election, and flipping a fair coin have simple one-round reductions to VSS. There is a constant-round reduction from Byzantine Agreement to non-interactive VSS. Non-interactive VSS provides asynchronous networks with a constant-round simulation of simultaneous broadcast networks whenever even a bare majority of processors are good. VSS is constantly repeated in the simulation of fault-free protocols by faulty systems. As verifiable secret sharing is a bottleneck for so many results, it is essential to find efficient solutions.**
+
+**1. Introduction**
+
+**1.1 The Problem**
+
+Informally, verifiable secret sharing is a protocol in which a distinguished processor, or _dealer_, selects and encrypts a "secret message", \(s\), and gives a "share" of \(s\) to each of \(n\) processors. There exist parameters \(t\),\(u\) such that no \(t\) processors can recover \(s\), but any set of \(u\) processors are guaranteed that they can easily compute \(s\). When \(u\)==\(t\)+1, we say \(t\) is a _threshold_. The efficiency of a VSS protocol is measured by other parameters as well:
+
+1. The number of rounds of communication required.
+
+2. The number of bits which must be communicated between processors.
+
+3. The number of computations the processors must do.
+
+Another important characteristic is the way in which the processors are guaranteed that they can recover the secret from their shares. All previous schemes have been _interactive_; the validity of a share is proven by an interactive protocol. Here we introduce the concept of a non-interactive VSS, in which a share "proves its own validity". This widens the applicability of VSS to scenarios in which interaction is infeasible, such as sharing a secret among an entire nation. Also, several executions of non-interactive protocols may be run in parallel. By contrast, interactive schemes may have to be run serially. Thus, non-interaction allows us to use VSS as a subroutine without increasing the round complexity.
+
+**1.2 History of the Problem**
+
+Chor, Goldwasser, Micali, and Awerbuch [CGMA] introduced the notion of VSS. They present a constant round interactive scheme for verifiable secret sharing based on the assumed intractability of factorization. In their solution, \(t\)==\(O(\mathit{logn})\), \(u\)==\(O(n)\); the communication complexity is exponential in \(t\).
+
+The powerful zero-knowledge proof system of Goldreich, Micali and Wigderson [GMW] can be used to create a constant round interactive verifiable secret sharing protocol for any threshhold \(t\). Their solution may be based on the existence of any one-way function.
+
+Benaloh [Be] assumes a reliable public "beacon", and uses it to demonstrate a verifiable secret sharing for any threshold \(t\) running in a constant number of rounds. The beacon may be replaced by an interactive verification. This VSS assumes the existence of hard-to-invert encryption functions with certain properties.
+
+Our contribution is the first non-interactive VSS protocol. Our protocol measures favorably on all of the above parameters. The protocol works for any threshhold \(t\) and requires 2 rounds of communication. The communication and computation complexity are small, \(O(\mathit{nk})\) and \(O((\mathit{nlogn}+k)(\mathit{nklogk}))\) respectively, where \(k\) is a security parameter (we assume unit cost for broadcasts). We assume the existence of hard-to-invert encryption functions with certain properties; we show that discrete log encryption in either finite fields or on elliptic curves, encryption based on \(r\)-th residues, and RSA all have the required properties.
+
+**2. Preliminaries**
+
+**2.1 The Network**
+
+We consider a network of \(n\) processors with identities 1,2,...,n. Each processor, or _player_, is a probabilistic polynomial-time algorithm (PPTA). We assume that every processor has a _broadcast channel_; a message sent on such a channel is received by all processors. Additionally, we assume that there is a private channel from each processor to every other processor. We consider a _semi-synchronous_ network. Messages sent at the \(r\)-th pulse are received by the \(r\)+1-st pulse. The period between the \(r\)-th and \(r\)+1st pulses is called the \(r\)-th _round_. We shall see, in Section 7, that the assumptions of the broadcast channels and private channels may be relaxed; a complete network is sufficient. A processor may initiate a protocol \(P\) with _common input_\(z\) by broadcasting \(P,x\). A protocol is _non-interacting_ if all messages are sent by one processor (_the leader_).
+
+A processor is considered _good_ as long as he has followed the protocol, and _faulty_ once he has deviated from the protocol. The most general (and difficult to guard against) faulty behavior occurs when an adversary coordinates the faulty processors.
+
+**Definition:** A _(static) \(t\)-adversary acting on \(P\) is a PPTA \(A\)_, which need not be one of the \(n\) processors, such that \(1.\ A\) can immediately read any message sent on a non-private channel.
+
+**2.** At pulse \(0\), \(A\) takes as input the common input \(z\) and outputs a \(t\)-tuple of processor identities, \((a_{1},\)...,\(a_{t})\), which are immediately _corrupted_. When \(i\) is corrupted, his current state and the contents of his tapes become inputs of \(A\). \(A\) can replace \(i\)'s finite state control with any other finite state control. Without loss of generality, \(A\) sends messages to \(i\), which \(i\) copies instantaneously onto its output tapes.
+
+As a PPTA, \(A\) has an output tape; this enables us to formalize the concept that \(A\) must "know" something by saying that \(A\) outputs it.
+
+We say that \(A\) is a _dynamic \(t\)-adversary_ if \(A\) may corrupt as many as \(t\) processors in the network at any time. When \(A\) corrupts a processor \(i\) during \(P\), \(A\) receives as input only's current (and future) state(s) and tapes.
+
+**2.2 Polynomial Time and the Security Parameter**
+
+All cryptographic protocols must assume bounds on the computational power of the players. A parameter of the protocol is a _security parameter_\(k\). Informally, any particular adversary has a _good_ chance of "defeating" the protocol only for sufficiently small values of \(k\).
+
+We assume the existence of polynomials \(Q_{0}\)= \(Q_{0}(n,k)\), \(Q_{1}\)= \(Q_{1}(n,k)\) such that all processors can execute \(Q_{0}(n,k)\) steps between pulses, and no processor, or the adversary, can execute \(Q_{1}(n,k)\) steps between pulses. An algorithm is _polynomial-time_ if there exists a polynomial \(Q\) such that \(Q(s)\) is an upper bound on its running time on inputs of length \(s\). Whenever we say that \(k\) is an input to an algorithm, we refer to the \(k\)-bit string 111...1.
+
+**2.3 Mathematical Notation**
+
+For a _language_\(L\), \(L_{k}\) consists of all \(k\)-bit strings in \(L\). For a string \(a\), \(|a|\) is the number of bits in \(a\). Implicit in the notation \(\{a,b,...\}\)\(\subset\)\(S\) is the fact that \(a,b,...\) are distinct members of \(S\).
+
+A function \(U\) is a _probability distribution_ if it assigns to each \(Y\)\(\in\)\(\{0,1\}^{*}\) a non-negative value \(U(Y)\) such that \(\sum U(Y)\)=1.
+
+A _poly-size family of circuits_ is a family \(\textbf{C}\)= \(\{\bigcup\limits_{k\in Z}C_{k}\}\) of probabilistic circuits such that for some polynomial \(Q\), \(C_{k}\) has at most \(Q(k)\) inputs and gates.
+
+To emphasize that an algorithm \(A\) receives one input we write \(A(\cdot)\); if it receives two inputs we write \(A(\cdot)\) and so on. If \(U\) is a probability distribution, then \(Y\)=\(U\) denotes the algorithm which assigns to \(Y\) an element randomly selected according to \(U\); that is, \(Y\) is assigned the value \(X\) with probability \(U(X)\). If \(S\) is a finite set, then \((y_{1},\)...,\(y_{4})\)\(\leftarrow\)\(S\) assigns to \((y_{1},\)...,\(y_{4})\) a \(d\)-tuple of elements of \(S\) with uniform probability. We let \(Pr[J(X,Y,...):X\)\(\leftarrow\)\(S;Y\)\(\leftarrow\)\(T(X);\)...] denote the probability that the predicate \(J(X,Y,...)\) will be true, after the ordered (left to right) execution of \(X\)\(\leftarrow\)\(S\), \(Y\)\(\leftarrow\)\(T(X)\), etc.
+
+**2.4 Indistinguishability of Probability Distributions and Zero-Knowledge**
+
+Goldwasser, Micall, and Rackoff [GMR] define the notion of _computational indistinguishability_; we shall adapt their definition to our needs.
+
+Let \(\textbf{U}\)= \(\{\bigcup\limits_{x\in L}U_{x}\}\) and \(\textbf{V}\)= \(\{\bigcup\limits_{x\in L}V_{x}\}\) be families of probability distributions. Let \(\textbf{C}\) be a poly-size family of circuits, and let \(P(\textbf{C},\textbf{U},x)\)= \(Pr[b=0:Y\)\(\leftarrow\)\(U_{x};b\)\(\leftarrow\)\(C_{\|x|}(Y)]\). Intuitively, \(\textbf{U}\) and \(\textbf{V}\) are indistinguishable if, for large \(x\), \(C_{\|x|}\) cannot distinguish the output of \(U_{x}\) from the output of \(V_{x}\).
+
+**Definition:** Two families of probability distributions \(\textbf{U}\) and \(\textbf{V}\) over a language \(L\) are _indistinguishable_ if for any poly-size family of circuits \(\textbf{C}\), \(\textbf{V}\)\(\leftarrow\)\(0\), \(\exists\)\(k_{0}\)\(>\)\(k\)\(\geq\)\(k_{0}\)\(\Rightarrow\)\(Pr[|P(\textbf{C},\textbf{U},x)-P(\textbf{C},\textbf{V},x)|>\)\(k^{-};x\)\(\leftarrow\)\(L_{1}|<\)\(k^{-}\).
+
+This notion had already been used by Goldwasser and Micall [GM] in the context of encryption and by Yao [Y] in the context of pseudo-random number generation.
+
+Intuitively, a protocol is zero-knowledge if for any dynamic adversary \(A\) acting on it, there is a PPTA which could output strings indistinguishable from those output by \(A\). If all processors have initially blank tapes, then all protocols are zero-knowledge by this definition, since one can construct a PPTA simulating the entire network, including the adversary. Zero-knowledge becomes meaningful when we allow processors to start with private _auxiliary inputs_ which are not easily computable functions of the _common input_. For example, assuming \(NP\) is not contained in \(BPP\), one processor may start with a satisfying assignment of a SAT formula, where the formula is given as input to the network.
+
+We define zero-knowledge for a non-interactive protocol \(P\) in which all processors except the leader start with blank tapes. The leader, \(i\), runs a PPTA _Start_ on input \((k,n)\), where \(k\) is the security parameter and \(n\) is the size of the network. The outputs of _Start_ are the common input to \(P\), \(z\), and an auxiliary input for \(i\). We assume that \(A\) may not corrupt \(i\). Let \(A\) output strings according to probability distribution \(U_{z}\) when \(P\) is initiated on input \(z\).
+
+**Definition:** A non-interactive protocol \(P\) is _\(t\)-zero-knowledge_ if for every dynamic \(t\)-adversary \(A\), there exists a PPTA \(A^{\prime}\) which takes as input \(z\)\(\in\)\(L\) and outputs strings according to \(V_{z}\) such that the families of probability distributions \((U_{z})\) and \((V_{z})\) are indistinguishable.
+
+## 3 Verifiable Secret Sharing
+
+We begin by describing ordinary secret sharing in a framework which generalizes naturally to VSS.
+
+### Ordinary Secret Sharing
+
+Ordinary secret sharing enables a dealer to split information among a network so that a quorum of processors is needed to recover the information. An \((n,t,u)\) secret sharing is a pair of PPTAs \((\mathit{Share}(\cdot,\cdot),\mathit{Recover}(\cdot\cdot\cdot))\); _Recover_ takes \(u+1\) inputs and is deterministic. The first input of both \(\mathit{Share}\) and \(\mathit{Recover}\) is \(\mathit{x}\)\(\in\)\(L\) for some language \(L\). We call \(\mathit{MES}_{s}\)=Domain(\(\mathit{Share}(\mathit{x},\cdot)\)) the _message space_; \(\mathit{\langle MES_{s}|>1.}\)\(\mathit{CYPH}_{s}\)=Range(\(\mathit{Share}(\mathit{x},\cdot)\)) is the _expher-text space_. We consider a particular \(z\)\(\in\)\(L\) and omit the argument \(z\). The input of \(\mathit{Share}\) is a _secret w\(\mathit{MES}\)_, and _Share_ outputs an ordered \(n\)-tuple \((\mathit{d}_{1}\),...,\(\mathit{d}_{n})\)\(\in\)\(\mathit{CYPH}\). Each \(d_{i}\) is called a _piece_, or _share_, of \(w\). The input of \(\mathit{Recover}\) is a \(u\)-tuple of ordered pairs \(((a_{1},c_{1}),...,(a_{s},c_{s}))\), where \(a_{i}\)\(\in\)\([1,n]\), \(c_{i}\)\(\in\)\(\mathit{CYPH}\), and the \(a_{i}\) are distinct. The output is an element of \(\mathit{MES}\). When the input to \(\mathit{Recover}\) is any labelled subset of \(u\) pieces output by \(\mathit{Share}\) on input \(\mathit{w}\)_\(\mathit{MES}\), \(\mathit{Recover}\)_ outputs \(w\). Formally,
+
+\[(\mathit{d}_{1}\),...,\(\mathit{d}_{n})\)\(\leftarrow\)\(\mathit{Share}(w)\)\(\triangleright\)\(\langle\mathit{d}_{1},...,\mathit{d}_{n}\rangle\)\(\leftarrow\)\([1,n]\), \((2.1)\)
+
+\[\mathit{Recover}((\mathit{a}_{1},\mathit{d}_{a_{1}}),...,(\mathit{d}_{n}, \mathit{d}_{n}))=w.\]
+
+Finally, we require that \(w\) be hard to compute given only \(t\) pieces output by \(\mathit{Share}\); no static adversary should be able to guess \(w\) significantly better than randomly given \(t\) labelled pieces.
+
+**Definition:** We say \((\mathit{Share}(\cdot,\cdot),\mathit{Recover}(\cdot\cdot\cdot))\) is an \((n,t,u)\) secret sharing if for a language \(L\),
+
+1. \(\mathit{Y}\)\(\in\)\(L\)\(\triangleright\)\(\mathit{V}\)\(\mathit{MSES}_{s}\),\((\mathit{d}_{1},...,\mathit{d}_{n})\)\(\leftarrow\)\(\mathit{Share}(\mathit{x},w)\)\(\triangleright\)
+
+V \((\mathit{a}_{1},...,\mathit{a}_{n})\)\(\leftarrow\)\([1,n]\), \(\mathit{Recover}(\mathit{x},(\mathit{a}_{1},d_{a_{1}}),...,(\mathit{d}_{n},d_{n}))\)=\(w\).
+
+2. V PPTA\((\cdot)\), \(\mathit{Guess}(\cdot\cdot\cdot),\mathit{V}\)\(\triangleright\)\(\mathit{0}\), \(\exists\)\(\mathit{k}_{0}\), \(\mathit{\mid}\)\(\mathit{x}\)\(\triangleright\)\(\mathit{k}_{0}\)\(\Rightarrow\)
+
+Pr\([\mathit{w}\)= \(\mathit{Guess}(\mathit{x},(\mathit{a}_{1},\mathit{d}_{a}),...,(\mathit{a}_{t}, \mathit{d}_{n}))\): \((\mathit{a}_{1},...,\mathit{d}_{t})\)\(\leftarrow\)\(A(\mathit{x})\); \(\mathit{w}\)\(\leftarrow\)\(\mathit{MES}_{s}\); \((\mathit{d}_{1},...,\mathit{d}_{n})\)\(\leftarrow\)\(\mathit{Share}(\mathit{x},w)\)\(\mid\)\(<\)\(\mid\)\(\mathit{1}/\mathit{MSES}_{s}\)\(\mid\)\(\mid\)\(\mathit{x}\)\(\mid\)\(\leftarrow\)\(\cdot\).
+
+Later, we shall strengthen property 2, by allowing a dynamic adversary to choose which pieces of the secret to take as input.
+
+Shamir [S] presents an \((n,t,t+1)\) secret sharing for any threshhold \(t\). Let \(L\) be the set of prime numbers greater than \(n\). For \(p\)\(\in\)\(L\), we define \(\mathit{Share}\)=\(\mathit{Share}(\mathit{p},\cdot)\) as follows. The domain is \(\mathit{MES}\)=\(\mathit{Z}_{s}\). Protocol \(\mathit{Share}\), on input \(w\)\(\in\)\(\mathit{MES}\), sets \(\mathit{y}_{0}\)=\(w\) and lets \((\mathit{y}_{1},...,\mathit{y}_{t})\)\(\leftarrow\)\(\mathit{Z}_{s}\). Let \(Q(s)\) be the polynomial \(\sum\limits_{i=0}^{t}\mathit{y}_{i}s^{i}\). Then the output of \(\mathit{Share}\) is \(Q(1),Q(2),...,Q(n)\) mod \(p\). _Recover_ is polynomial interpolation, which is used to find \(Q(0)\)=\(w\). Informally, we argue that \(t\) pieces are no help in recovering \(w\). Given the value of \(Q\) at any \(t\) points, then the value at \(0\), namely \(\mathit{y}_{0}\)=\(w\), uniquely specifies a polynomial \(Q\). Since all other coefficients were chosen uniformly, the chance that a particular polynomial was picked is directly proportional to the probability that its constant term was the secret chosen. Therefore, seeing \(t\) pieces gives no additional information.
+
+An \((n,t,u)\) secret sharing \((\mathit{Share},\mathit{Recover})\) suggests a non-interactive protocol in which the leader, or _dealer_, can "split" a secret among \(n\) players in such a way that only a quorum of \(u\) can recover the secret. Namely, the dealer broadcasts \(\mathit{z}\) and sends piece \(\mathit{d}_{i}\) to player \(i\) via private channel. When \(u\) players wish to recover the secret, each broadcasts his labeled piece, and _Recover_ can be run to return the secret.
+
+Can this protocol be used if \(t\) players may be faulty? Not I is true that no set of \(t\) faulty players can recover the secret themselves. However, even if \(u\)\(<\)\(n-t\), in which case there are enough good players to recover the secret, bad players may interfere. For example, a bad player \(i\) may broadcast a spurious value in place of \(\mathit{d}_{i}\). Good players cannot distinguish good pieces from spurious pieces. If \(t\)=\(\theta(n)\), then a random \(u\)-tuple consists entirely of good players with exponentially small probability.
+
+Indeed, the dealer can prevent this problem by authenticating the pieces. In this way, good players could recognize which pieces truly came from the dealer. However, a more endemic problem is the following: what happens if the dealer is faulty? The good players themselves might get authenticated yet spurious pieces, and they will not be able to recover the secret. Depending on the behavior of _Recover_ on "invalid" inputs, the good players may not be aware that different sets of pieces would return different secrets. The secret returned could depend on which bad players chose to broadcast their authenticated, spurious pieces. The best kind of secret sharing would allow any player to verify during _Share_ whether or not his piece is valid; moreover, he should be able to check during _Recover_ whether or not the piece another player broadcast is valid.
+
+### Verifiable Secret Sharing
+
+Informally, a verifiable secret sharing protocol must meet the following two requirements:
+
+1. Verifiability constraint: upon receiving a share of the secret, a player must be able to test whether or not it is a valid piece. If a piece is valid, there exists a unique secret which will be output by _Recover_ when it is run on any \(u\) distinct valid pieces.
+
+2. Unpredictability: there is no polynomial-time strategy for picking \(t\) pieces of the secret, such that they can be used to predict the secret with any perceivable advantage.
+
+This framework allows for an interactive protocol proving validity of the pieces. A VSS protocol is non-interactive if there is a polynomial-time algorithm _Check_ which tests validity of the pieces. Obviously, the same pieces are not valid for different secrets; we introduce a PPTA _Encrypt_ to handle this.
+
+**Informal Definition**: An _(n,t) non-interactive verifiable secret sharing_ is a quadruple of PPTAs \((\mathit{Share},\mathit{Recover},\mathit{Check},\mathit{Encrypt})\) such that
+
+1. \((\mathit{Share},\mathit{Recover})\) is an \((\mathit{n},\mathit{t},\mathit{u})\) secret sharing over a language \(L\).
+
+2. \(\mathit{V}\mathit{z}\mathit{\in}L,\mathit{V}\mathit{w}\mathit{MES}_{z},\mathit{V }1\mathit{\leq}j\mathit{\leq}n\), \(\mathit{Y}\mathit{\leftarrow}\mathit{Encrypt}(x,w)\);
+
+(\(\mathit{1}\),...,\(\mathit{d}_{u}\))\(\mathit{\leftarrow}\mathit{Share}(x,w)\)\(\Rightarrow\), \(\mathit{Check}(x,Y,j,d_{i})\)\(=\)1.
+
+3. \(\mathit{V}\mathit{z}\mathit{\in}L,\mathit{V}\mathit{Y}\mathit{\leftarrow} \mathit{Range}(\mathit{Encrypt}(x,\mathit{)})\), \(\exists\mathit{w}\mathit{MES}_{z}\).
+
+(\(\mathit{1}\),...,\(\mathit{d}_{u}\))\(\mathit{\leftarrow}\mathit{C}\)[1,n],\(\mathit{V}\mathit{d}_{1}\),...,\(\mathit{d}_{u}\)\(\mathit{\leftarrow}\mathit{MES}_{z}\),
+
+(\(\mathit{Check}(x,\mathit{Y},\mathit{d}_{i},d_{i})\))\(=\)1 V1\(\mathit{\leq}\mathit{\leq}\mathit{u}\)\(\Rightarrow\)
+
+\(\mathit{Recover}(x,(\mathit{d}_{1},d_{1}),...,(\mathit{d}_{u},d_{u}))\)\(=\)\(w\).
+
+**Remark**: Actually, we require that \((\mathit{Share},\mathit{Recover})\) remains an \((\mathit{n},\mathit{t},\mathit{u})\) secret sharing even when \(\mathit{Y}\mathit{\leftarrow}\mathit{Encrypt}(x,w)\) is given; _Share_ itself may take \(Y\) as an input. To formalize the definition, _Share_ itself would set \(\mathit{Y}\mathit{\leftarrow}\mathit{\leftarrow}\mathit{Encrypt}(x,w)\) and append \(Y\) to each piece.
+
+### Applications of Verifiable Secret Sharing
+
+Verifiable secret sharing enables a communication network to simulate a simultaneous broadcast network. Informally, every processor is required to share his round \(r\) message before any round \(r\) message is revealed. This trivializes the design of protocols such as secret bidding, leader election, and flipping a fair coin.
+
+In the simulation of a simulataneous broadcast network, each processor acts as dealer. For an interactive VSS such as [GMW], Chor and Rabin [CR] show that logn rounds are sufficient for \(n\) processors to prove the validity of their pieces; it is not known whether this can be done in a constant number of rounds. In a non-interactive VSS, all processors may deal secrets in parallel; therefore, our protocol gives constant round solutions to all these problems.
+
+Another application is achieving a fast Byzantine Agreement without any preprocessing. The best previously known algorithm which could tolerate a linear number of faulty processors, due to Chor and Coan [CC],[C], required expected O(n/logn) rounds. Feldman and Micali [FM] show that running non-interactive verifiable secret sharing without broadcast channels, using Crusader Agreement instead, yields a constant expected time Byzantine Agreement protocol.
+
+Even beyond the protocols which directly follow from it, verifiable secret sharing now plays a central role in cryptographic protocol design in a most dramatic way. In [GMW] it is shown that all protocols can be designed to resist \(t\) faulty players out of \(2t+1\). Verifiable secret sharing is one of the three main blocks needed for their simulation. This highlights even more the need for an efficient verifiable secret sharing, as it may enter as a key subroutine in a large class of protocols.
+
+## 4 Motivation for Our Solution
+
+The motivation behind our solution is to utilize homomorphic relationships which may exist between values and their encryptions. For a certain class of encryption schemes, which we shall call _homomorphic_, we can construct an algorithm _Check_ which enables a player to verify the validity of his piece.
+
+### Probabilistic Encryption
+
+A problem with deterministic encryption schemes is that it is easy to check whether or not a given ciphertext is the encryption of any given message. Goldwasser and Micali [GM] showed how to overcome this problem by _probabilistic_ encryption. They define the notion of a family of _unapproximable predicates_. Let \(\mathbf{H}\)\(=\)\(\{\mathit{Hard}_{z}\); \(z\mathit{\in}L\}\) be a family of _predicates_, each \(\mathit{Hard}_{z}\) maps \(\mathit{CYPH}_{z}\)\(\rightarrow\)\(\{0,1\}\). Elements which map to \(0\) (\(1\)) are considered encryptions of \(0\) (\(1\)). Intuitively, such an encryption is secure if there is no efficient way of computing \(Hard_{z}\) on random elements; \(\mathbf{H}\) is _unapproximable_ if no poly-size family of circuits can compute \(Hard_{z}(y)\) significantly better than randomly guessing when \(x\) and \(y\) are randomly selected.
+
+Let \(\mathbf{C}\)={\(C_{k}\): \(k\in\)Z} be a poly-size family of circuits, \(C_{k}(\cdot,\cdot)\) takes as input \(x\in L_{k}\) and \(y\in CYPH_{z}\) and outputs a bit. For \(z\in L_{k}\), let
+
+\(P(C,k,z)\)=\(Pr[C_{k}(z,y)=Had_{z}(y):y\)\(-\)\(CYPH_{z}]\).
+
+**Definition:** The predicate \(\mathbf{H}\) is _unapproximable_ if
+
+\[\mathbf{V}\)={\(C_{k}\): \(k\in\)Z},V \(c>0\), \(\exists\)\(k_{0}\)\(\exists\)\(k\)\(\geq\)\(k\)\(\geq\)\(k\)\(\Rightarrow\) (4.1) \(Pr[P(C,k,z)>.5+k^{-\varepsilon}:z\)\(-\)\(L_{k}]\)\(<\)\(k^{-\varepsilon}\).
+
+To probabilistically enrypt a bit using \(Hard\)\(\in\)\(\mathbf{H}\), there must be a way for the encrypter to find "random" elements which map to 0 (or 1). One possibility is if \(Hard\) is a _trapdoor_ function, that is, \(Hard\) is easy to compute given a short string \(Hint\). In this scenario, the encrypter generates a pair \(x\),\(Hint_{z}\); be can then compute \(Hard_{z}\) on random elements of \(CYPH_{z}\), and picks one which maps to the desired bit.
+
+Another method exists if \(Hard\) is an easy predicate composed with a one-way function, as we now explain. Let \(MES\) be a message space, and let \(Encrypt\) be an injection from \(MES\)\(\rightarrow\)\(CYPH\). Informally, \(Encrypt\) is one-way if \(Encrypt\) is easy to compute, but \(Encrypt^{-1}\) is hard to compute. Let \(Predicate:MES\) {0,1} be an easily computable function. Suppose \(Hard\)=\(Predicate(Encrypt^{-1})\). Then the encrypter can randomly pick \(y\in CYPH\), and compute \(z\)=\(Encrypt(y)\) and \(b\)=\(Predicate(y)\). By construction, \(Hard(z)\)=\(b\), hence \(z\) is a probabilistic encryption of \(b\). All encryptions we shall consider will be computed by this latter method, even though some are also trapdoor schemes.
+
+**Example:** RSA probabilistic encryption, developed by Rivest, Shamir, and Adleman [RSA] may be computed either way. Let \(m\) be a product of large primes, and \(e\) a number such that (\(e,\phi(m)\))=\(1\). Let \(d\)=\(e^{-1}\) mod \(\phi(m)\); \(d\), which is not easy to compute without knowing the factorization of \(m\), is the trapdoor hint. We define \(CYPH=Z_{m}^{*}\). For \(y\in Z_{m}^{*}\), we define \(Hard(y)\) to be the parity of \(y^{\mathsf{T}}\) mod \(m\). This is easy to compute for anyone knowing \(d\), but it is believed to be hard to compute otherwise. We shall focus on the method of encrypting bits without knowing \(d\). Let \(Encrypt(y)\)=\(y^{\mathsf{T}}\) mod \(m\) and \(Predicate(y)\) be the parity of \(y\); both are easy to compute. A 0 (1) is encrypted by raising a random even (odd) element of \(Z_{m}^{*}\) to the \(\phi\) power mod \(m\).
+
+We shall find it convenient to generalize this notion by enlarging the range of \(Predicate\), and hence \(Hard\), to \([1,l]\); the value of \(l\) is a parameter of the particular encryption function.
+
+### Homomorphic Encryption Functions
+
+Often, a rich algebraic structure underlies an encryption scheme. Relations among cleartext values may imply relations among the encryptions. For example, in RSA encryption, \(Encrypt(y_{2})\)=\((y_{2})^{\mathsf{T}}\) mod \(m\)=\(Encrypt(y)Encrypt(z)\). More generally, when both the domain and range of \(Encrypt\) are groups, \(Encrypt\) may be a homomorphism of the groups. Benaloh [Be] utilized such homomorphisms in his secret sharing, and pointed out that our VSS extends to such a class of encryption functions [Be2]. Let
+
+\(MES\)=\(\mathsf{Domain}(Encrypt)\) be an additive group, and \(CYPH\)=\(\mathsf{Range}(Encrypt)\) be a multiplicative group. The key property is that for all \(B,C\)\(\in\)\(MES\),
+
+\[Encrypt(B+C)=Encrypt(B)\cdot Encrypt(\mathcal{C}) \tag{4.2}\]
+
+For \(c\)\(\in\)Z, we define the scalar product \(c\)\(\cdot\)\(B\)=\(B+B+\)\(\cdot\)+\(B\) with \(c\) summands. Induction may be used to show that \(\nabla B\)\(\in\)\(MES\), \(\nabla\)\(c\)\(\in\)Z,
+
+\(Encrypt(c\)\)\(\equiv\)\((Encrypt(B))^{\mathsf{T}}\).
+
+Security can only be achieved by picking among a family of encryption functions. Let \(Generator(\cdot,\cdot)\) be a PPTA which, on input \(k\),\(n\), selects \(z\)\(\leftarrow\)\((L_{k}(\bigcap L^{n})\) for some language \(L\); we define \(L^{n}\)\(\subset\)\(L\) below. We impose uniformity constraints by requiring a PPTA \(Encrypt(\cdot,\cdot)\) such that \(Encrypt(x,\cdot)\)=\(Encrypt(\cdot)\), and similarly for \(Predicate(\cdot,\cdot)\). Likewise, there must be uniform algorithms for computing the group operations, uniformly sampling \(MES\), and the following function \(Diude\), whose purpose will first become clear in Section 5.3. For all \(B\)\(\in\)\(MES_{s}\), \(Diude(x,n,n!\cdot B)\)=\(Predicate(x,B)\). Since scalar multiplication by \(n!\) need not be a 1-1 function, the existence of \(Diude\) imposes a certain structure on \(Predicate\). Moreover, this says that \(Predicate_{s}(B)\) is easily computable given only \(n!\cdot B\) as input. We define \(MES_{s}^{*}\)=\(\{B\)\(\in\)\(MES_{s}\): \(Predicate(B)\)=\(s\}\). We define \(L^{*}\)=\(\{z\)\(\in\)\(L\): \((Diude(z,n,\cdot)\) is well defined \()\) and
+
+\[([\)Range\((Predicate(x,\cdot)\)\(\geq\)\(n)\)\(\}\).
+
+If these properties are satisfied, and \(Hard\)=\(Predicate(Encrypt^{-1})\) is unapproximable, we say _Generator_ is a _homomorphic probabilistic encryption scheme generator_. Equation (4.1) implies that \(NP\) is not contained in \(BP\), so we will need to make certain unproven complexity assumptions to assert that we have such generators.
+
+In Section 8, we construct homomorphic probabilistic encryption scheme generators based on different problems. One is based on the difficulty of taking discrete logs in a finite field; a suitable restriction of the domain is required. The same method lets us base a generator on the difficulty of taking discrete logs on a elliptic curves. Benaloh [Be2] has pointed out that a generator may be based on the difficulty of distinguishing \(r\)-th powers in \(Z_{m}^{*}\), where \(r\) is a prime dividing \(\phi(m)\); the nature of these probabilistic encryptions differs slightly from the description given here. RSA is sufficiently homomorphic for our purposes if we define the "addition" on the domain \(\mathit{MES}\!=\!Z_{m}^{*}\) to be multiplication mod \(m\).
+
+### Using a Homomorphic Probabilistic Encryption Scheme to Produce a Non-interactive (n,t,t+1) VSS
+
+We restrict the rest of this chapter to an informal discussion of our protocol. The formal presentation is given in Section 5.
+
+Given _Encrypt_, we show how to share a secret in [1,\(I\)]; a longer secret may be shared by sharing blocks of \(I\) +bit secrets in parallel. We convert Shamir's secret sharing into a non-interactive VSS as follows. The dealer uniformly picks a secret \(s\!\leftarrow\![1,I]\), and \(y_{0}\!\in\!\mathit{MES}^{*}\) and sets \(y_{0}\) to be the constant term of a degree \(t\) polynomial \(Q\). He chooses the \(t\) other coefficients of \(Q\) uniformly in \(\mathit{MES}\). He then broadcasts encryptions of the coefficients of \(Q\), \(\mathit{Encrypt}(y_{0}),...,\mathit{Encrypt}(y_{t})\). As in Shamir's scheme, he sends \(Q(j)\) to player \(j\) via a private channel. The point is that \(j\) can verify his piece by checking that
+
+\[\mathit{Encrypt}(Q(j))\!= \tag{11}\]
+
+\[(\mathit{Encrypt}(y_{0}))\cdot(\mathit{Encrypt}(y_{1}))^{j\cdots(\mathit{ Encrypt}(y_{t}))}^{j}\]
+
+Even for probabilistic encryption schemes, we must still prove that broadcasting the encryptions does not allow an adversary to guess the secret advantageously. This is done by showing that the adversary can simulate his view by himself. To facilitate the simulation, we alter the protocol slightly by having the dealer encrypt a certain multiple of the coefficients, as will be described below.
+
+### Tolerating a Dynamic Adversary
+
+It would seem that a non-interactive VSS could not be zero-knowledge with respect to a dynamic adversary. On the one hand, by the intractability assumption, a simulator cannot reconstruct the secret. On the other hand, we wish that he can simulate the output of an adversary, who could corrupt any \(t\) players and output valid pieces with those indices. However, if the simulator knew all the pieces, he could compute the secret, The resolution of this difficulty is to permute the shares in a way unknown to the adversary; the adversary does not know which share a player should have before corrupting him. In this way, a simulator knowing \(t\) shares can "fool" an adversary into thinking that these are the correct shares for the players corrupted. Of course, this leaves the problem of how to convince a player that he is receiving the proper share.
+
+This latter problem is solved by having the dealer probabilistically encrypt a random permutation \(\pi\!\in\!\mathit{S}_{n}\). The dealer lets \((A_{1}\!\leftarrow\!\mathit{MES}^{*(1)}),...,(A_{n}\!\leftarrow\!\mathit{MES}^{* (n)})\) and broadcasts \(\mathit{Encrypt}(A_{1}),...,\mathit{Encrypt}(A_{n})\). The dealer sends \(A_{1}\) on the private channel to player \(j\), where \(A\!\leftarrow\!\mathit{r}^{-1}(j)\); \(j\) can verify that \(\mathit{Predicate}(A_{k})\!=\!j\). This designates that player \(j\) should subsequently receive \(Q(h)\). Player \(j\) is not convinced that the dealer encrypted a real permutation, but he knows that the \(A_{k}\) piece is designated exclusively for him, since only \(A_{k}\) can encrypt to \(\mathit{Encrypt}(A_{k})\) and \(\mathit{Predicate}(A_{k})\!=\!j\). To facilitate the simulation, this step will precede the broadcast of the encrypted variables.
+
+With respect to a static adversary, the simulation may be done without permuting the shares. We argue without proof, in Section 0.2, that the shares need not be permuted even against a dynamic adversary, although there are problems with the simulation in that case.
+
+## 5 Our Protocol
+
+### Initialization
+
+Let _Generator_ be a homomorphic probabilistic encryption scheme generator. The dealer \(i\) sets \(z\!\leftarrow\!\mathit{Generator}(k,n)\), where \(k\) is the security parameter, and \(n\) is the size of the network. We omit the dependence on \(x\). Let \(\mathit{MES}\!=\!\mathsf{Domain}(\mathit{Encrypt})\), \(\mathit{CYPH}\!=\!\mathsf{Range}(\mathit{Encrypt})\).
+
+The dealer \(i\) uniformly picks a secret \(s\!\leftarrow\![1,I]\), sets \(y_{0}\!\leftarrow\!\mathit{MES}^{*}\), and computes \(Y\!\leftarrow\!\mathit{Encrypt}(y_{0})\). The VSS is initialized with common input \(i,x,Y\). All players store \(i,z,Y\) on a work tape; \(i\) additionally stores \(y_{0}\) as his auxiliary input.
+
+### The Protocol Share
+
+The dealer broadcasts messages in steps 1 and 3; the players perform calculations in steps 2 and 4.
+
+1. The dealer \(i\) selects \(\pi\!\leftarrow\!\mathit{S}_{n}\), a uniformly chosen permutation of \([1,n]\). He sets \(A_{j}\!\leftarrow\!\mathit{MES}^{*(1)}\) for each \(j\) and broadcasts the probabilistic encryption this specifies, \(\mathit{Encrypt}(A_{1}),...,\mathit{Encrypt}(A_{n})\). He sends \(h,A_{k}\) on the private channel to \(j\), where \(h\!=\!\pi^{-1}(j)\).
+
+2. Each player \(j\) lets \(\vec{A}\!=\!\mathit{(Encrypt}(A_{1}),...,\mathit{Encrypt}(A_{n}))\) denote the values he received on \(i\)'s broadcast channel and \(h\) and \(C\) denote the values he received on the private channel from \(i\) in round 1. We define \(\mathit{Checkit}(j,h,C,\vec{A})\!=\!1\) iff \(\mathit{Encrypt}(C)\!=\!\mathit{Encrypt}(A_{k})\) and \(\mathit{Predicate}(C)\!=\!j\). When this is the case, \(j\) stores \(h\) but not \(C\!=\!A_{k}\); if this fails, \(j\) immediately repeats the dealer as faulty.
+
+3. The dealer sets \((y_{1},...,y_{t})\!\leftarrow\!\mathit{MES}\). He computes and broadcasts \((Y_{1},...,Y_{t})\!=\!\mathit{(Encrypt}(n!\cdot\!y_{1}),...,\mathit{Encrypt}(n! \cdot\!y_{t}))\). Let \(Q\!:\!\mathit{Z}\!\rightarrow\!\mathit{MES}\) denote the "polynomial" function, \(Q(a)\!=\!\sum\limits_{i=0}^{t}a^{i}\!\cdot\!y_{i}\). The dealer privately sends \(M_{k}\!=\!Q(h)\) to player \(j\!=\!\pi(h)\).
+
+4. Each player \(j\) computes \(Y_{0}\)= \(Y^{n!}\). Let \(Y_{0}\)= \((Y_{0},Y_{1},...,Y_{t})\) denote \(Y_{0}\) and the values broadcast last round; let \(N_{h}\) be the value \(j\) just received on the private channel. Define \(Check(\vec{Y},N_{h},h)\)= 1 iff \(Encrypt(n!\cdot N_{h})\)= \((Y_{0})\cdot(Y_{1}^{h})\cdot(Y_{1}^{h})\cdot(Y_{1}^{h})\). When this is true, \(j\) stores \(h,N_{h}\); otherwise, he rejects the dealer as faulty.
+
+**Remark:** As we mentioned in Section 4.2, scalar multiplication by \(n!\) need not be 1-1. Therefore, coefficient \(Y_{a}\) is not uniquely determined by the encryption \(Y_{a}\)= \(Encrypt(n!\cdot y_{a})\). However, \(Encrypt\) is 1-1, so \(n!\cdot y_{a}\) is uniquely determined by \(Y_{a}\). Therefore, if \(Check(\vec{Y},N,h)\)= 1, this only guarantees that \(n!\cdot N\)= \(n!\cdot Q(h)\). Fortunately, this is good enough, since it suffices to find \(n!\cdot y_{0}\) to recover the secret.
+
+### The Protocol Recover
+
+At any time after _Share_ was executed on input \((i,x,Y)\), \(Recover\) may be initiated on the same input. Each player \(j\) retrieves and broadcasts the private values he stored for that execution, \(h,N_{h}\). Each \(j\) runs \(Check(\vec{Y},N_{i},l)\) to test whether an indexed piece which was broadcast, \(l,N_{i}\), is valid. Assume that \(j\) can find \(t\)+1 valid indexed pieces \(((a_{1},N_{e}),...,(a_{t+1},N_{a_{t+1}}))\). The polynomial \(Q\) is found by interpolation, \(Q\)= \(\prod\limits_{i=1}^{t+1}(\prod\limits_{i=1}^{t}(\frac{x-a_{i}}{a_{i}-a_{i}}) )\cdot N_{a}\). We observe that this formula would give a polynomial-time algorithm for computing \(Q\) if we could perform scalar division. In particular, \(y_{0}\)= \(Q(0)\)\(\prod\limits_{i=1}^{t+1}(\prod\limits_{h\neq l}(\frac{a_{i}}{a_{i}-a_{i}}))\cdot N _{a}\). Although we cannot necessarily do arbitrary scalar division, the denominator of each term of the sum divides \(n!\), so \(n!\cdot y_{0}\) may be computed by additions and scalar multiplications by integers. Therefore, \(j\) can compute \(n!\cdot y_{0}\) and hence \(Diude(n,n!\cdot y_{0})\)= \(Predicate(y_{0})\)= \(s\).
+
+### An Extension of Share
+
+In [F], we modify _Share_ by allowing each player to broadcast a single termination message. On the basis of these messages, the players can determine whether or not enough good players received good pieces to ensure recovery of the secret. This determination is based solely on broadcast messages, hence all good players reach the same conclusion.
+
+## 6 A Proof of the Security
+
+### The Zero-Knowledge Simulation
+
+Let \(A\) be any dynamic \(t\)- adversary. We construct a PPTA \(A^{\prime}\) which simulates the whole network, including \(A\), without benefit of the auxiliary input. Assume that _Share_ is initiated with common input \(i,x,Y\); henceforth, we omit the argument \(x\).
+
+1. Since \(i\) does not utilize the auxiliary input; namely \(y_{0}\), in round 1, \(A^{\prime}\) simulates \(i\) (and \(A\)) perfectly at step 1.
+
+2. Likewise, \(A^{\prime}\) perfectly simulates \(A\) and all other players in step 2.
+
+3. Let \(j_{1},...,j_{k}\) denote the players \(A\) corrupts by the end of step 2, and let \(\pi(h_{l})\)= \(j_{l}\) for \(l\in[1,t_{0}]\). \(A^{\prime}\) picks \(h_{t+1},...,h_{t}\) uniformly among the as-yet unselected indices in \([1,n]\), so \(h_{1},...,h_{t}\) are all distinct. Let \(h_{0}\)= \((Y_{1},...,Y_{t})\) and sends \(M_{l}\) to \(j_{l}\) for \(1\leq l\leq t_{0}\). By construction, \(Check(\vec{Y},M_{l},j_{l})\)= 1.
+
+ matrix, and its determinant is \(D=\prod\limits_{0\leq l<t\leq l}(h_{t^{-}}h_{l})\).
+
+**Lemma 6.1**: _Let \(H\)= \(\{h_{t}\}\), where \(l\) and \(e\) range from 0 to \(t\) and \(h_{t}\)= \(h_{l}^{\prime}\); let \(G\)= \(H^{-1}\)= \(\{G_{it}\}\). Then the denominator of \(G_{it}\) divides \(\prod\limits_{j\neq t}(h_{j}-h_{t})\)._
+
+This is proved by showing that \(\prod\limits_{j\neq t}\prod\limits_{i\neq l}(h_{j}-h_{i})\) divides the determinant of the \(l,e\) minor of \(H\). Since \(\{h_{0},...,h_{t}\}\)\(\subset\)\([0,n]\), the denominator of \(G_{it}\) divides \(n!\) for any \(e\).
+
+\(A^{\prime}\) sets \((M_{1},...,M_{t})\)\(\hookrightarrow\)_MES_. We implicitly set \(M_{0}\)= \(y_{0}\) (which is well defined as \(E^{-1}(Y)\)).
+
+We define the \(*\)-inner product by
+
+\((e_{1},...,e_{d})\) *\((B_{1},...,B_{d})\)= \(\sum\limits_{i=d}^{d}c_{i}\cdot B_{i}\), for \(c_{1},...,c_{d}\)\(\in\)Z and \(B_{1},...,B_{d}\)\(\in\)_MES_. This extends to a \(*\)-matrix product in the natural way. Observe that the conditions \(M_{h_{l}}\)= \(Q(h_{l})\), for \(l\in[0,t]\) may be written as a matrix equation \(\vec{M}\)= \(H\)\(\vec{q}\), where \(\vec{M}=\begin{pmatrix}M_{0}\\ M_{1}\\ \vdots\\ M_{l}\end{pmatrix}\) and \(\vec{y}=\begin{pmatrix}y_{0}\\ y_{1}\\ \vdots\\ y_{t}\end{pmatrix}\) are considered as column vectors. By \(*\)-multiplying both sides by \(G\)= \(H^{-1}\), we obtain \(G\)*\(\vec{M}\)= \(G\)*\((H\)*\(\vec{q})\)= \((G\)*\(H\)*\(\vec{q})\)= \(y\) (the associative law follows from direct calculation). Denote \(y\) of \((n!)\cdot G\) by the integers \(g_{10},...,g_{t}\), so \(\sum\limits_{i=0}^{t}g_{i}\cdot M_{e}\)= \(n!\cdot y_{i}\). Applying _Encrypt_ to both sides and using equation 4.2,
+
+\[\prod\limits_{i=0}^{t}(Encrypt(M_{e}))^{g_{it}}\)= \(Encrypt(n!\cdot y_{i}) \tag{6.1}\]
+
+Observe that \(A^{\prime}\) can compute the left hand side, since \(Encrypt(M_{0})\)= \(Y\) is part of the common input and \(M_{e}\) was chosen by \(A^{\prime}\) for \(e\)\(>\) 0. The right hand side is the definition of \(Y_{l}\). Therefore, at step 3, \(A^{\prime}\) broadcasts \((Y_{1},...,Y_{t})\) and sends \(M_{l}\) to \(j_{l}\) for \(1\leq l\leq t_{0}\). By construction, \(Check(\vec{Y},M_{l},j_{l})\)= 1.
+
+Let \(j_{k+1}\) be the next player \(A\) corrupts; \(A^{\prime}\) simulates \(j_{k+1}\) starting from the end of round 2, with \(i,x,Y,h_{t+1},\vec{A}\) as the only values on \(j_{k+1}\)'s work tape. By construction, \(A^{\prime}\) is able to give the proper piece \(M_{t+1}\) at round 3. In like manner, the next player corrupted will have stored the value \(h_{t+2}\), and so on.
+
+4. \(A^{\prime}\) simulates corrupted players by running \(A\) ansd outputs the output of \(A\).
+
+### Indistinguishability of the Output of \(A\) from the Output of \(A\)
+
+Actually, _Share_ is zero-knowledge even if _Encept_ is easy to invert, in which case \(i\)'s auxillary input is easily computable, and \(A^{\prime}\) can perfectly simulate the entire network and output what \(A\) outputs. For simplicity, we shall prove that _Share_ is zero-knowledge assuming equation 4.1, which implies that _Encept_ is hard to invert. If the output of \(A\) is distinguishable from the output of \(A^{\prime}\), then \(A\) distinguishes the probability distributions on its inputs. Thus, it suffices to show that the inputs to \(A\) acting on _Share_ are indistinguishable from the inputs to \(A\) in the simulation.
+
+The selection of \(\pi,A_{1},\ldots,A_{s}\) is done exactly as in _Share_. Also, the probability distribution on \(\overline{y}\)=\(y_{1},\ldots,y_{t}\), which is the uniform one when \(A\) acts on _Share_, is also uniform in the simulation for the following reason. \(A^{\prime}\) selected all elements of \(\overline{M}\)=\(M_{1},\ldots,M_{t}\) uniformly in _MES_. Given fixed values of \(M_{\underline{y}}\) and \(y_{0}\), there is a 1-1 onto map between choices of \(\overline{M}\) and choices of \(\overline{y}\) - \(H\) sends \(\overline{M}\)=\((M_{0},\overline{M})\) to \(\overline{y}\)=\((y_{0},\overline{y})\), so the uniform distribution on the implies the uniform distribution on the other. In _Share_, the elements of \(\overline{y}\)=\(\underline{y}_{1},\ldots,y_{t}\) were selected uniformly. Since in both cases, \(\overline{M}\) is uniquely determined by \(\overline{y}\), this also has identical distribution.
+
+There is only one difference in the inputs to \(A\) in the two cases. When \(A\) acts on _Share_, if player \(j\) is corrupted after round 2, \(j\) stored \(h\) where \(h\)=\(Predicate(A_{j})\)=\(Hard(Encept(A_{j}))\). In the simulation, the \(l\)-th player \(j\) corrupted by \(A\) after round 2 will have stored the value \(h_{k+l}\), regardless of the actual value \(Hard(Encept(A_{j}))\). Therefore, any PPTA which can distinguish the views can determine \(Hard(Encept(A_{j}))\) better than randomly guessing, given only \(Encept(A_{j})\). However, by (4.1), \(A\) cannot guess \(Hard(E(A_{j}))\) better than randomly. Therefore, the inputs to \(A\) are indistinguishable.
+
+## 7 Extending the Protocol to a Larger Class of Networks
+
+We informally remark that _Share_,_Recover_ may be implemented without private channels and/or broadcast channels; a complete network is sufficient. Formal proof of the claims in this section will appear in [F].
+
+We first observe that _random pads_ can be used to simulate private channels. Assume that the dealer once privately sent a long string of random bits, \(r_{j}\), to each player \(j\), but all future messages may be input by an adversary. To privately send message \(m_{j}\) to \(j\), he sends \(m_{\underline{y}}\)\(r_{j}\), a bitwise exclusive-or-of the real message and an "unused" portion of the random pad. Player \(j\), who knows \(r_{j}\), easily computes \(m_{j}\). The adversary, who does not know \(r_{j}\) cannot distinguish the sent message from random noise.
+
+A random pad \(r_{j}\) may be sent privately by the use of indoor encryption functions. Suppose that player \(j\) broadcasts an encryption function, _Encept_, for which he knows a trapdoor hint, \(Hint_{j}\). The dealer picks a random pad \(r_{j}\) and computes a probabilistic encryption of it, \(Encept_{j}(r_{j})\) and sends this to \(j\). Player \(j\) decrypts to find the pad \(r_{j}\). Assuming _Encept_ is secure, an adversary, on input \(Encept_{j}(r_{j})\), cannot guess any bit of \(r_{j}\) significantly better than at random.
+
+Although our algorithm only required that the dealer send messages along a private channel, this technique can be used to simulate, simultaneously, a complete network of private channels. In particular, all players may still "deal" secrets simultaneously.
+
+The assumption of a broadcast channel is very strong. We can eliminate this assumption by simulating the broadcast channel by Crusader Agreement, which is a weak form of Byzantine Agreement. The simplest version requires the assumption that \(t\)\(<\)\(n\)/3; a more involved version tolerates any value of \(t\)\(<\)\(n\)/2, provided that the processors start with secure signature schemes.
+
+## 8 Candidates for Homomorphic Encryption Schemes
+
+### Encryption Based on Discrete Logs in Finite Fields
+
+_Generator_, on input (\(k,n\)) uniformly selects a \(k\)-bit prime \(p\) and the prime factorization of \(p\)-1 subject to the condition below. (Each [Ba] shows how to uniformly generate numbers of known factorization.) Let \(d_{r,n}\)=\(\prod\limits_{\begin{subarray}{c}q\leq n\\ q\prime\prime\end{subarray}}\), that is, the largest divisor of \(r\) prime
+
+without a prime factor exceeding \(n\). We require that \(d_{p-1,n}\)\(<\)\(n^{3}\). For random \(k\)-bit numbers \(r\), \(d_{r,n}\) approximates a normal distribution with expected value \(n\) ', so \(d_{p-1,n}\)\(<\)\(n^{3}\) for all but an exponentially small fraction of \(p\), and this remains true when we restrict \(p\) to \(k\)-bit primes. (We could use any polynomial in place of \(n^{3}\)). Since the only fast algorithms for taking discrete logs require that \(p\)-1 has only small prime factors, any \(p\) which did not satisfy this condition would not be considered a good choice for discrete log encryption in any case.
+
+_Generator_ uniformly selects a generator of the multiplicative group \(Z_{p}^{*}\), \(g\). The index \(z\) is the concatenation \(p,g\); we omit reference to it. The domain of _Encept_ is \(Z_{p-1}\), and the range is \(Z_{p}^{*}\). For \(y\)\(\in\)\(Z_{p-1}\), \(Encept(y)\)=\(g^{y}\) mod \(p\). This satisfies the homomorphism property, \(Encept(B+C)\)=\(g^{B+C}\) mod \(p\)=\(Encept(B)\)\(Encept(C)\). It is easy to design PPTAs for the group operations and sampling _MES_; we describe _Predicate_ and _Divide_ below. We make the following intractability assumption for taking discrete logs:
+
+\[V\)\(c\)\(>\)\(0,V\)\(n\)\(>\)\(0,V\)\(P\)PTA\(Logarithm(\cdot,\cdot),\), (8.1) \(\exists\)\(k_{0}\)\(>\)\(k\)\(\geq\)\(k_{0}\)\(\Rightarrow\)\(Pr\{y\)=\(Logarithm(p,g,z)\):
+
+\[(p,g)\)\(\leftarrow\)\(Generator(k,n);y\)\(\leftarrow\)\(Z_{p-1};z\)=\(g^{y}\) mod \(p\)\(<\)\(k^{-c}\)
+
+[MISSING_PAGE_FAIL:9]
+
+## 9 Other Variations
+
+### Basing the VSS on Multiple Homomorphic Encryption Functions
+
+Note that one can easily combine the security of multiple homomorphic encryption schemes. For example to encode a secret \(s\) using _Encept_ and _Encept_\({}^{\prime}\), the dealer picks \(s^{\prime}\) at random, shares the secret \(s^{\prime}\) using _Encept_\({}^{\prime}\) and the secret \(s\mathcal{D}s^{\prime}\) using _Encept_. The good players can recover both \(s^{\prime}\) and \(s\mathcal{D}s^{\prime}\), and hence \(s\). The adversary cannot recover \(s\) unless he can invert both _Encept_ and _Encept_\({}^{\prime}\).
+
+### Efficiency
+
+The communicational complexity of VSS for all homomorphic encryption schemes proposed is very reasonable. The dealer initiates _Share_ by broadcasting his identity, the index of _Encept_, \(z\), and an encryption of a secret, \(Y\). In step 1, he broadcasts the encrypted \(A_{j}\)'s. In round 3, he broadcasts encryptions of the other \(t\) coefficients, the \(Y_{s}\)'s. Each broadcast has \(O(nk)\) bits. Also, \(O(k)\) bits are privately sent to each player. For all homomorphic encryption schemes proposed here, we feel that 1000 is a reasonable value for \(k\) given sufficient for discrete logs on elliptic curves.
+
+We shall examine the computational complexity in the case where discrete logs in finite fields are used. We ignore the cost of finding \(p\). This is a one-time cost which is not large if we allow non-uniform selection; it may be avoided entirely by choosing \(p\) from a list of known very large primes. In such a case the security of the protocol hinges on a bolder assumption than the discrete log assumption (equation 8.1).
+
+The most costly part of the computations is exponentiation. Evaluating _Encept_\({}^{\prime}(z)\)=\(g^{z}\) mod \(p\) can be performed in at most \(2\,|\,x|\leq 2\,|\,p|=2k\) multiplications mod \(p\) and at most \(k\) additions. The complexity will be determined by the speed of multiplication, which we take to be \(O(klogk)\). The dealer must encrypt a total of \(O(n)\) values, hence this can be done in \(O(nk^{2}logk)\) steps. This term swallows the cost of randomly selecting the values and evaluating the polynomial at \(n\) points.
+
+For the other players, the most costly steps are running _Checkpiece_ and _Recover_. A reasonable way to compute the product \((Y_{0})\cdot(Y_{1}^{\prime})\cdots(Y_{t}^{n})\) is the following:
+
+1. Set \(x_{0}\)= \(Y_{t}\).
+2. Set \(x_{1+1}\)= \(Y_{t-1}\cdot(x_{1})^{n}\).
+3. Reset \(l\) to \(l+1\); If \(l<t\) return to step 2.
+
+The desired product is \(x_{t}\). Since \(|\,h\,|\leq\,\)logn, step 2 requires at most \(O(logn)\) multiplications, hence _Checkpiece_ requires \(O(nlog+k)\) multiplications. (The \(k\) are for the exponentiation of the piece itself). In _Recover_, finding \(t+1\) good pieces can require running _Checkpiece_\(2t\) times. Having found \(t+1\) good pieces, a player can perform the polynomial interpolation using at most \(O(n^{2})\) multiplications and divisions. Thus, a player may recover the secret in \(O(n(nlogn+k)klogk)\) steps.
+
+### Must We Permute the Pieces?
+
+We believe that our protocol may be simplified to 1 round of communication. The pieces were permuted to facilitate the zero-knowledge simulation in the proof; indeed, we do not know how to do this simulation in the simpler setting for a dynamic adversary. (The simulation for a static adversary is straightforward.) Nevertheless, we conjecture that the simplified protocol is secure against a dynamic adversary as well.
+
+We see no way that knowledge of encryptions of the coefficients of \(Q\), or any subset of the pieces, can make certain other pieces "more useful". In fact, we could try the simulation for the simplified protocol with respect to a dynamic adversary \(A\), and we would succeed whenever we guessed the \(t\) players that \(A\) corrupts; however, this happens with probability inverse exponential in \(n\). This would contradict a strong intractability assumption; that is, if we assumed that any algorithm inverting _Encept_ with significant probability must run in time exponential in \(n\). This may apply to discrete logs on elliptic curves whenever \(k>n\), and to all the other schemes described when \(k\) is a sufficiently large function of \(n\).
+
+## 10 Conclusion
+
+We have presented a noninteractive verifiable secret sharing, optimal in that it tolerates up to \((n-1)/2\) bad players, which is provably bitwise secure, assuming the intractability of taking discrete logarithms (or one of the other homomorphic encryption schemes). As we observed in Section 3.3, verifiable secret sharing can be used as a subroutine to simulate a simultaneous broadcast network, which makes protocols such as secret bidding as efficient as the best verifiable secret sharing. We have also remarked that our VSS enables a network to reach Byzantine Agreement in constant expected time without any preprocessing. Moreover, the work of [GMW] suggests that verifiable secret sharing may enter as a key subroutine in protecting any protocol from faulty players, making the search for an efficient one even more important. The bitwise communication and local computation complexity of our protocols are small enough, \(O(nk)\) and \(O((nlogn+k)nklogk)\) respectively, making them feasible to implement. We believe that the proof technique introduced to prove security may have application to many other cryptographic protocols.
+
+Acknowledgement: I would like to thank the many people who greatly contributed to the writeup of this paper. I participated in an interactive proof of the results of this paper with Silvio Micali, whose suggestions immeasurably helped both the technical proof and presentation. Josh Benalob suggested basing the protocol on arbitrary encryption functions with the homomorphism property. Shafi Goldwasser helped simplify thepresentation by pointing out that certain complications were unnecessary. David Shmoys spent much time proofreading drafts so other readers wouldn't have to; the text was greatly clarified by his suggestions. Suggestions of Lance Fortnow and Joe Halpern have also been incorporated.
+
+[ACGS] W. Alexi, B.Chor, O. Goldreich, and C. Sehnorr, RSA/Rabin Bits are 1/2+1/poly(logn) Secure, 1984 FOCS.
+
+[Ba] E. Bach, How to Generate Random Integers With Known Factorization, 1983 STOC.
+
+[Be] J. Benaloh, Secret Sharing Homomorphisms: Keeping Shares of a Secret Secret, 1986 Crypto.
+
+[Be2] J. Benaloh, personal communication.
+
+[C] B. Coan, Achieving Consensus in Fault-Tolerant Distributed Computer Systems: Protocols, Lower Bounds, and Simulations, PhD. thesis, MIT, 1987.
+
+[CC] B. Chor and B. Coan, A Simple and Efficient Randomized Byzantine Agreement Algorithm, IEEE Transactions on Software Engineering, Vol. SE-11, No.6 1985.
+
+[CF] J. Cohen and M. Fischer, A Robust and Verifiable Cryptographically Secure Election Scheme, 1985 FOCS.
+
+[CGMA] B. Chor, S. Goldwasser, S. Micali, and B. Awerbuch Verifiable Secret Sharing and Achieving Simultaneity in the Presence of Faults, 1985 FOCS.
+
+[CR] B. Chor and M. Rabin, Achieving Independence in Logarithmic Number of Rounds, to appear in PODC 1087.
+
+[F] P. Feldman, MIT thesis, to appear.
+
+[FM] P. Feldman and S. Micali, Byzantine Agreement From Scratch in Constant Expected Time, manuscript.
+
+[GM] S. Goldwasser and S. Micali, Probabilistic Encryption, JCSS, Vol. 28, No. 2, April 1984.
+
+[GMW] O. Goldreich, S. Micali, and A. Wigderson, Proofs that Yield Nothing but Their Validity and a Methodology of Cryptographic Protocol Design, 1986 FOCS.
+
+[Ka] B. Kaliski, MIT thesis, to appear.
+
+[L] D. Long, The Security of Bits in the Discrete Logarithm, Princeton Thesis, 1984.
+
+[LW] D. Long and A. Wigderson, How Discrete is the Discrete Log?, 1983 STOC.
+
+[M1] V. Miller, Elliptic Curves and Cryptography, Crypto 1985.
+
+[M2] V. Miller, personal communication.
+
+[RSA] R. Rivest, A. Shamir, and L. Adleman, A Method for Obtaining Digital Signature and Public Key Cryptosystems, Comm. of the ACM, Vol. 21, Feb. 1978.
+
+[S] A. Shamir, How to Share a Secret, CACM Vol.22 No.11, 1979.
+
+[Y] A. Yao, Theory and Applications of Trapdoor Functions, 1982 FOCS.

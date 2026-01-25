@@ -1,0 +1,181 @@
+# Non-Interactive and
+
+Information-Theoretic Secure
+
+Verifiable Secret Sharing
+
+Torben Pryds Pedersen
+
+Computer Science Department
+
+Aarhus University, Denmark
+
+tppedersen@daimi.aau.dk
+
+###### Abstract
+
+It is shown how to distribute a secret to \(n\) persons such that each person can verify that he has received correct information about the secret without talking with other persons. Any \(k\) of these persons can later find the secret (\(1\leq k\leq n\)), whereas fewer than \(k\) persons get no (Shannon) information about the secret. The information rate of the scheme is \(\frac{1}{2}\) and the distribution as well as the verification requires approximately \(2k\) modular multiplications pr. bit of the secret. It is also shown how a number of persons can choose a secret "in the well" and distribute it verifiably among themselves.
+
+## 1 Introduction
+
+Secret sharing schemes were introduced independently in [1] and [2] and since then much work has been put into the investigation of such schemes (see [1] for a list of references). The verifiable secret sharing schemes constitute a particular interesting class of these schemes as they allow each receiver of information about the secret (_share_ of the secret) to verify that the share is consistent with the other shares.
+
+Let the _dealer_ be the person who has a secret and distributes it to \(n\)_shareholders_, where \(n>0\). If the dealer trusts one of the shareholders completely, he could give the secret to this person and then avoid the troubles of having a secret sharing scheme. Thus in many applications the dealer does not trust the shareholders completely, and therefore it should be expected that (some of) the shareholders do not trust the dealer either. For this reason efficient verifiable secret sharing schemes are necessary in practice.
+
+However, verifiable secret sharing has also turned out to be a useful tool in more theoretical work. In [1] and [1] unconditionally secure verifiable secret sharing schemes are constructed and used to design secure multi-party protocols. Unfortunately, these schemes are _interactive_ -- interaction between the participants is needed in order to verify the shares. Both of these schemes require that less than \(\frac{n}{3}\) of the shareholders are dishonest. This is improved in [1], where a scheme with the same properties is presented, except that it allows less than \(\frac{n}{2}\) dishonest participants. These three schemesall have the property that even an all powerful dealer cannot distribute incorrect shares (in [11] and [12] there is an exponentially small error probability however).
+
+In this paper, we are mainly interested in _non-interactive_ verifiable secret sharing. In such a scheme only the dealer is allowed to send messages -- in particular the shareholders cannot talk with each other or the dealer when verifying a share. This model is very suitable in practice as it allows distribution by mail for instance.
+
+[1] presented the first non-interactive verifiable secret sharing scheme, but it relied on the existence of a mutually trusted entity. In [10] this entity is avoided by letting the dealer publish probabilistic encryptions of the polynomial used to compute the shares, and due to a homomorphism property of the encryption scheme verification of the shares is possible. This scheme is quite efficient, but after the distribution, the privacy of the secret depends on a computational assumption -- such as the intractability of computing discrete logarithms.
+
+The goal of this paper is to construct an efficient non-interactive scheme for verifiable secret sharing in which no (Shannon) information about the secret is revealed. [12] presents a non-interactive verifiable secret sharing scheme which can be used for secrets, \(s\), for which \(g^{s}\) is known, where \(g\) is the generator of a group. In this paper the scheme suggested in [12] is modified in order to remove the assumption that \(g^{s}\) is known beforehand. This results in a secret sharing scheme which is unconditionally secure for the dealer. However, in this scheme the dealer can succeed in distributing incorrect shares, if he can solve the discrete logarithm problem (see [1] for a formal definition). This property is inevitable as we shall see that it is impossible to construct a non-interactive secret sharing scheme in which no information about the secret is revealed and even a dealer with unlimited computing power cannot cheat. Thus this scheme is in some sense dual to that of [10] (see Section 4.3).
+
+The new secret sharing scheme is constructed by combining Shamir's scheme (see [14]) with a commitment scheme, which is unconditionally secure for the committer and furthermore allows commitment to many bits simultaneously. This commitment scheme is a variant of a scheme proposed in [1].
+
+After introducing some notation in Section 2, Section 3 describes the commitment scheme, and in Section 4 the secret sharing scheme is presented. As an application of this scheme, Section 5 shows how the shareholders can compute linear combinations of shared secrets and Section 6 concludes the paper.
+
+## 2 Notation
+
+Throughout this paper \(p\) and \(q\) denote large primes such that \(q\) divides \(p-1\), \(G_{q}\) is the unique subgroup of \(Z_{p}^{*}\) of order \(q\), and \(g\) is a generator of \(G_{q}\). It can easily be tested if an element \(a\in Z_{p}^{*}\) is in \(G_{q}\) since
+
+\[a\in G_{q}\quad\Longleftrightarrow\quad a^{q}=1.\]
+
+As any element \(b\neq 1\) in \(G_{q}\) generates the group, the discrete logarithm of \(a\in G_{q}\) with respect to the base \(b\) is defined and it is denoted \(\log_{1}(a)\).
+
+For any integer \(x\) the length of the binary representation of \(x\) is denoted \(|x|\).
+
+[MISSING_PAGE_FAIL:3]
+
+[MISSING_PAGE_FAIL:4]
+
+[MISSING_PAGE_EMPTY:5]
+
+Note that they can also find \(t\) by the formula
+
+\[t=\sum_{i\in S}a_{i}t_{i}.\]
+
+**Theorem 4.3**: Under the assumption that the dealer cannot find \(\log_{g}h\) except with negligible probability in \(|q|\), the verification protocol satisfies Definition 4.1.
+
+**Proof**
+
+It is not hard to see that \((*)\) will be satisfied for all participants if the dealer follows the protocol.
+
+Let \(S\) and \(S^{\prime}\) be two subsets of \(\{1,\ldots,n\}\) of size \(k\) such that all participants in \(S\) and \(S^{\prime}\) have accepted their shares correctly. According to Lemma 4.2 the members of \(S\) and \(S^{\prime}\) can find pairs \((s,t)\) and \((s^{\prime},t^{\prime})\), respectively, such that \(E_{0}=E(s,t)=E(s^{\prime},t^{\prime})\).
+
+As the shares are consistent if and only if there is a polynomial, \(f\), of degree at most \(k-1\) such that
+
+\[f(i)=s_{i}\qquad\text{for $i=1,2,\ldots,n$}\]
+
+the dealer can find the two sets \(S\) and \(S^{\prime}\) as follows, if the shares are inconsistent:
+
+1. Let \(f\) be the unique polynomial of degree at most \(k-1\) such that \(f(i)=s_{i}\) for \(i=1,2,\ldots,k\).
+2. Let \(i=k+1\).
+3. If \(i>n\) then stop (all shares are consistent). If \(f(i)=s_{i}\) then put \(i:=i+1\) and goto 3. Otherwise return the sets \(S=\{1,2,\ldots,k\}\) and \(S^{\prime}=\{1,2,\ldots,k-1,i\}\).
+
+Thus, if the dealer has succeeded in distributing inconsistent shares, he can find \(\log_{g}h\) by first finding \(S\) and \(S^{\prime}\) as described above and then computing \(\log_{g}h\) as in Theorem 3.1
+
+As a consequence of Theorem 4.3 all the shares satisfying \((*)\) are consistent unless the dealer succeeds in finding \(\log_{g}(h)\)_before_ the last share has been sent.
+
+The following theorem shows, that fewer than \(k\) participants get no (Shannon) information about the secret. For any subset \(S\subset\{1,\ldots,n\}\), \(\mathit{view}_{S}\) denotes the messages that the members of \(S\) see:
+
+\[\mathit{view}_{S}=(E_{0},E_{1},\ldots,E_{k-1},(s_{i},t_{i})_{i\in S}).\]
+
+**Theorem 4.4**: For any \(S\subset\{1,\ldots,n\}\) of size at most \(k-1\) and any \(\mathit{view}_{S}\)
+
+\[\mathit{Prob}[\text{$D$ has secret $s$}\,|\,\mathit{view}_{S}]=\mathit{Prob}[ \text{$D$ has secret $s$}]\]
+
+for all \(s\in\text{$Z$}_{q}\).
+
+**Proof**
+
+It is sufficient to prove the theorem in the case where \(S\) has size \(k-1\). If \(k-1\) parties do not get any information about \(s\) then neither does fewer than \(k-1\) parties.
+
+[MISSING_PAGE_EMPTY:7]
+
+as the "hard-core" bits of a one-way function with homomorphic properties. Specifically, it is suggested to use the function
+
+\[x\mapsto g^{x}\qquad\text{for }x\in Z^{*}_{q}\]
+
+and encrypt \(l=O(\log|q|)\) bits as \(g^{x}\) where the \(l\) bits in question are easy to compute from \(x\). Using this scheme, the computational requirements when distributing an \(l\)-bits secret is very similar to the requirements in our scheme when distributing a \(|q|\)-bits secret (note that \(|q|\approx 2^{l}\)).
+
+With respect to security the two schemes are dual to each other, because the encryption schemes used in [21] only protects the secret under the assumption that the one-way function cannot be inverted. However, even an infinitely powerful dealer cannot distribute incorrect shares. In contrast, the new scheme protects the privacy of the secret unconditionally, but the correctness of the shares depends on a computational assumption.
+
+Having these two secret sharing schemes it is natural to ask for a non-interactive scheme in which
+
+* no information about the secret is revealed; and
+* even an infinitely powerful dealer cannot compute inconsistent shares.
+
+However, the following shows that such a scheme is impossible in the model which is used here. Let namely \(b\) denote all the information which the dealer broadcasts in a non-interactive secret sharing scheme, and let \(s_{i}\) be the secret share which is sent to \(P_{i}\). Let \(V(i,b,s_{i})\) denote the verification predicate which \(P_{i}\) computes in order to verify his share. Now consider \(P_{1},\ldots,P_{k-1}\) and assume that they have received correct shares. Let \(S_{k}\) be the set of shares which \(P_{k}\) can receive:
+
+\[S_{k}(b)=\{s_{k}\mid V(k,b,s_{k})\}.\]
+
+As even an all powerful dealer cannot find inconsistent shares then \(P_{1},\ldots,P_{k-1},P_{k}\) will find the same secret for any \(s_{k}\in S_{k}\). This means that \(P_{1},\ldots,P_{k-1}\) can find the secret by guessing a secret share \(s_{k}\in S_{k}\) and then combine their own shares with \(s_{k}\).
+
+In particular note that \(S_{k}(b)\) is in \(NP\) if \(V\) can be computed in polynomial time. Therefore does \(P_{1},\ldots,P_{k-1}\) "only" need nondeterministic polynomial time in order to find the secret if the scheme is unconditionally secure for the shareholders. Similarly, a dishonest dealer can distribute inconsistent shares in nondeterministic polynomial time if the scheme reveals no information about the secret.
+
+## 5 Computing on Shared Secrets
+
+As mentioned in the introduction verifiable secret sharing is an important tool in the construction of secure protocols for multiparty computations. In particular both the construction in [1] and [1] utilize the fact that it is easy to compute lines combinations of shared secrets. In this section we show that this is also true if the secret sharing scheme presented here is used, and we present an application of this property.
+
+[MISSING_PAGE_EMPTY:9]
+
+1. Choose \(s_{i0}\in Z_{q}\) at random.
+2. Distribute \(s_{i0}\) verifiably among \(P_{1},\ldots,P_{n}\). Furthermore \(P_{i}\) signs each secret share and sends the signature with the share.
+3. Verify all the received shares. If a share is incorrect, \(P_{i}\) publishes the share and its signature. Then \(P_{i}\) stops.
+4. Compute the share \((s_{i},t_{i})\) of \(s=s_{10}+s_{20}+s_{n0}\) and the corresponding public information \((E_{0},E_{1},\ldots,E_{k-1})\) as described in Subsection 5.1.
+
+It follows from the arguments in the previous subsection that
+
+* \((s_{i},t_{i})\) is a correct share of \(s\) if \(P_{i}\) has accepted all shares correctly; and
+* any \(k\) participants can find a pair \((s^{\prime},t^{\prime})\) such that \(E_{0}=E(s^{\prime},t^{\prime})\).
+
+We now show that \(s\) is uniformly distributed in \(Z_{q}\), and that fewer than \(k\) participants have no information about \(s\).
+
+**Theorem 5.1**
+
+If \(P_{i}\) chooses \(s_{i0}\in Z_{q}\) uniformly at random and at most \(k-1\) of the other parties cooperate, then \(s\) is uniformly distributed in \(Z_{q}\).
+
+**Proof**
+
+Follows from the fact that no set of at most \(k-1\) participants (excluding \(P_{i}\)) get any information about \(s_{i0}\). This implies that if at least one of the participants chooses \(s_{i0}\) at random then
+
+\[s=s_{10}+s_{20}+\ldots+s_{n0}\]
+
+is uniformly chosen in \(Z_{q}\).
+
+As before let \(view_{S}\) be the messages, which the participants in a subset \(S\) of \(\{1,\ldots,n\}\) see.
+
+**Theorem 5.2**
+
+For any \(S\subset\{1,\ldots,n\}\) of size at most \(k-1\) and any \(views\)
+
+\[Prob[s\text{ is chosen }
+
+## 6 Conclusion
+
+We have presented a non-interactive verifiable \((k,n)\)-threshold scheme which is at least as efficient as earlier proposals. Unlike the schemes in [1], [1] and [10] this scheme protects the secret to be distributed unconditionally for any value of \(k\) (\(1\leq k\leq n\)), but the correctness of the shares depends on the assumption that the dealer cannot find discrete logarithms before the distribution has been completed. This result is optimal because in any non-interactive verifiable secret sharing scheme, which reveals no information about the secret, it is possible for a dishonest dealer to distribute inconsistent shares in nondeterministic polynomial time.
+
+The information rate of the presented scheme is \(\frac{1}{2}\) and the distribution of a secret in \(Z_{q}\) as well as the verification of a share requires at most \(2|q|k\) multiplications modulo \(p\).
+
+It was shown that it is very easy to compute linear combinations of shared secrets, and in particular it was demonstrated how, \(l\) persons, \(P_{1},\ldots,P_{l}\), can select a secret democratically (without knowing the secret) and distribute it verifiably to \(P_{1},\ldots,P_{l}\), \(P_{l+1},\ldots,P_{n}\) in a \((k,n)\)-threshold scheme.
+
+## References
+
+* [BCC88] G. Brassard, D. Chaum, and C. Crepeau. Minimum disclosure proofs of knowledge. _Journal of Computer and System Sciences_, 37:156-189, 1988.
+* [BCP] J. Bos, D. Chaum, and G. Purdy. A voting scheme. Preliminary draft.
+* proceedings of CRYPTO 89_, pages 278
+- 285, 1990.
+* proceedings of CRYPTO 86_, Lecture Notes in Computer Science, pages 251-260. Springer-Verlag, 1987.
+* 319, 1979.
+* [BM84] M. Blum and S. Micali. How to generate cryptographically strong sequences of pseudo-random bits. _SIAM Journal of Computation_, 13:850-864, 1984.
+* [BGW88] M. Ben-Or, S. Goldwasser, and A. Widgerson. Completeness theorems for non-cryptographic fault-tolerant distributed computation. In _Proceedings of the Twentieth Annual ACM Symposium on Theory of Computing_, pages 1-10, 1988.
+* [CCD88] D. Chaum, C. Crepeau, and I. Damgard. Multiparty unconditionally secure protocols. In _Proceedings of the Twentieth Annual ACM Symposium on Theory of Computing_, pages 11-19, 1988.
+* 437, 1987.
+- proceedings of EUROCRYPT 90_, Lecture Notes in Computer Science, pages 266
+- 282. Springer-Verlag, 1991.
+* [Ped91] T. P. Pedersen. Distributed provers with applications to undeniable signatures, 1991. To appear in the proceedings of Eurocrypt'91.
+* 85, 1989.
+* [Sha79] A. Shamir. How to share a secret. _Communications of the ACM_, 22:612-613, 1979.
+* proceedings of CRYPTO 88_, Lecture Notes in Computer Science, pages 390
+- 448. Springer-Verlag, 1990.
+* 1080, July 1979.
