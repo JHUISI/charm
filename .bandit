@@ -1,17 +1,12 @@
-[bandit]
 # Bandit configuration for Charm-Crypto library
 # Targets production code, excludes test files
 
 # Exclude test directories
-exclude: /charm/test,/tests,/doc
-
-# Target all Python code in charm
-targets: charm
+exclude_dirs:
+  - charm/test
+  - tests
+  - doc
 
 # Skip informational issues (B101 assert usage is fine in crypto libs)
-skips: B101
-
-# Fail on medium severity or higher
-confidence: MEDIUM
-severity: MEDIUM
-
+skips:
+  - B101
