@@ -139,20 +139,26 @@ from charm.schemes.pksig.pksig_ecdsa import ECDSA
 group = ECGroup(secp256k1)
 ecdsa = ECDSA(group)
 
-# Ethereum-style transaction
-tx = {'from': '0x1a2b...', 'to': '0x3c4d...', 'value': 1.5, 'nonce': 42}
+# XRPL Payment transaction
+tx = {
+    'TransactionType': 'Payment',
+    'Account': 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+    'Destination': 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
+    'Amount': '1000000',  # drops of XRP
+    'Sequence': 1
+}
 
-# Serialize and hash (Ethereum uses RLP + Keccak256; simplified here)
+# Serialize and hash (XRPL uses canonical binary + SHA-512Half)
 tx_bytes = json.dumps(tx, sort_keys=True).encode('utf-8')
-tx_hash = hashlib.sha256(tx_bytes).hexdigest()
+tx_hash = hashlib.sha512(tx_bytes).hexdigest()[:64]  # SHA-512Half
 
 (pk, sk) = ecdsa.keygen(0)
 signature = ecdsa.sign(pk, sk, tx_hash)
 assert ecdsa.verify(pk, signature, tx_hash)
 ```
 
-> **Note:** Production implementations should use chain-specific serialization
-> (e.g., RLP for Ethereum, Bitcoin Script for Bitcoin) and hashing (Keccak-256, SHA-256d).
+> **Note:** Production XRPL implementations should use canonical binary serialization
+> and the full signing process per [XRPL documentation](https://xrpl.org/serialization.html).
 
 ## Schemes
 
