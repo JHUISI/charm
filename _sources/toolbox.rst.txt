@@ -18,6 +18,7 @@ primitives like symmetric encryption and hash functions.
    toolbox/ABEncMultiAuth
    toolbox/ABEnumeric
    toolbox/bitstring
+   toolbox/broadcast
    toolbox/Commit
    toolbox/conversion
    toolbox/DFA
@@ -32,7 +33,9 @@ primitives like symmetric encryption and hash functions.
    toolbox/integergroup
    toolbox/iterate
    toolbox/matrixops
+   toolbox/mpc_utils
    toolbox/msp
+   toolbox/mta
    toolbox/node
    toolbox/paddingschemes
    toolbox/pairingcurves
@@ -51,6 +54,7 @@ primitives like symmetric encryption and hash functions.
    toolbox/sigmaprotocol
    toolbox/specialprimes
    toolbox/symcrypto
+   toolbox/threshold_sharing
    toolbox/xmlserialize
    toolbox/zknode
    toolbox/ZKProof

@@ -18,5 +18,6 @@ These tests demonstrate how to use each scheme and verify correct functionality.
    test/pkenc_test
    test/pksig_test
    test/rsa_alg_test
+   test/threshold_test
 
 .. end_auto_test_schemes_list

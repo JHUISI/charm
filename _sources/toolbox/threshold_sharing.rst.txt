@@ -1,0 +1,7 @@
+
+threshold_sharing
+=========================================
+.. automodule:: threshold_sharing
+    :show-inheritance:
+    :members:
+    :undoc-members:
