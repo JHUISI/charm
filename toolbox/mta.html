@@ -7,7 +7,7 @@
         <link rel="prefetch" href="../_static/charm_logo.png" as="image">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>mta - Charm-Crypto v0.60</title>
+        <title>mta - Multiplicative-to-Additive Conversion - Charm-Crypto v0.60</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -298,7 +298,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bitstring.html">bitstring</a></li>
-<li class="toctree-l2"><a class="reference internal" href="broadcast.html">broadcast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="broadcast.html">broadcast - Echo Broadcast Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Commit.html">Commit - Commitment Schemes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conversion.html">conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="DFA.html">DFA</a></li>
@@ -313,9 +313,9 @@
 <li class="toctree-l2"><a class="reference internal" href="integergroup.html">integergroup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="iterate.html">iterate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="matrixops.html">matrixops</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mpc_utils.html">mpc_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpc_utils.html">mpc_utils - MPC Utility Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="msp.html">msp</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">mta</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">mta - Multiplicative-to-Additive Conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="node.html">node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="paddingschemes.html">paddingschemes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pairingcurves.html">pairingcurves</a></li>
@@ -334,7 +334,7 @@
 <li class="toctree-l2"><a class="reference internal" href="sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="specialprimes.html">specialprimes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
-<li class="toctree-l2"><a class="reference internal" href="threshold_sharing.html">threshold_sharing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threshold_sharing.html">threshold_sharing - Threshold Secret Sharing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xmlserialize.html">xmlserialize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="zknode.html">zknode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ZKProof.html">ZKProof</a></li>
@@ -352,7 +352,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/threshold_test.html">threshold_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/threshold_test.html">threshold_test - DKLS23 Threshold ECDSA Tests</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -407,13 +407,123 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="mta">
-<h1>mta<a class="headerlink" href="#mta" title="Link to this heading">¶</a></h1>
+          <section id="mta-multiplicative-to-additive-conversion">
+<h1>mta - Multiplicative-to-Additive Conversion<a class="headerlink" href="#mta-multiplicative-to-additive-conversion" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">mta</span></code> module implements <strong>Multiplicative-to-Additive (MtA)</strong> share conversion,
+a fundamental building block for threshold ECDSA protocols. MtA enables two parties
+holding multiplicative shares (a, b) to convert them into additive shares (α, β)
+such that <strong>a·b = α + β (mod q)</strong>, without revealing their individual shares.</p>
+<p>This implementation is based on the DKLS23 paper (“Threshold ECDSA from ECDSA
+Assumptions: The Multiparty Case”) and uses real oblivious transfer (OT) for
+security rather than simulation.</p>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Secure Share Conversion</strong>: Converts multiplicative to additive shares without revealing inputs</p></li>
+<li><p><strong>OT-Based Security</strong>: Uses real SimpleOT for cryptographic security guarantees</p></li>
+<li><p><strong>MtA with Check (MtAwc)</strong>: Includes zero-knowledge proofs for malicious security</p></li>
+<li><p><strong>Curve Agnostic</strong>: Works with any DDH-hard elliptic curve group</p></li>
+<li><p><strong>Bit-Level OT</strong>: Uses correlated OT with one OT per bit of the secret</p></li>
+</ul>
+</section>
+<section id="security-properties">
+<h2>Security Properties<a class="headerlink" href="#security-properties" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Sender Privacy</strong>: Receiver learns nothing about sender’s share beyond the additive output</p></li>
+<li><p><strong>Receiver Privacy</strong>: Sender learns nothing about receiver’s share</p></li>
+<li><p><strong>Correctness</strong>: The additive shares always sum to the original product</p></li>
+<li><p><strong>Malicious Security</strong> (MtAwc): Zero-knowledge proofs detect cheating parties</p></li>
+</ul>
+</section>
+<section id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>DKLS23 Presigning</strong>: Core component for generating presignatures</p></li>
+<li><p><strong>Threshold ECDSA</strong>: Enables secure multiplication of secret shares</p></li>
+<li><p><strong>Two-Party Computation</strong>: General-purpose secure multiplication protocol</p></li>
+</ul>
+</section>
+<section id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading">¶</a></h2>
+<p><strong>Basic MtA Conversion:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ecgroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECGroup</span><span class="p">,</span> <span class="n">ZR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.mta</span><span class="w"> </span><span class="kn">import</span> <span class="n">MtA</span>
+
+<span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+
+<span class="c1"># Create separate MtA instances for Alice and Bob</span>
+<span class="n">alice_mta</span> <span class="o">=</span> <span class="n">MtA</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="n">bob_mta</span> <span class="o">=</span> <span class="n">MtA</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+
+<span class="c1"># Alice has share a, Bob has share b</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+<span class="c1"># Run the 4-round MtA protocol</span>
+<span class="n">sender_msg</span> <span class="o">=</span> <span class="n">alice_mta</span><span class="o">.</span><span class="n">sender_round1</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">receiver_msg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bob_mta</span><span class="o">.</span><span class="n">receiver_round1</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">sender_msg</span><span class="p">)</span>
+<span class="n">alpha</span><span class="p">,</span> <span class="n">ot_data</span> <span class="o">=</span> <span class="n">alice_mta</span><span class="o">.</span><span class="n">sender_round2</span><span class="p">(</span><span class="n">receiver_msg</span><span class="p">)</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="n">bob_mta</span><span class="o">.</span><span class="n">receiver_round2</span><span class="p">(</span><span class="n">ot_data</span><span class="p">)</span>
+
+<span class="c1"># Verify: a*b = alpha + beta (mod q)</span>
+<span class="k">assert</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">==</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span>
+</pre></div>
+</div>
+<p><strong>MtA with Correctness Check (MtAwc):</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.mta</span><span class="w"> </span><span class="kn">import</span> <span class="n">MtAwc</span>
+
+<span class="n">mta_wc</span> <span class="o">=</span> <span class="n">MtAwc</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+<span class="c1"># Commitment phase</span>
+<span class="n">sender_commit</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">sender_commit</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">receiver_commit</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">receiver_commit</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+<span class="c1"># MtA with ZK proofs</span>
+<span class="n">sender_msg</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">sender_round1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">receiver_commit</span><span class="p">)</span>
+<span class="n">receiver_msg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">receiver_round1</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">sender_commit</span><span class="p">,</span> <span class="n">sender_msg</span><span class="p">)</span>
+<span class="n">alpha</span><span class="p">,</span> <span class="n">proof</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">sender_round2</span><span class="p">(</span><span class="n">receiver_msg</span><span class="p">)</span>
+<span class="n">beta</span><span class="p">,</span> <span class="n">valid</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">receiver_verify</span><span class="p">(</span><span class="n">proof</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">valid</span>  <span class="c1"># Proof verified</span>
+<span class="k">assert</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">==</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span>
+</pre></div>
+</div>
+</section>
+<section id="protocol-details">
+<h2>Protocol Details<a class="headerlink" href="#protocol-details" title="Link to this heading">¶</a></h2>
+<p>The MtA protocol works as follows:</p>
+<ol class="arabic simple">
+<li><p><strong>Sender Setup</strong>: Sender decomposes share <cite>a</cite> into bits and creates OT sender instances</p></li>
+<li><p><strong>Receiver Choose</strong>: Receiver uses bits of <cite>b</cite> to select OT messages (learns only selected values)</p></li>
+<li><p><strong>Sender Transfer</strong>: Sender encrypts correlated messages via OT</p></li>
+<li><p><strong>Receiver Output</strong>: Receiver decrypts selected messages and computes additive share</p></li>
+</ol>
+<p>For each bit position i, the correlation is: m₁ = m₀ + a·2ⁱ, ensuring the sum of
+selected values equals a·b.</p>
+</section>
+<section id="related-modules">
+<h2>Related Modules<a class="headerlink" href="#related-modules" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="mpc_utils.html"><span class="doc">mpc_utils - MPC Utility Functions</span></a> - Bit decomposition utilities used by MtA</p></li>
+<li><p><a class="reference internal" href="threshold_sharing.html"><span class="doc">threshold_sharing - Threshold Secret Sharing</span></a> - Threshold sharing for key distribution</p></li>
+<li><p><a class="reference internal" href="broadcast.html"><span class="doc">broadcast - Echo Broadcast Protocol</span></a> - Broadcast primitives for consistency</p></li>
+</ul>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
+</section>
 </section>
 
         </article>
@@ -451,7 +561,7 @@
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Jan 29, 2026</div>
+              Last updated on Jan 30, 2026</div>
           </div>
           <div class="right-details">
             
@@ -460,8 +570,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">mta - Multiplicative-to-Additive Conversion</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#key-features">Key Features</a></li>
+<li><a class="reference internal" href="#security-properties">Security Properties</a></li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li><a class="reference internal" href="#protocol-details">Protocol Details</a></li>
+<li><a class="reference internal" href="#related-modules">Related Modules</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

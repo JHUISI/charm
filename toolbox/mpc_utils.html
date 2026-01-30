@@ -7,7 +7,7 @@
         <link rel="prefetch" href="../_static/charm_logo.png" as="image">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>mpc_utils - Charm-Crypto v0.60</title>
+        <title>mpc_utils - MPC Utility Functions - Charm-Crypto v0.60</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -298,7 +298,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bitstring.html">bitstring</a></li>
-<li class="toctree-l2"><a class="reference internal" href="broadcast.html">broadcast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="broadcast.html">broadcast - Echo Broadcast Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Commit.html">Commit - Commitment Schemes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conversion.html">conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="DFA.html">DFA</a></li>
@@ -313,9 +313,9 @@
 <li class="toctree-l2"><a class="reference internal" href="integergroup.html">integergroup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="iterate.html">iterate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="matrixops.html">matrixops</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">mpc_utils</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">mpc_utils - MPC Utility Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="msp.html">msp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mta.html">mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mta.html">mta - Multiplicative-to-Additive Conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="node.html">node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="paddingschemes.html">paddingschemes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pairingcurves.html">pairingcurves</a></li>
@@ -334,7 +334,7 @@
 <li class="toctree-l2"><a class="reference internal" href="sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="specialprimes.html">specialprimes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
-<li class="toctree-l2"><a class="reference internal" href="threshold_sharing.html">threshold_sharing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threshold_sharing.html">threshold_sharing - Threshold Secret Sharing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xmlserialize.html">xmlserialize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="zknode.html">zknode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ZKProof.html">ZKProof</a></li>
@@ -352,7 +352,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../test/pkenc_test.html">pkenc_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../test/pksig_test.html">pksig_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../test/rsa_alg_test.html">rsa_alg_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../test/threshold_test.html">threshold_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../test/threshold_test.html">threshold_test - DKLS23 Threshold ECDSA Tests</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -407,13 +407,97 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="mpc-utils">
-<h1>mpc_utils<a class="headerlink" href="#mpc-utils" title="Link to this heading">¶</a></h1>
+          <section id="mpc-utils-mpc-utility-functions">
+<h1>mpc_utils - MPC Utility Functions<a class="headerlink" href="#mpc-utils-mpc-utility-functions" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">mpc_utils</span></code> module provides common utility functions for multi-party computation
+(MPC) protocols in the Charm cryptographic library. These utilities support byte/integer
+conversions, bit decomposition for OT-based protocols, and Pedersen commitments for
+hiding values during secure computation.</p>
+<p>This module serves as a foundational building block for threshold ECDSA implementations
+like DKLS23, providing consistent data handling across all MPC components.</p>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Byte/Integer Conversion</strong>: Consistent big-endian conversion between integers and bytes</p></li>
+<li><p><strong>Bit Decomposition</strong>: LSB-first bit extraction for oblivious transfer protocols</p></li>
+<li><p><strong>Pedersen Commitments</strong>: Information-theoretically hiding, computationally binding commitments</p></li>
+<li><p><strong>Homomorphic Properties</strong>: Commitments support additive homomorphism for secure aggregation</p></li>
+<li><p><strong>Elliptic Curve Support</strong>: Works with any DDH-hard elliptic curve group</p></li>
+</ul>
+</section>
+<section id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Oblivious Transfer</strong>: Bit decomposition enables OT-based MtA conversion</p></li>
+<li><p><strong>Zero-Knowledge Proofs</strong>: Pedersen commitments provide hiding for ZK protocols</p></li>
+<li><p><strong>Secure Aggregation</strong>: Homomorphic commitment addition for distributed protocols</p></li>
+<li><p><strong>Protocol Serialization</strong>: Consistent byte encoding for network transmission</p></li>
+</ul>
+</section>
+<section id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading">¶</a></h2>
+<p><strong>Byte/Integer Conversion:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.mpc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">int_to_bytes</span><span class="p">,</span> <span class="n">bytes_to_int</span>
+
+<span class="c1"># Convert integer to fixed-length bytes (big-endian)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">int_to_bytes</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>  <span class="c1"># b&#39;\x00\x00\x01\x00&#39;</span>
+
+<span class="c1"># Convert back to integer</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">bytes_to_int</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># 256</span>
+</pre></div>
+</div>
+<p><strong>Bit Decomposition:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.mpc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">bit_decompose</span><span class="p">,</span> <span class="n">bits_to_int</span>
+
+<span class="c1"># Decompose value into bits (LSB first)</span>
+<span class="n">bits</span> <span class="o">=</span> <span class="n">bit_decompose</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">256</span><span class="p">,</span> <span class="n">num_bits</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>  <span class="c1"># [1, 0, 1, 0]</span>
+
+<span class="c1"># Reconstruct from bits</span>
+<span class="n">reconstructed</span> <span class="o">=</span> <span class="n">bits_to_int</span><span class="p">(</span><span class="n">bits</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">256</span><span class="p">)</span>  <span class="c1"># 5</span>
+</pre></div>
+</div>
+<p><strong>Pedersen Commitments:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ecgroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECGroup</span><span class="p">,</span> <span class="n">ZR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.mpc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">PedersenCommitment</span>
+
+<span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="n">pc</span> <span class="o">=</span> <span class="n">PedersenCommitment</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="n">pc</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+<span class="c1"># Commit to a value</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="n">commitment</span><span class="p">,</span> <span class="n">randomness</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="c1"># Verify the commitment opens correctly</span>
+<span class="n">is_valid</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">commitment</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">randomness</span><span class="p">)</span>  <span class="c1"># True</span>
+
+<span class="c1"># Homomorphic addition of commitments</span>
+<span class="n">c1</span><span class="p">,</span> <span class="n">r1</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">c2</span><span class="p">,</span> <span class="n">r2</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+<span class="n">c_sum</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span>  <span class="c1"># Commits to 30</span>
+</pre></div>
+</div>
+</section>
+<section id="related-modules">
+<h2>Related Modules<a class="headerlink" href="#related-modules" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="mta.html"><span class="doc">mta - Multiplicative-to-Additive Conversion</span></a> - Uses bit decomposition for MtA protocol</p></li>
+<li><p><a class="reference internal" href="threshold_sharing.html"><span class="doc">threshold_sharing - Threshold Secret Sharing</span></a> - Uses Pedersen commitments in Pedersen VSS</p></li>
+<li><p><a class="reference internal" href="broadcast.html"><span class="doc">broadcast - Echo Broadcast Protocol</span></a> - Broadcast primitives for MPC</p></li>
+</ul>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
+</section>
 </section>
 
         </article>
@@ -451,7 +535,7 @@
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Jan 29, 2026</div>
+              Last updated on Jan 30, 2026</div>
           </div>
           <div class="right-details">
             
@@ -460,8 +544,32 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">mpc_utils - MPC Utility Functions</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#key-features">Key Features</a></li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li><a class="reference internal" href="#related-modules">Related Modules</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

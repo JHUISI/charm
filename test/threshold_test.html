@@ -7,7 +7,7 @@
         <link rel="prefetch" href="../_static/charm_logo.png" as="image">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>threshold_test - Charm-Crypto v0.60</title>
+        <title>threshold_test - DKLS23 Threshold ECDSA Tests - Charm-Crypto v0.60</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -298,7 +298,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/bitstring.html">bitstring</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../toolbox/broadcast.html">broadcast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/broadcast.html">broadcast - Echo Broadcast Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/Commit.html">Commit - Commitment Schemes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/conversion.html">conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/DFA.html">DFA</a></li>
@@ -313,9 +313,9 @@
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/integergroup.html">integergroup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/iterate.html">iterate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/matrixops.html">matrixops</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../toolbox/mpc_utils.html">mpc_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/mpc_utils.html">mpc_utils - MPC Utility Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/msp.html">msp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../toolbox/mta.html">mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/mta.html">mta - Multiplicative-to-Additive Conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/node.html">node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/paddingschemes.html">paddingschemes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/pairingcurves.html">pairingcurves</a></li>
@@ -334,7 +334,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/specialprimes.html">specialprimes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../toolbox/threshold_sharing.html">threshold_sharing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/threshold_sharing.html">threshold_sharing - Threshold Secret Sharing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/xmlserialize.html">xmlserialize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/zknode.html">zknode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/ZKProof.html">ZKProof</a></li>
@@ -352,7 +352,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pkenc_test.html">pkenc_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pksig_test.html">pksig_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rsa_alg_test.html">rsa_alg_test</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">threshold_test</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">threshold_test - DKLS23 Threshold ECDSA Tests</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -407,13 +407,156 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="threshold-test">
-<h1>threshold_test<a class="headerlink" href="#threshold-test" title="Link to this heading">¶</a></h1>
+          <section id="threshold-test-dkls23-threshold-ecdsa-tests">
+<h1>threshold_test - DKLS23 Threshold ECDSA Tests<a class="headerlink" href="#threshold-test-dkls23-threshold-ecdsa-tests" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">threshold_test</span></code> module provides comprehensive test coverage for the DKLS23
+threshold ECDSA implementation. It validates all components of the threshold
+signature protocol including oblivious transfer, MtA conversion, secret sharing,
+distributed key generation, presigning, and signing.</p>
+<p>These tests ensure correctness, security properties, and proper error handling
+across the entire threshold ECDSA stack.</p>
+</section>
+<section id="test-categories">
+<h2>Test Categories<a class="headerlink" href="#test-categories" title="Link to this heading">¶</a></h2>
+<p>The test suite is organized into the following categories:</p>
+<dl class="simple">
+<dt><strong>Oblivious Transfer Tests (TestSimpleOT, TestOTExtension)</strong></dt><dd><ul class="simple">
+<li><p>Basic OT correctness for choice bits 0 and 1</p></li>
+<li><p>Multiple independent OT transfers</p></li>
+<li><p>Invalid point rejection (identity element attacks)</p></li>
+<li><p>OT extension with 256+ OTs</p></li>
+<li><p>Base OT setup verification</p></li>
+</ul>
+</dd>
+<dt><strong>MtA Tests (TestMtA, TestMtAwc)</strong></dt><dd><ul class="simple">
+<li><p>Multiplicative-to-additive correctness: a·b = α + β</p></li>
+<li><p>Real OT security (receiver never sees both messages)</p></li>
+<li><p>Edge cases near curve order boundary</p></li>
+<li><p>MtAwc zero-knowledge proof verification</p></li>
+<li><p>Proof structure validation (no secret leakage)</p></li>
+</ul>
+</dd>
+<dt><strong>Threshold Sharing Tests (TestThresholdSharing, TestPedersenVSS)</strong></dt><dd><ul class="simple">
+<li><p>Basic Shamir sharing and reconstruction</p></li>
+<li><p>Feldman VSS verification</p></li>
+<li><p>Tampered share detection</p></li>
+<li><p>Various threshold configurations (2-of-3, 3-of-5)</p></li>
+<li><p>Pedersen VSS with blinding factors</p></li>
+</ul>
+</dd>
+<dt><strong>DKG Tests (TestDKLS23_DKG)</strong></dt><dd><ul class="simple">
+<li><p>2-of-3 distributed key generation</p></li>
+<li><p>Public key consistency across parties</p></li>
+<li><p>Correct public key computation</p></li>
+<li><p>Session ID validation</p></li>
+</ul>
+</dd>
+<dt><strong>Presigning Tests (TestDKLS23_Presign)</strong></dt><dd><ul class="simple">
+<li><p>Valid presignature generation</p></li>
+<li><p>Consistent r values across participants</p></li>
+<li><p>Session ID requirements</p></li>
+</ul>
+</dd>
+<dt><strong>Signing Tests (TestDKLS23_Sign)</strong></dt><dd><ul class="simple">
+<li><p>Signature share generation</p></li>
+<li><p>Standard ECDSA verification</p></li>
+<li><p>Wrong message detection</p></li>
+<li><p>Invalid signature share detection</p></li>
+</ul>
+</dd>
+<dt><strong>End-to-End Tests (TestDKLS23_Complete)</strong></dt><dd><ul class="simple">
+<li><p>Complete 2-of-3 signing flow</p></li>
+<li><p>Different participant combinations</p></li>
+<li><p>Standard ECDSA format output</p></li>
+<li><p>DER encoding validation</p></li>
+<li><p>Multiple messages with same keys</p></li>
+</ul>
+</dd>
+<dt><strong>Security Tests (TestMaliciousParties)</strong></dt><dd><ul class="simple">
+<li><p>Invalid share detection during DKG</p></li>
+<li><p>Commitment mismatch detection</p></li>
+<li><p>Malicious party identification</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="running-the-tests">
+<h2>Running the Tests<a class="headerlink" href="#running-the-tests" title="Link to this heading">¶</a></h2>
+<p>Run all threshold tests with pytest:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>charm/test/schemes/threshold_test.py<span class="w"> </span>-v
+</pre></div>
+</div>
+<p>Run specific test class:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>charm/test/schemes/threshold_test.py::TestDKLS23_Complete<span class="w"> </span>-v
+</pre></div>
+</div>
+<p>Run with coverage:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>charm/test/schemes/threshold_test.py<span class="w"> </span>--cov<span class="o">=</span>charm.schemes.threshold<span class="w"> </span>--cov-report<span class="o">=</span>html
+</pre></div>
+</div>
+</section>
+<section id="key-test-scenarios">
+<h2>Key Test Scenarios<a class="headerlink" href="#key-test-scenarios" title="Link to this heading">¶</a></h2>
+<p><strong>Complete Signing Flow:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_complete_2_of_3_signing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">dkls</span> <span class="o">=</span> <span class="n">DKLS23</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+    <span class="c1"># Step 1: Distributed Key Generation</span>
+    <span class="n">key_shares</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">dkls</span><span class="o">.</span><span class="n">distributed_keygen</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+    <span class="c1"># Step 2: Generate presignatures</span>
+    <span class="n">presignatures</span> <span class="o">=</span> <span class="n">dkls</span><span class="o">.</span><span class="n">presign</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">key_shares</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+    <span class="c1"># Step 3: Sign a message</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Hello, threshold ECDSA!&quot;</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">dkls</span><span class="o">.</span><span class="n">sign</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">presignatures</span><span class="p">,</span> <span class="n">key_shares</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+    <span class="c1"># Step 4: Verify signature</span>
+    <span class="k">assert</span> <span class="n">dkls</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Curve Agnosticism:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_curve_agnostic_prime256v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">prime256v1</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime256v1</span><span class="p">)</span>
+
+    <span class="n">dkls</span> <span class="o">=</span> <span class="n">DKLS23</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="c1"># Protocol works with P-256 curve</span>
+</pre></div>
+</div>
+<p><strong>Malicious Party Detection:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_dkg_invalid_share_detected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># Tamper with a share during DKG</span>
+    <span class="n">tampered_share</span> <span class="o">=</span> <span class="n">original_share</span> <span class="o">+</span> <span class="n">one</span>
+
+    <span class="c1"># Victim party detects the invalid share</span>
+    <span class="n">key_share</span><span class="p">,</span> <span class="n">complaint</span> <span class="o">=</span> <span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round3</span><span class="p">(</span><span class="n">victim_id</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">received</span><span class="p">,</span> <span class="n">msgs</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">key_share</span> <span class="ow">is</span> <span class="kc">None</span>  <span class="c1"># Verification failed</span>
+    <span class="k">assert</span> <span class="n">complaint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># Complaint generated</span>
+</pre></div>
+</div>
+</section>
+<section id="related-modules">
+<h2>Related Modules<a class="headerlink" href="#related-modules" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../toolbox/threshold_sharing.html"><span class="doc">threshold_sharing - Threshold Secret Sharing</span></a> - Threshold sharing implementation</p></li>
+<li><p><a class="reference internal" href="../toolbox/mta.html"><span class="doc">mta - Multiplicative-to-Additive Conversion</span></a> - MtA conversion tested here</p></li>
+<li><p><a class="reference internal" href="../toolbox/broadcast.html"><span class="doc">broadcast - Echo Broadcast Protocol</span></a> - Broadcast primitives</p></li>
+<li><p><a class="reference internal" href="../toolbox/mpc_utils.html"><span class="doc">mpc_utils - MPC Utility Functions</span></a> - MPC utilities</p></li>
+</ul>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
+</section>
 </section>
 
         </article>
@@ -451,7 +594,7 @@
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Jan 29, 2026</div>
+              Last updated on Jan 30, 2026</div>
           </div>
           <div class="right-details">
             
@@ -460,8 +603,32 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">threshold_test - DKLS23 Threshold ECDSA Tests</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#test-categories">Test Categories</a></li>
+<li><a class="reference internal" href="#running-the-tests">Running the Tests</a></li>
+<li><a class="reference internal" href="#key-test-scenarios">Key Test Scenarios</a></li>
+<li><a class="reference internal" href="#related-modules">Related Modules</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
