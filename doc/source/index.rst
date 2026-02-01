@@ -5,12 +5,12 @@ Charm-Crypto
 
 **A framework for rapidly prototyping advanced cryptographic schemes**
 
-.. image:: https://img.shields.io/pypi/v/charm-crypto.svg
-   :target: https://pypi.org/project/charm-crypto/
+.. image:: https://img.shields.io/pypi/v/charm-crypto-framework.svg
+   :target: https://pypi.org/project/charm-crypto-framework/
    :alt: PyPI version
 
-.. image:: https://img.shields.io/pypi/pyversions/charm-crypto.svg
-   :target: https://pypi.org/project/charm-crypto/
+.. image:: https://img.shields.io/pypi/pyversions/charm-crypto-framework.svg
+   :target: https://pypi.org/project/charm-crypto-framework/
    :alt: Python versions
 
 .. image:: https://img.shields.io/github/license/JHUISI/charm.svg
@@ -35,7 +35,7 @@ Quick Start
 
 Install from PyPI::
 
-    pip install charm-crypto
+    pip install charm-crypto-framework
 
 **BLS Signatures** (used in Ethereum 2.0):
 
@@ -129,7 +129,7 @@ Links
 -----
 
 - **Source Code**: `GitHub <https://github.com/JHUISI/charm>`_
-- **Package**: `PyPI <https://pypi.org/project/charm-crypto/>`_
+- **Package**: `PyPI <https://pypi.org/project/charm-crypto-framework/>`_
 - **Issues**: `Bug Tracker <https://github.com/JHUISI/charm/issues>`_
 
 Indices and Tables
