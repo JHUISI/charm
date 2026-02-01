@@ -4,8 +4,7 @@ try:
   import charm.core.math.pairing as pg
   from charm.config import libs,pairing_lib
 except Exception as err:
-  print(err)
-  exit(-1)
+  raise ImportError("Cannot import pairing module. Ensure Charm crypto C extensions are compiled: %s" % err)
 
 class PairingGroup():
     def __init__(self, param_id, param_file = False, secparam = 512, verbose = False, seed1 = None, seed2 = None):

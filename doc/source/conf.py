@@ -45,6 +45,15 @@ sys.path.insert(0, os.path.abspath('../../charm/test/toolbox'))
 # Note: sphinx.ext.pngmath was deprecated; replaced with sphinx.ext.mathjax
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'sphinx.ext.viewcode']
 todo_include_todos = True
+
+# Mock C extension modules that may not be available during documentation build
+# This allows autodoc to import Python modules that depend on these C extensions
+autodoc_mock_imports = [
+    'charm.core.math.pairing',
+    'charm.core.math.elliptic_curve',
+    'charm.core.math.integer',
+    'charm.config',
+]
 #jsmath_path="jsMath/easy/load.js"
 
 # Add any paths that contain templates here, relative to this directory.

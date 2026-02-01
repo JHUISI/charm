@@ -2,8 +2,7 @@ try:
    from charm.core.math.elliptic_curve import elliptic_curve,ec_element,ZR,G,init,random,order,getGenerator,bitsize,serialize,deserialize,hashEC,encode,decode,getXY
    import charm.core.math.elliptic_curve as ecc
 except Exception as err:
-   print(err)
-   exit(-1)
+   raise ImportError("Cannot import elliptic_curve module. Ensure Charm crypto C extensions are compiled: %s" % err)
 
 class ECGroup():
     def __init__(self, builtin_cv):
