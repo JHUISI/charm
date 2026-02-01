@@ -6,7 +6,7 @@
         <link rel="prefetch" href="../_static/charm_logo.png" as="image">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>PREnc - Charm-Crypto v0.60</title>
+        <title>mpc_utils - Charm-Crypto v0.60</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -401,58 +401,328 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for PREnc</h1><div class="highlight"><pre>
-<span></span><span class="sd">&#39;&#39;&#39; Base class for Proxy Re-Encryption</span>
-<span class="sd"> </span>
-<span class="sd"> Notes: This class implements an interface for a standard proxy re-encryption scheme.</span>
-<span class="sd"> </span>
-<span class="sd"> A proxy re-encryption scheme consists of six algorithms: </span>
-<span class="sd"> (setup, keygen, encrypt, decrypt, rekeygen, re_encrypt).</span>
+          <h1>Source code for mpc_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">MPC Utility Functions for Charm</span>
+
+<span class="sd">Common utilities for multi-party computation protocols including:</span>
+<span class="sd">- Byte/integer conversion with consistent big-endian ordering</span>
+<span class="sd">- Bit decomposition and reconstruction for OT-based protocols</span>
+<span class="sd">- Pedersen commitment scheme for hiding commitments</span>
+
+<span class="sd">:Authors: Elton de Souza</span>
+<span class="sd">:Date:    01/2026</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.schemebase</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
-<div class="viewcode-block" id="PREnc">
-<a class="viewcode-back" href="../toolbox/PREnc.html#PREnc.PREnc">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">PREnc</span><span class="p">(</span><span class="n">SchemeBase</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">SchemeBase</span><span class="o">.</span><span class="n">_setProperty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;PREnc&#39;</span><span class="p">)</span>  
-        <span class="c1">#self.baseSecDefs = Enum(&#39;IND_AB_CPA&#39;, &#39;IND_AB_CCA&#39;, &#39;sIND_AB_CPA&#39;, &#39;sIND_AB_CCA&#39;) </span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ecgroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECGroup</span><span class="p">,</span> <span class="n">ZR</span><span class="p">,</span> <span class="n">G</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
-<div class="viewcode-block" id="PREnc.setup">
-<a class="viewcode-back" href="../toolbox/PREnc.html#PREnc.PREnc.setup">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<span class="c1"># Type aliases</span>
+<span class="n">ZRElement</span> <span class="o">=</span> <span class="n">Any</span>
+<span class="n">GElement</span> <span class="o">=</span> <span class="n">Any</span>
+<span class="n">ECGroupType</span> <span class="o">=</span> <span class="n">Any</span>
 
 
-<div class="viewcode-block" id="PREnc.keygen">
-<a class="viewcode-back" href="../toolbox/PREnc.html#PREnc.PREnc.keygen">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<div class="viewcode-block" id="int_to_bytes">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.int_to_bytes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">int_to_bytes</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a non-negative integer to a fixed-length byte string.</span>
+
+<span class="sd">    Uses big-endian byte ordering (most significant byte first),</span>
+<span class="sd">    which is standard for cryptographic protocols.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Non-negative integer to convert. Must fit within `length` bytes.</span>
+<span class="sd">    length : int</span>
+<span class="sd">        Exact number of bytes in the output. Value is zero-padded if needed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bytes</span>
+<span class="sd">        Big-endian representation of `n` with exactly `length` bytes.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    OverflowError</span>
+<span class="sd">        If `n` is too large to fit in `length` bytes.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If `n` is negative.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; int_to_bytes(256, 2)</span>
+<span class="sd">    b&#39;\\x01\\x00&#39;</span>
+<span class="sd">    &gt;&gt;&gt; int_to_bytes(0, 4)</span>
+<span class="sd">    b&#39;\\x00\\x00\\x00\\x00&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n must be non-negative&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="s1">&#39;big&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="PREnc.encrypt">
-<a class="viewcode-back" href="../toolbox/PREnc.html#PREnc.PREnc.encrypt">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="bytes_to_int">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.bytes_to_int">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bytes_to_int</span><span class="p">(</span><span class="n">b</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a byte string to a non-negative integer.</span>
+
+<span class="sd">    Uses big-endian byte ordering (most significant byte first),</span>
+<span class="sd">    which is standard for cryptographic protocols.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    b : bytes</span>
+<span class="sd">        Byte string to convert.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The integer value represented by the bytes.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; bytes_to_int(b&#39;\\x01\\x00&#39;)</span>
+<span class="sd">    256</span>
+<span class="sd">    &gt;&gt;&gt; bytes_to_int(b&#39;\\x00\\x00\\x00\\x00&#39;)</span>
+<span class="sd">    0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="s1">&#39;big&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="PREnc.decrypt">
-<a class="viewcode-back" href="../toolbox/PREnc.html#PREnc.PREnc.decrypt">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">sk</span><span class="p">,</span> <span class="n">ct</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="bit_decompose">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.bit_decompose">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bit_decompose</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_bits</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decompose a field element into its bit representation.</span>
+
+<span class="sd">    The input value is first reduced modulo order to ensure consistent</span>
+<span class="sd">    behavior for values at or near the group order boundary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : ZR element or int</span>
+<span class="sd">        The value to decompose (will be reduced mod order)</span>
+<span class="sd">    order : int</span>
+<span class="sd">        The group order</span>
+<span class="sd">    num_bits : int</span>
+<span class="sd">        Number of bits to extract</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of int</span>
+<span class="sd">        List of bits (0 or 1), LSB first</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; bit_decompose(5, 2**256, 4)</span>
+<span class="sd">    [1, 0, 1, 0]</span>
+<span class="sd">    &gt;&gt;&gt; bit_decompose(0, 2**256, 4)</span>
+<span class="sd">    [0, 0, 0, 0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;__int__&#39;</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">%</span> <span class="n">order</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="o">%</span> <span class="n">order</span>
+
+    <span class="n">bits</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_bits</span><span class="p">):</span>
+        <span class="n">bits</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span> <span class="o">&gt;&gt;</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bits</span></div>
 
 
-<div class="viewcode-block" id="PREnc.rekeygen">
-<a class="viewcode-back" href="../toolbox/PREnc.html#PREnc.PREnc.rekeygen">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">rekeygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">pk_a</span><span class="p">,</span> <span class="n">sk_a</span><span class="p">,</span> <span class="n">pk_b</span><span class="p">,</span> <span class="n">sk_b</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-    
-<div class="viewcode-block" id="PREnc.re_encrypt">
-<a class="viewcode-back" href="../toolbox/PREnc.html#PREnc.PREnc.re_encrypt">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">re_encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">rk</span><span class="p">,</span> <span class="n">c_a</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+<div class="viewcode-block" id="bits_to_int">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.bits_to_int">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bits_to_int</span><span class="p">(</span><span class="n">bits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reconstruct an integer from its bit representation, reduced mod order.</span>
+
+<span class="sd">    This is the inverse of bit_decompose. The result is always reduced</span>
+<span class="sd">    modulo the group order to ensure values stay in the valid field range.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bits : list of int</span>
+<span class="sd">        List of bits (0 or 1), LSB first</span>
+<span class="sd">    order : int</span>
+<span class="sd">        The group order</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The reconstructed integer, reduced mod order</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; bits_to_int([1, 0, 1, 0], 2**256)</span>
+<span class="sd">    5</span>
+<span class="sd">    &gt;&gt;&gt; bits_to_int([0, 0, 0, 0], 2**256)</span>
+<span class="sd">    0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bit</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bits</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">bit</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span> <span class="o">%</span> <span class="n">order</span></div>
+
+
+
+<div class="viewcode-block" id="PedersenCommitment">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.PedersenCommitment">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PedersenCommitment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pedersen Commitment Scheme for Elliptic Curve Groups.</span>
+
+<span class="sd">    Implements the information-theoretically hiding commitment scheme:</span>
+<span class="sd">    C = g^value * h^randomness</span>
+
+<span class="sd">    where g and h are generators with unknown discrete log relationship.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">    - Computationally binding (under DLP assumption)</span>
+<span class="sd">    - Information-theoretically hiding</span>
+<span class="sd">    - Additively homomorphic</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    group : ECGroup</span>
+<span class="sd">        An elliptic curve group object</span>
+<span class="sd">    g : GElement, optional</span>
+<span class="sd">        First generator (random if not provided)</span>
+<span class="sd">    h : GElement, optional</span>
+<span class="sd">        Second generator (random if not provided)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.eccurve import secp256k1</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.ecgroup import ECGroup, ZR</span>
+<span class="sd">    &gt;&gt;&gt; group = ECGroup(secp256k1)</span>
+<span class="sd">    &gt;&gt;&gt; pc = PedersenCommitment(group)</span>
+<span class="sd">    &gt;&gt;&gt; pc.setup()</span>
+<span class="sd">    &gt;&gt;&gt; value = group.random(ZR)</span>
+<span class="sd">    &gt;&gt;&gt; c, r = pc.commit(value)</span>
+<span class="sd">    &gt;&gt;&gt; pc.open(c, value, r)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">ECGroup</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GElement</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">h</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GElement</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">group</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;group cannot be None&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">order</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="n">h</span>
+
+<div class="viewcode-block" id="PedersenCommitment.setup">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.PedersenCommitment.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GElement</span><span class="p">,</span> <span class="n">GElement</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate random generators if not already set.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GElement</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;First generator.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Call setup() first&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GElement</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Second generator.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Call setup() first&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_h</span>
+
+<div class="viewcode-block" id="PedersenCommitment.commit">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.PedersenCommitment.commit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">commit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">randomness</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ZRElement</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+               <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GElement</span><span class="p">,</span> <span class="n">ZRElement</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create Pedersen commitment: C = g^value * h^randomness.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : ZRElement or int</span>
+<span class="sd">            Value to commit to</span>
+<span class="sd">        randomness : ZRElement, optional</span>
+<span class="sd">            Randomness for commitment (generated if not provided)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            (commitment, randomness)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">randomness</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">randomness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">value</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+
+        <span class="n">commitment</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">**</span> <span class="n">value</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">**</span> <span class="n">randomness</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">commitment</span><span class="p">,</span> <span class="n">randomness</span></div>
+
+
+<div class="viewcode-block" id="PedersenCommitment.open">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.PedersenCommitment.open">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commitment</span><span class="p">:</span> <span class="n">GElement</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+             <span class="n">randomness</span><span class="p">:</span> <span class="n">ZRElement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify that a commitment opens to the given value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        commitment : GElement</span>
+<span class="sd">            The commitment to verify</span>
+<span class="sd">        value : ZRElement or int</span>
+<span class="sd">            The claimed value</span>
+<span class="sd">        randomness : ZRElement</span>
+<span class="sd">            The randomness used in commitment</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if commitment opens correctly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">value</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+
+        <span class="n">expected</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">**</span> <span class="n">value</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">**</span> <span class="n">randomness</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">commitment</span> <span class="o">==</span> <span class="n">expected</span></div>
+
+
+<div class="viewcode-block" id="PedersenCommitment.add">
+<a class="viewcode-back" href="../toolbox/mpc_utils.html#mpc_utils.PedersenCommitment.add">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c1</span><span class="p">:</span> <span class="n">GElement</span><span class="p">,</span> <span class="n">c2</span><span class="p">:</span> <span class="n">GElement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GElement</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Homomorphically add two commitments.</span>
+
+<span class="sd">        If c1 = Commit(v1, r1) and c2 = Commit(v2, r2),</span>
+<span class="sd">        then c1 * c2 = Commit(v1 + v2, r1 + r2).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c1 : GElement</span>
+<span class="sd">            First commitment</span>
+<span class="sd">        c2 : GElement</span>
+<span class="sd">            Second commitment</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        GElement</span>
+<span class="sd">            Combined commitment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">c2</span></div>
 </div>
 
 </pre></div>

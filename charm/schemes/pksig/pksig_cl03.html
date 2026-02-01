@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,102 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="pksig-cl03">
-<h1>pksig_cl03<a class="headerlink" href="#pksig-cl03" title="Link to this heading">¶</a></h1>
+          <section id="module-pksig_cl03">
+<span id="pksig-cl03"></span><h1>pksig_cl03<a class="headerlink" href="#module-pksig_cl03" title="Link to this heading">¶</a></h1>
+<p><strong>Camenisch-Lysyanskaya Signature (CL03)</strong></p>
+<p><em>Authors:</em> J. Camenisch, A. Lysyanskaya</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “A Signature Scheme with Efficient Protocols”</div>
+<div class="line"><strong>Published in:</strong> SCN, 2003</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://cs.brown.edu/~anna/papers/camlys02b.pdf">http://cs.brown.edu/~anna/papers/camlys02b.pdf</a></div>
+<div class="line"><strong>Notes:</strong> Schemes 2.2 (on page 4) and 4 (on page 8).</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> signature (public key)</p></li>
+<li><p><strong>Setting:</strong> integer groups</p></li>
+<li><p><strong>Assumption:</strong> Strong RSA</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Christina Garman, Antonio de la Piedra</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>11/2013</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="pksig_cl03.SHA1">
+<span class="sig-prename descclassname"><span class="pre">pksig_cl03.</span></span><span class="sig-name descname"><span class="pre">SHA1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_cl03.html#SHA1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_cl03.SHA1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pksig_cl03.Sig_CL03">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pksig_cl03.</span></span><span class="sig-name descname"><span class="pre">Sig_CL03</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">160</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">160</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PKSig</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span> <span class="o">=</span> <span class="n">Sig_CL03</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">21281327767482252741932894893985715222965623124768085901716557791820905647984944443933101657552322341359898014680608292582311911954091137905079983298534519</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">25806791860198780216123533220157510131833627659100364815258741328806284055493647951841418122944864389129382151632630375439181728665686745203837140362092027</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">SHA1</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;This is the message I want to hash.&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.conversion</span><span class="w"> </span><span class="kn">import</span> <span class="n">Conversion</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>  <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">j</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span> <span class="n">g</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">randomQR</span><span class="p">(</span><span class="n">public_key</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span> <span class="n">m</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="n">SHA1</span><span class="p">(</span><span class="n">Conversion</span><span class="o">.</span><span class="n">IP2OS</span><span class="p">(</span><span class="n">random</span><span class="p">(</span><span class="n">public_key</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Cx</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">%</span> <span class="n">public_key</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span> <span class="n">Cx</span> <span class="o">=</span> <span class="n">Cx</span><span class="o">*</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">**</span> <span class="n">m</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span> <span class="o">=</span> <span class="n">Sig_CL03</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">21281327767482252741932894893985715222965623124768085901716557791820905647984944443933101657552322341359898014680608292582311911954091137905079983298534519</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">25806791860198780216123533220157510131833627659100364815258741328806284055493647951841418122944864389129382151632630375439181728665686745203837140362092027</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">pksig</span><span class="o">.</span><span class="n">signCommit</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">Cx</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pksig</span><span class="o">.</span><span class="n">verifyCommit</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">Cx</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_cl03.Sig_CL03.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_cl03.Sig_CL03.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.sign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_cl03.Sig_CL03.signCommit">
+<span class="sig-name descname"><span class="pre">signCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.signCommit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.signCommit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_cl03.Sig_CL03.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.verify" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_cl03.Sig_CL03.verifyCommit">
+<span class="sig-name descname"><span class="pre">verifyCommit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_cl03.html#Sig_CL03.verifyCommit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_cl03.Sig_CL03.verifyCommit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pksig_cl03.randomQR">
+<span class="sig-prename descclassname"><span class="pre">pksig_cl03.</span></span><span class="sig-name descname"><span class="pre">randomQR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_cl03.html#randomQR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_cl03.randomQR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +549,36 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pksig_cl03</a><ul>
+<li><a class="reference internal" href="#pksig_cl03.SHA1"><code class="docutils literal notranslate"><span class="pre">SHA1()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_cl03.Sig_CL03"><code class="docutils literal notranslate"><span class="pre">Sig_CL03</span></code></a><ul>
+<li><a class="reference internal" href="#pksig_cl03.Sig_CL03.keygen"><code class="docutils literal notranslate"><span class="pre">Sig_CL03.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_cl03.Sig_CL03.sign"><code class="docutils literal notranslate"><span class="pre">Sig_CL03.sign()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_cl03.Sig_CL03.signCommit"><code class="docutils literal notranslate"><span class="pre">Sig_CL03.signCommit()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_cl03.Sig_CL03.verify"><code class="docutils literal notranslate"><span class="pre">Sig_CL03.verify()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_cl03.Sig_CL03.verifyCommit"><code class="docutils literal notranslate"><span class="pre">Sig_CL03.verifyCommit()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pksig_cl03.randomQR"><code class="docutils literal notranslate"><span class="pre">randomQR()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

@@ -533,8 +533,353 @@ Commitments Cⱼ = g^{aⱼ} · h^{bⱼ} hide the coefficients information-theore
 <li><p><a class="reference internal" href="broadcast.html"><span class="doc">broadcast - Echo Broadcast Protocol</span></a> - Broadcast for DKG consistency</p></li>
 </ul>
 </section>
-<section id="api-reference">
-<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
+<section id="module-threshold_sharing">
+<span id="api-reference"></span><h2>API Reference<a class="headerlink" href="#module-threshold_sharing" title="Link to this heading">¶</a></h2>
+<p>Threshold Secret Sharing for DKLS23 and Threshold ECDSA</p>
+<div class="line-block">
+<div class="line">From: “How to Share a Secret” (Shamir Secret Sharing)</div>
+<div class="line">By:   Adi Shamir</div>
+<div class="line">Published: Communications of the ACM, 1979</div>
+<div class="line">URL:  <a class="reference external" href="https://dl.acm.org/doi/10.1145/359168.359176">https://dl.acm.org/doi/10.1145/359168.359176</a></div>
+<div class="line"><br /></div>
+<div class="line">Feldman VSS from:</div>
+<div class="line">“A Practical Scheme for Non-interactive Verifiable Secret Sharing”</div>
+<div class="line">By:   Paul Feldman</div>
+<div class="line">Published: FOCS 1987</div>
+<div class="line">URL:  <a class="reference external" href="https://ieeexplore.ieee.org/document/4568297">https://ieeexplore.ieee.org/document/4568297</a></div>
+<div class="line"><br /></div>
+<div class="line">Pedersen Commitments from:</div>
+<div class="line">“Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing”</div>
+<div class="line">By:   Torben Pryds Pedersen</div>
+<div class="line">Published: CRYPTO 1991</div>
+<div class="line">URL:  <a class="reference external" href="https://link.springer.com/chapter/10.1007/3-540-46766-1_9">https://link.springer.com/chapter/10.1007/3-540-46766-1_9</a></div>
+</div>
+<ul class="simple">
+<li><p>type:          secret sharing</p></li>
+<li><p>setting:       Elliptic Curve group</p></li>
+<li><p>assumption:    DLP (for Feldman VSS)</p></li>
+</ul>
+<p>This module extends Shamir secret sharing for threshold ECDSA requirements,
+providing Feldman VSS, Pedersen commitments, and EC group element support.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_sharing.PedersenVSS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_sharing.</span></span><span class="sig-name descname"><span class="pre">PedersenVSS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_sharing.html#PedersenVSS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.PedersenVSS" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#threshold_sharing.ThresholdSharing" title="threshold_sharing.ThresholdSharing"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThresholdSharing</span></code></a></p>
+<p>Pedersen VSS with information-theoretic hiding</p>
+<p>Uses two generators g, h for commitments where the discrete log
+relationship between g and h is unknown. This provides unconditional
+hiding of the secret, unlike Feldman VSS.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvss</span> <span class="o">=</span> <span class="n">PedersenVSS</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares</span><span class="p">,</span> <span class="n">blindings</span><span class="p">,</span> <span class="n">comms</span> <span class="o">=</span> <span class="n">pvss</span><span class="o">.</span><span class="n">share_with_blinding</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvss</span><span class="o">.</span><span class="n">verify_pedersen_share</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">blindings</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">comms</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvss</span><span class="o">.</span><span class="n">verify_pedersen_share</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">blindings</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">comms</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvss</span><span class="o">.</span><span class="n">verify_pedersen_share</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">blindings</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">comms</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recovered</span> <span class="o">=</span> <span class="n">pvss</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">2</span><span class="p">]},</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">==</span> <span class="n">recovered</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.PedersenVSS.combine_pedersen_commitments">
+<span class="sig-name descname"><span class="pre">combine_pedersen_commitments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commitments_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#PedersenVSS.combine_pedersen_commitments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.PedersenVSS.combine_pedersen_commitments" title="Link to this definition">¶</a></dt>
+<dd><p>Combine multiple Pedersen commitments (for DKG)</p>
+<p>When multiple dealers contribute shares, their commitments
+can be combined element-wise.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>commitments_list: List of commitment lists from different dealers</p>
+</dd>
+<dt>Returns:</dt><dd><p>Combined commitments list</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvss</span> <span class="o">=</span> <span class="n">PedersenVSS</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">comms1</span> <span class="o">=</span> <span class="n">pvss</span><span class="o">.</span><span class="n">share_with_blinding</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">comms2</span> <span class="o">=</span> <span class="n">pvss</span><span class="o">.</span><span class="n">share_with_blinding</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">combined</span> <span class="o">=</span> <span class="n">pvss</span><span class="o">.</span><span class="n">combine_pedersen_commitments</span><span class="p">([</span><span class="n">comms1</span><span class="p">,</span> <span class="n">comms2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">comms1</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.PedersenVSS.share_with_blinding">
+<span class="sig-name descname"><span class="pre">share_with_blinding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#PedersenVSS.share_with_blinding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.PedersenVSS.share_with_blinding" title="Link to this definition">¶</a></dt>
+<dd><p>Share with Pedersen commitments (information-theoretically hiding)</p>
+<p>Creates two polynomials:
+- f(x) with f(0) = secret for the actual shares
+- r(x) with r(0) = random blinding for hiding</p>
+<p>Commitments are C_j = g^{a_j} * h^{b_j} where a_j, b_j are
+coefficients of f and r respectively.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>secret: The secret to share (ZR element)
+g: First generator point
+h: Second generator point (discrete log to g unknown)
+threshold: Minimum shares needed to reconstruct
+num_parties: Total number of parties</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple of (shares_dict, blindings_dict, commitments_list)
+- shares_dict: {party_id: share_value}
+- blindings_dict: {party_id: blinding_value}
+- commitments_list: [C_0, C_1, …, C_{t-1}]</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvss</span> <span class="o">=</span> <span class="n">PedersenVSS</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares</span><span class="p">,</span> <span class="n">blindings</span><span class="p">,</span> <span class="n">comms</span> <span class="o">=</span> <span class="n">pvss</span><span class="o">.</span><span class="n">share_with_blinding</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">all</span><span class="p">(</span><span class="n">pvss</span><span class="o">.</span><span class="n">verify_pedersen_share</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">blindings</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">comms</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.PedersenVSS.verify_pedersen_share">
+<span class="sig-name descname"><span class="pre">verify_pedersen_share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">party_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blinding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commitments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#PedersenVSS.verify_pedersen_share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.PedersenVSS.verify_pedersen_share" title="Link to this definition">¶</a></dt>
+<dd><p>Verify a share against Pedersen commitments</p>
+<p>Checks that g^{share} * h^{blinding} == prod_{j=0}^{t-1} C_j^{i^j}</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>party_id: The party’s identifier (1 to n)
+share: The share value (ZR element)
+blinding: The blinding value (ZR element)
+commitments: List of Pedersen commitments [C_0, …, C_{t-1}]
+g: First generator point
+h: Second generator point</p>
+</dd>
+<dt>Returns:</dt><dd><p>True if share is valid, False otherwise</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvss</span> <span class="o">=</span> <span class="n">PedersenVSS</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares</span><span class="p">,</span> <span class="n">blindings</span><span class="p">,</span> <span class="n">comms</span> <span class="o">=</span> <span class="n">pvss</span><span class="o">.</span><span class="n">share_with_blinding</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pvss</span><span class="o">.</span><span class="n">verify_pedersen_share</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">blindings</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">comms</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_sharing.ThresholdSharing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_sharing.</span></span><span class="sig-name descname"><span class="pre">ThresholdSharing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_sharing.html#ThresholdSharing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.ThresholdSharing" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Enhanced secret sharing for threshold ECDSA</p>
+<p>Supports Feldman VSS and operations on EC groups.</p>
+<section id="curve-agnostic">
+<h3>Curve Agnostic<a class="headerlink" href="#curve-agnostic" title="Link to this heading">¶</a></h3>
+<p>This implementation supports any elliptic curve group that is DDH-hard.
+The curve is specified via the groupObj parameter.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">ThresholdSharing</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares</span><span class="p">,</span> <span class="n">commitments</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">share_with_verification</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">verify_share</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">commitments</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">verify_share</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">commitments</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span><span class="o">.</span><span class="n">verify_share</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">commitments</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recovered</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">2</span><span class="p">]},</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">==</span> <span class="n">recovered</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.ThresholdSharing.add_shares">
+<span class="sig-name descname"><span class="pre">add_shares</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shares1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shares2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#ThresholdSharing.add_shares"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.ThresholdSharing.add_shares" title="Link to this definition">¶</a></dt>
+<dd><p>Add two sets of shares (for additive share combination)</p>
+<p>Useful for distributed key generation and refreshing.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shares1: First dictionary of shares {party_id: share}
+shares2: Second dictionary of shares {party_id: share}</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dictionary of combined shares</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">ThresholdSharing</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">),</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares1</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares2</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">combined</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">add_shares</span><span class="p">(</span><span class="n">shares1</span><span class="p">,</span> <span class="n">shares2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recovered</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="n">combined</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">:</span> <span class="n">combined</span><span class="p">[</span><span class="mi">2</span><span class="p">]},</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recovered</span> <span class="o">==</span> <span class="n">s1</span> <span class="o">+</span> <span class="n">s2</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.ThresholdSharing.lagrange_coefficient">
+<span class="sig-name descname"><span class="pre">lagrange_coefficient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">party_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#ThresholdSharing.lagrange_coefficient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.ThresholdSharing.lagrange_coefficient" title="Link to this definition">¶</a></dt>
+<dd><p>Compute Lagrange coefficient for party i at point x</p>
+<p>L_i(x) = prod_{j != i} (x - j) / (i - j)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>party_ids: List of party identifiers in the reconstruction set
+i: The party for which to compute the coefficient
+x: The evaluation point (default 0 for secret recovery)</p>
+</dd>
+<dt>Returns:</dt><dd><p>The Lagrange coefficient as a ZR element</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">ThresholdSharing</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coeff</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">lagrange_coefficient</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># L_1(0) = (0-2)(0-3) / (1-2)(1-3) = 6/2 = 3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.ThresholdSharing.reconstruct">
+<span class="sig-name descname"><span class="pre">reconstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shares</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#ThresholdSharing.reconstruct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.ThresholdSharing.reconstruct" title="Link to this definition">¶</a></dt>
+<dd><p>Reconstruct secret from threshold shares using Lagrange interpolation</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shares: Dictionary {party_id: share_value} with at least threshold entries
+threshold: The threshold used when sharing</p>
+</dd>
+<dt>Returns:</dt><dd><p>The reconstructed secret</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If fewer than threshold shares provided</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">ThresholdSharing</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recovered</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">4</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">4</span><span class="p">]},</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">==</span> <span class="n">recovered</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.ThresholdSharing.refresh_shares">
+<span class="sig-name descname"><span class="pre">refresh_shares</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shares</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#ThresholdSharing.refresh_shares"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.ThresholdSharing.refresh_shares" title="Link to this definition">¶</a></dt>
+<dd><p>Refresh shares for proactive security</p>
+<p>Generates new shares of zero and adds them to existing shares.
+The new shares reconstruct to the same secret but are unlinkable
+to the old shares.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>shares: Dictionary of current shares {party_id: share}
+threshold: The threshold of the sharing</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dictionary of refreshed shares</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">ThresholdSharing</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">refreshed</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">refresh_shares</span><span class="p">(</span><span class="n">shares</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recovered</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="n">refreshed</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">3</span><span class="p">:</span> <span class="n">refreshed</span><span class="p">[</span><span class="mi">3</span><span class="p">]},</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">==</span> <span class="n">recovered</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.ThresholdSharing.share">
+<span class="sig-name descname"><span class="pre">share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#ThresholdSharing.share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.ThresholdSharing.share" title="Link to this definition">¶</a></dt>
+<dd><p>Basic Shamir secret sharing</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>secret: The secret to share (ZR element)
+threshold: Minimum number of shares needed to reconstruct (t)
+num_parties: Total number of parties (n)</p>
+</dd>
+<dt>Returns:</dt><dd><p>Dictionary mapping party_id (1 to n) to share values</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">ThresholdSharing</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">shares</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recovered</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">reconstruct</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">3</span><span class="p">:</span> <span class="n">shares</span><span class="p">[</span><span class="mi">3</span><span class="p">]},</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">==</span> <span class="n">recovered</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.ThresholdSharing.share_with_verification">
+<span class="sig-name descname"><span class="pre">share_with_verification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#ThresholdSharing.share_with_verification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.ThresholdSharing.share_with_verification" title="Link to this definition">¶</a></dt>
+<dd><p>Feldman VSS - shares with public commitments for verification</p>
+<p>Creates shares using Shamir’s scheme and publishes commitments
+C_j = g^{a_j} for each coefficient a_j, allowing verification
+without revealing the secret.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>secret: The secret to share (ZR element)
+generator: Generator point g in the EC group (G element)
+threshold: Minimum shares needed to reconstruct
+num_parties: Total number of parties</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple of (shares_dict, commitments_list)
+- shares_dict: {party_id: share_value}
+- commitments_list: [C_0, C_1, …, C_{t-1}] where C_j = g^{a_j}</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">ThresholdSharing</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shares</span><span class="p">,</span> <span class="n">comms</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">share_with_verification</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">all</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">verify_share</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">shares</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">comms</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_sharing.ThresholdSharing.verify_share">
+<span class="sig-name descname"><span class="pre">verify_share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">party_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commitments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/threshold_sharing.html#ThresholdSharing.verify_share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_sharing.ThresholdSharing.verify_share" title="Link to this definition">¶</a></dt>
+<dd><p>Verify a share against Feldman commitments</p>
+<p>Checks that g^{share} == prod_{j=0}^{t-1} C_j^{i^j}</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>party_id: The party’s identifier (1 to n)
+share: The share value to verify (ZR element)
+commitments: List of Feldman commitments [C_0, …, C_{t-1}]
+generator: Generator point g used in commitments</p>
+</dd>
+<dt>Returns:</dt><dd><p>True if share is valid, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</dd></dl>
+
 </section>
 </section>
 
@@ -602,7 +947,25 @@ Commitments Cⱼ = g^{aⱼ} · h^{bⱼ} hide the coefficients information-theore
 <li><a class="reference internal" href="#example-usage">Example Usage</a></li>
 <li><a class="reference internal" href="#mathematical-background">Mathematical Background</a></li>
 <li><a class="reference internal" href="#related-modules">Related Modules</a></li>
-<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+<li><a class="reference internal" href="#module-threshold_sharing">API Reference</a><ul>
+<li><a class="reference internal" href="#threshold_sharing.PedersenVSS"><code class="docutils literal notranslate"><span class="pre">PedersenVSS</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_sharing.PedersenVSS.combine_pedersen_commitments"><code class="docutils literal notranslate"><span class="pre">PedersenVSS.combine_pedersen_commitments()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_sharing.PedersenVSS.share_with_blinding"><code class="docutils literal notranslate"><span class="pre">PedersenVSS.share_with_blinding()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_sharing.PedersenVSS.verify_pedersen_share"><code class="docutils literal notranslate"><span class="pre">PedersenVSS.verify_pedersen_share()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_sharing.ThresholdSharing"><code class="docutils literal notranslate"><span class="pre">ThresholdSharing</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_sharing.ThresholdSharing.add_shares"><code class="docutils literal notranslate"><span class="pre">ThresholdSharing.add_shares()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_sharing.ThresholdSharing.lagrange_coefficient"><code class="docutils literal notranslate"><span class="pre">ThresholdSharing.lagrange_coefficient()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_sharing.ThresholdSharing.reconstruct"><code class="docutils literal notranslate"><span class="pre">ThresholdSharing.reconstruct()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_sharing.ThresholdSharing.refresh_shares"><code class="docutils literal notranslate"><span class="pre">ThresholdSharing.refresh_shares()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_sharing.ThresholdSharing.share"><code class="docutils literal notranslate"><span class="pre">ThresholdSharing.share()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_sharing.ThresholdSharing.share_with_verification"><code class="docutils literal notranslate"><span class="pre">ThresholdSharing.share_with_verification()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_sharing.ThresholdSharing.verify_share"><code class="docutils literal notranslate"><span class="pre">ThresholdSharing.verify_share()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

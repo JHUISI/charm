@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,127 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="abenc-tbpre-lww14">
-<h1>abenc_tbpre_lww14<a class="headerlink" href="#abenc-tbpre-lww14" title="Link to this heading">¶</a></h1>
+          <section id="module-abenc_tbpre_lww14">
+<span id="abenc-tbpre-lww14"></span><h1>abenc_tbpre_lww14<a class="headerlink" href="#module-abenc_tbpre_lww14" title="Link to this heading">¶</a></h1>
+<p><strong>Time-Based Proxy Re-Encryption (LWW14)</strong></p>
+<p><em>Authors:</em> Qin Liu, Guojun Wang, Jie Wu</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Time-based proxy re-encryption scheme for secure data sharing in a cloud environment”</div>
+<div class="line"><strong>Published in:</strong> Information Sciences, Volume 258, 2014</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S0020025512006275">http://www.sciencedirect.com/science/article/pii/S0020025512006275</a></div>
+<div class="line"><strong>Notes:</strong> Time-based access control with proxy re-encryption for cloud storage</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption (public key)</p></li>
+<li><p><strong>Setting:</strong> Pairing groups</p></li>
+<li><p><strong>Assumption:</strong> Decisional Bilinear Diffie-Hellman</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>artjomb</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>07/2014</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_tbpre_lww14.</span></span><span class="sig-name descname"><span class="pre">TBPRE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">term</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypts the content(-key) from the cipher-text (executed by user/content consumer)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Generate the cipher-text from the content(-key) and a policy (executed by the content owner)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.group" title="Link to this definition">¶</a></dt>
+<dd><p>Prime order group</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.hashDate">
+<span class="sig-name descname"><span class="pre">hashDate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.hashDate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.hashDate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pubuser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate user keys for a specific attribute (executed by CA)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.policyTerm">
+<span class="sig-name descname"><span class="pre">policyTerm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.policyTerm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.policyTerm" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.reencrypt">
+<span class="sig-name descname"><span class="pre">reencrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">currentTime</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.reencrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.reencrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Re-encrypts the cipher-text using the current time (executed by cloud service provider)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.registerUser">
+<span class="sig-name descname"><span class="pre">registerUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.registerUser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.registerUser" title="Link to this definition">¶</a></dt>
+<dd><p>Registers a user by id (executed by user)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Global Setup (executed by CA)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.TBPRE.timeSuffices">
+<span class="sig-name descname"><span class="pre">timeSuffices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeRange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">needle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#TBPRE.timeSuffices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.TBPRE.timeSuffices" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.basicTest">
+<span class="sig-prename descclassname"><span class="pre">abenc_tbpre_lww14.</span></span><span class="sig-name descname"><span class="pre">basicTest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#basicTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.basicTest" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.basicTest2">
+<span class="sig-prename descclassname"><span class="pre">abenc_tbpre_lww14.</span></span><span class="sig-name descname"><span class="pre">basicTest2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#basicTest2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.basicTest2" title="Link to this definition">¶</a></dt>
+<dd><p>Month-based attributes are used</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.gcd">
+<span class="sig-prename descclassname"><span class="pre">abenc_tbpre_lww14.</span></span><span class="sig-name descname"><span class="pre">gcd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">numbers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#gcd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.gcd" title="Link to this definition">¶</a></dt>
+<dd><p>Return the greatest common divisor of the given integers</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.lcm">
+<span class="sig-prename descclassname"><span class="pre">abenc_tbpre_lww14.</span></span><span class="sig-name descname"><span class="pre">lcm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numbers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#lcm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.lcm" title="Link to this definition">¶</a></dt>
+<dd><p>Return lowest common multiple.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_tbpre_lww14.test">
+<span class="sig-prename descclassname"><span class="pre">abenc_tbpre_lww14.</span></span><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_tbpre_lww14.html#test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_tbpre_lww14.test" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +574,44 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">abenc_tbpre_lww14</a><ul>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE"><code class="docutils literal notranslate"><span class="pre">TBPRE</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.decrypt"><code class="docutils literal notranslate"><span class="pre">TBPRE.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.encrypt"><code class="docutils literal notranslate"><span class="pre">TBPRE.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.group"><code class="docutils literal notranslate"><span class="pre">TBPRE.group</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.hashDate"><code class="docutils literal notranslate"><span class="pre">TBPRE.hashDate()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.keygen"><code class="docutils literal notranslate"><span class="pre">TBPRE.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.policyTerm"><code class="docutils literal notranslate"><span class="pre">TBPRE.policyTerm()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.reencrypt"><code class="docutils literal notranslate"><span class="pre">TBPRE.reencrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.registerUser"><code class="docutils literal notranslate"><span class="pre">TBPRE.registerUser()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.setup"><code class="docutils literal notranslate"><span class="pre">TBPRE.setup()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.TBPRE.timeSuffices"><code class="docutils literal notranslate"><span class="pre">TBPRE.timeSuffices()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.basicTest"><code class="docutils literal notranslate"><span class="pre">basicTest()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.basicTest2"><code class="docutils literal notranslate"><span class="pre">basicTest2()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.gcd"><code class="docutils literal notranslate"><span class="pre">gcd()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.lcm"><code class="docutils literal notranslate"><span class="pre">lcm()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_tbpre_lww14.test"><code class="docutils literal notranslate"><span class="pre">test()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

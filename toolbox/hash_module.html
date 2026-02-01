@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,53 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="hash-module">
-<h1>hash_module<a class="headerlink" href="#hash-module" title="Link to this heading">¶</a></h1>
+          <section id="module-hash_module">
+<span id="hash-module"></span><h1>hash_module<a class="headerlink" href="#module-hash_module" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="hash_module.Hash">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hash_module.</span></span><span class="sig-name descname"><span class="pre">Hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairingElement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">htype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha256'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integerElement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Hash" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hash_module.Hash.hashToZn">
+<span class="sig-name descname"><span class="pre">hashToZn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Hash.hashToZn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Hash.hashToZn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hash_module.Hash.hashToZr">
+<span class="sig-name descname"><span class="pre">hashToZr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Hash.hashToZr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Hash.hashToZr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hash_module.Waters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hash_module.</span></span><span class="sig-name descname"><span class="pre">Waters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha256'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Waters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Waters" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.hash_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">Waters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s2">&quot;SS512&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waters</span> <span class="o">=</span> <span class="n">Waters</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">waters</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="s2">&quot;user@email.com&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="hash_module.Waters.hash">
+<span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Waters.hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Waters.hash" title="Link to this definition">¶</a></dt>
+<dd><p>Hash the identity string and break it up in to l bit pieces</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hash_module.Waters.sha2">
+<span class="sig-name descname"><span class="pre">sha2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hash_module.html#Waters.sha2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hash_module.Waters.sha2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +500,36 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">hash_module</a><ul>
+<li><a class="reference internal" href="#hash_module.Hash"><code class="docutils literal notranslate"><span class="pre">Hash</span></code></a><ul>
+<li><a class="reference internal" href="#hash_module.Hash.hashToZn"><code class="docutils literal notranslate"><span class="pre">Hash.hashToZn()</span></code></a></li>
+<li><a class="reference internal" href="#hash_module.Hash.hashToZr"><code class="docutils literal notranslate"><span class="pre">Hash.hashToZr()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hash_module.Waters"><code class="docutils literal notranslate"><span class="pre">Waters</span></code></a><ul>
+<li><a class="reference internal" href="#hash_module.Waters.hash"><code class="docutils literal notranslate"><span class="pre">Waters.hash()</span></code></a></li>
+<li><a class="reference internal" href="#hash_module.Waters.sha2"><code class="docutils literal notranslate"><span class="pre">Waters.sha2()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,117 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="abenc-maabe-yj14">
-<h1>abenc_maabe_yj14<a class="headerlink" href="#abenc-maabe-yj14" title="Link to this heading">¶</a></h1>
+          <section id="module-abenc_maabe_yj14">
+<span id="abenc-maabe-yj14"></span><h1>abenc_maabe_yj14<a class="headerlink" href="#module-abenc_maabe_yj14" title="Link to this heading">¶</a></h1>
+<p><strong>Multi-Authority ABE for Cloud Storage (YJ14)</strong></p>
+<p><em>Authors:</em> Kan Yang, Xiaohua Jia</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Expressive, Efficient, and Revocable Data Access Control for Multi-Authority Cloud Storage”</div>
+<div class="line"><strong>Published in:</strong> IEEE Transactions on Parallel and Distributed Systems, Volume 25, Issue 7, 2014</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=6620875">http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=6620875</a></div>
+<div class="line"><strong>Notes:</strong> Supports expressive access policies with efficient revocation</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption (public key)</p></li>
+<li><p><strong>Setting:</strong> Pairing groups</p></li>
+<li><p><strong>Assumption:</strong> Decisional Bilinear Diffie-Hellman</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>artjomb</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>07/2014</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_maabe_yj14.</span></span><span class="sig-name descname"><span class="pre">MAABE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.ctupdate">
+<span class="sig-name descname"><span class="pre">ctupdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UKc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.ctupdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.ctupdate" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the cipher-text using the update key, because of the revoked attribute (executed by cloud provider)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypts the content(-key) from the cipher-text (executed by user/content consumer)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authority</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Generate the cipher-text from the content(-key) and a policy (executed by the content owner)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#abenc_maabe_yj14.MAABE.group" title="Link to this definition">¶</a></dt>
+<dd><p>Prime order group</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authority</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">USK</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate user keys for a specific attribute (executed on attribute authority)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.registerUser">
+<span class="sig-name descname"><span class="pre">registerUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.registerUser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.registerUser" title="Link to this definition">¶</a></dt>
+<dd><p>Generate user keys (executed by the user).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Global Setup (executed by CA)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.setupAuthority">
+<span class="sig-name descname"><span class="pre">setupAuthority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authorityid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authorities</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.setupAuthority"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.setupAuthority" title="Link to this definition">¶</a></dt>
+<dd><p>Generate attribute authority keys (executed by attribute authority)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.skupdate">
+<span class="sig-name descname"><span class="pre">skupdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">USK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UKs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.skupdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.skupdate" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the user attribute secret key for the specified attribute (executed by non-revoked user)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.MAABE.ukeygen">
+<span class="sig-name descname"><span class="pre">ukeygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authority</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#MAABE.ukeygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.MAABE.ukeygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate update keys for users and cloud provider (executed by attribute authority?)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.basicTest">
+<span class="sig-prename descclassname"><span class="pre">abenc_maabe_yj14.</span></span><span class="sig-name descname"><span class="pre">basicTest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#basicTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.basicTest" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.revokedTest">
+<span class="sig-prename descclassname"><span class="pre">abenc_maabe_yj14.</span></span><span class="sig-name descname"><span class="pre">revokedTest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#revokedTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.revokedTest" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_maabe_yj14.test">
+<span class="sig-prename descclassname"><span class="pre">abenc_maabe_yj14.</span></span><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_yj14.html#test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_yj14.test" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +564,42 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">abenc_maabe_yj14</a><ul>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE"><code class="docutils literal notranslate"><span class="pre">MAABE</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.ctupdate"><code class="docutils literal notranslate"><span class="pre">MAABE.ctupdate()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.decrypt"><code class="docutils literal notranslate"><span class="pre">MAABE.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.encrypt"><code class="docutils literal notranslate"><span class="pre">MAABE.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.group"><code class="docutils literal notranslate"><span class="pre">MAABE.group</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.keygen"><code class="docutils literal notranslate"><span class="pre">MAABE.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.registerUser"><code class="docutils literal notranslate"><span class="pre">MAABE.registerUser()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.setup"><code class="docutils literal notranslate"><span class="pre">MAABE.setup()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.setupAuthority"><code class="docutils literal notranslate"><span class="pre">MAABE.setupAuthority()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.skupdate"><code class="docutils literal notranslate"><span class="pre">MAABE.skupdate()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.MAABE.ukeygen"><code class="docutils literal notranslate"><span class="pre">MAABE.ukeygen()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.basicTest"><code class="docutils literal notranslate"><span class="pre">basicTest()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.revokedTest"><code class="docutils literal notranslate"><span class="pre">revokedTest()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_yj14.test"><code class="docutils literal notranslate"><span class="pre">test()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

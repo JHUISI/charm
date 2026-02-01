@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,79 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="redundancyschemes">
-<h1>redundancyschemes<a class="headerlink" href="#redundancyschemes" title="Link to this heading">¶</a></h1>
+          <section id="module-redundancyschemes">
+<span id="redundancyschemes"></span><h1>redundancyschemes<a class="headerlink" href="#module-redundancyschemes" title="Link to this heading">¶</a></h1>
+<p>A collection of redundancy schemes</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="redundancyschemes.ExtraBitsRedundancy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">redundancyschemes.</span></span><span class="sig-name descname"><span class="pre">ExtraBitsRedundancy</span></span><a class="reference internal" href="../_modules/redundancyschemes.html#ExtraBitsRedundancy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.ExtraBitsRedundancy" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Christina Garman</p>
+</dd>
+</dl>
+<p>TODO</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="redundancyschemes.ExtraBitsRedundancy.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encMessage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redundancyschemes.html#ExtraBitsRedundancy.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.ExtraBitsRedundancy.decode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="redundancyschemes.ExtraBitsRedundancy.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redundancyschemes.html#ExtraBitsRedundancy.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.ExtraBitsRedundancy.encode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="redundancyschemes.InMessageRedundancy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">redundancyschemes.</span></span><span class="sig-name descname"><span class="pre">InMessageRedundancy</span></span><a class="reference internal" href="../_modules/redundancyschemes.html#InMessageRedundancy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.InMessageRedundancy" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Christina Garman</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="redundancyschemes.InMessageRedundancy.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encMessage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redundancyschemes.html#InMessageRedundancy.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.InMessageRedundancy.decode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="redundancyschemes.InMessageRedundancy.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redundancyschemes.html#InMessageRedundancy.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.InMessageRedundancy.encode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="redundancyschemes.WilliamsRedundancy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">redundancyschemes.</span></span><span class="sig-name descname"><span class="pre">WilliamsRedundancy</span></span><a class="reference internal" href="../_modules/redundancyschemes.html#WilliamsRedundancy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.WilliamsRedundancy" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Christina Garman</p>
+</dd>
+</dl>
+<p>TODO</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="redundancyschemes.WilliamsRedundancy.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encMessage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redundancyschemes.html#WilliamsRedundancy.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.WilliamsRedundancy.decode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="redundancyschemes.WilliamsRedundancy.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redundancyschemes.html#WilliamsRedundancy.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redundancyschemes.WilliamsRedundancy.encode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +526,41 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">redundancyschemes</a><ul>
+<li><a class="reference internal" href="#redundancyschemes.ExtraBitsRedundancy"><code class="docutils literal notranslate"><span class="pre">ExtraBitsRedundancy</span></code></a><ul>
+<li><a class="reference internal" href="#redundancyschemes.ExtraBitsRedundancy.decode"><code class="docutils literal notranslate"><span class="pre">ExtraBitsRedundancy.decode()</span></code></a></li>
+<li><a class="reference internal" href="#redundancyschemes.ExtraBitsRedundancy.encode"><code class="docutils literal notranslate"><span class="pre">ExtraBitsRedundancy.encode()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#redundancyschemes.InMessageRedundancy"><code class="docutils literal notranslate"><span class="pre">InMessageRedundancy</span></code></a><ul>
+<li><a class="reference internal" href="#redundancyschemes.InMessageRedundancy.decode"><code class="docutils literal notranslate"><span class="pre">InMessageRedundancy.decode()</span></code></a></li>
+<li><a class="reference internal" href="#redundancyschemes.InMessageRedundancy.encode"><code class="docutils literal notranslate"><span class="pre">InMessageRedundancy.encode()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#redundancyschemes.WilliamsRedundancy"><code class="docutils literal notranslate"><span class="pre">WilliamsRedundancy</span></code></a><ul>
+<li><a class="reference internal" href="#redundancyschemes.WilliamsRedundancy.decode"><code class="docutils literal notranslate"><span class="pre">WilliamsRedundancy.decode()</span></code></a></li>
+<li><a class="reference internal" href="#redundancyschemes.WilliamsRedundancy.encode"><code class="docutils literal notranslate"><span class="pre">WilliamsRedundancy.encode()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

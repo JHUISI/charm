@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,66 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="cgw15">
-<h1>cgw15<a class="headerlink" href="#cgw15" title="Link to this heading">¶</a></h1>
+          <section id="module-cgw15">
+<span id="cgw15"></span><h1>cgw15<a class="headerlink" href="#module-cgw15" title="Link to this heading">¶</a></h1>
+<p><strong>Improved Dual System ABE (CGW15)</strong></p>
+<p><em>Authors:</em> Jie Chen, Romain Gay, Hoeteck Wee</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Improved Dual System ABE in Prime-Order Groups via Predicate Encodings”</div>
+<div class="line"><strong>Published in:</strong> EUROCRYPT, 2015</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2015/409">http://eprint.iacr.org/2015/409</a></div>
+<div class="line"><strong>Notes:</strong> Implemented the scheme in Appendix B.2</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption</p></li>
+<li><p><strong>Setting:</strong> Pairing groups (prime order)</p></li>
+<li><p><strong>Assumption:</strong> k-linear</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Shashank Agrawal</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>05/2016</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="cgw15.CGW15CPABE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cgw15.</span></span><span class="sig-name descname"><span class="pre">CGW15CPABE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assump_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uni_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/cgw15.html#CGW15CPABE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cgw15.CGW15CPABE" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEnc</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cgw15.CGW15CPABE.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctxt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/cgw15.html#CGW15CPABE.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cgw15.CGW15CPABE.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypt ciphertext ctxt with key key.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cgw15.CGW15CPABE.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/cgw15.html#CGW15CPABE.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cgw15.CGW15CPABE.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Encrypt a message M under a policy string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cgw15.CGW15CPABE.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/cgw15.html#CGW15CPABE.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cgw15.CGW15CPABE.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a key for a set of attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cgw15.CGW15CPABE.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/cgw15.html#CGW15CPABE.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cgw15.CGW15CPABE.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Generates public key and master secret key.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +513,33 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">cgw15</a><ul>
+<li><a class="reference internal" href="#cgw15.CGW15CPABE"><code class="docutils literal notranslate"><span class="pre">CGW15CPABE</span></code></a><ul>
+<li><a class="reference internal" href="#cgw15.CGW15CPABE.decrypt"><code class="docutils literal notranslate"><span class="pre">CGW15CPABE.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#cgw15.CGW15CPABE.encrypt"><code class="docutils literal notranslate"><span class="pre">CGW15CPABE.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#cgw15.CGW15CPABE.keygen"><code class="docutils literal notranslate"><span class="pre">CGW15CPABE.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#cgw15.CGW15CPABE.setup"><code class="docutils literal notranslate"><span class="pre">CGW15CPABE.setup()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

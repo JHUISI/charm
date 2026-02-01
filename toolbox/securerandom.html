@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,93 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="securerandom">
-<h1>securerandom<a class="headerlink" href="#securerandom" title="Link to this heading">¶</a></h1>
+          <section id="module-securerandom">
+<span id="securerandom"></span><h1>securerandom<a class="headerlink" href="#module-securerandom" title="Link to this heading">¶</a></h1>
+<p>Base class for cryptographic secure random number generation
+:authors: Gary Belvin</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="securerandom.OpenSSLRand">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">securerandom.</span></span><span class="sig-name descname"><span class="pre">OpenSSLRand</span></span><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.OpenSSLRand" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">SecureRandom</span></code></a></p>
+<p>Uses the OpenSSL PRNG for random bits</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="securerandom.OpenSSLRand.getRandomBits">
+<span class="sig-name descname"><span class="pre">getRandomBits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand.getRandomBits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.OpenSSLRand.getRandomBits" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="securerandom.OpenSSLRand.getRandomBytes">
+<span class="sig-name descname"><span class="pre">getRandomBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#OpenSSLRand.getRandomBytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.OpenSSLRand.getRandomBytes" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a random bit string of length bytes</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="securerandom.SecureRandom">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">securerandom.</span></span><span class="sig-name descname"><span class="pre">SecureRandom</span></span><a class="reference internal" href="../_modules/securerandom.html#SecureRandom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandom" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="securerandom.SecureRandom.addSeed">
+<span class="sig-name descname"><span class="pre">addSeed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.addSeed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandom.addSeed" title="Link to this definition">¶</a></dt>
+<dd><p>Add randomness to the generator.  
+Always increases entropy</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="securerandom.SecureRandom.getRandomBytes">
+<span class="sig-name descname"><span class="pre">getRandomBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandom.getRandomBytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandom.getRandomBytes" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a random bit string of length bytes</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="securerandom.SecureRandomFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">securerandom.</span></span><span class="sig-name descname"><span class="pre">SecureRandomFactory</span></span><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandomFactory" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides a central place to swap out the randomness engine
+used by the charm framework.
+Classes should call <code class="docutils literal notranslate"><span class="pre">rand</span> <span class="pre">=</span> <span class="pre">SecureRandomFactory.getInstance()</span></code> 
+to acquire a randomnesss generator</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="securerandom.SecureRandomFactory.getInstance">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getInstance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#SecureRandomFactory.getInstance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.SecureRandomFactory.getInstance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="securerandom.WeakRandom">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">securerandom.</span></span><span class="sig-name descname"><span class="pre">WeakRandom</span></span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.WeakRandom" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#securerandom.SecureRandom" title="securerandom.SecureRandom"><code class="xref py py-class docutils literal notranslate"><span class="pre">SecureRandom</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="securerandom.WeakRandom.addSeed">
+<span class="sig-name descname"><span class="pre">addSeed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.addSeed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.WeakRandom.addSeed" title="Link to this definition">¶</a></dt>
+<dd><p>Add randomness to the generator.  
+Always increases entropy</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="securerandom.WeakRandom.getRandomBytes">
+<span class="sig-name descname"><span class="pre">getRandomBytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.getRandomBytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.WeakRandom.getRandomBytes" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a random bit string of length bytes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="securerandom.WeakRandom.myrandom">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">myrandom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/securerandom.html#WeakRandom.myrandom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#securerandom.WeakRandom.myrandom" title="Link to this definition">¶</a></dt>
+<dd><p>This method does <strong>NOT</strong> provide cryptographically secure random numbers.
+This should <strong>NOT</strong> be used for production code</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +540,46 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">securerandom</a><ul>
+<li><a class="reference internal" href="#securerandom.OpenSSLRand"><code class="docutils literal notranslate"><span class="pre">OpenSSLRand</span></code></a><ul>
+<li><a class="reference internal" href="#securerandom.OpenSSLRand.getRandomBits"><code class="docutils literal notranslate"><span class="pre">OpenSSLRand.getRandomBits()</span></code></a></li>
+<li><a class="reference internal" href="#securerandom.OpenSSLRand.getRandomBytes"><code class="docutils literal notranslate"><span class="pre">OpenSSLRand.getRandomBytes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#securerandom.SecureRandom"><code class="docutils literal notranslate"><span class="pre">SecureRandom</span></code></a><ul>
+<li><a class="reference internal" href="#securerandom.SecureRandom.addSeed"><code class="docutils literal notranslate"><span class="pre">SecureRandom.addSeed()</span></code></a></li>
+<li><a class="reference internal" href="#securerandom.SecureRandom.getRandomBytes"><code class="docutils literal notranslate"><span class="pre">SecureRandom.getRandomBytes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#securerandom.SecureRandomFactory"><code class="docutils literal notranslate"><span class="pre">SecureRandomFactory</span></code></a><ul>
+<li><a class="reference internal" href="#securerandom.SecureRandomFactory.getInstance"><code class="docutils literal notranslate"><span class="pre">SecureRandomFactory.getInstance()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#securerandom.WeakRandom"><code class="docutils literal notranslate"><span class="pre">WeakRandom</span></code></a><ul>
+<li><a class="reference internal" href="#securerandom.WeakRandom.addSeed"><code class="docutils literal notranslate"><span class="pre">WeakRandom.addSeed()</span></code></a></li>
+<li><a class="reference internal" href="#securerandom.WeakRandom.getRandomBytes"><code class="docutils literal notranslate"><span class="pre">WeakRandom.getRandomBytes()</span></code></a></li>
+<li><a class="reference internal" href="#securerandom.WeakRandom.myrandom"><code class="docutils literal notranslate"><span class="pre">WeakRandom.myrandom()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

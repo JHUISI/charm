@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,392 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="abenc-accountability-jyjxgd20">
-<h1>abenc_accountability_jyjxgd20<a class="headerlink" href="#abenc-accountability-jyjxgd20" title="Link to this heading">¶</a></h1>
+          <section id="module-abenc_accountability_jyjxgd20">
+<span id="abenc-accountability-jyjxgd20"></span><h1>abenc_accountability_jyjxgd20<a class="headerlink" href="#module-abenc_accountability_jyjxgd20" title="Link to this heading">¶</a></h1>
+<p><strong>ABE with Privacy Protection and Accountability (JYJXGD20)</strong></p>
+<p><em>Authors:</em> Jiguo Li, Yichen Zhang, Jianting Ning, Xinyi Huang, Geong Sen Poh, Debang Wang</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Attribute Based Encryption with Privacy Protection and Accountability for CloudIoT”</div>
+<div class="line"><strong>Published in:</strong> IEEE Transactions on Cloud Computing, 2020</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/9003205">https://ieeexplore.ieee.org/abstract/document/9003205</a></div>
+<div class="line"><strong>Notes:</strong> Two schemes implemented: (1) CP policy hiding (class CP_Hiding_ABE), (2) CP policy hiding with accountability under white box assumption (class CP_Hiding_Accountability_ABE)</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption (public key)</p></li>
+<li><p><strong>Setting:</strong> Pairing groups</p></li>
+<li><p><strong>Assumption:</strong> Decisional Bilinear Diffie-Hellman</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ahmed Bakr</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>08/2023</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.Attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_accountability_jyjxgd20.</span></span><span class="sig-name descname"><span class="pre">Attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#Attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.Attribute" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.Attribute.add_value">
+<span class="sig-name descname"><span class="pre">add_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#Attribute.add_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.Attribute.add_value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.Attribute.get_attribute_values_full_name">
+<span class="sig-name descname"><span class="pre">get_attribute_values_full_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#Attribute.get_attribute_values_full_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.Attribute.get_attribute_values_full_name" title="Link to this definition">¶</a></dt>
+<dd><p>Attribute values full name is in the following format: ‘attrName_value’</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.Attribute.get_full_attribute_value_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_full_attribute_value_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#Attribute.get_full_attribute_value_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.Attribute.get_full_attribute_value_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.Attribute.set_values">
+<span class="sig-name descname"><span class="pre">set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#Attribute.set_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.Attribute.set_values" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_ABE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_accountability_jyjxgd20.</span></span><span class="sig-name descname"><span class="pre">CP_Hiding_ABE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_ABE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEnc</span></code></p>
+<p>Cipher text policy hiding attribute based encryption (Section 3 in the paper).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_ABE.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_ABE.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypt a cipher text. This algorithm is performed by a data user who has the required attributes to decipher
+the ciphertext that was encrypted using an access policy.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>CT: Cipher text.</p></li>
+<li><p>PK: Public parameters and the public key of the TA.</p></li>
+<li><p>SK: User’s secret key.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>m: The original decrypted message.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_ABE.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_ABE.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Encrypt a message using an access policy. This function is performed by a data user who wants to encrypt his 
+message with an access policy. They consider only and-gates in their policy.
+Note: The access policy is hidden into the ciphertext.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>PK: Public parameters and the public key of the TA.</p></li>
+<li><p>m: Message to be encrypted in G_T.</p></li>
+<li><dl class="simple">
+<dt>access_policy: Access policy that will be used to encrypt the message. It has to be and gated policy,</dt><dd><p>which means that each attribute can have only one value.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>CT: Cipher text.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_ABE.key_gen">
+<span class="sig-name descname"><span class="pre">key_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MSK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_ABE.key_gen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE.key_gen" title="Link to this definition">¶</a></dt>
+<dd><p>Key generation for a user based on his list of attributes. This algorithm is performed by TA.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>MSK: Master Secret Key of the TA.</p></li>
+<li><p>PK: Public parameters and the public key of the TA.</p></li>
+<li><dl class="simple">
+<dt>attributes_list: List of attributes held by this user, where each attribute is in the format:</dt><dd><p>‘attrName_value’</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>SK: User’s secret key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_ABE.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attributes_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_ABE.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE.setup" title="Link to this definition">¶</a></dt>
+<dd><p>System Setup algorithm. This algorithm is performed by TA.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>None</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>MSK: TA’s master secret key.</p></li>
+<li><p>PK: Public Parameters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_accountability_jyjxgd20.</span></span><span class="sig-name descname"><span class="pre">CP_Hiding_Accountability_ABE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_Accountability_ABE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE" title="abenc_accountability_jyjxgd20.CP_Hiding_ABE"><code class="xref py py-class docutils literal notranslate"><span class="pre">CP_Hiding_ABE</span></code></a></p>
+<p>Cipher text policy hiding attribute based encryption (Section 4 in the paper).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_Accountability_ABE.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypt a cipher text. This algorithm is performed by a data user who has the required attributes to decipher
+the ciphertext that was encrypted using an access policy.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>CT: Cipher text.</p></li>
+<li><p>PK: Public parameters and the public key of the TA.</p></li>
+<li><p>SK: User’s secret key.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>m: The original decrypted message.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_Accountability_ABE.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Encrypt a message using an access policy. This function is performed by a data user who wants to encrypt his 
+message with an access policy. They consider only and-gates in their policy.
+Note: The access policy is hidden into the ciphertext.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>PK: Public parameters and the public key of the TA.</p></li>
+<li><p>m: Message to be encrypted in G_T.</p></li>
+<li><dl class="simple">
+<dt>access_policy: Access policy that will be used to encrypt the message. It has to be and gated policy,</dt><dd><p>which means that each attribute can have only one value.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>CT: Cipher text.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.key_gen">
+<span class="sig-name descname"><span class="pre">key_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MSK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_Accountability_ABE.key_gen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.key_gen" title="Link to this definition">¶</a></dt>
+<dd><p>Key generation for a user based on his list of attributes. This algorithm is performed by TA and the user.
+Part of the key generation is executed as an interaction between the user and the TA, as the user generates
+a random number (k) that he does not share with the TA. However, he shares with it w**k, and proves knowledge of
+(k) to TA using any ZKP algorithm.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>MSK: Master Secret Key of the TA.</p></li>
+<li><p>PK: Public parameters and the public key of the TA.</p></li>
+<li><p>ID: User’s unique identifier.</p></li>
+<li><dl class="simple">
+<dt>attributes_list: List of attributes held by this user, where each attribute is in the format:</dt><dd><p>‘attrName_value’</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>SK: User’s secret key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.key_gen_TA">
+<span class="sig-name descname"><span class="pre">key_gen_TA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MSK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_Accountability_ABE.key_gen_TA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.key_gen_TA" title="Link to this definition">¶</a></dt>
+<dd><p>Key generation for a user based on his list of attributes. This algorithm is performed by TA and the user.
+Part of the key generation is executed as an interaction between the user and the TA, as the user generates
+a random number (k) that he does not share with the TA. However, he shares with it w**k, and proves knowledge of
+(k) to TA using any ZKP algorithm.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>MSK: Master Secret Key of the TA.</p></li>
+<li><p>PK: Public parameters and the public key of the TA.</p></li>
+<li><p>ID: User’s unique identifier.</p></li>
+<li><p>R: w ** k, where (w) is a public point on the curve, and (k) is the secret KFN selected by the user.</p></li>
+<li><dl class="simple">
+<dt>attributes_list: List of attributes held by this user, where each attribute is in the format:</dt><dd><p>‘attrName_value’</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>SK: User’s secret key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attributes_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_Accountability_ABE.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.setup" title="Link to this definition">¶</a></dt>
+<dd><p>System Setup algorithm. This algorithm is performed by TA.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>None</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>MSK: TA’s master secret key.</p></li>
+<li><p>PK: Public Parameters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.trace">
+<span class="sig-name descname"><span class="pre">trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SK_suspected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authentic_user_IDs_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_Hiding_Accountability_ABE.trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.trace" title="Link to this definition">¶</a></dt>
+<dd><p>Trace function is executed by the auditor. The auditor checks the suspected SK and determines who is misbehaving
+: the user who owns SK or the TA. If this function is called, it means that either the user or the TA is</p>
+<blockquote>
+<div><p>misbehaving. The trigger how this function is triggered and how the malicious activity is detected is out of
+this paper’s scope.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Inputs:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>SK_suspected: Secret key of the suspected user under the white box model, which means that it has access</dt><dd><p>to the full secret key of the user.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>authentic_user_IDs_list: A list of the authentic user IDs issued by a trusted third party outside the</dt><dd><p>system.</p>
+</dd>
+</dl>
+</li>
+<li><p>PK: Public parameters and the public key of the TA.</p></li>
+</ul>
+</dd>
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>{‘user’: True/False,</dt><dd><p>‘TA’: True/False} ; Only one of them will be true and the other will be false.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_policy_hiding_ABE_test">
+<span class="sig-prename descclassname"><span class="pre">abenc_accountability_jyjxgd20.</span></span><span class="sig-name descname"><span class="pre">CP_policy_hiding_ABE_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_policy_hiding_ABE_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_policy_hiding_ABE_test" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.CP_policy_hiding_with_accountability_test">
+<span class="sig-prename descclassname"><span class="pre">abenc_accountability_jyjxgd20.</span></span><span class="sig-name descname"><span class="pre">CP_policy_hiding_with_accountability_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#CP_policy_hiding_with_accountability_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.CP_policy_hiding_with_accountability_test" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.ShnorrInteractiveZKP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_accountability_jyjxgd20.</span></span><span class="sig-name descname"><span class="pre">ShnorrInteractiveZKP</span></span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#ShnorrInteractiveZKP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Shnorr’s Interactive ZKP</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Prover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#ShnorrInteractiveZKP.Prover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover.create_proof">
+<span class="sig-name descname"><span class="pre">create_proof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#ShnorrInteractiveZKP.Prover.create_proof"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover.create_proof" title="Link to this definition">¶</a></dt>
+<dd><ol class="arabic simple" start="3">
+<li><p>This function is executed by the prover after he received the challenge value (c) from the verifier</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover.create_prover_commitments">
+<span class="sig-name descname"><span class="pre">create_prover_commitments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#ShnorrInteractiveZKP.Prover.create_prover_commitments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover.create_prover_commitments" title="Link to this definition">¶</a></dt>
+<dd><ol class="arabic simple">
+<li><p>This function is executed by the prover to send a random value to the verifier</p></li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Verifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#ShnorrInteractiveZKP.Verifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier.create_verifier_challenge">
+<span class="sig-name descname"><span class="pre">create_verifier_challenge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#ShnorrInteractiveZKP.Verifier.create_verifier_challenge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier.create_verifier_challenge" title="Link to this definition">¶</a></dt>
+<dd><ol class="arabic simple" start="2">
+<li><p>This function is executed by the verifier after he had received the value u from the prover to send a challenge value to the prover.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier.is_proof_verified">
+<span class="sig-name descname"><span class="pre">is_proof_verified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#ShnorrInteractiveZKP.Verifier.is_proof_verified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier.is_proof_verified" title="Link to this definition">¶</a></dt>
+<dd><p>4) This function is executed by the verifier to verify the authenticity of the proof sent by the prover
+z: Created by the prover in create_proof function
+u: Created by the prover in create_prover_commitments function
+h: g^x, where x is the secret key of the prover that he wants to prove that he knows it.</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_accountability_jyjxgd20.main">
+<span class="sig-prename descclassname"><span class="pre">abenc_accountability_jyjxgd20.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_accountability_jyjxgd20.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_accountability_jyjxgd20.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +839,65 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">abenc_accountability_jyjxgd20</a><ul>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.Attribute"><code class="docutils literal notranslate"><span class="pre">Attribute</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.Attribute.add_value"><code class="docutils literal notranslate"><span class="pre">Attribute.add_value()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.Attribute.get_attribute_values_full_name"><code class="docutils literal notranslate"><span class="pre">Attribute.get_attribute_values_full_name()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.Attribute.get_full_attribute_value_name"><code class="docutils literal notranslate"><span class="pre">Attribute.get_full_attribute_value_name()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.Attribute.set_values"><code class="docutils literal notranslate"><span class="pre">Attribute.set_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_ABE</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE.decrypt"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_ABE.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE.encrypt"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_ABE.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE.key_gen"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_ABE.key_gen()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_ABE.setup"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_ABE.setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_Accountability_ABE</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.decrypt"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_Accountability_ABE.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.encrypt"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_Accountability_ABE.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.key_gen"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_Accountability_ABE.key_gen()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.key_gen_TA"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_Accountability_ABE.key_gen_TA()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.setup"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_Accountability_ABE.setup()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_Hiding_Accountability_ABE.trace"><code class="docutils literal notranslate"><span class="pre">CP_Hiding_Accountability_ABE.trace()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_policy_hiding_ABE_test"><code class="docutils literal notranslate"><span class="pre">CP_policy_hiding_ABE_test()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.CP_policy_hiding_with_accountability_test"><code class="docutils literal notranslate"><span class="pre">CP_policy_hiding_with_accountability_test()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Prover</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover.create_proof"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Prover.create_proof()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Prover.create_prover_commitments"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Prover.create_prover_commitments()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Verifier</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier.create_verifier_challenge"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Verifier.create_verifier_challenge()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.ShnorrInteractiveZKP.Verifier.is_proof_verified"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Verifier.is_proof_verified()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_accountability_jyjxgd20.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

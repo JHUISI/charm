@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,102 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="aggrsign-musig">
-<h1>aggrsign_MuSig<a class="headerlink" href="#aggrsign-musig" title="Link to this heading">¶</a></h1>
+          <section id="module-aggrsign_MuSig">
+<span id="aggrsign-musig"></span><h1>aggrsign_MuSig<a class="headerlink" href="#module-aggrsign_MuSig" title="Link to this heading">¶</a></h1>
+<p><strong>MuSig: Key Aggregation for Schnorr Signatures (MuSig)</strong></p>
+<p><em>Authors:</em> Gregory Maxwell, Andrew Poelstra, Yannick Seurin, Pieter Wuille</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Simple Schnorr Multi-Signatures with Applications to Bitcoin”</div>
+<div class="line"><strong>Published in:</strong> ePrint Archive, 2018</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://eprint.iacr.org/2018/068">https://eprint.iacr.org/2018/068</a></div>
+<div class="line"><strong>Notes:</strong> Designed for Bitcoin multi-signature applications</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> aggregate signature (Schnorr-based)</p></li>
+<li><p><strong>Setting:</strong> elliptic curve groups</p></li>
+<li><p><strong>Assumption:</strong> DL</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lovesh Harchandani</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>6/2018</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aggrsign_MuSig.</span></span><span class="sig-name descname"><span class="pre">MuSig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.aggregate_nonce">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aggregate_nonce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonces</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.aggregate_nonce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.aggregate_nonce" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.aggregate_sigs">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aggregate_sigs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signatures</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.aggregate_sigs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.aggregate_sigs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.aggregated_pub_key">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aggregated_pub_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pub_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.aggregated_pub_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.aggregated_pub_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.compute_challenge">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_challenge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aggregated_pub_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_nonce</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.compute_challenge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.compute_challenge" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.dump">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.dump" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.hash_pub_keys">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hash_pub_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pub_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.hash_pub_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.hash_pub_keys" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.new_nonce">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">new_nonce</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.new_nonce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.new_nonce" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.product">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.product"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.product" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nonce</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">challenge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_pub_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.sign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_MuSig.MuSig.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pub_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#MuSig.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.MuSig.verify" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aggrsign_MuSig.main">
+<span class="sig-prename descclassname"><span class="pre">aggrsign_MuSig.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_MuSig.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_MuSig.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +549,41 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">aggrsign_MuSig</a><ul>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig"><code class="docutils literal notranslate"><span class="pre">MuSig</span></code></a><ul>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.aggregate_nonce"><code class="docutils literal notranslate"><span class="pre">MuSig.aggregate_nonce()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.aggregate_sigs"><code class="docutils literal notranslate"><span class="pre">MuSig.aggregate_sigs()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.aggregated_pub_key"><code class="docutils literal notranslate"><span class="pre">MuSig.aggregated_pub_key()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.compute_challenge"><code class="docutils literal notranslate"><span class="pre">MuSig.compute_challenge()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.dump"><code class="docutils literal notranslate"><span class="pre">MuSig.dump()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.hash_pub_keys"><code class="docutils literal notranslate"><span class="pre">MuSig.hash_pub_keys()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.keygen"><code class="docutils literal notranslate"><span class="pre">MuSig.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.new_nonce"><code class="docutils literal notranslate"><span class="pre">MuSig.new_nonce()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.product"><code class="docutils literal notranslate"><span class="pre">MuSig.product()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.sign"><code class="docutils literal notranslate"><span class="pre">MuSig.sign()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_MuSig.MuSig.verify"><code class="docutils literal notranslate"><span class="pre">MuSig.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#aggrsign_MuSig.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

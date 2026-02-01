@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,81 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="pk-vrf">
-<h1>pk_vrf<a class="headerlink" href="#pk-vrf" title="Link to this heading">¶</a></h1>
+          <section id="module-pk_vrf">
+<span id="pk-vrf"></span><h1>pk_vrf<a class="headerlink" href="#module-pk_vrf" title="Link to this heading">¶</a></h1>
+<p><strong>Verifiable Random Functions with Large Input Spaces (HW10)</strong></p>
+<p><em>Authors:</em> Susan Hohenberger, Brent Waters</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Constructing Verifiable Random Functions with Large Input Spaces”</div>
+<div class="line"><strong>Published in:</strong> ePrint Archive, 2010</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2010/102.pdf">http://eprint.iacr.org/2010/102.pdf</a></div>
+<div class="line"><strong>Notes:</strong> Applications to resettable ZK proofs, micropayment schemes, updatable ZK DBs</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> verifiable random function (VRF)</p></li>
+<li><p><strong>Setting:</strong> bilinear groups (pairing-based)</p></li>
+<li><p><strong>Assumption:</strong> q-DBDHI</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>1/2012</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="pk_vrf.VRF10">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pk_vrf.</span></span><span class="sig-name descname"><span class="pre">VRF10</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pk_vrf.VRF10" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vrf</span> <span class="o">=</span> <span class="n">VRF10</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">statement</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">vrf</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">witness</span> <span class="o">=</span> <span class="n">vrf</span><span class="o">.</span><span class="n">prove</span><span class="p">(</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">statement</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vrf</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">witness</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pk_vrf.VRF10.F">
+<span class="sig-name descname"><span class="pre">F</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.F"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pk_vrf.VRF10.F" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pk_vrf.VRF10.prove">
+<span class="sig-name descname"><span class="pre">prove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.prove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pk_vrf.VRF10.prove" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pk_vrf.VRF10.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pk_vrf.VRF10.setup" title="Link to this definition">¶</a></dt>
+<dd><p>n = bit length of inputs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pk_vrf.VRF10.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">st</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#VRF10.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pk_vrf.VRF10.verify" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pk_vrf.main">
+<span class="sig-prename descclassname"><span class="pre">pk_vrf.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pk_vrf.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pk_vrf.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +528,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pk_vrf</a><ul>
+<li><a class="reference internal" href="#pk_vrf.VRF10"><code class="docutils literal notranslate"><span class="pre">VRF10</span></code></a><ul>
+<li><a class="reference internal" href="#pk_vrf.VRF10.F"><code class="docutils literal notranslate"><span class="pre">VRF10.F()</span></code></a></li>
+<li><a class="reference internal" href="#pk_vrf.VRF10.prove"><code class="docutils literal notranslate"><span class="pre">VRF10.prove()</span></code></a></li>
+<li><a class="reference internal" href="#pk_vrf.VRF10.setup"><code class="docutils literal notranslate"><span class="pre">VRF10.setup()</span></code></a></li>
+<li><a class="reference internal" href="#pk_vrf.VRF10.verify"><code class="docutils literal notranslate"><span class="pre">VRF10.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pk_vrf.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

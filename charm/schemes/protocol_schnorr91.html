@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,71 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="protocol-schnorr91">
-<h1>protocol_schnorr91<a class="headerlink" href="#protocol-schnorr91" title="Link to this heading">¶</a></h1>
+          <section id="module-protocol_schnorr91">
+<span id="protocol-schnorr91"></span><h1>protocol_schnorr91<a class="headerlink" href="#module-protocol_schnorr91" title="Link to this heading">¶</a></h1>
+<p><strong>Schnorr Zero-Knowledge Protocol (Schnorr91)</strong></p>
+<p><em>Authors:</em> Claus-Peter Schnorr</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Efficient Signature Generation by Smart Cards”</div>
+<div class="line"><strong>Published in:</strong> Journal of Cryptology, 1991</div>
+<div class="line"><strong>Notes:</strong> Classic three-move zero-knowledge proof of knowledge of discrete log</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> sigma protocol (zero-knowledge proof)</p></li>
+<li><p><strong>Setting:</strong> elliptic curve groups</p></li>
+<li><p><strong>Assumption:</strong> DL</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Charm Developers</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>Unknown</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="protocol_schnorr91.SchnorrZK">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">protocol_schnorr91.</span></span><span class="sig-name descname"><span class="pre">SchnorrZK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">builtin_cv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_schnorr91.html#SchnorrZK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_schnorr91.SchnorrZK" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="protocol_schnorr91.SchnorrZK.prover_state1">
+<span class="sig-name descname"><span class="pre">prover_state1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_schnorr91.html#SchnorrZK.prover_state1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_schnorr91.SchnorrZK.prover_state1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="protocol_schnorr91.SchnorrZK.prover_state3">
+<span class="sig-name descname"><span class="pre">prover_state3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_schnorr91.html#SchnorrZK.prover_state3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_schnorr91.SchnorrZK.prover_state3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="protocol_schnorr91.SchnorrZK.prover_state5">
+<span class="sig-name descname"><span class="pre">prover_state5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_schnorr91.html#SchnorrZK.prover_state5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_schnorr91.SchnorrZK.prover_state5" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="protocol_schnorr91.SchnorrZK.verifier_state2">
+<span class="sig-name descname"><span class="pre">verifier_state2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_schnorr91.html#SchnorrZK.verifier_state2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_schnorr91.SchnorrZK.verifier_state2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="protocol_schnorr91.SchnorrZK.verifier_state4">
+<span class="sig-name descname"><span class="pre">verifier_state4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_schnorr91.html#SchnorrZK.verifier_state4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_schnorr91.SchnorrZK.verifier_state4" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="protocol_schnorr91.SchnorrZK.verifier_state6">
+<span class="sig-name descname"><span class="pre">verifier_state6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/protocol_schnorr91.html#SchnorrZK.verifier_state6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#protocol_schnorr91.SchnorrZK.verifier_state6" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +518,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">protocol_schnorr91</a><ul>
+<li><a class="reference internal" href="#protocol_schnorr91.SchnorrZK"><code class="docutils literal notranslate"><span class="pre">SchnorrZK</span></code></a><ul>
+<li><a class="reference internal" href="#protocol_schnorr91.SchnorrZK.prover_state1"><code class="docutils literal notranslate"><span class="pre">SchnorrZK.prover_state1()</span></code></a></li>
+<li><a class="reference internal" href="#protocol_schnorr91.SchnorrZK.prover_state3"><code class="docutils literal notranslate"><span class="pre">SchnorrZK.prover_state3()</span></code></a></li>
+<li><a class="reference internal" href="#protocol_schnorr91.SchnorrZK.prover_state5"><code class="docutils literal notranslate"><span class="pre">SchnorrZK.prover_state5()</span></code></a></li>
+<li><a class="reference internal" href="#protocol_schnorr91.SchnorrZK.verifier_state2"><code class="docutils literal notranslate"><span class="pre">SchnorrZK.verifier_state2()</span></code></a></li>
+<li><a class="reference internal" href="#protocol_schnorr91.SchnorrZK.verifier_state4"><code class="docutils literal notranslate"><span class="pre">SchnorrZK.verifier_state4()</span></code></a></li>
+<li><a class="reference internal" href="#protocol_schnorr91.SchnorrZK.verifier_state6"><code class="docutils literal notranslate"><span class="pre">SchnorrZK.verifier_state6()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

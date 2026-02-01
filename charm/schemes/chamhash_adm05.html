@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,74 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="chamhash-adm05">
-<h1>chamhash_adm05<a class="headerlink" href="#chamhash-adm05" title="Link to this heading">¶</a></h1>
+          <section id="module-chamhash_adm05">
+<span id="chamhash-adm05"></span><h1>chamhash_adm05<a class="headerlink" href="#module-chamhash_adm05" title="Link to this heading">¶</a></h1>
+<p><strong>Ateniese-Medeiros Chameleon Hash (ADM05)</strong></p>
+<p><em>Authors:</em> Giuseppe Ateniese, Breno de Medeiros</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “On the Key Exposure Problem in Chameleon Hashes”</div>
+<div class="line"><strong>Published in:</strong> SCN 2004</div>
+<div class="line"><strong>Notes:</strong> Section 4, Schnorr group-based construction</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> chameleon hash function</p></li>
+<li><p><strong>Setting:</strong> Schnorr groups</p></li>
+<li><p><strong>Assumption:</strong> DL</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>4/2011</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="chamhash_adm05.ChamHash_Adm05">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chamhash_adm05.</span></span><span class="sig-name descname"><span class="pre">ChamHash_Adm05</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chamhash_adm05.html#ChamHash_Adm05"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chamhash_adm05.ChamHash_Adm05" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ChamHash</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.core.math.integer</span><span class="w"> </span><span class="kn">import</span> <span class="n">integer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">141660875619984104245410764464185421040193281776686085728248762539241852738181649330509191671665849071206347515263344232662465937366909502530516774705282764748558934610432918614104329009095808618770549804432868118610669336907161081169097403439689930233383598055540343198389409225338204714777812724565461351567</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">70830437809992052122705382232092710520096640888343042864124381269620926369090824665254595835832924535603173757631672116331232968683454751265258387352641382374279467305216459307052164504547904309385274902216434059305334668453580540584548701719844965116691799027770171599194704612669102357388906362282730675783</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chamHash</span> <span class="o">=</span> <span class="n">ChamHash_Adm05</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">paramgen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;hello world this is the message&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">==</span> <span class="n">chamHash</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="chamhash_adm05.ChamHash_Adm05.find_collision">
+<span class="sig-name descname"><span class="pre">find_collision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chamhash_adm05.html#ChamHash_Adm05.find_collision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chamhash_adm05.ChamHash_Adm05.find_collision" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chamhash_adm05.ChamHash_Adm05.hash">
+<span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chamhash_adm05.html#ChamHash_Adm05.hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chamhash_adm05.ChamHash_Adm05.hash" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chamhash_adm05.ChamHash_Adm05.paramgen">
+<span class="sig-name descname"><span class="pre">paramgen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chamhash_adm05.html#ChamHash_Adm05.paramgen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chamhash_adm05.ChamHash_Adm05.paramgen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chamhash_adm05.main">
+<span class="sig-prename descclassname"><span class="pre">chamhash_adm05.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/chamhash_adm05.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chamhash_adm05.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +521,33 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">chamhash_adm05</a><ul>
+<li><a class="reference internal" href="#chamhash_adm05.ChamHash_Adm05"><code class="docutils literal notranslate"><span class="pre">ChamHash_Adm05</span></code></a><ul>
+<li><a class="reference internal" href="#chamhash_adm05.ChamHash_Adm05.find_collision"><code class="docutils literal notranslate"><span class="pre">ChamHash_Adm05.find_collision()</span></code></a></li>
+<li><a class="reference internal" href="#chamhash_adm05.ChamHash_Adm05.hash"><code class="docutils literal notranslate"><span class="pre">ChamHash_Adm05.hash()</span></code></a></li>
+<li><a class="reference internal" href="#chamhash_adm05.ChamHash_Adm05.paramgen"><code class="docutils literal notranslate"><span class="pre">ChamHash_Adm05.paramgen()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#chamhash_adm05.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

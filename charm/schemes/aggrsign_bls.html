@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,122 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="aggrsign-bls">
-<h1>aggrsign_bls<a class="headerlink" href="#aggrsign-bls" title="Link to this heading">¶</a></h1>
+          <section id="module-aggrsign_bls">
+<span id="aggrsign-bls"></span><h1>aggrsign_bls<a class="headerlink" href="#module-aggrsign_bls" title="Link to this heading">¶</a></h1>
+<p><strong>BLS Multi-Signatures (BLS)</strong></p>
+<p><em>Authors:</em> Dan Boneh, Manu Drijvers, Gregory Neven</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “BLS Multi-Signatures With Public-Key Aggregation”</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html">https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html</a></div>
+<div class="line"><strong>Notes:</strong> Includes both vulnerable and rogue-public-key-resistant aggregation methods</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> aggregate signature</p></li>
+<li><p><strong>Setting:</strong> bilinear groups (asymmetric)</p></li>
+<li><p><strong>Assumption:</strong> CDH in G1</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lovesh Harchandani</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>5/2018</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aggrsign_bls.</span></span><span class="sig-name descname"><span class="pre">BLSAggregation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.aggregate_pub_key">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aggregate_pub_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.aggregate_pub_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.aggregate_pub_key" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.aggregate_sigs_safe">
+<span class="sig-name descname"><span class="pre">aggregate_sigs_safe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pubkey_signatures</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.aggregate_sigs_safe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.aggregate_sigs_safe" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.aggregate_sigs_vulnerable">
+<span class="sig-name descname"><span class="pre">aggregate_sigs_vulnerable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signatures</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.aggregate_sigs_vulnerable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.aggregate_sigs_vulnerable" title="Link to this definition">¶</a></dt>
+<dd><p>This method of aggregation is vulnerable to rogue public key attack</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.check_and_return_same_generator_in_public_keys">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_and_return_same_generator_in_public_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.check_and_return_same_generator_in_public_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.check_and_return_same_generator_in_public_keys" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.dump">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.dump" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.hash_keys">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hash_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_pks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.hash_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.hash_keys" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.product">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.product"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.product" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.sign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.verify" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.verify_aggregate_sig_safe">
+<span class="sig-name descname"><span class="pre">verify_aggregate_sig_safe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">public_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.verify_aggregate_sig_safe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.verify_aggregate_sig_safe" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aggrsign_bls.BLSAggregation.verify_aggregate_sig_vulnerable">
+<span class="sig-name descname"><span class="pre">verify_aggregate_sig_vulnerable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">public_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#BLSAggregation.verify_aggregate_sig_vulnerable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.BLSAggregation.verify_aggregate_sig_vulnerable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aggrsign_bls.defend_rogue_public_key_attack">
+<span class="sig-prename descclassname"><span class="pre">aggrsign_bls.</span></span><span class="sig-name descname"><span class="pre">defend_rogue_public_key_attack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#defend_rogue_public_key_attack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.defend_rogue_public_key_attack" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aggrsign_bls.demo_rogue_public_key_attack">
+<span class="sig-prename descclassname"><span class="pre">aggrsign_bls.</span></span><span class="sig-name descname"><span class="pre">demo_rogue_public_key_attack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#demo_rogue_public_key_attack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.demo_rogue_public_key_attack" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aggrsign_bls.safe">
+<span class="sig-prename descclassname"><span class="pre">aggrsign_bls.</span></span><span class="sig-name descname"><span class="pre">safe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#safe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.safe" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aggrsign_bls.vulnerable">
+<span class="sig-prename descclassname"><span class="pre">aggrsign_bls.</span></span><span class="sig-name descname"><span class="pre">vulnerable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/aggrsign_bls.html#vulnerable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aggrsign_bls.vulnerable" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +569,45 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">aggrsign_bls</a><ul>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation"><code class="docutils literal notranslate"><span class="pre">BLSAggregation</span></code></a><ul>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.aggregate_pub_key"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.aggregate_pub_key()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.aggregate_sigs_safe"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.aggregate_sigs_safe()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.aggregate_sigs_vulnerable"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.aggregate_sigs_vulnerable()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.check_and_return_same_generator_in_public_keys"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.check_and_return_same_generator_in_public_keys()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.dump"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.dump()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.hash_keys"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.hash_keys()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.keygen"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.product"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.product()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.sign"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.sign()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.verify"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.verify()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.verify_aggregate_sig_safe"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.verify_aggregate_sig_safe()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.BLSAggregation.verify_aggregate_sig_vulnerable"><code class="docutils literal notranslate"><span class="pre">BLSAggregation.verify_aggregate_sig_vulnerable()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#aggrsign_bls.defend_rogue_public_key_attack"><code class="docutils literal notranslate"><span class="pre">defend_rogue_public_key_attack()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.demo_rogue_public_key_attack"><code class="docutils literal notranslate"><span class="pre">demo_rogue_public_key_attack()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.safe"><code class="docutils literal notranslate"><span class="pre">safe()</span></code></a></li>
+<li><a class="reference internal" href="#aggrsign_bls.vulnerable"><code class="docutils literal notranslate"><span class="pre">vulnerable()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

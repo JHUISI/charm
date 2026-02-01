@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,103 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="dabe-aw11">
-<h1>dabe_aw11<a class="headerlink" href="#dabe-aw11" title="Link to this heading">¶</a></h1>
+          <section id="module-dabe_aw11">
+<span id="dabe-aw11"></span><h1>dabe_aw11<a class="headerlink" href="#module-dabe_aw11" title="Link to this heading">¶</a></h1>
+<p><strong>Decentralized Attribute-Based Encryption (AW11)</strong></p>
+<p><em>Authors:</em> Allison Lewko, Brent Waters</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Decentralizing Attribute-Based Encryption”</div>
+<div class="line"><strong>Published in:</strong> EUROCRYPT, 2011 (Appendix D)</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2010/351.pdf">http://eprint.iacr.org/2010/351.pdf</a></div>
+<div class="line"><strong>Notes:</strong> Decentralized multi-authority ABE construction</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> decentralized attribute-based encryption</p></li>
+<li><p><strong>Setting:</strong> Bilinear groups (asymmetric)</p></li>
+<li><p><strong>Assumption:</strong> Decisional Bilinear Diffie-Hellman</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Gary Belvin</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>06/2011</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="dabe_aw11.Dabe">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dabe_aw11.</span></span><span class="sig-name descname"><span class="pre">Dabe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dabe_aw11.html#Dabe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabe_aw11.Dabe" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEncMultiAuth</span></code></p>
+<p>Decentralized Attribute-Based Encryption by Lewko and Waters</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dabe</span> <span class="o">=</span> <span class="n">Dabe</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">public_parameters</span> <span class="o">=</span> <span class="n">dabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">auth_attrs</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span><span class="p">]</span> <span class="c1">#setup an authority</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">master_public_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">dabe</span><span class="o">.</span><span class="n">authsetup</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="n">auth_attrs</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Setup a user and give him some keys</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ID</span><span class="p">,</span> <span class="n">secret_keys</span> <span class="o">=</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">usr_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;THREE&#39;</span><span class="p">,</span> <span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">usr_attrs</span><span class="p">:</span>  <span class="n">dabe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="n">master_secret_key</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">secret_keys</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">policy</span> <span class="o">=</span> <span class="s1">&#39;((one or three) and (TWO or FOUR))&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">dabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="n">master_public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">dabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="n">secret_keys</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dabe_aw11.Dabe.authsetup">
+<span class="sig-name descname"><span class="pre">authsetup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dabe_aw11.html#Dabe.authsetup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabe_aw11.Dabe.authsetup" title="Link to this definition">¶</a></dt>
+<dd><p>Authority Setup for a given set of attributes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dabe_aw11.Dabe.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dabe_aw11.html#Dabe.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabe_aw11.Dabe.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypt a ciphertext
+SK is the user’s private key dictionary {attr: { xxx , xxx }}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dabe_aw11.Dabe.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dabe_aw11.html#Dabe.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabe_aw11.Dabe.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Encrypt</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dabe_aw11.Dabe.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pkey</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dabe_aw11.html#Dabe.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabe_aw11.Dabe.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Create a key for GID on attribute i belonging to authority sk
+sk is the private key for the releveant authority
+i is the attribute to give bob
+pkey is bob’s private key dictionary, to which the appropriate private key is added</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dabe_aw11.Dabe.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dabe_aw11.html#Dabe.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabe_aw11.Dabe.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Global Setup</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dabe_aw11.main">
+<span class="sig-prename descclassname"><span class="pre">dabe_aw11.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dabe_aw11.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabe_aw11.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +550,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">dabe_aw11</a><ul>
+<li><a class="reference internal" href="#dabe_aw11.Dabe"><code class="docutils literal notranslate"><span class="pre">Dabe</span></code></a><ul>
+<li><a class="reference internal" href="#dabe_aw11.Dabe.authsetup"><code class="docutils literal notranslate"><span class="pre">Dabe.authsetup()</span></code></a></li>
+<li><a class="reference internal" href="#dabe_aw11.Dabe.decrypt"><code class="docutils literal notranslate"><span class="pre">Dabe.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#dabe_aw11.Dabe.encrypt"><code class="docutils literal notranslate"><span class="pre">Dabe.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#dabe_aw11.Dabe.keygen"><code class="docutils literal notranslate"><span class="pre">Dabe.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#dabe_aw11.Dabe.setup"><code class="docutils literal notranslate"><span class="pre">Dabe.setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dabe_aw11.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

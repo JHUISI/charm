@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,572 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="blindsig-ps16">
-<h1>blindsig_ps16<a class="headerlink" href="#blindsig-ps16" title="Link to this heading">¶</a></h1>
+          <section id="module-blindsig_ps16">
+<span id="blindsig-ps16"></span><h1>blindsig_ps16<a class="headerlink" href="#module-blindsig_ps16" title="Link to this heading">¶</a></h1>
+<p><strong>Pointcheval-Sanders Short Randomizable Signatures (PS16)</strong></p>
+<p><em>Authors:</em> David Pointcheval, Olivier Sanders</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Short Randomizable Signatures”</div>
+<div class="line"><strong>Published in:</strong> RSA Conference on Topics in Cryptology, 2016</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://dl.acm.org/doi/10.1007/978-3-319-29485-8_7">https://dl.acm.org/doi/10.1007/978-3-319-29485-8_7</a></div>
+<div class="line"><strong>Notes:</strong> Implements single/multi message signatures and blind signatures</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> blind signature</p></li>
+<li><p><strong>Setting:</strong> bilinear groups (asymmetric)</p></li>
+<li><p><strong>Assumption:</strong> PS assumption</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ahmed Bakr</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>04/2023</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindMultiMessageSig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">PS_BlindMultiMessageSig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindMultiMessageSig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindMultiMessageSig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#blindsig_ps16.PS_BlindSig" title="blindsig_ps16.PS_BlindSig"><code class="xref py py-class docutils literal notranslate"><span class="pre">PS_BlindSig</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindMultiMessageSig.blind">
+<span class="sig-name descname"><span class="pre">blind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindMultiMessageSig.blind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindMultiMessageSig.blind" title="Link to this definition">¶</a></dt>
+<dd><p>This function takes a message and blinds it to return a blinded message.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>messages: List of messages to be blinded</p></li>
+<li><p>pk: pk is needed to know some of the public parameters used in message blinding</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>C: A blinded message</p></li>
+<li><p>t: Blind random value</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindMultiMessageSig.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_messages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindMultiMessageSig.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindMultiMessageSig.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used to generate the secret key and the public key of the signer
+Outputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sk: Secret key</p></li>
+<li><p>pk: public key</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindMultiMessageSig.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blinded_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindMultiMessageSig.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindMultiMessageSig.sign" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the signer to sign a message
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sk: Secret key of the signer</p></li>
+<li><p>pk: Public key of the signer</p></li>
+<li><p>blinded_message: A blinded message to be signed</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma_dash: Signature on the blinded message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindMultiMessageSig.unblind">
+<span class="sig-name descname"><span class="pre">unblind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blinded_sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindMultiMessageSig.unblind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindMultiMessageSig.unblind" title="Link to this definition">¶</a></dt>
+<dd><p>This function takes a blinded signature and returns the unblinded signature
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>blinded_sig: Blinded signature</p></li>
+<li><p>t: random number used to blind the original message</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma: unblinded signature</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindMultiMessageSig.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindMultiMessageSig.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindMultiMessageSig.verify" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the user to verify a signature on a specific message using the message and the public
+key of the signer.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>messages: List of messages</p></li>
+<li><p>pk: Public key</p></li>
+<li><p>sig: signature</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>True if the signature is valid on the message by the user whose public key is pk</p></li>
+<li><p>False, otherwise</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">PS_BlindSig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#blindsig_ps16.PS_Sig" title="blindsig_ps16.PS_Sig"><code class="xref py py-class docutils literal notranslate"><span class="pre">PS_Sig</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSig.blind">
+<span class="sig-name descname"><span class="pre">blind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSig.blind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSig.blind" title="Link to this definition">¶</a></dt>
+<dd><p>This function takes a message and blinds it to return a blinded message.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>message: message to be blinded</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>blinded_message: A blinded message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSig.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSig.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSig.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used to generate the secret key and the public key of the signer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSig.proof_of_knowledge_of_commitment_secrets">
+<span class="sig-name descname"><span class="pre">proof_of_knowledge_of_commitment_secrets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blinded_message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSig.proof_of_knowledge_of_commitment_secrets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSig.proof_of_knowledge_of_commitment_secrets" title="Link to this definition">¶</a></dt>
+<dd><p>This function runs shnorr’ interactive proof of knowledge</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSig.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blinded_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSig.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSig.sign" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the signer to sign a message
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sk: Secret key of the signer</p></li>
+<li><p>blinded_message: A blinded message to be signed</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma_dash: Signature on the blinded message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSig.unblind">
+<span class="sig-name descname"><span class="pre">unblind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blinded_sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSig.unblind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSig.unblind" title="Link to this definition">¶</a></dt>
+<dd><p>This function takes a blinded signature and returns the unblinded signature
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>blinded_sig: Blinded signature</p></li>
+<li><p>t: random number used to blind the original message</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma: unblinded signature</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSig.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSig.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSig.verify" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the user to verify a signature on a specific message using the message and the public
+key of the signer.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>message: The message</p></li>
+<li><p>pk: Public key</p></li>
+<li><p>sig: signature</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>True if the signature is valid on the message by the user whose public key is pk</p></li>
+<li><p>False, otherwise</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSingleMessageSig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">PS_BlindSingleMessageSig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSingleMessageSig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSingleMessageSig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#blindsig_ps16.PS_BlindSig" title="blindsig_ps16.PS_BlindSig"><code class="xref py py-class docutils literal notranslate"><span class="pre">PS_BlindSig</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSingleMessageSig.blind">
+<span class="sig-name descname"><span class="pre">blind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSingleMessageSig.blind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSingleMessageSig.blind" title="Link to this definition">¶</a></dt>
+<dd><p>This function takes a message and blinds it to return a blinded message.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>message: message to be blinded</p></li>
+<li><p>pk: pk is needed to know some of the public parameters used in message blinding</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>C: A blinded message</p></li>
+<li><p>t: Blind random value</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSingleMessageSig.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSingleMessageSig.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSingleMessageSig.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used to generate the secret key and the public key of the signer
+Outputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sk: Secret key</p></li>
+<li><p>pk: public key</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSingleMessageSig.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blinded_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSingleMessageSig.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSingleMessageSig.sign" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the signer to sign a message
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sk: Secret key of the signer</p></li>
+<li><p>pk: Public key of the signer</p></li>
+<li><p>blinded_message: A blinded message to be signed</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma_dash: Signature on the blinded message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSingleMessageSig.unblind">
+<span class="sig-name descname"><span class="pre">unblind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blinded_sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSingleMessageSig.unblind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSingleMessageSig.unblind" title="Link to this definition">¶</a></dt>
+<dd><p>This function takes a blinded signature and returns the unblinded signature
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>blinded_sig: Blinded signature</p></li>
+<li><p>t: random number used to blind the original message</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma: unblinded signature</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_BlindSingleMessageSig.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_BlindSingleMessageSig.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_BlindSingleMessageSig.verify" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the user to verify a signature on a specific message using the message and the public
+key of the signer.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>message: The message</p></li>
+<li><p>pk: Public key</p></li>
+<li><p>sig: signature</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>True if the signature is valid on the message by the user whose public key is pk</p></li>
+<li><p>False, otherwise</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_Sig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">PS_Sig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_Sig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_Sig" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PKSig</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_Sig.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_Sig.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_Sig.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used to generate the secret key and the public key of the signer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_Sig.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_Sig.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_Sig.sign" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the signer to sign a message
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sk: Secret key of the signer</p></li>
+<li><p>message: message to be signed</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma: Signature on the message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_Sig.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_Sig.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_Sig.verify" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the user to verify a signature on a specific message using the message and the public
+key of the signer.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>message: The message</p></li>
+<li><p>pk: Public key</p></li>
+<li><p>sig: signature</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>True if the signature is valid on the message by the user whose public key is pk</p></li>
+<li><p>False, otherwise</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_SigMultiMessage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">PS_SigMultiMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_SigMultiMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_SigMultiMessage" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#blindsig_ps16.PS_Sig" title="blindsig_ps16.PS_Sig"><code class="xref py py-class docutils literal notranslate"><span class="pre">PS_Sig</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_SigMultiMessage.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_messages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_SigMultiMessage.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_SigMultiMessage.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used to generate the secret key and the public key of the signer
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>num_message: Number of messages</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_SigMultiMessage.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_SigMultiMessage.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_SigMultiMessage.sign" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the signer to sign a message
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sk: Secret key of the signer</p></li>
+<li><p>messages: List of messages to be signed</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma: Signature on the message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_SigMultiMessage.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_SigMultiMessage.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_SigMultiMessage.verify" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the user to verify a signature on a specific message using the message and the public
+key of the signer.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>messages: The list of messages</p></li>
+<li><p>pk: Public key</p></li>
+<li><p>sig: signature</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>True if the signature is valid on the message by the user whose public key is pk</p></li>
+<li><p>False, otherwise</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_SigSingleMessage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">PS_SigSingleMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_SigSingleMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_SigSingleMessage" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#blindsig_ps16.PS_Sig" title="blindsig_ps16.PS_Sig"><code class="xref py py-class docutils literal notranslate"><span class="pre">PS_Sig</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_SigSingleMessage.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_SigSingleMessage.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_SigSingleMessage.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used to generate the secret key and the public key of the signer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_SigSingleMessage.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_SigSingleMessage.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_SigSingleMessage.sign" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the signer to sign a message
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sk: Secret key of the signer</p></li>
+<li><p>message: message to be signed</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>sigma: Signature on the message</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.PS_SigSingleMessage.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/blindsig_ps16.html#PS_SigSingleMessage.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.PS_SigSingleMessage.verify" title="Link to this definition">¶</a></dt>
+<dd><p>This function is used for the user to verify a signature on a specific message using the message and the public
+key of the signer.
+Inputs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>message: The message</p></li>
+<li><p>pk: Public key</p></li>
+<li><p>sig: signature</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Outputs:</dt><dd><ul class="simple">
+<li><p>True if the signature is valid on the message by the user whose public key is pk</p></li>
+<li><p>False, otherwise</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.ShnorrInteractiveZKP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">ShnorrInteractiveZKP</span></span><a class="reference internal" href="../../_modules/blindsig_ps16.html#ShnorrInteractiveZKP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.ShnorrInteractiveZKP" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.ShnorrInteractiveZKP.Prover">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Prover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secret_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secret_messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#ShnorrInteractiveZKP.Prover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.ShnorrInteractiveZKP.Prover" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.ShnorrInteractiveZKP.Prover.create_proof">
+<span class="sig-name descname"><span class="pre">create_proof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#ShnorrInteractiveZKP.Prover.create_proof"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.ShnorrInteractiveZKP.Prover.create_proof" title="Link to this definition">¶</a></dt>
+<dd><ol class="arabic simple" start="3">
+<li><p>This function is executed by the prover after he received the challenge value (c) from the verifier</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.ShnorrInteractiveZKP.Prover.create_prover_commitments">
+<span class="sig-name descname"><span class="pre">create_prover_commitments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#ShnorrInteractiveZKP.Prover.create_prover_commitments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.ShnorrInteractiveZKP.Prover.create_prover_commitments" title="Link to this definition">¶</a></dt>
+<dd><ol class="arabic simple">
+<li><p>This function is executed by the prover to send a random value to the verifier</p></li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="blindsig_ps16.ShnorrInteractiveZKP.Verifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Verifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#ShnorrInteractiveZKP.Verifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.ShnorrInteractiveZKP.Verifier" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.ShnorrInteractiveZKP.Verifier.create_verifier_challenge">
+<span class="sig-name descname"><span class="pre">create_verifier_challenge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#ShnorrInteractiveZKP.Verifier.create_verifier_challenge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.ShnorrInteractiveZKP.Verifier.create_verifier_challenge" title="Link to this definition">¶</a></dt>
+<dd><ol class="arabic simple" start="2">
+<li><p>This function is executed by the verifier after he had received the value u from the prover to send a challenge value to the prover.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blindsig_ps16.ShnorrInteractiveZKP.Verifier.is_proof_verified">
+<span class="sig-name descname"><span class="pre">is_proof_verified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_ms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blinded_message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commitment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#ShnorrInteractiveZKP.Verifier.is_proof_verified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.ShnorrInteractiveZKP.Verifier.is_proof_verified" title="Link to this definition">¶</a></dt>
+<dd><ol class="arabic simple" start="4">
+<li><p>This function is executed by the verifier to verify the authenticity of the proof sent by the prover</p></li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blindsig_ps16.blinded_multi_message_main">
+<span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">blinded_multi_message_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#blinded_multi_message_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.blinded_multi_message_main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blindsig_ps16.blinded_single_message_main">
+<span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">blinded_single_message_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#blinded_single_message_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.blinded_single_message_main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blindsig_ps16.dump_to_zp_element">
+<span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">dump_to_zp_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#dump_to_zp_element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.dump_to_zp_element" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blindsig_ps16.multi_message_main">
+<span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">multi_message_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#multi_message_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.multi_message_main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="blindsig_ps16.single_message_main">
+<span class="sig-prename descclassname"><span class="pre">blindsig_ps16.</span></span><span class="sig-name descname"><span class="pre">single_message_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/blindsig_ps16.html#single_message_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blindsig_ps16.single_message_main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +1019,87 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">blindsig_ps16</a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindMultiMessageSig"><code class="docutils literal notranslate"><span class="pre">PS_BlindMultiMessageSig</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindMultiMessageSig.blind"><code class="docutils literal notranslate"><span class="pre">PS_BlindMultiMessageSig.blind()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindMultiMessageSig.keygen"><code class="docutils literal notranslate"><span class="pre">PS_BlindMultiMessageSig.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindMultiMessageSig.sign"><code class="docutils literal notranslate"><span class="pre">PS_BlindMultiMessageSig.sign()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindMultiMessageSig.unblind"><code class="docutils literal notranslate"><span class="pre">PS_BlindMultiMessageSig.unblind()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindMultiMessageSig.verify"><code class="docutils literal notranslate"><span class="pre">PS_BlindMultiMessageSig.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSig"><code class="docutils literal notranslate"><span class="pre">PS_BlindSig</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSig.blind"><code class="docutils literal notranslate"><span class="pre">PS_BlindSig.blind()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSig.keygen"><code class="docutils literal notranslate"><span class="pre">PS_BlindSig.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSig.proof_of_knowledge_of_commitment_secrets"><code class="docutils literal notranslate"><span class="pre">PS_BlindSig.proof_of_knowledge_of_commitment_secrets()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSig.sign"><code class="docutils literal notranslate"><span class="pre">PS_BlindSig.sign()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSig.unblind"><code class="docutils literal notranslate"><span class="pre">PS_BlindSig.unblind()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSig.verify"><code class="docutils literal notranslate"><span class="pre">PS_BlindSig.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSingleMessageSig"><code class="docutils literal notranslate"><span class="pre">PS_BlindSingleMessageSig</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSingleMessageSig.blind"><code class="docutils literal notranslate"><span class="pre">PS_BlindSingleMessageSig.blind()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSingleMessageSig.keygen"><code class="docutils literal notranslate"><span class="pre">PS_BlindSingleMessageSig.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSingleMessageSig.sign"><code class="docutils literal notranslate"><span class="pre">PS_BlindSingleMessageSig.sign()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSingleMessageSig.unblind"><code class="docutils literal notranslate"><span class="pre">PS_BlindSingleMessageSig.unblind()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_BlindSingleMessageSig.verify"><code class="docutils literal notranslate"><span class="pre">PS_BlindSingleMessageSig.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_Sig"><code class="docutils literal notranslate"><span class="pre">PS_Sig</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.PS_Sig.keygen"><code class="docutils literal notranslate"><span class="pre">PS_Sig.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_Sig.sign"><code class="docutils literal notranslate"><span class="pre">PS_Sig.sign()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_Sig.verify"><code class="docutils literal notranslate"><span class="pre">PS_Sig.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_SigMultiMessage"><code class="docutils literal notranslate"><span class="pre">PS_SigMultiMessage</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.PS_SigMultiMessage.keygen"><code class="docutils literal notranslate"><span class="pre">PS_SigMultiMessage.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_SigMultiMessage.sign"><code class="docutils literal notranslate"><span class="pre">PS_SigMultiMessage.sign()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_SigMultiMessage.verify"><code class="docutils literal notranslate"><span class="pre">PS_SigMultiMessage.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_SigSingleMessage"><code class="docutils literal notranslate"><span class="pre">PS_SigSingleMessage</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.PS_SigSingleMessage.keygen"><code class="docutils literal notranslate"><span class="pre">PS_SigSingleMessage.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_SigSingleMessage.sign"><code class="docutils literal notranslate"><span class="pre">PS_SigSingleMessage.sign()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.PS_SigSingleMessage.verify"><code class="docutils literal notranslate"><span class="pre">PS_SigSingleMessage.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blindsig_ps16.ShnorrInteractiveZKP"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.ShnorrInteractiveZKP.Prover"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Prover</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.ShnorrInteractiveZKP.Prover.create_proof"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Prover.create_proof()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.ShnorrInteractiveZKP.Prover.create_prover_commitments"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Prover.create_prover_commitments()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blindsig_ps16.ShnorrInteractiveZKP.Verifier"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Verifier</span></code></a><ul>
+<li><a class="reference internal" href="#blindsig_ps16.ShnorrInteractiveZKP.Verifier.create_verifier_challenge"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Verifier.create_verifier_challenge()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.ShnorrInteractiveZKP.Verifier.is_proof_verified"><code class="docutils literal notranslate"><span class="pre">ShnorrInteractiveZKP.Verifier.is_proof_verified()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blindsig_ps16.blinded_multi_message_main"><code class="docutils literal notranslate"><span class="pre">blinded_multi_message_main()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.blinded_single_message_main"><code class="docutils literal notranslate"><span class="pre">blinded_single_message_main()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.dump_to_zp_element"><code class="docutils literal notranslate"><span class="pre">dump_to_zp_element()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.multi_message_main"><code class="docutils literal notranslate"><span class="pre">multi_message_main()</span></code></a></li>
+<li><a class="reference internal" href="#blindsig_ps16.single_message_main"><code class="docutils literal notranslate"><span class="pre">single_message_main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

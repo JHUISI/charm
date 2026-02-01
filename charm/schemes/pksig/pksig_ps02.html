@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,73 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="pksig-ps02">
-<h1>pksig_ps02<a class="headerlink" href="#pksig-ps02" title="Link to this heading">¶</a></h1>
+          <section id="module-pksig_ps02">
+<span id="pksig-ps02"></span><h1>pksig_ps02<a class="headerlink" href="#module-pksig_ps02" title="Link to this heading">¶</a></h1>
+<p><strong>Pointcheval-Sanders Signature (PS16) - Sequential Aggregate</strong></p>
+<p><em>Authors:</em> D. Pointcheval, O. Sanders</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Short Randomizable Signatures”</div>
+<div class="line"><strong>Published in:</strong> CT-RSA, 2016</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://eprint.iacr.org/2015/525.pdf">https://eprint.iacr.org/2015/525.pdf</a></div>
+<div class="line"><strong>Notes:</strong> Section 5 - Sequential aggregate signatures over known messages.</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> signature (public key)</p></li>
+<li><p><strong>Setting:</strong> bilinear groups (asymmetric)</p></li>
+<li><p><strong>Assumption:</strong> PS assumption</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Lovesh Harchandani</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>6/2018</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="pksig_ps02.PS02">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pksig_ps02.</span></span><span class="sig-name descname"><span class="pre">PS02</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_ps02.html#PS02"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_ps02.PS02" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Sequential Aggregate signatures over known messages, section 5 of the paper</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_ps02.PS02.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_messages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_ps02.html#PS02.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_ps02.PS02.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_ps02.PS02.product">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_ps02.html#PS02.product"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_ps02.PS02.product" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_ps02.PS02.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_ps02.html#PS02.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_ps02.PS02.setup" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_ps02.PS02.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_ps02.html#PS02.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_ps02.PS02.sign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_ps02.PS02.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_ps02.html#PS02.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_ps02.PS02.verify" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pksig_ps02.main">
+<span class="sig-prename descclassname"><span class="pre">pksig_ps02.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_ps02.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_ps02.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +520,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pksig_ps02</a><ul>
+<li><a class="reference internal" href="#pksig_ps02.PS02"><code class="docutils literal notranslate"><span class="pre">PS02</span></code></a><ul>
+<li><a class="reference internal" href="#pksig_ps02.PS02.keygen"><code class="docutils literal notranslate"><span class="pre">PS02.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_ps02.PS02.product"><code class="docutils literal notranslate"><span class="pre">PS02.product()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_ps02.PS02.setup"><code class="docutils literal notranslate"><span class="pre">PS02.setup()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_ps02.PS02.sign"><code class="docutils literal notranslate"><span class="pre">PS02.sign()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_ps02.PS02.verify"><code class="docutils literal notranslate"><span class="pre">PS02.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pksig_ps02.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,69 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="dfa-fe12">
-<h1>dfa_fe12<a class="headerlink" href="#dfa-fe12" title="Link to this heading">¶</a></h1>
+          <section id="module-dfa_fe12">
+<span id="dfa-fe12"></span><h1>dfa_fe12<a class="headerlink" href="#module-dfa_fe12" title="Link to this heading">¶</a></h1>
+<p><strong>Functional Encryption for Regular Languages (FE12)</strong></p>
+<p><em>Authors:</em> Brent Waters</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Functional Encryption for Regular Languages”</div>
+<div class="line"><strong>Published in:</strong> CRYPTO, 2012</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2012/384">http://eprint.iacr.org/2012/384</a></div>
+<div class="line"><strong>Notes:</strong> DFA-based functional encryption with public index</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> functional encryption (public index)</p></li>
+<li><p><strong>Setting:</strong> Pairing groups</p></li>
+<li><p><strong>Assumption:</strong> Decisional Linear</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>12/2012</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="dfa_fe12.FE_DFA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dfa_fe12.</span></span><span class="sig-name descname"><span class="pre">FE_DFA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_groupObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_dfaObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dfa_fe12.html#FE_DFA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dfa_fe12.FE_DFA" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dfa_fe12.FE_DFA.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dfa_fe12.html#FE_DFA.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dfa_fe12.FE_DFA.decrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dfa_fe12.FE_DFA.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mpk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dfa_fe12.html#FE_DFA.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dfa_fe12.FE_DFA.encrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dfa_fe12.FE_DFA.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mpk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfaM</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dfa_fe12.html#FE_DFA.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dfa_fe12.FE_DFA.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dfa_fe12.FE_DFA.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alphabet</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dfa_fe12.html#FE_DFA.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dfa_fe12.FE_DFA.setup" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dfa_fe12.main">
+<span class="sig-prename descclassname"><span class="pre">dfa_fe12.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dfa_fe12.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dfa_fe12.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +516,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">dfa_fe12</a><ul>
+<li><a class="reference internal" href="#dfa_fe12.FE_DFA"><code class="docutils literal notranslate"><span class="pre">FE_DFA</span></code></a><ul>
+<li><a class="reference internal" href="#dfa_fe12.FE_DFA.decrypt"><code class="docutils literal notranslate"><span class="pre">FE_DFA.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#dfa_fe12.FE_DFA.encrypt"><code class="docutils literal notranslate"><span class="pre">FE_DFA.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#dfa_fe12.FE_DFA.keygen"><code class="docutils literal notranslate"><span class="pre">FE_DFA.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#dfa_fe12.FE_DFA.setup"><code class="docutils literal notranslate"><span class="pre">FE_DFA.setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dfa_fe12.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

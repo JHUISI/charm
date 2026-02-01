@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,76 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="pkenc-adapt-chk04">
-<h1>pkenc_adapt_chk04<a class="headerlink" href="#pkenc-adapt-chk04" title="Link to this heading">¶</a></h1>
+          <section id="module-pkenc_adapt_chk04">
+<span id="pkenc-adapt-chk04"></span><h1>pkenc_adapt_chk04<a class="headerlink" href="#module-pkenc_adapt_chk04" title="Link to this heading">¶</a></h1>
+<p><strong>Canetti-Halevi-Katz IBE-to-PKE Transform (CHK04)</strong></p>
+<p><em>Description:</em> Transforms an Identity-Based Encryption scheme into a CCA-secure
+Public Key Encryption scheme using generic composition of IBE + one-time signature.</p>
+<div class="line-block">
+<div class="line"><strong>Based on:</strong> Chosen-Ciphertext Security from Identity-Based Encryption</div>
+<div class="line"><strong>Published in:</strong> CRYPTO 2004</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://eprint.iacr.org/2003/182">https://eprint.iacr.org/2003/182</a></div>
+<div class="line"><strong>Notes:</strong> Requires a selective-ID secure IBE scheme and an EU-CMA one-time signature scheme</div>
+</div>
+<p class="rubric">Adapter Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> IBE-to-PKE transform</p></li>
+<li><p><strong>Underlying Scheme:</strong> selective-ID secure IBE + EU-CMA one-time signature</p></li>
+<li><p><strong>Purpose:</strong> constructs CCA-secure public key encryption from IBE and signatures</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>1/2011</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="pkenc_adapt_chk04.CHK04">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pkenc_adapt_chk04.</span></span><span class="sig-name descname"><span class="pre">CHK04</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ibe_scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ots_scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pkenc_adapt_chk04.html#CHK04"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_adapt_chk04.CHK04" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PKEnc</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.adapters.ibenc_adapt_identityhash</span><span class="w"> </span><span class="kn">import</span> <span class="n">HashIDAdapter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.ibenc.ibenc_bb03</span><span class="w"> </span><span class="kn">import</span> <span class="n">IBE_BB04</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.pksig.pksig_bls04</span><span class="w"> </span><span class="kn">import</span> <span class="n">BLS01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hash_ibe</span> <span class="o">=</span> <span class="n">HashIDAdapter</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ots</span> <span class="o">=</span> <span class="n">BLS01</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pkenc</span> <span class="o">=</span> <span class="n">CHK04</span><span class="p">(</span><span class="n">hash_ibe</span><span class="p">,</span> <span class="n">ots</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">pkenc</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pkenc_adapt_chk04.CHK04.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pkenc_adapt_chk04.html#CHK04.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_adapt_chk04.CHK04.decrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pkenc_adapt_chk04.CHK04.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pkenc_adapt_chk04.html#CHK04.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_adapt_chk04.CHK04.encrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pkenc_adapt_chk04.CHK04.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pkenc_adapt_chk04.html#CHK04.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_adapt_chk04.CHK04.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +523,32 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pkenc_adapt_chk04</a><ul>
+<li><a class="reference internal" href="#pkenc_adapt_chk04.CHK04"><code class="docutils literal notranslate"><span class="pre">CHK04</span></code></a><ul>
+<li><a class="reference internal" href="#pkenc_adapt_chk04.CHK04.decrypt"><code class="docutils literal notranslate"><span class="pre">CHK04.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#pkenc_adapt_chk04.CHK04.encrypt"><code class="docutils literal notranslate"><span class="pre">CHK04.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#pkenc_adapt_chk04.CHK04.keygen"><code class="docutils literal notranslate"><span class="pre">CHK04.keygen()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

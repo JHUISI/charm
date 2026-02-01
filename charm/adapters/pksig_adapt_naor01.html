@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,76 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="pksig-adapt-naor01">
-<h1>pksig_adapt_naor01<a class="headerlink" href="#pksig-adapt-naor01" title="Link to this heading">¶</a></h1>
+          <section id="module-pksig_adapt_naor01">
+<span id="pksig-adapt-naor01"></span><h1>pksig_adapt_naor01<a class="headerlink" href="#module-pksig_adapt_naor01" title="Link to this heading">¶</a></h1>
+<p><strong>Naor’s IBE-to-Signature Transform (Naor01)</strong></p>
+<p><em>Description:</em> Transforms a fully-secure Identity-Based Encryption scheme into a
+digital signature scheme using Naor’s construction.</p>
+<div class="line-block">
+<div class="line"><strong>Based on:</strong> Identity-Based Encryption from the Weil Pairing</div>
+<div class="line"><strong>Published in:</strong> CRYPTO 2001</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://eprint.iacr.org/2001/090.pdf">https://eprint.iacr.org/2001/090.pdf</a></div>
+<div class="line"><strong>Notes:</strong> First described by Boneh and Franklin, credited to Moni Naor.</div>
+<div class="line">Uses IBE key extraction as signing; verification via encrypt-then-decrypt.</div>
+<div class="line"><strong>Warning:</strong> Not secure for selectively-secure IBE schemes!</div>
+</div>
+<p class="rubric">Adapter Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> IBE-to-signature transform</p></li>
+<li><p><strong>Underlying Scheme:</strong> any fully-secure IBE scheme</p></li>
+<li><p><strong>Purpose:</strong> constructs digital signatures from Identity-Based Encryption</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>05/2011</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pksig_adapt_naor01.</span></span><span class="sig-name descname"><span class="pre">Sig_Generic_ibetosig_Naor01</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ibe_scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pksig_adapt_naor01.html#Sig_Generic_ibetosig_Naor01"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PKSig</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">ZR</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.ibenc.ibenc_bb03</span><span class="w"> </span><span class="kn">import</span> <span class="n">IBE_BB04</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.adapters.ibenc_adapt_identityhash</span><span class="w"> </span><span class="kn">import</span> <span class="n">HashIDAdapter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ibe</span> <span class="o">=</span> <span class="n">IBE_BB04</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hashID</span> <span class="o">=</span> <span class="n">HashIDAdapter</span><span class="p">(</span><span class="n">ibe</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ibsig</span> <span class="o">=</span> <span class="n">Sig_Generic_ibetosig_Naor01</span><span class="p">(</span><span class="n">hashID</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;hello world!!!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">ibsig</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">master_secret_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ibsig</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span> 
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pksig_adapt_naor01.html#Sig_Generic_ibetosig_Naor01.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pksig_adapt_naor01.html#Sig_Generic_ibetosig_Naor01.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.sign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pksig_adapt_naor01.html#Sig_Generic_ibetosig_Naor01.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.verify" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +523,32 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pksig_adapt_naor01</a><ul>
+<li><a class="reference internal" href="#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01"><code class="docutils literal notranslate"><span class="pre">Sig_Generic_ibetosig_Naor01</span></code></a><ul>
+<li><a class="reference internal" href="#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.keygen"><code class="docutils literal notranslate"><span class="pre">Sig_Generic_ibetosig_Naor01.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.sign"><code class="docutils literal notranslate"><span class="pre">Sig_Generic_ibetosig_Naor01.sign()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_adapt_naor01.Sig_Generic_ibetosig_Naor01.verify"><code class="docutils literal notranslate"><span class="pre">Sig_Generic_ibetosig_Naor01.verify()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

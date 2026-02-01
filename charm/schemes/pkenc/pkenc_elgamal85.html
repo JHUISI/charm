@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,88 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="pkenc-elgamal85">
-<h1>pkenc_elgamal85<a class="headerlink" href="#pkenc-elgamal85" title="Link to this heading">¶</a></h1>
+          <section id="module-pkenc_elgamal85">
+<span id="pkenc-elgamal85"></span><h1>pkenc_elgamal85<a class="headerlink" href="#module-pkenc_elgamal85" title="Link to this heading">¶</a></h1>
+<p><strong>ElGamal Public Key Encryption Scheme (ElGamal85)</strong></p>
+<p><em>Authors:</em> T. ElGamal</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “A Public Key Cryptosystem and a Signature Scheme Based on Discrete Logarithms”</div>
+<div class="line"><strong>Published in:</strong> CRYPTO 1984</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://en.wikipedia.org/wiki/ElGamal_encryption">http://en.wikipedia.org/wiki/ElGamal_encryption</a></div>
+<div class="line"><strong>Notes:</strong></div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> encryption (public key)</p></li>
+<li><p><strong>Setting:</strong> DDH-hard prime order group</p></li>
+<li><p><strong>Assumption:</strong> DDH</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>3/2011</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="pkenc_elgamal85.ElGamal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pkenc_elgamal85.</span></span><span class="sig-name descname"><span class="pre">ElGamal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PKEnc</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">prime192v2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ecgroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">prime192v2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">el</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">groupObj</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;hello world!12345678&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntegerGroupQ</span><span class="p">,</span> <span class="n">integer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">148829018183496626261556856344710600327516732500226144177322012998064772051982752493460332138204351040296264880017943408846937646702376203733370973197019636813306480144595809796154634625021213611577190781215296823124523899584781302512549499802030946698512327294159881907114777803654670044046376468983244647367</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">integer</span><span class="p">(</span><span class="mi">74414509091748313130778428172355300163758366250113072088661006499032386025991376246730166069102175520148132440008971704423468823351188101866685486598509818406653240072297904898077317312510606805788595390607648411562261949792390651256274749901015473349256163647079940953557388901827335022023188234491622323683</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">groupObj</span> <span class="o">=</span> <span class="n">IntegerGroupQ</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">el</span> <span class="o">=</span> <span class="n">ElGamal</span><span class="p">(</span><span class="n">groupObj</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;hello world!&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>    
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_msg</span> <span class="o">==</span> <span class="n">msg</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pkenc_elgamal85.ElGamal.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamal.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.decrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pkenc_elgamal85.ElGamal.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamal.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.encrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pkenc_elgamal85.ElGamal.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamal.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamal.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pkenc_elgamal85.ElGamalCipher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pkenc_elgamal85.</span></span><span class="sig-name descname"><span class="pre">ElGamalCipher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pkenc_elgamal85.html#ElGamalCipher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pkenc_elgamal85.ElGamalCipher" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +535,33 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pkenc_elgamal85</a><ul>
+<li><a class="reference internal" href="#pkenc_elgamal85.ElGamal"><code class="docutils literal notranslate"><span class="pre">ElGamal</span></code></a><ul>
+<li><a class="reference internal" href="#pkenc_elgamal85.ElGamal.decrypt"><code class="docutils literal notranslate"><span class="pre">ElGamal.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#pkenc_elgamal85.ElGamal.encrypt"><code class="docutils literal notranslate"><span class="pre">ElGamal.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#pkenc_elgamal85.ElGamal.keygen"><code class="docutils literal notranslate"><span class="pre">ElGamal.keygen()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pkenc_elgamal85.ElGamalCipher"><code class="docutils literal notranslate"><span class="pre">ElGamalCipher</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

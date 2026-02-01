@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,123 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="abenc-dacmacs-yj14">
-<h1>abenc_dacmacs_yj14<a class="headerlink" href="#abenc-dacmacs-yj14" title="Link to this heading">¶</a></h1>
+          <section id="module-abenc_dacmacs_yj14">
+<span id="abenc-dacmacs-yj14"></span><h1>abenc_dacmacs_yj14<a class="headerlink" href="#module-abenc_dacmacs_yj14" title="Link to this heading">¶</a></h1>
+<p><strong>DAC-MACS: Data Access Control for Multi-Authority Cloud Storage (YJ14)</strong></p>
+<p><em>Authors:</em> Kan Yang, Xiaohua Jia</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “DAC-MACS: Effective Data Access Control for Multi-Authority Cloud Storage Systems”</div>
+<div class="line"><strong>Published in:</strong> Security for Cloud Storage Systems - SpringerBriefs in Computer Science, 2014</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://link.springer.com/chapter/10.1007/978-1-4614-7873-7_4">http://link.springer.com/chapter/10.1007/978-1-4614-7873-7_4</a></div>
+<div class="line"><strong>Notes:</strong> Multi-authority scheme with efficient attribute revocation</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> ciphertext-policy attribute-based encryption (public key)</p></li>
+<li><p><strong>Setting:</strong> Pairing groups</p></li>
+<li><p><strong>Assumption:</strong> Decisional Bilinear Diffie-Hellman</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>artjomb</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>07/2014</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_dacmacs_yj14.</span></span><span class="sig-name descname"><span class="pre">DACMACS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.ctupdate">
+<span class="sig-name descname"><span class="pre">ctupdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CUK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.ctupdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.ctupdate" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the cipher-text using the update key, because of the revoked attribute (executed by cloud provider)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypts the content(-key) from the cipher-text using the token and the user secret key (executed by user/content consumer)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authority</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Generate the cipher-text from the content(-key) and a policy (executed by the content owner)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.generateTK">
+<span class="sig-name descname"><span class="pre">generateTK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UASK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.generateTK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.generateTK" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a token using the user’s attribute secret keys to offload the decryption process (executed by cloud provider)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.group" title="Link to this definition">¶</a></dt>
+<dd><p>Prime order group</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authority</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">USK</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate user keys for a specific attribute (executed on attribute authority)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.registerUser">
+<span class="sig-name descname"><span class="pre">registerUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.registerUser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.registerUser" title="Link to this definition">¶</a></dt>
+<dd><p>Generate user keys (executed by the user).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Global Setup (executed by CA)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.setupAuthority">
+<span class="sig-name descname"><span class="pre">setupAuthority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authorityid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authorities</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.setupAuthority"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.setupAuthority" title="Link to this definition">¶</a></dt>
+<dd><p>Generate attribute authority keys (executed by attribute authority)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.skupdate">
+<span class="sig-name descname"><span class="pre">skupdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">USK</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">KUK</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.skupdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.skupdate" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the user attribute secret key for the specified attribute (executed by non-revoked user)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.DACMACS.ukeygen">
+<span class="sig-name descname"><span class="pre">ukeygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authority</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">userObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#DACMACS.ukeygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.DACMACS.ukeygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate update keys for users and cloud provider (executed by attribute authority?)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.basicTest">
+<span class="sig-prename descclassname"><span class="pre">abenc_dacmacs_yj14.</span></span><span class="sig-name descname"><span class="pre">basicTest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#basicTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.basicTest" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.revokedTest">
+<span class="sig-prename descclassname"><span class="pre">abenc_dacmacs_yj14.</span></span><span class="sig-name descname"><span class="pre">revokedTest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#revokedTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.revokedTest" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_dacmacs_yj14.test">
+<span class="sig-prename descclassname"><span class="pre">abenc_dacmacs_yj14.</span></span><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_dacmacs_yj14.html#test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_dacmacs_yj14.test" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +570,43 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">abenc_dacmacs_yj14</a><ul>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS"><code class="docutils literal notranslate"><span class="pre">DACMACS</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.ctupdate"><code class="docutils literal notranslate"><span class="pre">DACMACS.ctupdate()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.decrypt"><code class="docutils literal notranslate"><span class="pre">DACMACS.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.encrypt"><code class="docutils literal notranslate"><span class="pre">DACMACS.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.generateTK"><code class="docutils literal notranslate"><span class="pre">DACMACS.generateTK()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.group"><code class="docutils literal notranslate"><span class="pre">DACMACS.group</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.keygen"><code class="docutils literal notranslate"><span class="pre">DACMACS.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.registerUser"><code class="docutils literal notranslate"><span class="pre">DACMACS.registerUser()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.setup"><code class="docutils literal notranslate"><span class="pre">DACMACS.setup()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.setupAuthority"><code class="docutils literal notranslate"><span class="pre">DACMACS.setupAuthority()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.skupdate"><code class="docutils literal notranslate"><span class="pre">DACMACS.skupdate()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.DACMACS.ukeygen"><code class="docutils literal notranslate"><span class="pre">DACMACS.ukeygen()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.basicTest"><code class="docutils literal notranslate"><span class="pre">basicTest()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.revokedTest"><code class="docutils literal notranslate"><span class="pre">revokedTest()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_dacmacs_yj14.test"><code class="docutils literal notranslate"><span class="pre">test()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

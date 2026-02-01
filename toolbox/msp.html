@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,76 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="msp">
-<h1>msp<a class="headerlink" href="#msp" title="Link to this heading">¶</a></h1>
+          <section id="module-msp">
+<span id="msp"></span><h1>msp<a class="headerlink" href="#module-msp" title="Link to this heading">¶</a></h1>
+<p>This class is adapted from the SecretUtil class in charm/toolbox/secretutil.py.
+It provides the following methods:
+- createPolicy: convert a Boolean formula encoded as a string into a policy represented like a tree;
+- convertPolicyToMSP: convert a policy into a monotone span program (MSP);
+- getCoefficients: given a policy, returns a coefficient for every attribute;
+- strip_index: remove the index from an attribute (i.e., x_y -&gt; x);
+- prune: determine whether a given set of attributes satisfies the policy</p>
+<blockquote>
+<div><p>(returns false if it doesn’t, otherwise a good enough subset of attributes);</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>getAttributeList: retrieve the attributes that occur in a policy tree in order (left to right).</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="msp.MSP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">msp.</span></span><span class="sig-name descname"><span class="pre">MSP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#msp.MSP" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="msp.MSP.convert_policy_to_msp">
+<span class="sig-name descname"><span class="pre">convert_policy_to_msp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.convert_policy_to_msp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#msp.MSP.convert_policy_to_msp" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a policy into a monotone span program (MSP)
+represented by a dictionary with (attribute, row) pairs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="msp.MSP.createPolicy">
+<span class="sig-name descname"><span class="pre">createPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.createPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#msp.MSP.createPolicy" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a Boolean formula represented as a string into a policy represented like a tree.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="msp.MSP.getAttributeList">
+<span class="sig-name descname"><span class="pre">getAttributeList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.getAttributeList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#msp.MSP.getAttributeList" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve the attributes that occur in a policy tree in order (left to right).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="msp.MSP.getCoefficients">
+<span class="sig-name descname"><span class="pre">getCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.getCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#msp.MSP.getCoefficients" title="Link to this definition">¶</a></dt>
+<dd><p>Given a policy, returns a coefficient for every attribute.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="msp.MSP.prune">
+<span class="sig-name descname"><span class="pre">prune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.prune"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#msp.MSP.prune" title="Link to this definition">¶</a></dt>
+<dd><p>Determine whether a given set of attributes satisfies the policy
+(returns false if it doesn’t, otherwise a good enough subset of attributes).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="msp.MSP.recoverCoefficients">
+<span class="sig-name descname"><span class="pre">recoverCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.recoverCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#msp.MSP.recoverCoefficients" title="Link to this definition">¶</a></dt>
+<dd><p>recovers the coefficients over a binary tree.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="msp.MSP.strip_index">
+<span class="sig-name descname"><span class="pre">strip_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/msp.html#MSP.strip_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#msp.MSP.strip_index" title="Link to this definition">¶</a></dt>
+<dd><p>Remove the index from an attribute (i.e., x_y -&gt; x).</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +523,36 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">msp</a><ul>
+<li><a class="reference internal" href="#msp.MSP"><code class="docutils literal notranslate"><span class="pre">MSP</span></code></a><ul>
+<li><a class="reference internal" href="#msp.MSP.convert_policy_to_msp"><code class="docutils literal notranslate"><span class="pre">MSP.convert_policy_to_msp()</span></code></a></li>
+<li><a class="reference internal" href="#msp.MSP.createPolicy"><code class="docutils literal notranslate"><span class="pre">MSP.createPolicy()</span></code></a></li>
+<li><a class="reference internal" href="#msp.MSP.getAttributeList"><code class="docutils literal notranslate"><span class="pre">MSP.getAttributeList()</span></code></a></li>
+<li><a class="reference internal" href="#msp.MSP.getCoefficients"><code class="docutils literal notranslate"><span class="pre">MSP.getCoefficients()</span></code></a></li>
+<li><a class="reference internal" href="#msp.MSP.prune"><code class="docutils literal notranslate"><span class="pre">MSP.prune()</span></code></a></li>
+<li><a class="reference internal" href="#msp.MSP.recoverCoefficients"><code class="docutils literal notranslate"><span class="pre">MSP.recoverCoefficients()</span></code></a></li>
+<li><a class="reference internal" href="#msp.MSP.strip_index"><code class="docutils literal notranslate"><span class="pre">MSP.strip_index()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

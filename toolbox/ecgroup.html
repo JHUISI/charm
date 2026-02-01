@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,145 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="ecgroup">
-<h1>ecgroup<a class="headerlink" href="#ecgroup" title="Link to this heading">¶</a></h1>
+          <section id="module-ecgroup">
+<span id="ecgroup"></span><h1>ecgroup<a class="headerlink" href="#module-ecgroup" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ecgroup.ECGroup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ecgroup.</span></span><span class="sig-name descname"><span class="pre">ECGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">builtin_cv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.EndBenchmark">
+<span class="sig-name descname"><span class="pre">EndBenchmark</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.EndBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.EndBenchmark" title="Link to this definition">¶</a></dt>
+<dd><p>ends an ongoing benchmark</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.GetBenchmark">
+<span class="sig-name descname"><span class="pre">GetBenchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.GetBenchmark" title="Link to this definition">¶</a></dt>
+<dd><p>retrieves benchmark results for any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.GetGeneralBenchmarks">
+<span class="sig-name descname"><span class="pre">GetGeneralBenchmarks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetGeneralBenchmarks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.GetGeneralBenchmarks" title="Link to this definition">¶</a></dt>
+<dd><p>retrieves benchmark count for all group operations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.GetGranularBenchmarks">
+<span class="sig-name descname"><span class="pre">GetGranularBenchmarks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.GetGranularBenchmarks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.GetGranularBenchmarks" title="Link to this definition">¶</a></dt>
+<dd><p>retrieves group operation count per type: ZR and G</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.InitBenchmark">
+<span class="sig-name descname"><span class="pre">InitBenchmark</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.InitBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.InitBenchmark" title="Link to this definition">¶</a></dt>
+<dd><p>initiates the benchmark state</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.StartBenchmark">
+<span class="sig-name descname"><span class="pre">StartBenchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.StartBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.StartBenchmark" title="Link to this definition">¶</a></dt>
+<dd><p>starts the benchmark with any of these options: 
+RealTime, CpuTime, Mul, Div, Add, Sub, Exp, Granular</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.bitsize">
+<span class="sig-name descname"><span class="pre">bitsize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.bitsize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.bitsize" title="Link to this definition">¶</a></dt>
+<dd><p>returns the bitsize for encoding messages in the group</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.coordinates">
+<span class="sig-name descname"><span class="pre">coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.coordinates" title="Link to this definition">¶</a></dt>
+<dd><p>get the X and Y coordinates of an EC point</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.debug" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_ctr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.decode" title="Link to this definition">¶</a></dt>
+<dd><p>decode a group element into a string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.deserialize">
+<span class="sig-name descname"><span class="pre">deserialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.deserialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.deserialize" title="Link to this definition">¶</a></dt>
+<dd><p>deserializes into a pairing object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_ctr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.encode" title="Link to this definition">¶</a></dt>
+<dd><p>encode arbitrary string as a group element. Max size is dependent on the EC group order</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.groupSetting">
+<span class="sig-name descname"><span class="pre">groupSetting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.groupSetting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.groupSetting" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.groupType">
+<span class="sig-name descname"><span class="pre">groupType</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.groupType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.groupType" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.hash">
+<span class="sig-name descname"><span class="pre">hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">charm.core.math.elliptic_curve.ZR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.hash" title="Link to this definition">¶</a></dt>
+<dd><p>hashes objects into ZR or G</p>
+<p>Different object types may hash to the same element, e.g., the ASCII
+string ‘str’ and the byte string b’str’ map to the same element.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">charm.core.math.elliptic_curve.ZR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.init" title="Link to this definition">¶</a></dt>
+<dd><p>initializes an object with a specified type and value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.order">
+<span class="sig-name descname"><span class="pre">order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.order" title="Link to this definition">¶</a></dt>
+<dd><p>returns the order of the group</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.paramgen">
+<span class="sig-name descname"><span class="pre">paramgen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.paramgen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.paramgen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.random">
+<span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">charm.core.math.elliptic_curve.ZR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.random" title="Link to this definition">¶</a></dt>
+<dd><p>selects a random element in ZR or G</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.serialize">
+<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.serialize" title="Link to this definition">¶</a></dt>
+<dd><p>serializes a pairing object into bytes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ecgroup.ECGroup.zr">
+<span class="sig-name descname"><span class="pre">zr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ecgroup.html#ECGroup.zr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ecgroup.ECGroup.zr" title="Link to this definition">¶</a></dt>
+<dd><p>get the X coordinate only</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +592,50 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ecgroup</a><ul>
+<li><a class="reference internal" href="#ecgroup.ECGroup"><code class="docutils literal notranslate"><span class="pre">ECGroup</span></code></a><ul>
+<li><a class="reference internal" href="#ecgroup.ECGroup.EndBenchmark"><code class="docutils literal notranslate"><span class="pre">ECGroup.EndBenchmark()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.GetBenchmark"><code class="docutils literal notranslate"><span class="pre">ECGroup.GetBenchmark()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.GetGeneralBenchmarks"><code class="docutils literal notranslate"><span class="pre">ECGroup.GetGeneralBenchmarks()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.GetGranularBenchmarks"><code class="docutils literal notranslate"><span class="pre">ECGroup.GetGranularBenchmarks()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.InitBenchmark"><code class="docutils literal notranslate"><span class="pre">ECGroup.InitBenchmark()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.StartBenchmark"><code class="docutils literal notranslate"><span class="pre">ECGroup.StartBenchmark()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.bitsize"><code class="docutils literal notranslate"><span class="pre">ECGroup.bitsize()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.coordinates"><code class="docutils literal notranslate"><span class="pre">ECGroup.coordinates()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.debug"><code class="docutils literal notranslate"><span class="pre">ECGroup.debug()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.decode"><code class="docutils literal notranslate"><span class="pre">ECGroup.decode()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.deserialize"><code class="docutils literal notranslate"><span class="pre">ECGroup.deserialize()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.encode"><code class="docutils literal notranslate"><span class="pre">ECGroup.encode()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.groupSetting"><code class="docutils literal notranslate"><span class="pre">ECGroup.groupSetting()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.groupType"><code class="docutils literal notranslate"><span class="pre">ECGroup.groupType()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.hash"><code class="docutils literal notranslate"><span class="pre">ECGroup.hash()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.init"><code class="docutils literal notranslate"><span class="pre">ECGroup.init()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.order"><code class="docutils literal notranslate"><span class="pre">ECGroup.order()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.paramgen"><code class="docutils literal notranslate"><span class="pre">ECGroup.paramgen()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.random"><code class="docutils literal notranslate"><span class="pre">ECGroup.random()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.serialize"><code class="docutils literal notranslate"><span class="pre">ECGroup.serialize()</span></code></a></li>
+<li><a class="reference internal" href="#ecgroup.ECGroup.zr"><code class="docutils literal notranslate"><span class="pre">ECGroup.zr()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

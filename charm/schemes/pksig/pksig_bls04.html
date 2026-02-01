@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,79 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="pksig-bls04">
-<h1>pksig_bls04<a class="headerlink" href="#pksig-bls04" title="Link to this heading">¶</a></h1>
+          <section id="module-pksig_bls04">
+<span id="pksig-bls04"></span><h1>pksig_bls04<a class="headerlink" href="#module-pksig_bls04" title="Link to this heading">¶</a></h1>
+<p><strong>Boneh-Lynn-Shacham Signature (BLS04)</strong></p>
+<p><em>Authors:</em> D. Boneh, B. Lynn, H. Shacham</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Short Signatures from the Weil Pairing”</div>
+<div class="line"><strong>Published in:</strong> Journal of Cryptology, 2004</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html">https://crypto.stanford.edu/~dabo/pubs/papers/BLSmultisig.html</a></div>
+<div class="line"><strong>Notes:</strong> This is the IBE (2-level HIBE) implementation of the HIBE scheme BB_2.</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> signature (identity-based)</p></li>
+<li><p><strong>Setting:</strong> bilinear groups (asymmetric)</p></li>
+<li><p><strong>Assumption:</strong> CDH</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>1/2011</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="pksig_bls04.BLS01">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pksig_bls04.</span></span><span class="sig-name descname"><span class="pre">BLS01</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_bls04.BLS01" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IBSig</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;MNT224&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">messages</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="s2">&quot;hello world!!!&quot;</span> <span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="s2">&quot;test message&quot;</span> <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ib</span> <span class="o">=</span> <span class="n">BLS01</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">ib</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signature</span> <span class="o">=</span> <span class="n">ib</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">secret_key</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">messages</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ib</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">messages</span><span class="p">)</span> 
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_bls04.BLS01.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.dump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_bls04.BLS01.dump" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_bls04.BLS01.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">secparam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_bls04.BLS01.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_bls04.BLS01.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_bls04.BLS01.sign" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pksig_bls04.BLS01.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#BLS01.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_bls04.BLS01.verify" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pksig_bls04.main">
+<span class="sig-prename descclassname"><span class="pre">pksig_bls04.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/pksig_bls04.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pksig_bls04.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +526,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pksig_bls04</a><ul>
+<li><a class="reference internal" href="#pksig_bls04.BLS01"><code class="docutils literal notranslate"><span class="pre">BLS01</span></code></a><ul>
+<li><a class="reference internal" href="#pksig_bls04.BLS01.dump"><code class="docutils literal notranslate"><span class="pre">BLS01.dump()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_bls04.BLS01.keygen"><code class="docutils literal notranslate"><span class="pre">BLS01.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_bls04.BLS01.sign"><code class="docutils literal notranslate"><span class="pre">BLS01.sign()</span></code></a></li>
+<li><a class="reference internal" href="#pksig_bls04.BLS01.verify"><code class="docutils literal notranslate"><span class="pre">BLS01.verify()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pksig_bls04.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

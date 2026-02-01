@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,634 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="policy-parser-stress-test">
-<h1>policy_parser_stress_test<a class="headerlink" href="#policy-parser-stress-test" title="Link to this heading">¶</a></h1>
+          <section id="module-policy_parser_stress_test">
+<span id="policy-parser-stress-test"></span><h1>policy_parser_stress_test<a class="headerlink" href="#module-policy_parser_stress_test" title="Link to this heading">¶</a></h1>
+<p>Comprehensive stress test for the ABE policy parser.</p>
+<p>This script tests the PolicyParser and MSP classes for expressiveness,
+correctness, and robustness. It can be run independently to verify
+the policy parser functionality.</p>
+<dl>
+<dt>Usage:</dt><dd><p>python -m charm.test.toolbox.policy_parser_stress_test</p>
+<p># Or with pytest:
+pytest charm/test/toolbox/policy_parser_stress_test.py -v</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">policy_parser_stress_test.</span></span><span class="sig-name descname"><span class="pre">NumericAttributeEdgeCaseTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for edge cases in numeric attribute handling.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attr_name_all_caps">
+<span class="sig-name descname"><span class="pre">test_attr_name_all_caps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_attr_name_all_caps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attr_name_all_caps" title="Link to this definition">¶</a></dt>
+<dd><p>Test attribute name in all caps.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attr_name_mixed_case">
+<span class="sig-name descname"><span class="pre">test_attr_name_mixed_case</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_attr_name_mixed_case"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attr_name_mixed_case" title="Link to this definition">¶</a></dt>
+<dd><p>Test attribute name in mixed case.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attribute_name_with_encoding_pattern">
+<span class="sig-name descname"><span class="pre">test_attribute_name_with_encoding_pattern</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_attribute_name_with_encoding_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attribute_name_with_encoding_pattern" title="Link to this definition">¶</a></dt>
+<dd><p>Test that attribute names with #b# pattern are rejected.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attribute_name_with_partial_pattern">
+<span class="sig-name descname"><span class="pre">test_attribute_name_with_partial_pattern</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_attribute_name_with_partial_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attribute_name_with_partial_pattern" title="Link to this definition">¶</a></dt>
+<dd><p>Test attribute names with partial encoding pattern.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_error_in_int_to_bits">
+<span class="sig-name descname"><span class="pre">test_bit_overflow_error_in_int_to_bits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_bit_overflow_error_in_int_to_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_error_in_int_to_bits" title="Link to this definition">¶</a></dt>
+<dd><p>Test that int_to_bits raises BitOverflowError on overflow.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_in_expand">
+<span class="sig-name descname"><span class="pre">test_bit_overflow_in_expand</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_bit_overflow_in_expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_in_expand" title="Link to this definition">¶</a></dt>
+<dd><p>Test that values exceeding bit width raise BitOverflowError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_in_user_attributes">
+<span class="sig-name descname"><span class="pre">test_bit_overflow_in_user_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_bit_overflow_in_user_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_in_user_attributes" title="Link to this definition">¶</a></dt>
+<dd><p>Test that user_attributes raises error for overflow values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_boundary_value_at_max">
+<span class="sig-name descname"><span class="pre">test_boundary_value_at_max</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_boundary_value_at_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_boundary_value_at_max" title="Link to this definition">¶</a></dt>
+<dd><p>Test value exactly at maximum (255 for 8-bit).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_boundary_value_just_over_max">
+<span class="sig-name descname"><span class="pre">test_boundary_value_just_over_max</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_boundary_value_just_over_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_boundary_value_just_over_max" title="Link to this definition">¶</a></dt>
+<dd><p>Test value just over maximum.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_empty_policy">
+<span class="sig-name descname"><span class="pre">test_empty_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_empty_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_empty_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test that empty policy returns empty string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_equal_zero">
+<span class="sig-name descname"><span class="pre">test_equal_zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_equal_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_equal_zero" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr == 0 correctly encodes all zeros.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_excessive_bit_width">
+<span class="sig-name descname"><span class="pre">test_excessive_bit_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_excessive_bit_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_excessive_bit_width" title="Link to this definition">¶</a></dt>
+<dd><p>Test that num_bits &gt; 64 raises InvalidBitWidthError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_extra_spaces_around_operator">
+<span class="sig-name descname"><span class="pre">test_extra_spaces_around_operator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_extra_spaces_around_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_extra_spaces_around_operator" title="Link to this definition">¶</a></dt>
+<dd><p>Test numeric comparison with extra spaces.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_greater_equal_zero_is_tautology">
+<span class="sig-name descname"><span class="pre">test_greater_equal_zero_is_tautology</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_greater_equal_zero_is_tautology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_greater_equal_zero_is_tautology" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr &gt;= 0 returns None (always true for non-negative).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_greater_than_zero">
+<span class="sig-name descname"><span class="pre">test_greater_than_zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_greater_than_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_greater_than_zero" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr &gt; 0 works correctly.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_helper_max_value_property">
+<span class="sig-name descname"><span class="pre">test_helper_max_value_property</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_helper_max_value_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_helper_max_value_property" title="Link to this definition">¶</a></dt>
+<dd><p>Test that NumericAttributeHelper exposes max_value correctly.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_exclamation_equal">
+<span class="sig-name descname"><span class="pre">test_invalid_operator_exclamation_equal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_invalid_operator_exclamation_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_exclamation_equal" title="Link to this definition">¶</a></dt>
+<dd><p>Test that != operator is rejected.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_not_equal_diamond">
+<span class="sig-name descname"><span class="pre">test_invalid_operator_not_equal_diamond</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_invalid_operator_not_equal_diamond"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_not_equal_diamond" title="Link to this definition">¶</a></dt>
+<dd><p>Test that &lt;&gt; operator is rejected.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_tilde">
+<span class="sig-name descname"><span class="pre">test_invalid_operator_tilde</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_invalid_operator_tilde"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_tilde" title="Link to this definition">¶</a></dt>
+<dd><p>Test that arbitrary operators are rejected.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_less_than_zero_is_contradiction">
+<span class="sig-name descname"><span class="pre">test_less_than_zero_is_contradiction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_less_than_zero_is_contradiction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_less_than_zero_is_contradiction" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr &lt; 0 handling.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_mixed_spacing">
+<span class="sig-name descname"><span class="pre">test_mixed_spacing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_mixed_spacing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_mixed_spacing" title="Link to this definition">¶</a></dt>
+<dd><p>Test numeric comparison with mixed spacing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_multiple_parentheses">
+<span class="sig-name descname"><span class="pre">test_multiple_parentheses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_multiple_parentheses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_multiple_parentheses" title="Link to this definition">¶</a></dt>
+<dd><p>Test policy with multiple levels of parentheses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_bit_width">
+<span class="sig-name descname"><span class="pre">test_negative_bit_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_negative_bit_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_bit_width" title="Link to this definition">¶</a></dt>
+<dd><p>Test that negative num_bits raises InvalidBitWidthError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_in_expand">
+<span class="sig-name descname"><span class="pre">test_negative_value_in_expand</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_negative_value_in_expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_in_expand" title="Link to this definition">¶</a></dt>
+<dd><p>Test that negative values raise ValueError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_in_user_attributes">
+<span class="sig-name descname"><span class="pre">test_negative_value_in_user_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_negative_value_in_user_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_in_user_attributes" title="Link to this definition">¶</a></dt>
+<dd><p>Test that user_attributes raises error for negative values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_message">
+<span class="sig-name descname"><span class="pre">test_negative_value_message</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_negative_value_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_message" title="Link to this definition">¶</a></dt>
+<dd><p>Test that error message mentions negative values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_no_spaces_around_operator">
+<span class="sig-name descname"><span class="pre">test_no_spaces_around_operator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_no_spaces_around_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_no_spaces_around_operator" title="Link to this definition">¶</a></dt>
+<dd><p>Test numeric comparison without spaces.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_non_integer_bit_width">
+<span class="sig-name descname"><span class="pre">test_non_integer_bit_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_non_integer_bit_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_non_integer_bit_width" title="Link to this definition">¶</a></dt>
+<dd><p>Test that non-integer num_bits raises InvalidBitWidthError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_non_strict_mode_continues_on_error">
+<span class="sig-name descname"><span class="pre">test_non_strict_mode_continues_on_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_non_strict_mode_continues_on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_non_strict_mode_continues_on_error" title="Link to this definition">¶</a></dt>
+<dd><p>Test that non-strict mode leaves problematic expression unchanged.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_none_policy">
+<span class="sig-name descname"><span class="pre">test_none_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_none_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_none_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test that None policy raises ValueError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_policy_without_numeric">
+<span class="sig-name descname"><span class="pre">test_policy_without_numeric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_policy_without_numeric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_policy_without_numeric" title="Link to this definition">¶</a></dt>
+<dd><p>Test that policy without numeric comparisons is unchanged.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_strict_helper_raises_on_overflow">
+<span class="sig-name descname"><span class="pre">test_strict_helper_raises_on_overflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_strict_helper_raises_on_overflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_strict_helper_raises_on_overflow" title="Link to this definition">¶</a></dt>
+<dd><p>Test that helper in strict mode raises exceptions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_strict_mode_raises_on_overflow">
+<span class="sig-name descname"><span class="pre">test_strict_mode_raises_on_overflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_strict_mode_raises_on_overflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_strict_mode_raises_on_overflow" title="Link to this definition">¶</a></dt>
+<dd><p>Test that strict mode raises exceptions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_string_bit_width">
+<span class="sig-name descname"><span class="pre">test_string_bit_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_string_bit_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_string_bit_width" title="Link to this definition">¶</a></dt>
+<dd><p>Test that string num_bits raises InvalidBitWidthError.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_valid_attribute_names">
+<span class="sig-name descname"><span class="pre">test_valid_attribute_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_valid_attribute_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_valid_attribute_names" title="Link to this definition">¶</a></dt>
+<dd><p>Test that normal attribute names are accepted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_valid_operators_all_work">
+<span class="sig-name descname"><span class="pre">test_valid_operators_all_work</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_valid_operators_all_work"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_valid_operators_all_work" title="Link to this definition">¶</a></dt>
+<dd><p>Test that all supported operators work.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_whitespace_only_policy">
+<span class="sig-name descname"><span class="pre">test_whitespace_only_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_whitespace_only_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_whitespace_only_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test that whitespace-only policy returns empty string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_zero_bit_width">
+<span class="sig-name descname"><span class="pre">test_zero_bit_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeEdgeCaseTest.test_zero_bit_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_zero_bit_width" title="Link to this definition">¶</a></dt>
+<dd><p>Test that num_bits=0 raises InvalidBitWidthError.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">policy_parser_stress_test.</span></span><span class="sig-name descname"><span class="pre">NumericAttributeTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for numeric attribute support using bag of bits encoding.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.setUpClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.setUpClass" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_bit_encoding_correctness">
+<span class="sig-name descname"><span class="pre">test_bit_encoding_correctness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_bit_encoding_correctness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_bit_encoding_correctness" title="Link to this definition">¶</a></dt>
+<dd><p>Test that bit encoding is correct for various values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_boundary_values">
+<span class="sig-name descname"><span class="pre">test_boundary_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_boundary_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_boundary_values" title="Link to this definition">¶</a></dt>
+<dd><p>Test boundary conditions for numeric comparisons.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_compound_numeric_policy">
+<span class="sig-name descname"><span class="pre">test_compound_numeric_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_compound_numeric_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_compound_numeric_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test combined numeric comparisons.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_equality">
+<span class="sig-name descname"><span class="pre">test_equality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_equality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_equality" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr == value comparison.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_greater_than">
+<span class="sig-name descname"><span class="pre">test_greater_than</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_greater_than"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_greater_than" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr &gt; value comparison.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_greater_than_or_equal">
+<span class="sig-name descname"><span class="pre">test_greater_than_or_equal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_greater_than_or_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_greater_than_or_equal" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr &gt;= value comparison.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_less_than">
+<span class="sig-name descname"><span class="pre">test_less_than</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_less_than"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_less_than" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr &lt; value comparison.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_less_than_or_equal">
+<span class="sig-name descname"><span class="pre">test_less_than_or_equal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_less_than_or_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_less_than_or_equal" title="Link to this definition">¶</a></dt>
+<dd><p>Test attr &lt;= value comparison.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_mixed_numeric_and_string_policy">
+<span class="sig-name descname"><span class="pre">test_mixed_numeric_and_string_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_mixed_numeric_and_string_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_mixed_numeric_and_string_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test policies mixing numeric comparisons and string attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericAttributeTest.test_zero_comparisons">
+<span class="sig-name descname"><span class="pre">test_zero_comparisons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericAttributeTest.test_zero_comparisons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericAttributeTest.test_zero_comparisons" title="Link to this definition">¶</a></dt>
+<dd><p>Test comparisons with zero.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">policy_parser_stress_test.</span></span><span class="sig-name descname"><span class="pre">NumericNegationTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for negation of numeric comparisons.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_helper_expand_negated_policy_equality">
+<span class="sig-name descname"><span class="pre">test_helper_expand_negated_policy_equality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_helper_expand_negated_policy_equality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_helper_expand_negated_policy_equality" title="Link to this definition">¶</a></dt>
+<dd><p>Test expand_negated_policy for equality.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_helper_expand_negated_policy_simple">
+<span class="sig-name descname"><span class="pre">test_helper_expand_negated_policy_simple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_helper_expand_negated_policy_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_helper_expand_negated_policy_simple" title="Link to this definition">¶</a></dt>
+<dd><p>Test expand_negated_policy for simple operators.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_helper_negate_comparison">
+<span class="sig-name descname"><span class="pre">test_helper_negate_comparison</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_helper_negate_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_helper_negate_comparison" title="Link to this definition">¶</a></dt>
+<dd><p>Test NumericAttributeHelper.negate_comparison method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_at_max">
+<span class="sig-name descname"><span class="pre">test_negate_at_max</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_at_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_at_max" title="Link to this definition">¶</a></dt>
+<dd><p>Test negation at max value boundary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_at_zero">
+<span class="sig-name descname"><span class="pre">test_negate_at_zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_at_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_at_zero" title="Link to this definition">¶</a></dt>
+<dd><p>Test negation at zero boundary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_equality">
+<span class="sig-name descname"><span class="pre">test_negate_equality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_equality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_equality" title="Link to this definition">¶</a></dt>
+<dd><p>Test NOT (age == 21) becomes (age &lt; 21) OR (age &gt; 21).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_greater_equal">
+<span class="sig-name descname"><span class="pre">test_negate_greater_equal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_greater_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_greater_equal" title="Link to this definition">¶</a></dt>
+<dd><p>Test NOT (age &gt;= 21) becomes age &lt; 21.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_greater_than">
+<span class="sig-name descname"><span class="pre">test_negate_greater_than</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_greater_than"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_greater_than" title="Link to this definition">¶</a></dt>
+<dd><p>Test NOT (age &gt; 21) becomes age &lt;= 21.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_invalid_operator">
+<span class="sig-name descname"><span class="pre">test_negate_invalid_operator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_invalid_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_invalid_operator" title="Link to this definition">¶</a></dt>
+<dd><p>Test that negating invalid operators raises error.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_less_equal">
+<span class="sig-name descname"><span class="pre">test_negate_less_equal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_less_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_less_equal" title="Link to this definition">¶</a></dt>
+<dd><p>Test NOT (age &lt;= 21) becomes age &gt; 21.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_less_than">
+<span class="sig-name descname"><span class="pre">test_negate_less_than</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_less_than"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_less_than" title="Link to this definition">¶</a></dt>
+<dd><p>Test NOT (age &lt; 21) becomes age &gt;= 21.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_to_policy_equality">
+<span class="sig-name descname"><span class="pre">test_negate_to_policy_equality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_to_policy_equality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_to_policy_equality" title="Link to this definition">¶</a></dt>
+<dd><p>Test negate_comparison_to_policy for equality.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negate_to_policy_simple">
+<span class="sig-name descname"><span class="pre">test_negate_to_policy_simple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negate_to_policy_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negate_to_policy_simple" title="Link to this definition">¶</a></dt>
+<dd><p>Test negate_comparison_to_policy for simple operators.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negated_equality_satisfaction">
+<span class="sig-name descname"><span class="pre">test_negated_equality_satisfaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negated_equality_satisfaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negated_equality_satisfaction" title="Link to this definition">¶</a></dt>
+<dd><p>Test that negated equality works correctly end-to-end.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.NumericNegationTest.test_negated_policy_satisfaction">
+<span class="sig-name descname"><span class="pre">test_negated_policy_satisfaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#NumericNegationTest.test_negated_policy_satisfaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.NumericNegationTest.test_negated_policy_satisfaction" title="Link to this definition">¶</a></dt>
+<dd><p>Test that negated policies work correctly end-to-end.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserEdgeCaseTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">policy_parser_stress_test.</span></span><span class="sig-name descname"><span class="pre">PolicyParserEdgeCaseTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserEdgeCaseTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Edge case tests for the policy parser.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserEdgeCaseTest.setUpClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserEdgeCaseTest.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest.setUpClass" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserEdgeCaseTest.test_case_insensitive_operators">
+<span class="sig-name descname"><span class="pre">test_case_insensitive_operators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserEdgeCaseTest.test_case_insensitive_operators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest.test_case_insensitive_operators" title="Link to this definition">¶</a></dt>
+<dd><p>Test that AND/OR operators are case-insensitive.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserEdgeCaseTest.test_parentheses_variations">
+<span class="sig-name descname"><span class="pre">test_parentheses_variations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserEdgeCaseTest.test_parentheses_variations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest.test_parentheses_variations" title="Link to this definition">¶</a></dt>
+<dd><p>Test various parentheses patterns.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserEdgeCaseTest.test_whitespace_handling">
+<span class="sig-name descname"><span class="pre">test_whitespace_handling</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserEdgeCaseTest.test_whitespace_handling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest.test_whitespace_handling" title="Link to this definition">¶</a></dt>
+<dd><p>Test handling of extra whitespace.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">policy_parser_stress_test.</span></span><span class="sig-name descname"><span class="pre">PolicyParserStressTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Comprehensive stress tests for the ABE policy parser.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.setUpClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.setUpClass" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_attribute_with_index">
+<span class="sig-name descname"><span class="pre">test_attribute_with_index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_attribute_with_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_attribute_with_index" title="Link to this definition">¶</a></dt>
+<dd><p>Test attributes with numeric index suffix (used for duplicates).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_balanced_tree">
+<span class="sig-name descname"><span class="pre">test_balanced_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_balanced_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_balanced_tree" title="Link to this definition">¶</a></dt>
+<dd><p>Test balanced binary tree structure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_basic_and">
+<span class="sig-name descname"><span class="pre">test_basic_and</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_basic_and"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_basic_and" title="Link to this definition">¶</a></dt>
+<dd><p>Test basic AND operations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_basic_or">
+<span class="sig-name descname"><span class="pre">test_basic_or</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_basic_or"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_basic_or" title="Link to this definition">¶</a></dt>
+<dd><p>Test basic OR operations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_deep_nesting">
+<span class="sig-name descname"><span class="pre">test_deep_nesting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_deep_nesting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_deep_nesting" title="Link to this definition">¶</a></dt>
+<dd><p>Test deeply nested expressions (20 levels).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_duplicate_attributes">
+<span class="sig-name descname"><span class="pre">test_duplicate_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_duplicate_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_duplicate_attributes" title="Link to this definition">¶</a></dt>
+<dd><p>Test handling of duplicate attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_duplicate_labeling">
+<span class="sig-name descname"><span class="pre">test_duplicate_labeling</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_duplicate_labeling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_duplicate_labeling" title="Link to this definition">¶</a></dt>
+<dd><p>Test that duplicate attributes get unique labels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_many_attributes">
+<span class="sig-name descname"><span class="pre">test_many_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_many_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_many_attributes" title="Link to this definition">¶</a></dt>
+<dd><p>Test policy with 100 attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_msp_coefficient_recovery">
+<span class="sig-name descname"><span class="pre">test_msp_coefficient_recovery</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_msp_coefficient_recovery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_coefficient_recovery" title="Link to this definition">¶</a></dt>
+<dd><p>Test coefficient recovery from MSP.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_msp_complex_policy">
+<span class="sig-name descname"><span class="pre">test_msp_complex_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_msp_complex_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_complex_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test MSP conversion for complex policy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_msp_conversion_performance">
+<span class="sig-name descname"><span class="pre">test_msp_conversion_performance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_msp_conversion_performance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_conversion_performance" title="Link to this definition">¶</a></dt>
+<dd><p>Test MSP conversion performance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_msp_simple_and">
+<span class="sig-name descname"><span class="pre">test_msp_simple_and</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_msp_simple_and"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_simple_and" title="Link to this definition">¶</a></dt>
+<dd><p>Test MSP conversion for AND policy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_msp_simple_or">
+<span class="sig-name descname"><span class="pre">test_msp_simple_or</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_msp_simple_or"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_simple_or" title="Link to this definition">¶</a></dt>
+<dd><p>Test MSP conversion for OR policy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_negated_attributes">
+<span class="sig-name descname"><span class="pre">test_negated_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_negated_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_negated_attributes" title="Link to this definition">¶</a></dt>
+<dd><p>Test negated attribute parsing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_nested_expressions">
+<span class="sig-name descname"><span class="pre">test_nested_expressions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_nested_expressions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_nested_expressions" title="Link to this definition">¶</a></dt>
+<dd><p>Test nested policy expressions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_parsing_performance">
+<span class="sig-name descname"><span class="pre">test_parsing_performance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_parsing_performance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_parsing_performance" title="Link to this definition">¶</a></dt>
+<dd><p>Test parsing performance with 1000 iterations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_prune_and_policy">
+<span class="sig-name descname"><span class="pre">test_prune_and_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_prune_and_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_prune_and_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test policy satisfaction for AND policies.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_prune_complex_policy">
+<span class="sig-name descname"><span class="pre">test_prune_complex_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_prune_complex_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_prune_complex_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test policy satisfaction for complex policies.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_prune_or_policy">
+<span class="sig-name descname"><span class="pre">test_prune_or_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_prune_or_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_prune_or_policy" title="Link to this definition">¶</a></dt>
+<dd><p>Test policy satisfaction for OR policies.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_random_policies">
+<span class="sig-name descname"><span class="pre">test_random_policies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_random_policies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_random_policies" title="Link to this definition">¶</a></dt>
+<dd><p>Generate and parse 100 random valid policies.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_single_attribute">
+<span class="sig-name descname"><span class="pre">test_single_attribute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_single_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_single_attribute" title="Link to this definition">¶</a></dt>
+<dd><p>Test parsing single attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_special_characters_in_attributes">
+<span class="sig-name descname"><span class="pre">test_special_characters_in_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_special_characters_in_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_special_characters_in_attributes" title="Link to this definition">¶</a></dt>
+<dd><p>Test attributes with special characters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_underscore_limitation">
+<span class="sig-name descname"><span class="pre">test_underscore_limitation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_underscore_limitation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_underscore_limitation" title="Link to this definition">¶</a></dt>
+<dd><p>Test that underscore + non-digits fails (known limitation).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="policy_parser_stress_test.PolicyParserStressTest.test_wide_or_tree">
+<span class="sig-name descname"><span class="pre">test_wide_or_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#PolicyParserStressTest.test_wide_or_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.PolicyParserStressTest.test_wide_or_tree" title="Link to this definition">¶</a></dt>
+<dd><p>Test wide OR tree with 50 branches.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="policy_parser_stress_test.run_stress_test">
+<span class="sig-prename descclassname"><span class="pre">policy_parser_stress_test.</span></span><span class="sig-name descname"><span class="pre">run_stress_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/policy_parser_stress_test.html#run_stress_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#policy_parser_stress_test.run_stress_test" title="Link to this definition">¶</a></dt>
+<dd><p>Run the stress test suite and print results.</p>
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +1081,137 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">policy_parser_stress_test</a><ul>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest</span></code></a><ul>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.setUp"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attr_name_all_caps"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_attr_name_all_caps()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attr_name_mixed_case"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_attr_name_mixed_case()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attribute_name_with_encoding_pattern"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_attribute_name_with_encoding_pattern()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attribute_name_with_partial_pattern"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_attribute_name_with_partial_pattern()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_error_in_int_to_bits"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_bit_overflow_error_in_int_to_bits()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_in_expand"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_bit_overflow_in_expand()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_bit_overflow_in_user_attributes"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_bit_overflow_in_user_attributes()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_boundary_value_at_max"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_boundary_value_at_max()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_boundary_value_just_over_max"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_boundary_value_just_over_max()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_empty_policy"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_empty_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_equal_zero"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_equal_zero()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_excessive_bit_width"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_excessive_bit_width()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_extra_spaces_around_operator"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_extra_spaces_around_operator()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_greater_equal_zero_is_tautology"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_greater_equal_zero_is_tautology()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_greater_than_zero"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_greater_than_zero()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_helper_max_value_property"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_helper_max_value_property()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_exclamation_equal"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_invalid_operator_exclamation_equal()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_not_equal_diamond"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_invalid_operator_not_equal_diamond()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_invalid_operator_tilde"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_invalid_operator_tilde()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_less_than_zero_is_contradiction"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_less_than_zero_is_contradiction()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_mixed_spacing"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_mixed_spacing()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_multiple_parentheses"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_multiple_parentheses()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_bit_width"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_negative_bit_width()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_in_expand"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_negative_value_in_expand()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_in_user_attributes"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_negative_value_in_user_attributes()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_negative_value_message"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_negative_value_message()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_no_spaces_around_operator"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_no_spaces_around_operator()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_non_integer_bit_width"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_non_integer_bit_width()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_non_strict_mode_continues_on_error"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_non_strict_mode_continues_on_error()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_none_policy"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_none_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_policy_without_numeric"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_policy_without_numeric()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_strict_helper_raises_on_overflow"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_strict_helper_raises_on_overflow()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_strict_mode_raises_on_overflow"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_strict_mode_raises_on_overflow()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_string_bit_width"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_string_bit_width()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_valid_attribute_names"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_valid_attribute_names()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_valid_operators_all_work"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_valid_operators_all_work()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_whitespace_only_policy"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_whitespace_only_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_zero_bit_width"><code class="docutils literal notranslate"><span class="pre">NumericAttributeEdgeCaseTest.test_zero_bit_width()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest</span></code></a><ul>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.setUpClass"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.setUpClass()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_bit_encoding_correctness"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_bit_encoding_correctness()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_boundary_values"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_boundary_values()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_compound_numeric_policy"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_compound_numeric_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_equality"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_equality()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_greater_than"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_greater_than()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_greater_than_or_equal"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_greater_than_or_equal()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_less_than"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_less_than()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_less_than_or_equal"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_less_than_or_equal()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_mixed_numeric_and_string_policy"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_mixed_numeric_and_string_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericAttributeTest.test_zero_comparisons"><code class="docutils literal notranslate"><span class="pre">NumericAttributeTest.test_zero_comparisons()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest</span></code></a><ul>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.setUp"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_helper_expand_negated_policy_equality"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_helper_expand_negated_policy_equality()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_helper_expand_negated_policy_simple"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_helper_expand_negated_policy_simple()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_helper_negate_comparison"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_helper_negate_comparison()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_at_max"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_at_max()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_at_zero"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_at_zero()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_equality"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_equality()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_greater_equal"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_greater_equal()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_greater_than"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_greater_than()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_invalid_operator"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_invalid_operator()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_less_equal"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_less_equal()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_less_than"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_less_than()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_to_policy_equality"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_to_policy_equality()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negate_to_policy_simple"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negate_to_policy_simple()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negated_equality_satisfaction"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negated_equality_satisfaction()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.NumericNegationTest.test_negated_policy_satisfaction"><code class="docutils literal notranslate"><span class="pre">NumericNegationTest.test_negated_policy_satisfaction()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest"><code class="docutils literal notranslate"><span class="pre">PolicyParserEdgeCaseTest</span></code></a><ul>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest.setUpClass"><code class="docutils literal notranslate"><span class="pre">PolicyParserEdgeCaseTest.setUpClass()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest.test_case_insensitive_operators"><code class="docutils literal notranslate"><span class="pre">PolicyParserEdgeCaseTest.test_case_insensitive_operators()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest.test_parentheses_variations"><code class="docutils literal notranslate"><span class="pre">PolicyParserEdgeCaseTest.test_parentheses_variations()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserEdgeCaseTest.test_whitespace_handling"><code class="docutils literal notranslate"><span class="pre">PolicyParserEdgeCaseTest.test_whitespace_handling()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest</span></code></a><ul>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.setUpClass"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.setUpClass()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_attribute_with_index"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_attribute_with_index()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_balanced_tree"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_balanced_tree()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_basic_and"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_basic_and()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_basic_or"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_basic_or()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_deep_nesting"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_deep_nesting()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_duplicate_attributes"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_duplicate_attributes()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_duplicate_labeling"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_duplicate_labeling()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_many_attributes"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_many_attributes()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_coefficient_recovery"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_msp_coefficient_recovery()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_complex_policy"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_msp_complex_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_conversion_performance"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_msp_conversion_performance()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_simple_and"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_msp_simple_and()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_msp_simple_or"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_msp_simple_or()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_negated_attributes"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_negated_attributes()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_nested_expressions"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_nested_expressions()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_parsing_performance"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_parsing_performance()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_prune_and_policy"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_prune_and_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_prune_complex_policy"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_prune_complex_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_prune_or_policy"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_prune_or_policy()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_random_policies"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_random_policies()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_single_attribute"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_single_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_special_characters_in_attributes"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_special_characters_in_attributes()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_underscore_limitation"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_underscore_limitation()</span></code></a></li>
+<li><a class="reference internal" href="#policy_parser_stress_test.PolicyParserStressTest.test_wide_or_tree"><code class="docutils literal notranslate"><span class="pre">PolicyParserStressTest.test_wide_or_tree()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#policy_parser_stress_test.run_stress_test"><code class="docutils literal notranslate"><span class="pre">run_stress_test()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

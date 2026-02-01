@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,174 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="abenc-maabe-rw15">
-<h1>abenc_maabe_rw15<a class="headerlink" href="#abenc-maabe-rw15" title="Link to this heading">¶</a></h1>
+          <section id="module-abenc_maabe_rw15">
+<span id="abenc-maabe-rw15"></span><h1>abenc_maabe_rw15<a class="headerlink" href="#module-abenc_maabe_rw15" title="Link to this heading">¶</a></h1>
+<p><strong>Multi-Authority Attribute-Based Encryption (RW15)</strong></p>
+<p><em>Authors:</em> Yannis Rouselakis, Brent Waters</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption”</div>
+<div class="line"><strong>Published in:</strong> Financial Cryptography and Data Security, 2015</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://eprint.iacr.org/2015/016.pdf">http://eprint.iacr.org/2015/016.pdf</a></div>
+<div class="line"><strong>Notes:</strong> Implementation based on maabe_rw12.py (<a class="reference external" href="https://sites.google.com/site/yannisrouselakis/rwabe">https://sites.google.com/site/yannisrouselakis/rwabe</a>)</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> multi-authority attribute-based encryption (public key)</p></li>
+<li><p><strong>Setting:</strong> Bilinear pairing group of prime order</p></li>
+<li><p><strong>Assumption:</strong> Complex q-type assumption</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Yannis Rouselakis</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>11/2012</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.MaabeRW15">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">abenc_maabe_rw15.</span></span><span class="sig-name descname"><span class="pre">MaabeRW15</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#MaabeRW15"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.MaabeRW15" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEncMultiAuth</span></code></p>
+<p>Efficient Statically-Secure Large-Universe Multi-Authority Attribute-Based Encryption
+Rouselakis - Waters</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maabe</span> <span class="o">=</span> <span class="n">MaabeRW15</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">public_parameters</span> <span class="o">=</span> <span class="n">maabe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Setup the attribute authorities</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">attributes1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributes2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;THREE&#39;</span><span class="p">,</span> <span class="s1">&#39;FOUR&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key1</span><span class="p">,</span> <span class="n">secret_key1</span><span class="p">)</span> <span class="o">=</span> <span class="n">maabe</span><span class="o">.</span><span class="n">authsetup</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="s1">&#39;UT&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">public_key2</span><span class="p">,</span> <span class="n">secret_key2</span><span class="p">)</span> <span class="o">=</span> <span class="n">maabe</span><span class="o">.</span><span class="n">authsetup</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="s1">&#39;OU&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">public_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;UT&#39;</span><span class="p">:</span> <span class="n">public_key1</span><span class="p">,</span> <span class="s1">&#39;OU&#39;</span><span class="p">:</span> <span class="n">public_key2</span><span class="p">}</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Setup a user and give him some keys</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gid</span> <span class="o">=</span> <span class="s2">&quot;bob&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user_attributes1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;STUDENT@UT&#39;</span><span class="p">,</span> <span class="s1">&#39;PHD@UT&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user_attributes2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;STUDENT@OU&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user_keys1</span> <span class="o">=</span> <span class="n">maabe</span><span class="o">.</span><span class="n">multiple_attributes_keygen</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="n">secret_key1</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">user_attributes1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user_keys2</span> <span class="o">=</span> <span class="n">maabe</span><span class="o">.</span><span class="n">multiple_attributes_keygen</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="n">secret_key2</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">user_attributes2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;GID&#39;</span><span class="p">:</span> <span class="n">gid</span><span class="p">,</span> <span class="s1">&#39;keys&#39;</span><span class="p">:</span> <span class="n">merge_dicts</span><span class="p">(</span><span class="n">user_keys1</span><span class="p">,</span> <span class="n">user_keys2</span><span class="p">)}</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Create a random message</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">message</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">GT</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Encrypt the message</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">access_policy</span> <span class="o">=</span> <span class="s1">&#39;(STUDENT@UT or PROFESSOR@OU) and (STUDENT@UT or MASTERS@OU)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">maabe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="n">public_keys</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Decrypt the message</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_message</span> <span class="o">=</span> <span class="n">maabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">public_parameters</span><span class="p">,</span> <span class="n">user_keys</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decrypted_message</span> <span class="o">==</span> <span class="n">message</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.MaabeRW15.authsetup">
+<span class="sig-name descname"><span class="pre">authsetup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#MaabeRW15.authsetup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.MaabeRW15.authsetup" title="Link to this definition">¶</a></dt>
+<dd><p>Setup an attribute authority.
+:param gp: The global parameters
+:param name: The name of the authority
+:return: The public and private key of the authority</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.MaabeRW15.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#MaabeRW15.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.MaabeRW15.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypt the ciphertext using the secret keys of the user.
+:param gp: The global parameters.
+:param sk: The secret keys of the user.
+:param ct: The ciphertext to decrypt.
+:return: The decrypted message.
+:raise Exception: When the access policy can not be satisfied with the user’s attributes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.MaabeRW15.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#MaabeRW15.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.MaabeRW15.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Encrypt a message under an access policy
+:param gp: The global parameters.
+:param pks: The public keys of the relevant attribute authorities, as dict from authority name to public key.
+:param message: The message to encrypt.
+:param policy_str: The access policy to use.
+:return: The encrypted message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.MaabeRW15.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#MaabeRW15.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.MaabeRW15.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a user secret key for the attribute.
+:param gp: The global parameters.
+:param sk: The secret key of the attribute authority.
+:param gid: The global user identifier.
+:param attribute: The attribute.
+:return: The secret key for the attribute for the user with identifier gid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.MaabeRW15.multiple_attributes_keygen">
+<span class="sig-name descname"><span class="pre">multiple_attributes_keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#MaabeRW15.multiple_attributes_keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.MaabeRW15.multiple_attributes_keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a dictionary of secret keys for a user for a list of attributes.
+:param gp: The global parameters.
+:param sk: The secret key of the attribute authority.
+:param gid: The global user identifier.
+:param attributes: The list of attributes.
+:return: A dictionary with attribute names as keys, and secret keys for the attributes as values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.MaabeRW15.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#MaabeRW15.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.MaabeRW15.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Setup this multi-authority attribute based encryption scheme.
+:return: The result of the central setup, for example some global parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.MaabeRW15.unpack_attribute">
+<span class="sig-name descname"><span class="pre">unpack_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#MaabeRW15.unpack_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.MaabeRW15.unpack_attribute" title="Link to this definition">¶</a></dt>
+<dd><p>Unpacks an attribute in attribute name, authority name and index
+:param attribute: The attribute to unpack
+:return: The attribute name, authority name and the attribute index, if present.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maabe</span> <span class="o">=</span> <span class="n">MaabeRW15</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maabe</span><span class="o">.</span><span class="n">unpack_attribute</span><span class="p">(</span><span class="s1">&#39;STUDENT@UT&#39;</span><span class="p">)</span>
+<span class="go">(&#39;STUDENT&#39;, &#39;UT&#39;, None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maabe</span><span class="o">.</span><span class="n">unpack_attribute</span><span class="p">(</span><span class="s1">&#39;STUDENT@UT_2&#39;</span><span class="p">)</span>
+<span class="go">(&#39;STUDENT&#39;, &#39;UT&#39;, &#39;2&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="abenc_maabe_rw15.merge_dicts">
+<span class="sig-prename descclassname"><span class="pre">abenc_maabe_rw15.</span></span><span class="sig-name descname"><span class="pre">merge_dicts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dict_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/abenc_maabe_rw15.html#merge_dicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#abenc_maabe_rw15.merge_dicts" title="Link to this definition">¶</a></dt>
+<dd><p>Given any number of dicts, shallow copy and merge into a new dict,
+precedence goes to key value pairs in latter dicts.</p>
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +621,37 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">abenc_maabe_rw15</a><ul>
+<li><a class="reference internal" href="#abenc_maabe_rw15.MaabeRW15"><code class="docutils literal notranslate"><span class="pre">MaabeRW15</span></code></a><ul>
+<li><a class="reference internal" href="#abenc_maabe_rw15.MaabeRW15.authsetup"><code class="docutils literal notranslate"><span class="pre">MaabeRW15.authsetup()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_rw15.MaabeRW15.decrypt"><code class="docutils literal notranslate"><span class="pre">MaabeRW15.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_rw15.MaabeRW15.encrypt"><code class="docutils literal notranslate"><span class="pre">MaabeRW15.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_rw15.MaabeRW15.keygen"><code class="docutils literal notranslate"><span class="pre">MaabeRW15.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_rw15.MaabeRW15.multiple_attributes_keygen"><code class="docutils literal notranslate"><span class="pre">MaabeRW15.multiple_attributes_keygen()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_rw15.MaabeRW15.setup"><code class="docutils literal notranslate"><span class="pre">MaabeRW15.setup()</span></code></a></li>
+<li><a class="reference internal" href="#abenc_maabe_rw15.MaabeRW15.unpack_attribute"><code class="docutils literal notranslate"><span class="pre">MaabeRW15.unpack_attribute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abenc_maabe_rw15.merge_dicts"><code class="docutils literal notranslate"><span class="pre">merge_dicts()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
