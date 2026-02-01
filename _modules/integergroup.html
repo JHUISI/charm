@@ -405,8 +405,102 @@
 <span></span><span class="k">try</span><span class="p">:</span>
   <span class="c1">#from charm.core.math.integer import integer,randomBits,random,randomPrime,isPrime,encode,decode,hashInt,bitsize,legendre,gcd,lcm,serialize,deserialize,int2Bytes,toInt</span>
   <span class="kn">from</span><span class="w"> </span><span class="nn">charm.core.math.integer</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span> <span class="c1">#InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,ClearBenchmark</span>
+  <span class="c1"># Verify we got actual implementations, not mocks (for Sphinx autodoc)</span>
+  <span class="n">_test</span> <span class="o">=</span> <span class="n">integer</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-  <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Cannot import integer module. Ensure Charm crypto C extensions are compiled: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="p">)</span>
+  <span class="c1"># Provide stub implementations for documentation purposes (Sphinx autodoc)</span>
+  <span class="c1"># These allow modules to be imported for documentation generation</span>
+  <span class="c1"># but will raise errors if actually used at runtime</span>
+<div class="viewcode-block" id="integer">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.integer">[docs]</a>
+  <span class="k">class</span><span class="w"> </span><span class="nc">integer</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;Stub class for documentation. Requires C extension for actual use.&quot;&quot;&quot;</span>
+      <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="randomBits">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.randomBits">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">randomBits</span><span class="p">(</span><span class="n">bits</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.random">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">random</span><span class="p">(</span><span class="nb">max</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="randomPrime">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.randomPrime">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">randomPrime</span><span class="p">(</span><span class="n">bits</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="isPrime">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.isPrime">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">isPrime</span><span class="p">(</span><span class="n">n</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="encode">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.encode">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="decode">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.decode">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="hashInt">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.hashInt">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">hashInt</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">flag</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="bitsize">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.bitsize">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">bitsize</span><span class="p">(</span><span class="n">n</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="legendre">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.legendre">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">legendre</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="gcd">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.gcd">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="lcm">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.lcm">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">lcm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="serialize">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.serialize">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">serialize</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="deserialize">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.deserialize">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">deserialize</span><span class="p">(</span><span class="n">data</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="int2Bytes">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.int2Bytes">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">int2Bytes</span><span class="p">(</span><span class="n">n</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="toInt">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.toInt">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">toInt</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InitBenchmark">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.InitBenchmark">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">InitBenchmark</span><span class="p">():</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StartBenchmark">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.StartBenchmark">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">StartBenchmark</span><span class="p">(</span><span class="n">options</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EndBenchmark">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.EndBenchmark">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">EndBenchmark</span><span class="p">():</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GetBenchmark">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.GetBenchmark">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">GetBenchmark</span><span class="p">(</span><span class="n">option</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GetGeneralBenchmarks">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.GetGeneralBenchmarks">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">GetGeneralBenchmarks</span><span class="p">():</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ClearBenchmark">
+<a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.ClearBenchmark">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">ClearBenchmark</span><span class="p">():</span> <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Requires C extension&quot;</span><span class="p">)</span></div>
+
     
 <div class="viewcode-block" id="IntegerGroup">
 <a class="viewcode-back" href="../toolbox/integergroup.html#integergroup.IntegerGroup">[docs]</a>

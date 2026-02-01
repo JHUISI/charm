@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,82 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="kpabenc-adapt-hybrid">
-<h1>kpabenc_adapt_hybrid<a class="headerlink" href="#kpabenc-adapt-hybrid" title="Link to this heading">¶</a></h1>
+          <section id="module-kpabenc_adapt_hybrid">
+<span id="kpabenc-adapt-hybrid"></span><h1>kpabenc_adapt_hybrid<a class="headerlink" href="#module-kpabenc_adapt_hybrid" title="Link to this heading">¶</a></h1>
+<p><strong>Hybrid Encryption Adapter for KP-ABE (KP-ABE Hybrid)</strong></p>
+<p><em>Description:</em> Converts a Key-Policy Attribute-Based Encryption scheme into a hybrid
+encryption scheme capable of encrypting arbitrary-length messages.</p>
+<div class="line-block">
+<div class="line"><strong>Notes:</strong> Uses symmetric encryption (AES) with a randomly generated session key.</div>
+<div class="line">The session key is encrypted using the underlying KP-ABE scheme.</div>
+</div>
+<p class="rubric">Adapter Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> hybrid encryption adapter</p></li>
+<li><p><strong>Underlying Scheme:</strong> any Key-Policy ABE scheme</p></li>
+<li><p><strong>Purpose:</strong> enables KP-ABE schemes to encrypt arbitrary-length byte messages</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>2011</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kpabenc_adapt_hybrid.HybridABEnc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kpabenc_adapt_hybrid.</span></span><span class="sig-name descname"><span class="pre">HybridABEnc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/kpabenc_adapt_hybrid.html#HybridABEnc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kpabenc_adapt_hybrid.HybridABEnc" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEnc</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.abenc.abenc_lsw08</span><span class="w"> </span><span class="kn">import</span> <span class="n">KPabe</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kpabe</span> <span class="o">=</span> <span class="n">KPabe</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyb_abe</span> <span class="o">=</span> <span class="n">HybridABEnc</span><span class="p">(</span><span class="n">kpabe</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">access_policy</span> <span class="o">=</span>  <span class="p">[</span><span class="s1">&#39;ONE&#39;</span><span class="p">,</span> <span class="s1">&#39;TWO&#39;</span><span class="p">,</span> <span class="s1">&#39;THREE&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">access_key</span> <span class="o">=</span> <span class="s1">&#39;((FOUR or THREE) and (TWO or ONE))&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;hello world this is an important message.&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">hyb_abe</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">hyb_abe</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">master_key</span><span class="p">,</span> <span class="n">access_key</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">hyb_abe</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">master_public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">access_policy</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyb_abe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">cipher_text</span><span class="p">,</span> <span class="n">secret_key</span><span class="p">)</span>
+<span class="go">b&#39;hello world this is an important message.&#39;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="kpabenc_adapt_hybrid.HybridABEnc.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/kpabenc_adapt_hybrid.html#HybridABEnc.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kpabenc_adapt_hybrid.HybridABEnc.decrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kpabenc_adapt_hybrid.HybridABEnc.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/kpabenc_adapt_hybrid.html#HybridABEnc.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kpabenc_adapt_hybrid.HybridABEnc.encrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kpabenc_adapt_hybrid.HybridABEnc.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/kpabenc_adapt_hybrid.html#HybridABEnc.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kpabenc_adapt_hybrid.HybridABEnc.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="kpabenc_adapt_hybrid.HybridABEnc.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/kpabenc_adapt_hybrid.html#HybridABEnc.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kpabenc_adapt_hybrid.HybridABEnc.setup" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kpabenc_adapt_hybrid.main">
+<span class="sig-prename descclassname"><span class="pre">kpabenc_adapt_hybrid.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/kpabenc_adapt_hybrid.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kpabenc_adapt_hybrid.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +529,34 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">kpabenc_adapt_hybrid</a><ul>
+<li><a class="reference internal" href="#kpabenc_adapt_hybrid.HybridABEnc"><code class="docutils literal notranslate"><span class="pre">HybridABEnc</span></code></a><ul>
+<li><a class="reference internal" href="#kpabenc_adapt_hybrid.HybridABEnc.decrypt"><code class="docutils literal notranslate"><span class="pre">HybridABEnc.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#kpabenc_adapt_hybrid.HybridABEnc.encrypt"><code class="docutils literal notranslate"><span class="pre">HybridABEnc.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#kpabenc_adapt_hybrid.HybridABEnc.keygen"><code class="docutils literal notranslate"><span class="pre">HybridABEnc.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#kpabenc_adapt_hybrid.HybridABEnc.setup"><code class="docutils literal notranslate"><span class="pre">HybridABEnc.setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kpabenc_adapt_hybrid.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

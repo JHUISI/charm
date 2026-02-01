@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,73 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="joye-scheme">
-<h1>joye_scheme<a class="headerlink" href="#joye-scheme" title="Link to this heading">¶</a></h1>
+          <section id="module-joye_scheme">
+<span id="joye-scheme"></span><h1>joye_scheme<a class="headerlink" href="#module-joye_scheme" title="Link to this heading">¶</a></h1>
+<p><strong>Privacy-Preserving Aggregation Scheme (JL13)</strong></p>
+<p><em>Authors:</em> Marc Joye, Benoit Libert</p>
+<div class="line-block">
+<div class="line"><strong>Title:</strong> “A Scalable Scheme for Privacy-Preserving Aggregation of Time-Series Data”</div>
+<div class="line"><strong>Published in:</strong> Financial Crypto 2013</div>
+<div class="line"><strong>Available from:</strong> <a class="reference external" href="http://joye.site88.net/papers/JL13aggreg.pdf">http://joye.site88.net/papers/JL13aggreg.pdf</a></div>
+<div class="line"><strong>Notes:</strong> Enables plaintext evaluation of sums from encrypted values</div>
+</div>
+<p class="rubric">Scheme Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> aggregation (privacy-preserving)</p></li>
+<li><p><strong>Setting:</strong> integer groups</p></li>
+<li><p><strong>Assumption:</strong> Paillier</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Iraklis Leontiadis</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>12/2013</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="joye_scheme.Joye">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">joye_scheme.</span></span><span class="sig-name descname"><span class="pre">Joye</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">users</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/joye_scheme.html#Joye"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joye_scheme.Joye" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="joye_scheme.Joye.destruction_keys">
+<span class="sig-name descname"><span class="pre">destruction_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/joye_scheme.html#Joye.destruction_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joye_scheme.Joye.destruction_keys" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="joye_scheme.Joye.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/joye_scheme.html#Joye.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joye_scheme.Joye.encode" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="joye_scheme.Joye.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/joye_scheme.html#Joye.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joye_scheme.Joye.encrypt" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="joye_scheme.Joye.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/joye_scheme.html#Joye.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joye_scheme.Joye.keygen" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="joye_scheme.Joye.sum">
+<span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/joye_scheme.html#Joye.sum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joye_scheme.Joye.sum" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="joye_scheme.Joye.sumfree">
+<span class="sig-name descname"><span class="pre">sumfree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/joye_scheme.html#Joye.sumfree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joye_scheme.Joye.sumfree" title="Link to this definition">¶</a></dt>
+<dd><p>Tests sum evaluations without encryption</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +520,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">joye_scheme</a><ul>
+<li><a class="reference internal" href="#joye_scheme.Joye"><code class="docutils literal notranslate"><span class="pre">Joye</span></code></a><ul>
+<li><a class="reference internal" href="#joye_scheme.Joye.destruction_keys"><code class="docutils literal notranslate"><span class="pre">Joye.destruction_keys()</span></code></a></li>
+<li><a class="reference internal" href="#joye_scheme.Joye.encode"><code class="docutils literal notranslate"><span class="pre">Joye.encode()</span></code></a></li>
+<li><a class="reference internal" href="#joye_scheme.Joye.encrypt"><code class="docutils literal notranslate"><span class="pre">Joye.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#joye_scheme.Joye.keygen"><code class="docutils literal notranslate"><span class="pre">Joye.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#joye_scheme.Joye.sum"><code class="docutils literal notranslate"><span class="pre">Joye.sum()</span></code></a></li>
+<li><a class="reference internal" href="#joye_scheme.Joye.sumfree"><code class="docutils literal notranslate"><span class="pre">Joye.sumfree()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

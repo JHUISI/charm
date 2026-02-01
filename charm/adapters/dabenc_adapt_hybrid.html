@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -407,13 +407,156 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="dabenc-adapt-hybrid">
-<h1>dabenc_adapt_hybrid<a class="headerlink" href="#dabenc-adapt-hybrid" title="Link to this heading">¶</a></h1>
+          <section id="module-dabenc_adapt_hybrid">
+<span id="dabenc-adapt-hybrid"></span><h1>dabenc_adapt_hybrid<a class="headerlink" href="#module-dabenc_adapt_hybrid" title="Link to this heading">¶</a></h1>
+<p><strong>Hybrid Encryption Adapter for Multi-Authority ABE (MA-ABE Hybrid)</strong></p>
+<p><em>Description:</em> Converts a Decentralized/Multi-Authority Attribute-Based Encryption scheme
+into a hybrid encryption scheme capable of encrypting arbitrary-length messages.</p>
+<div class="line-block">
+<div class="line"><strong>Notes:</strong> Uses symmetric encryption (AES) with a randomly generated session key.</div>
+<div class="line">The session key is encrypted using the underlying Multi-Authority ABE scheme.</div>
+</div>
+<p class="rubric">Adapter Properties</p>
+<ul class="simple">
+<li><p><strong>Type:</strong> hybrid encryption adapter</p></li>
+<li><p><strong>Underlying Scheme:</strong> any Decentralized/Multi-Authority ABE scheme</p></li>
+<li><p><strong>Purpose:</strong> enables Multi-Authority ABE schemes to encrypt arbitrary-length byte messages</p></li>
+</ul>
+<p class="rubric">Implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="10">
+<li><p>Ayo Akinyele</p></li>
+</ol>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>2011</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="dabenc_adapt_hybrid.HybridABEncMA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dabenc_adapt_hybrid.</span></span><span class="sig-name descname"><span class="pre">HybridABEncMA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dabenc_adapt_hybrid.html#HybridABEncMA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABEncMultiAuth</span></code></p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.pairinggroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairingGroup</span><span class="p">,</span><span class="n">GT</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">PairingGroup</span><span class="p">(</span><span class="s1">&#39;SS512&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dabe</span> <span class="o">=</span> <span class="n">Dabe</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Setup master authority.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hyb_abema</span> <span class="o">=</span> <span class="n">HybridABEncMA</span><span class="p">(</span><span class="n">dabe</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">global_parameters</span> <span class="o">=</span> <span class="n">hyb_abema</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Generate attributes for two different sub-authorities:
+Johns Hopkins University, and Johns Hopkins Medical Institutions.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">jhu_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;jhu.professor&#39;</span><span class="p">,</span> <span class="s1">&#39;jhu.staff&#39;</span><span class="p">,</span> <span class="s1">&#39;jhu.student&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jhmi_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;jhmi.doctor&#39;</span><span class="p">,</span> <span class="s1">&#39;jhmi.nurse&#39;</span><span class="p">,</span> <span class="s1">&#39;jhmi.staff&#39;</span><span class="p">,</span> <span class="s1">&#39;jhmi.researcher&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Johns Hopkins sub-authorities master key.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">jhu_secret_key</span><span class="p">,</span> <span class="n">jhu_public_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">hyb_abema</span><span class="o">.</span><span class="n">authsetup</span><span class="p">(</span><span class="n">global_parameters</span><span class="p">,</span> <span class="n">jhu_attributes</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>JHMI sub-authorities master key</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">jhmi_secret_key</span><span class="p">,</span> <span class="n">jhmi_public_key</span><span class="p">)</span> <span class="o">=</span> <span class="n">hyb_abema</span><span class="o">.</span><span class="n">authsetup</span><span class="p">(</span><span class="n">global_parameters</span><span class="p">,</span> <span class="n">jhmi_attributes</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>To encrypt messages we need all of the authorities’ public keys.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">allAuth_public_key</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">allAuth_public_key</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">jhu_public_key</span><span class="p">);</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">allAuth_public_key</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">jhmi_public_key</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>An example user, Bob, who is both a professor at JHU and a researcher at JHMI.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ID</span> <span class="o">=</span> <span class="s2">&quot;20110615 bob@gmail.com cryptokey&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">secrets_keys</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyb_abema</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">global_parameters</span><span class="p">,</span> <span class="n">jhu_secret_key</span><span class="p">,</span><span class="s1">&#39;jhu.professor&#39;</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">secrets_keys</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyb_abema</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">global_parameters</span><span class="p">,</span> <span class="n">jhmi_secret_key</span><span class="p">,</span><span class="s1">&#39;jhmi.researcher&#39;</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">secrets_keys</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Encrypt a message to anyone who is both a profesor at JHU and a researcher at JHMI.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;Hello World, I am a sensitive record!&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">policy_str</span> <span class="o">=</span> <span class="s2">&quot;(jhmi.doctor or (jhmi.researcher and jhu.professor))&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cipher_text</span> <span class="o">=</span> <span class="n">hyb_abema</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">global_parameters</span><span class="p">,</span> <span class="n">allAuth_public_key</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">policy_str</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyb_abema</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">global_parameters</span><span class="p">,</span> <span class="n">secrets_keys</span><span class="p">,</span> <span class="n">cipher_text</span><span class="p">)</span>
+<span class="go">b&#39;Hello World, I am a sensitive record!&#39;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dabenc_adapt_hybrid.HybridABEncMA.authsetup">
+<span class="sig-name descname"><span class="pre">authsetup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.authsetup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.authsetup" title="Link to this definition">¶</a></dt>
+<dd><p>Setup an authority.
+:param gp: The global parameters of the scheme.
+:param object: Additional required arguments, for example a list of attributes or a name.
+:return: The result of the authority setup.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dabenc_adapt_hybrid.HybridABEncMA.decrypt">
+<span class="sig-name descname"><span class="pre">decrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.decrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.decrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Decrypt a ciphertext.
+:param gp: The global parameters of the scheme.
+:param sk: The secret keys of the user.
+:param ct: The ciphertext to decrypt.
+:return: The plaintext.
+:raise Exception: Raised when the attributes do not satisfy the access policy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dabenc_adapt_hybrid.HybridABEncMA.encrypt">
+<span class="sig-name descname"><span class="pre">encrypt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.encrypt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.encrypt" title="Link to this definition">¶</a></dt>
+<dd><p>Encrypt a message.
+:param gp: The global parameters of the scheme.
+:param pk: The public keys of all relevant authorities.
+:param m: The message to encrypt.
+:param object: An access policy or a set of attributes to use.
+:return: The encrypted message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dabenc_adapt_hybrid.HybridABEncMA.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pkey</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Generate user secret keys for attributes from a single authority.
+:param gp: The global parameters of the scheme.
+:param sk: The secret keys of the attribute authority.
+:param gid: Global identifier for the user.
+:param object: An attribute, list of attributes or access structure, depending on the scheme.
+:return: The secret keys for the user for the given attributes/access structure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dabenc_adapt_hybrid.HybridABEncMA.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dabenc_adapt_hybrid.html#HybridABEncMA.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabenc_adapt_hybrid.HybridABEncMA.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Setup this multi-authority attribute based encryption scheme.
+:return: The result of the central setup, for example some global parameters.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dabenc_adapt_hybrid.main">
+<span class="sig-prename descclassname"><span class="pre">dabenc_adapt_hybrid.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dabenc_adapt_hybrid.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dabenc_adapt_hybrid.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
         </article>
@@ -460,8 +603,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">dabenc_adapt_hybrid</a><ul>
+<li><a class="reference internal" href="#dabenc_adapt_hybrid.HybridABEncMA"><code class="docutils literal notranslate"><span class="pre">HybridABEncMA</span></code></a><ul>
+<li><a class="reference internal" href="#dabenc_adapt_hybrid.HybridABEncMA.authsetup"><code class="docutils literal notranslate"><span class="pre">HybridABEncMA.authsetup()</span></code></a></li>
+<li><a class="reference internal" href="#dabenc_adapt_hybrid.HybridABEncMA.decrypt"><code class="docutils literal notranslate"><span class="pre">HybridABEncMA.decrypt()</span></code></a></li>
+<li><a class="reference internal" href="#dabenc_adapt_hybrid.HybridABEncMA.encrypt"><code class="docutils literal notranslate"><span class="pre">HybridABEncMA.encrypt()</span></code></a></li>
+<li><a class="reference internal" href="#dabenc_adapt_hybrid.HybridABEncMA.keygen"><code class="docutils literal notranslate"><span class="pre">HybridABEncMA.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#dabenc_adapt_hybrid.HybridABEncMA.setup"><code class="docutils literal notranslate"><span class="pre">HybridABEncMA.setup()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dabenc_adapt_hybrid.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

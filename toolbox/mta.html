@@ -521,8 +521,431 @@ selected values equals a·b.</p>
 <li><p><a class="reference internal" href="broadcast.html"><span class="doc">broadcast - Echo Broadcast Protocol</span></a> - Broadcast primitives for consistency</p></li>
 </ul>
 </section>
-<section id="api-reference">
-<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
+<section id="module-mta">
+<span id="api-reference"></span><h2>API Reference<a class="headerlink" href="#module-mta" title="Link to this heading">¶</a></h2>
+<p>Multiplicative-to-Additive (MtA) Share Conversion for DKLS23</p>
+<div class="line-block">
+<div class="line">From: “Threshold ECDSA from ECDSA Assumptions: The Multiparty Case”</div>
+<div class="line">By:   Jack Doerner, Yashvanth Kondi, Eysa Lee, abhi shelat</div>
+<div class="line">Published: IEEE S&amp;P 2019</div>
+<div class="line">URL:  <a class="reference external" href="https://eprint.iacr.org/2019/523">https://eprint.iacr.org/2019/523</a></div>
+<div class="line"><br /></div>
+<div class="line">Also implements MtAwc (MtA with check) from:</div>
+<div class="line">“Two-Round Threshold ECDSA from ECDSA Assumptions” (DKLS23)</div>
+<div class="line">By:   Jack Doerner, Yashvanth Kondi, Eysa Lee, abhi shelat</div>
+<div class="line">Published: IEEE S&amp;P 2023</div>
+<div class="line">URL:  <a class="reference external" href="https://eprint.iacr.org/2023/765">https://eprint.iacr.org/2023/765</a></div>
+</div>
+<ul class="simple">
+<li><p>type:          share conversion</p></li>
+<li><p>setting:       Elliptic Curve DDH-hard group</p></li>
+<li><p>assumption:    DDH + OT security</p></li>
+</ul>
+<p>MtA converts multiplicative shares (a, b) where two parties hold a and b
+to additive shares (alpha, beta) such that a*b = alpha + beta (mod q).
+Neither party learns the other’s share.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Authors<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Elton de Souza</p>
+</dd>
+<dt class="field-even">Date<span class="colon">:</span></dt>
+<dd class="field-even"><p>01/2026</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="mta.CorrelatedOT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mta.</span></span><span class="sig-name descname"><span class="pre">CorrelatedOT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mta.html#CorrelatedOT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.CorrelatedOT" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Correlated Oblivious Transfer for MtA.</p>
+<p>Generates correlated random values for OT-based MtA.
+For each bit of the sender’s input, generates correlation pairs.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.CorrelatedOT.generate_batch_correlations">
+<span class="sig-name descname"><span class="pre">generate_batch_correlations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deltas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mta.html#CorrelatedOT.generate_batch_correlations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.CorrelatedOT.generate_batch_correlations" title="Link to this definition">¶</a></dt>
+<dd><p>Generate batch of correlated pairs.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>deltas<span class="classifier">list of int</span></dt><dd><p>List of correlation offsets</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>list of tuples</dt><dd><p>List of (t0, t1) pairs</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.CorrelatedOT.generate_correlation">
+<span class="sig-name descname"><span class="pre">generate_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mta.html#CorrelatedOT.generate_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.CorrelatedOT.generate_correlation" title="Link to this definition">¶</a></dt>
+<dd><p>Generate correlated pair (t0, t1) where t1 = t0 + delta.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>delta<span class="classifier">int</span></dt><dd><p>The correlation offset</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>tuple</dt><dd><p>(t0, t1) where t1 = t0 + delta (mod order)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mta.MtA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mta.</span></span><span class="sig-name descname"><span class="pre">MtA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mta.html#MtA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtA" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Multiplicative-to-Additive share conversion using OT.</p>
+<p>Converts multiplicative shares (a, b) where parties hold a and b
+to additive shares (alpha, beta) where a*b = alpha + beta (mod q).</p>
+<section id="curve-agnostic">
+<h3>Curve Agnostic<a class="headerlink" href="#curve-agnostic" title="Link to this heading">¶</a></h3>
+<p>This implementation supports any elliptic curve group that is DDH-hard.
+The curve is specified via the groupObj parameter.</p>
+<p>The protocol works as follows:
+1. Sender (holding a) decomposes a into bits
+2. For each bit position i, run correlated OT with correlation 2^i * b
+3. Receiver (holding b) chooses based on sender’s bits
+4. Parties compute their additive shares from OT outputs</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create separate instances for Alice (sender) and Bob (receiver)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alice_mta</span> <span class="o">=</span> <span class="n">MtA</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bob_mta</span> <span class="o">=</span> <span class="n">MtA</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Alice has share a, Bob has share b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Convert to additive shares using the protocol with real OT</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sender_msg</span> <span class="o">=</span> <span class="n">alice_mta</span><span class="o">.</span><span class="n">sender_round1</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">receiver_msg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bob_mta</span><span class="o">.</span><span class="n">receiver_round1</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">sender_msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="p">,</span> <span class="n">ot_data</span> <span class="o">=</span> <span class="n">alice_mta</span><span class="o">.</span><span class="n">sender_round2</span><span class="p">(</span><span class="n">receiver_msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span> <span class="o">=</span> <span class="n">bob_mta</span><span class="o">.</span><span class="n">receiver_round2</span><span class="p">(</span><span class="n">ot_data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Verify: a*b = alpha + beta (mod q)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">product</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">additive_sum</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">product</span> <span class="o">==</span> <span class="n">additive_sum</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtA.receiver_complete">
+<span class="sig-name descname"><span class="pre">receiver_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender_bits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/mta.html#MtA.receiver_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtA.receiver_complete" title="Link to this definition">¶</a></dt>
+<dd><p>Receiver returns their additive share beta (already computed).</p>
+<section id="id3">
+<h4>Parameters<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>sender_bits<span class="classifier">list of int</span></dt><dd><p>Sender’s bit decomposition (unused in correct protocol)</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h4>Returns<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>ZR element</dt><dd><p>Receiver’s additive share beta</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtA.receiver_round1">
+<span class="sig-name descname"><span class="pre">receiver_round1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sender_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtA.receiver_round1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtA.receiver_round1" title="Link to this definition">¶</a></dt>
+<dd><p>Receiver (holding b) selects OT messages based on bits of b.</p>
+<p>Uses real SimpleOT: for each bit b_i, receiver only learns m_{b_i}.
+The receiver NEVER sees both m0 and m1.</p>
+<section id="id5">
+<h4>Parameters<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>b<span class="classifier">ZR element</span></dt><dd><p>Receiver’s multiplicative share</p>
+</dd>
+<dt>sender_msg<span class="classifier">dict</span></dt><dd><p>Message from sender_round1</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h4>Returns<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>tuple (dict, None)</dt><dd><p>A tuple containing:
+- dict: Receiver parameters with ‘ot_responses’ list of OT receiver responses
+- None: Placeholder for beta (computed in receiver_round2)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtA.receiver_round2">
+<span class="sig-name descname"><span class="pre">receiver_round2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender_round2_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/mta.html#MtA.receiver_round2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtA.receiver_round2" title="Link to this definition">¶</a></dt>
+<dd><p>Receiver retrieves selected OT messages and computes beta.</p>
+<section id="id7">
+<h4>Parameters<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>sender_round2_msg<span class="classifier">dict</span></dt><dd><p>Message from sender_round2 containing OT ciphertexts</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h4>Returns<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>ZR element</dt><dd><p>Receiver’s additive share beta such that a*b = alpha + beta (mod q)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtA.sender_round1">
+<span class="sig-name descname"><span class="pre">sender_round1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtA.sender_round1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtA.sender_round1" title="Link to this definition">¶</a></dt>
+<dd><p>Sender (holding a) generates first message.</p>
+<p>Sender samples random alpha and prepares OT messages such that
+receiver can learn beta = a*b - alpha. Uses real SimpleOT for security.</p>
+<section id="id9">
+<h4>Parameters<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>a<span class="classifier">ZR element</span></dt><dd><p>Sender’s multiplicative share</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h4>Returns<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>dict</dt><dd><p>OT setup parameters containing:
+- ‘ot_params’: list of OT sender parameters (one per bit position)
+- ‘adjustment’: integer for receiver to compute beta</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtA.sender_round2">
+<span class="sig-name descname"><span class="pre">sender_round2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtA.sender_round2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtA.sender_round2" title="Link to this definition">¶</a></dt>
+<dd><p>Sender processes receiver’s OT responses and returns alpha.</p>
+<section id="id11">
+<h4>Parameters<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>receiver_msg<span class="classifier">dict</span></dt><dd><p>Message from receiver_round1 containing OT responses</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h4>Returns<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h4>
+<dl class="simple">
+<dt>tuple (ZR element, dict)</dt><dd><p>A tuple containing:
+- ZR element: Sender’s additive share alpha
+- dict: OT data with ‘ot_ciphertexts’ list for receiver to retrieve</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mta.MtAwc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mta.</span></span><span class="sig-name descname"><span class="pre">MtAwc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupObj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mta.html#MtAwc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtAwc" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>MtA with check - includes ZK proof that conversion is correct.</p>
+<p>Used for malicious security. Adds commitment and proof phases
+to verify that parties performed MtA correctly.</p>
+<p>The protocol adds:
+1. Commitment phase: parties commit to their shares
+2. Proof phase: parties prove correctness of OT selections
+3. Verification: parties verify each other’s proofs</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mta_wc</span> <span class="o">=</span> <span class="n">MtAwc</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Alice has share a, Bob has share b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Run MtA with correctness check</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sender_commit</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">sender_commit</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">receiver_commit</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">receiver_commit</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Exchange commitments and run MtA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sender_msg</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">sender_round1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">receiver_commit</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">receiver_msg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">receiver_round1</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">sender_commit</span><span class="p">,</span> <span class="n">sender_msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="p">,</span> <span class="n">sender_proof</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">sender_round2</span><span class="p">(</span><span class="n">receiver_msg</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span><span class="p">,</span> <span class="n">valid</span> <span class="o">=</span> <span class="n">mta_wc</span><span class="o">.</span><span class="n">receiver_verify</span><span class="p">(</span><span class="n">sender_proof</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">valid</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Verify: a*b = alpha + beta (mod q)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">product</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">additive_sum</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">product</span> <span class="o">==</span> <span class="n">additive_sum</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtAwc.receiver_commit">
+<span class="sig-name descname"><span class="pre">receiver_commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtAwc.receiver_commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtAwc.receiver_commit" title="Link to this definition">¶</a></dt>
+<dd><p>Receiver commits to share b.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>b<span class="classifier">ZR element</span></dt><dd><p>Receiver’s multiplicative share</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>Commitment to send to sender</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtAwc.receiver_round1">
+<span class="sig-name descname"><span class="pre">receiver_round1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sender_commit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sender_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtAwc.receiver_round1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtAwc.receiver_round1" title="Link to this definition">¶</a></dt>
+<dd><p>Receiver processes sender message with commitments.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>b<span class="classifier">ZR element</span></dt><dd><p>Receiver’s multiplicative share</p>
+</dd>
+<dt>sender_commit<span class="classifier">dict</span></dt><dd><p>Sender’s commitment from sender_commit (includes bit_proof)</p>
+</dd>
+<dt>sender_msg<span class="classifier">dict</span></dt><dd><p>Message from sender_round1</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>tuple</dt><dd><p>(receiver_message, beta_placeholder)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtAwc.receiver_verify">
+<span class="sig-name descname"><span class="pre">receiver_verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proof</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtAwc.receiver_verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtAwc.receiver_verify" title="Link to this definition">¶</a></dt>
+<dd><p>Receiver verifies proof including ZK bit decomposition and returns beta.</p>
+<p>Implements full ZK verification per DKLS23 Section 3:
+1. Verifies challenge-response for commitment
+2. Verifies bit decomposition OR-proofs (each bit is 0 or 1)
+3. Verifies bits sum to the committed value</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>proof<span class="classifier">dict</span></dt><dd><p>Proof from sender_round2</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>tuple</dt><dd><p>(beta, valid) where:
+- beta: receiver’s additive share
+- valid: boolean indicating if proof is valid</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtAwc.sender_commit">
+<span class="sig-name descname"><span class="pre">sender_commit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtAwc.sender_commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtAwc.sender_commit" title="Link to this definition">¶</a></dt>
+<dd><p>Sender commits to share a with ZK bit decomposition proof.</p>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>a<span class="classifier">ZR element</span></dt><dd><p>Sender’s multiplicative share</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>Commitment and bit decomposition proof to send to receiver</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtAwc.sender_round1">
+<span class="sig-name descname"><span class="pre">sender_round1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receiver_commit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtAwc.sender_round1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtAwc.sender_round1" title="Link to this definition">¶</a></dt>
+<dd><p>Sender generates first message with receiver’s commitment.</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>a<span class="classifier">ZR element</span></dt><dd><p>Sender’s multiplicative share</p>
+</dd>
+<dt>receiver_commit<span class="classifier">dict</span></dt><dd><p>Receiver’s commitment from receiver_commit</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>Message to send to receiver</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mta.MtAwc.sender_round2">
+<span class="sig-name descname"><span class="pre">sender_round2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mta.html#MtAwc.sender_round2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.MtAwc.sender_round2" title="Link to this definition">¶</a></dt>
+<dd><p>Sender completes MtA and generates proof.</p>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>receiver_msg<span class="classifier">dict</span></dt><dd><p>Message from receiver_round1</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h3>Returns<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>tuple</dt><dd><p>(alpha, proof) where:
+- alpha: sender’s additive share
+- proof: ZK proof of correctness (does NOT reveal sender_bits)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mta.hash_to_field">
+<span class="sig-prename descclassname"><span class="pre">mta.</span></span><span class="sig-name descname"><span class="pre">hash_to_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/mta.html#hash_to_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mta.hash_to_field" title="Link to this definition">¶</a></dt>
+<dd><p>Hash multiple values to a field element with domain separation.</p>
+<p>Uses group.hash() for proper domain separation and automatic
+serialization of different types.</p>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>group<span class="classifier">ECGroup</span></dt><dd><p>The elliptic curve group</p>
+</dd>
+<dt><a href="#id26"><span class="problematic" id="id27">*</span></a>args<span class="classifier">various</span></dt><dd><p>Values to hash</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>ZR element</dt><dd><p>Hash output as field element</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 </section>
 </section>
 
@@ -590,7 +1013,32 @@ selected values equals a·b.</p>
 <li><a class="reference internal" href="#example-usage">Example Usage</a></li>
 <li><a class="reference internal" href="#protocol-details">Protocol Details</a></li>
 <li><a class="reference internal" href="#related-modules">Related Modules</a></li>
-<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+<li><a class="reference internal" href="#module-mta">API Reference</a><ul>
+<li><a class="reference internal" href="#mta.CorrelatedOT"><code class="docutils literal notranslate"><span class="pre">CorrelatedOT</span></code></a><ul>
+<li><a class="reference internal" href="#mta.CorrelatedOT.generate_batch_correlations"><code class="docutils literal notranslate"><span class="pre">CorrelatedOT.generate_batch_correlations()</span></code></a></li>
+<li><a class="reference internal" href="#mta.CorrelatedOT.generate_correlation"><code class="docutils literal notranslate"><span class="pre">CorrelatedOT.generate_correlation()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mta.MtA"><code class="docutils literal notranslate"><span class="pre">MtA</span></code></a><ul>
+<li><a class="reference internal" href="#mta.MtA.receiver_complete"><code class="docutils literal notranslate"><span class="pre">MtA.receiver_complete()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtA.receiver_round1"><code class="docutils literal notranslate"><span class="pre">MtA.receiver_round1()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtA.receiver_round2"><code class="docutils literal notranslate"><span class="pre">MtA.receiver_round2()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtA.sender_round1"><code class="docutils literal notranslate"><span class="pre">MtA.sender_round1()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtA.sender_round2"><code class="docutils literal notranslate"><span class="pre">MtA.sender_round2()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mta.MtAwc"><code class="docutils literal notranslate"><span class="pre">MtAwc</span></code></a><ul>
+<li><a class="reference internal" href="#mta.MtAwc.receiver_commit"><code class="docutils literal notranslate"><span class="pre">MtAwc.receiver_commit()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtAwc.receiver_round1"><code class="docutils literal notranslate"><span class="pre">MtAwc.receiver_round1()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtAwc.receiver_verify"><code class="docutils literal notranslate"><span class="pre">MtAwc.receiver_verify()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtAwc.sender_commit"><code class="docutils literal notranslate"><span class="pre">MtAwc.sender_commit()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtAwc.sender_round1"><code class="docutils literal notranslate"><span class="pre">MtAwc.sender_round1()</span></code></a></li>
+<li><a class="reference internal" href="#mta.MtAwc.sender_round2"><code class="docutils literal notranslate"><span class="pre">MtAwc.sender_round2()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mta.hash_to_field"><code class="docutils literal notranslate"><span class="pre">hash_to_field()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

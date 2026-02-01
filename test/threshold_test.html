@@ -554,8 +554,658 @@ across the entire threshold ECDSA stack.</p>
 <li><p><a class="reference internal" href="../toolbox/mpc_utils.html"><span class="doc">mpc_utils - MPC Utility Functions</span></a> - MPC utilities</p></li>
 </ul>
 </section>
-<section id="api-reference">
-<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
+<section id="module-threshold_test">
+<span id="api-reference"></span><h2>API Reference<a class="headerlink" href="#module-threshold_test" title="Link to this heading">¶</a></h2>
+<p>Tests for DKLS23 Threshold ECDSA implementation.</p>
+<p>Run with: pytest charm/test/schemes/threshold_test.py -v</p>
+<p>This module tests:
+- SimpleOT: Base Oblivious Transfer protocol
+- OTExtension: IKNP-style OT extension
+- MtA/MtAwc: Multiplicative-to-Additive conversion
+- ThresholdSharing/PedersenVSS: Threshold secret sharing
+- DKLS23_DKG: Distributed Key Generation
+- DKLS23_Presign: Presigning protocol
+- DKLS23_Sign: Signing protocol
+- DKLS23: Complete threshold ECDSA protocol</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestCurveAgnostic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestCurveAgnostic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCurveAgnostic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCurveAgnostic" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for curve agnosticism (MEDIUM-11)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCurveAgnostic.test_curve_agnostic_prime256v1">
+<span class="sig-name descname"><span class="pre">test_curve_agnostic_prime256v1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCurveAgnostic.test_curve_agnostic_prime256v1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCurveAgnostic.test_curve_agnostic_prime256v1" title="Link to this definition">¶</a></dt>
+<dd><p>Test that DKLS23 works with different curves (MEDIUM-11).</p>
+<p>Uses prime256v1 (P-256/secp256r1) instead of secp256k1 to verify
+the protocol is curve-agnostic.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestDKLS23_Complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>End-to-end tests for complete DKLS23 protocol</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_3_of_5_threshold">
+<span class="sig-name descname"><span class="pre">test_3_of_5_threshold</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_3_of_5_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_3_of_5_threshold" title="Link to this definition">¶</a></dt>
+<dd><p>Test 3-of-5 threshold scheme</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_complete_2_of_3_signing">
+<span class="sig-name descname"><span class="pre">test_complete_2_of_3_signing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_complete_2_of_3_signing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_complete_2_of_3_signing" title="Link to this definition">¶</a></dt>
+<dd><p>Complete flow: keygen -&gt; presign -&gt; sign -&gt; verify</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_different_participant_combinations">
+<span class="sig-name descname"><span class="pre">test_different_participant_combinations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_different_participant_combinations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_different_participant_combinations" title="Link to this definition">¶</a></dt>
+<dd><p>Test that any 2 of 3 parties can sign</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_insufficient_participants_raises_error">
+<span class="sig-name descname"><span class="pre">test_insufficient_participants_raises_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_insufficient_participants_raises_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_insufficient_participants_raises_error" title="Link to this definition">¶</a></dt>
+<dd><p>Test that signing with insufficient participants raises error</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_invalid_threshold_raises_error">
+<span class="sig-name descname"><span class="pre">test_invalid_threshold_raises_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_invalid_threshold_raises_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_invalid_threshold_raises_error" title="Link to this definition">¶</a></dt>
+<dd><p>Test that invalid threshold/num_parties raises error</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_keygen_interface">
+<span class="sig-name descname"><span class="pre">test_keygen_interface</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_keygen_interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_keygen_interface" title="Link to this definition">¶</a></dt>
+<dd><p>Test the PKSig-compatible keygen interface</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_multiple_messages_same_keys">
+<span class="sig-name descname"><span class="pre">test_multiple_messages_same_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_multiple_messages_same_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_multiple_messages_same_keys" title="Link to this definition">¶</a></dt>
+<dd><p>Test signing multiple messages with same key shares</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_signature_is_standard_ecdsa">
+<span class="sig-name descname"><span class="pre">test_signature_is_standard_ecdsa</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_signature_is_standard_ecdsa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_signature_is_standard_ecdsa" title="Link to this definition">¶</a></dt>
+<dd><p>Verify that output is standard ECDSA signature format</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Complete.test_wrong_message_fails_verification">
+<span class="sig-name descname"><span class="pre">test_wrong_message_fails_verification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Complete.test_wrong_message_fails_verification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Complete.test_wrong_message_fails_verification" title="Link to this definition">¶</a></dt>
+<dd><p>Test that signature verification fails with wrong message</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_DKG">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestDKLS23_DKG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_DKG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_DKG" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for Distributed Key Generation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_DKG.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_DKG.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_DKG.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_DKG.test_2_of_3_dkg">
+<span class="sig-name descname"><span class="pre">test_2_of_3_dkg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_DKG.test_2_of_3_dkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_DKG.test_2_of_3_dkg" title="Link to this definition">¶</a></dt>
+<dd><p>Test 2-of-3 distributed key generation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_DKG.test_all_parties_same_pubkey">
+<span class="sig-name descname"><span class="pre">test_all_parties_same_pubkey</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_DKG.test_all_parties_same_pubkey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_DKG.test_all_parties_same_pubkey" title="Link to this definition">¶</a></dt>
+<dd><p>All parties should derive the same public key</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_DKG.test_dkg_computes_correct_public_key">
+<span class="sig-name descname"><span class="pre">test_dkg_computes_correct_public_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_DKG.test_dkg_computes_correct_public_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_DKG.test_dkg_computes_correct_public_key" title="Link to this definition">¶</a></dt>
+<dd><p>Test that DKG computes public key as product of individual contributions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_DKG.test_dkg_rejects_empty_session_id">
+<span class="sig-name descname"><span class="pre">test_dkg_rejects_empty_session_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_DKG.test_dkg_rejects_empty_session_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_DKG.test_dkg_rejects_empty_session_id" title="Link to this definition">¶</a></dt>
+<dd><p>Test that DKG keygen_round1 rejects empty session_id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_DKG.test_dkg_rejects_none_session_id">
+<span class="sig-name descname"><span class="pre">test_dkg_rejects_none_session_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_DKG.test_dkg_rejects_none_session_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_DKG.test_dkg_rejects_none_session_id" title="Link to this definition">¶</a></dt>
+<dd><p>Test that DKG keygen_round1 rejects None session_id</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Presign">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestDKLS23_Presign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Presign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Presign" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for presigning protocol</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Presign.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Presign.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Presign.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Presign.test_presign_generates_valid_presignature">
+<span class="sig-name descname"><span class="pre">test_presign_generates_valid_presignature</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Presign.test_presign_generates_valid_presignature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Presign.test_presign_generates_valid_presignature" title="Link to this definition">¶</a></dt>
+<dd><p>Test that presigning produces valid presignature objects</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Presign.test_presign_rejects_empty_session_id">
+<span class="sig-name descname"><span class="pre">test_presign_rejects_empty_session_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Presign.test_presign_rejects_empty_session_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Presign.test_presign_rejects_empty_session_id" title="Link to this definition">¶</a></dt>
+<dd><p>Test that presign_round1 rejects empty session_id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Presign.test_presign_rejects_none_session_id">
+<span class="sig-name descname"><span class="pre">test_presign_rejects_none_session_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Presign.test_presign_rejects_none_session_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Presign.test_presign_rejects_none_session_id" title="Link to this definition">¶</a></dt>
+<dd><p>Test that presign_round1 rejects None session_id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Presign.test_presignatures_have_same_r">
+<span class="sig-name descname"><span class="pre">test_presignatures_have_same_r</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Presign.test_presignatures_have_same_r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Presign.test_presignatures_have_same_r" title="Link to this definition">¶</a></dt>
+<dd><p>All parties’ presignatures should have the same r value</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Sign">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestDKLS23_Sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Sign" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for signing protocol</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Sign.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Sign.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Sign.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Sign.test_signature_share_generation">
+<span class="sig-name descname"><span class="pre">test_signature_share_generation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Sign.test_signature_share_generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Sign.test_signature_share_generation" title="Link to this definition">¶</a></dt>
+<dd><p>Test that signature shares are generated correctly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Sign.test_signature_share_verification">
+<span class="sig-name descname"><span class="pre">test_signature_share_verification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Sign.test_signature_share_verification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Sign.test_signature_share_verification" title="Link to this definition">¶</a></dt>
+<dd><p>Test that invalid signature shares are detected (MEDIUM-06).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Sign.test_signature_verification_correct">
+<span class="sig-name descname"><span class="pre">test_signature_verification_correct</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Sign.test_signature_verification_correct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Sign.test_signature_verification_correct" title="Link to this definition">¶</a></dt>
+<dd><p>Test that valid ECDSA signatures verify correctly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDKLS23_Sign.test_signature_verification_wrong_message">
+<span class="sig-name descname"><span class="pre">test_signature_verification_wrong_message</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDKLS23_Sign.test_signature_verification_wrong_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDKLS23_Sign.test_signature_verification_wrong_message" title="Link to this definition">¶</a></dt>
+<dd><p>Test that signature verification fails with wrong message</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestDPF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestDPF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDPF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDPF" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for Distributed Point Function (GGM-based)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDPF.test_dpf_full_eval">
+<span class="sig-name descname"><span class="pre">test_dpf_full_eval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDPF.test_dpf_full_eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDPF.test_dpf_full_eval" title="Link to this definition">¶</a></dt>
+<dd><p>Test DPF full domain evaluation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDPF.test_dpf_key_independence">
+<span class="sig-name descname"><span class="pre">test_dpf_key_independence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDPF.test_dpf_key_independence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDPF.test_dpf_key_independence" title="Link to this definition">¶</a></dt>
+<dd><p>Test that individual keys reveal nothing about alpha/beta.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDPF.test_dpf_off_points">
+<span class="sig-name descname"><span class="pre">test_dpf_off_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDPF.test_dpf_off_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDPF.test_dpf_off_points" title="Link to this definition">¶</a></dt>
+<dd><p>Test DPF correctness at non-target points.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestDPF.test_dpf_single_point">
+<span class="sig-name descname"><span class="pre">test_dpf_single_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDPF.test_dpf_single_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDPF.test_dpf_single_point" title="Link to this definition">¶</a></dt>
+<dd><p>Test DPF correctness at target point.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestMPFSS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestMPFSS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMPFSS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMPFSS" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for Multi-Point Function Secret Sharing</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMPFSS.test_mpfss_empty">
+<span class="sig-name descname"><span class="pre">test_mpfss_empty</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMPFSS.test_mpfss_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMPFSS.test_mpfss_empty" title="Link to this definition">¶</a></dt>
+<dd><p>Test MPFSS with empty point set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMPFSS.test_mpfss_full_eval">
+<span class="sig-name descname"><span class="pre">test_mpfss_full_eval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMPFSS.test_mpfss_full_eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMPFSS.test_mpfss_full_eval" title="Link to this definition">¶</a></dt>
+<dd><p>Test MPFSS full domain evaluation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMPFSS.test_mpfss_multiple_points">
+<span class="sig-name descname"><span class="pre">test_mpfss_multiple_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMPFSS.test_mpfss_multiple_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMPFSS.test_mpfss_multiple_points" title="Link to this definition">¶</a></dt>
+<dd><p>Test MPFSS with multiple points.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMPFSS.test_mpfss_single_point">
+<span class="sig-name descname"><span class="pre">test_mpfss_single_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMPFSS.test_mpfss_single_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMPFSS.test_mpfss_single_point" title="Link to this definition">¶</a></dt>
+<dd><p>Test MPFSS with single point (should match DPF).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestMaliciousParties">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestMaliciousParties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMaliciousParties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMaliciousParties" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for adversarial/malicious party scenarios in threshold ECDSA.</p>
+<p>These tests verify that the protocol correctly detects and handles
+various forms of malicious behavior including:
+- Invalid shares during DKG
+- Wrong commitments
+- Commitment mismatches during presigning
+- Invalid signature shares</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMaliciousParties.setUpClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMaliciousParties.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMaliciousParties.setUpClass" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMaliciousParties.test_dkg_insufficient_honest_parties">
+<span class="sig-name descname"><span class="pre">test_dkg_insufficient_honest_parties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMaliciousParties.test_dkg_insufficient_honest_parties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMaliciousParties.test_dkg_insufficient_honest_parties" title="Link to this definition">¶</a></dt>
+<dd><p>Test that a party can identify malicious parties when multiple collude.</p>
+<p>Run 2-of-3 DKG where 2 parties (party 2 and party 3) send invalid
+shares to party 1. Verify party 1 can identify both malicious parties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMaliciousParties.test_dkg_invalid_share_detected">
+<span class="sig-name descname"><span class="pre">test_dkg_invalid_share_detected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMaliciousParties.test_dkg_invalid_share_detected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMaliciousParties.test_dkg_invalid_share_detected" title="Link to this definition">¶</a></dt>
+<dd><p>Test that DKG detects tampered shares during round 3.</p>
+<p>Run DKG with 3 parties. In round 2, tamper with party 3’s share
+to party 1 (add 1 to the share value). Verify that party 1
+detects the invalid share in round 3 (returns a complaint).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMaliciousParties.test_dkg_wrong_commitment_detected">
+<span class="sig-name descname"><span class="pre">test_dkg_wrong_commitment_detected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMaliciousParties.test_dkg_wrong_commitment_detected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMaliciousParties.test_dkg_wrong_commitment_detected" title="Link to this definition">¶</a></dt>
+<dd><p>Test that DKG detects when a party’s commitment doesn’t match their shares.</p>
+<p>Run DKG round 1, then modify party 2’s commitment list by changing
+the first commitment to a random point. Verify share verification
+fails for party 2’s shares.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMaliciousParties.test_mta_receiver_learns_only_chosen_message">
+<span class="sig-name descname"><span class="pre">test_mta_receiver_learns_only_chosen_message</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMaliciousParties.test_mta_receiver_learns_only_chosen_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMaliciousParties.test_mta_receiver_learns_only_chosen_message" title="Link to this definition">¶</a></dt>
+<dd><p>Test MtA security property: receiver’s beta depends only on chosen values.</p>
+<p>Run MtA protocol and verify that the receiver’s beta calculation
+depends only on the specific input values used, not any other information.
+This tests the basic security property of the MtA protocol.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMaliciousParties.test_presign_commitment_mismatch_detected">
+<span class="sig-name descname"><span class="pre">test_presign_commitment_mismatch_detected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMaliciousParties.test_presign_commitment_mismatch_detected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMaliciousParties.test_presign_commitment_mismatch_detected" title="Link to this definition">¶</a></dt>
+<dd><p>Test that presigning detects when Gamma_i doesn’t match the commitment.</p>
+<p>Run presign round 1 with 3 parties. In round 2 messages, replace
+party 2’s Gamma_i with a different value that doesn’t match the
+commitment. Verify round 3 raises ValueError about commitment verification.</p>
+<p>Note: This test validates the commitment verification logic in the presigning
+protocol. The test directly verifies commitment checking without going through
+the full MtA completion (which has a separate API change).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMaliciousParties.test_signature_invalid_share_produces_invalid_sig">
+<span class="sig-name descname"><span class="pre">test_signature_invalid_share_produces_invalid_sig</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMaliciousParties.test_signature_invalid_share_produces_invalid_sig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMaliciousParties.test_signature_invalid_share_produces_invalid_sig" title="Link to this definition">¶</a></dt>
+<dd><p>Test that tampering with signature shares produces invalid signatures.</p>
+<p>Use simulated presignatures to test that modifying a party’s
+signature share (s_i) causes the aggregated signature to fail
+ECDSA verification. This validates that malicious tampering with
+signature shares is detectable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestMtA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestMtA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtA" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for Multiplicative-to-Additive conversion</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtA.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtA.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtA.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtA.test_mta_correctness">
+<span class="sig-name descname"><span class="pre">test_mta_correctness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtA.test_mta_correctness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtA.test_mta_correctness" title="Link to this definition">¶</a></dt>
+<dd><p>Test that a*b = alpha + beta (mod q) - multiplicative to additive with real OT</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtA.test_mta_edge_case_near_order">
+<span class="sig-name descname"><span class="pre">test_mta_edge_case_near_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtA.test_mta_edge_case_near_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtA.test_mta_edge_case_near_order" title="Link to this definition">¶</a></dt>
+<dd><p>Test MtA with values close to the curve order (MEDIUM-04).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtA.test_mta_multiple_invocations">
+<span class="sig-name descname"><span class="pre">test_mta_multiple_invocations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtA.test_mta_multiple_invocations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtA.test_mta_multiple_invocations" title="Link to this definition">¶</a></dt>
+<dd><p>Test MtA with multiple random values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtA.test_mta_return_types">
+<span class="sig-name descname"><span class="pre">test_mta_return_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtA.test_mta_return_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtA.test_mta_return_types" title="Link to this definition">¶</a></dt>
+<dd><p>Test MtA methods have documented return types (LOW-03).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtA.test_mta_uses_real_ot">
+<span class="sig-name descname"><span class="pre">test_mta_uses_real_ot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtA.test_mta_uses_real_ot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtA.test_mta_uses_real_ot" title="Link to this definition">¶</a></dt>
+<dd><p>Test that MtA uses real OT - receiver never sees both messages</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestMtAwc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestMtAwc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtAwc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtAwc" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for MtA with correctness check</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtAwc.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtAwc.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtAwc.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtAwc.test_mtawc_correctness">
+<span class="sig-name descname"><span class="pre">test_mtawc_correctness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtAwc.test_mtawc_correctness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtAwc.test_mtawc_correctness" title="Link to this definition">¶</a></dt>
+<dd><p>Test MtA with correctness check produces valid shares</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestMtAwc.test_mtawc_proof_does_not_reveal_sender_bits">
+<span class="sig-name descname"><span class="pre">test_mtawc_proof_does_not_reveal_sender_bits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestMtAwc.test_mtawc_proof_does_not_reveal_sender_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestMtAwc.test_mtawc_proof_does_not_reveal_sender_bits" title="Link to this definition">¶</a></dt>
+<dd><p>Test that MtAwc proof does NOT contain sender_bits (CRITICAL-02 fix)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestOTExtension">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestOTExtension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestOTExtension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestOTExtension" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for IKNP-style OT Extension</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestOTExtension.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestOTExtension.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestOTExtension.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestOTExtension.test_base_ot_required_for_receiver_extend">
+<span class="sig-name descname"><span class="pre">test_base_ot_required_for_receiver_extend</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestOTExtension.test_base_ot_required_for_receiver_extend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestOTExtension.test_base_ot_required_for_receiver_extend" title="Link to this definition">¶</a></dt>
+<dd><p>Verify receiver_extend fails if base OT not completed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestOTExtension.test_base_ot_required_for_sender_init">
+<span class="sig-name descname"><span class="pre">test_base_ot_required_for_sender_init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestOTExtension.test_base_ot_required_for_sender_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestOTExtension.test_base_ot_required_for_sender_init" title="Link to this definition">¶</a></dt>
+<dd><p>Verify sender_init fails if base OT not completed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestOTExtension.test_ot_extension_alternating_bits">
+<span class="sig-name descname"><span class="pre">test_ot_extension_alternating_bits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestOTExtension.test_ot_extension_alternating_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestOTExtension.test_ot_extension_alternating_bits" title="Link to this definition">¶</a></dt>
+<dd><p>Test OT extension with alternating choice bits</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestOTExtension.test_ot_extension_basic">
+<span class="sig-name descname"><span class="pre">test_ot_extension_basic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestOTExtension.test_ot_extension_basic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestOTExtension.test_ot_extension_basic" title="Link to this definition">¶</a></dt>
+<dd><p>Test OT extension with 256 OTs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestOTExtension.test_sender_s_not_exposed">
+<span class="sig-name descname"><span class="pre">test_sender_s_not_exposed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestOTExtension.test_sender_s_not_exposed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestOTExtension.test_sender_s_not_exposed" title="Link to this definition">¶</a></dt>
+<dd><p>Verify receiver cannot access sender’s random bits.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestPedersenVSS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestPedersenVSS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestPedersenVSS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestPedersenVSS" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for Pedersen VSS (information-theoretically hiding)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestPedersenVSS.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestPedersenVSS.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestPedersenVSS.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestPedersenVSS.test_pedersen_vss_reconstruction">
+<span class="sig-name descname"><span class="pre">test_pedersen_vss_reconstruction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestPedersenVSS.test_pedersen_vss_reconstruction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestPedersenVSS.test_pedersen_vss_reconstruction" title="Link to this definition">¶</a></dt>
+<dd><p>Test that Pedersen VSS shares reconstruct correctly</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestPedersenVSS.test_pedersen_vss_verification">
+<span class="sig-name descname"><span class="pre">test_pedersen_vss_verification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestPedersenVSS.test_pedersen_vss_verification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestPedersenVSS.test_pedersen_vss_verification" title="Link to this definition">¶</a></dt>
+<dd><p>Test Pedersen VSS share verification</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestSilentOT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestSilentOT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSilentOT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSilentOT" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for Silent OT Extension (PCG-based)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSilentOT.test_silent_ot_basic">
+<span class="sig-name descname"><span class="pre">test_silent_ot_basic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSilentOT.test_silent_ot_basic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSilentOT.test_silent_ot_basic" title="Link to this definition">¶</a></dt>
+<dd><p>Test basic Silent OT correctness.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSilentOT.test_silent_ot_choice_distribution">
+<span class="sig-name descname"><span class="pre">test_silent_ot_choice_distribution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSilentOT.test_silent_ot_choice_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSilentOT.test_silent_ot_choice_distribution" title="Link to this definition">¶</a></dt>
+<dd><p>Test that choice bits come from sparse set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSilentOT.test_silent_ot_different_messages">
+<span class="sig-name descname"><span class="pre">test_silent_ot_different_messages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSilentOT.test_silent_ot_different_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSilentOT.test_silent_ot_different_messages" title="Link to this definition">¶</a></dt>
+<dd><p>Test that m0 and m1 are different for each OT.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSilentOT.test_silent_ot_larger">
+<span class="sig-name descname"><span class="pre">test_silent_ot_larger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSilentOT.test_silent_ot_larger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSilentOT.test_silent_ot_larger" title="Link to this definition">¶</a></dt>
+<dd><p>Test Silent OT with larger output size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSilentOT.test_silent_ot_messages_32_bytes">
+<span class="sig-name descname"><span class="pre">test_silent_ot_messages_32_bytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSilentOT.test_silent_ot_messages_32_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSilentOT.test_silent_ot_messages_32_bytes" title="Link to this definition">¶</a></dt>
+<dd><p>Test that OT messages are 32 bytes each.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestSimpleOT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestSimpleOT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSimpleOT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSimpleOT" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for base Oblivious Transfer (Chou-Orlandi style)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSimpleOT.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSimpleOT.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSimpleOT.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSimpleOT.test_ot_choice_one">
+<span class="sig-name descname"><span class="pre">test_ot_choice_one</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSimpleOT.test_ot_choice_one"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSimpleOT.test_ot_choice_one" title="Link to this definition">¶</a></dt>
+<dd><p>Test OT with choice bit 1 - receiver should learn m1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSimpleOT.test_ot_choice_zero">
+<span class="sig-name descname"><span class="pre">test_ot_choice_zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSimpleOT.test_ot_choice_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSimpleOT.test_ot_choice_zero" title="Link to this definition">¶</a></dt>
+<dd><p>Test OT with choice bit 0 - receiver should learn m0</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSimpleOT.test_ot_invalid_point_rejected">
+<span class="sig-name descname"><span class="pre">test_ot_invalid_point_rejected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSimpleOT.test_ot_invalid_point_rejected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSimpleOT.test_ot_invalid_point_rejected" title="Link to this definition">¶</a></dt>
+<dd><p>Test that invalid points from malicious sender are rejected</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSimpleOT.test_ot_multiple_transfers">
+<span class="sig-name descname"><span class="pre">test_ot_multiple_transfers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSimpleOT.test_ot_multiple_transfers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSimpleOT.test_ot_multiple_transfers" title="Link to this definition">¶</a></dt>
+<dd><p>Test multiple independent OT instances</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestSimpleOT.test_ot_reset_sender">
+<span class="sig-name descname"><span class="pre">test_ot_reset_sender</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestSimpleOT.test_ot_reset_sender"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestSimpleOT.test_ot_reset_sender" title="Link to this definition">¶</a></dt>
+<dd><p>Test that reset_sender clears sender state</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestThresholdSharing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for threshold secret sharing (Shamir-style)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing.test_basic_sharing_and_reconstruction">
+<span class="sig-name descname"><span class="pre">test_basic_sharing_and_reconstruction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing.test_basic_sharing_and_reconstruction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing.test_basic_sharing_and_reconstruction" title="Link to this definition">¶</a></dt>
+<dd><p>Test basic 2-of-3 secret sharing and reconstruction</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing.test_feldman_vss_detects_invalid_share">
+<span class="sig-name descname"><span class="pre">test_feldman_vss_detects_invalid_share</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing.test_feldman_vss_detects_invalid_share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing.test_feldman_vss_detects_invalid_share" title="Link to this definition">¶</a></dt>
+<dd><p>Test that Feldman VSS detects tampered shares</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing.test_feldman_vss_verification">
+<span class="sig-name descname"><span class="pre">test_feldman_vss_verification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing.test_feldman_vss_verification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing.test_feldman_vss_verification" title="Link to this definition">¶</a></dt>
+<dd><p>Test Feldman VSS verification - shares should verify against commitments</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing.test_insufficient_shares_raises_error">
+<span class="sig-name descname"><span class="pre">test_insufficient_shares_raises_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing.test_insufficient_shares_raises_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing.test_insufficient_shares_raises_error" title="Link to this definition">¶</a></dt>
+<dd><p>Test that reconstruction fails with insufficient shares</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing.test_invalid_threshold_raises_error">
+<span class="sig-name descname"><span class="pre">test_invalid_threshold_raises_error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing.test_invalid_threshold_raises_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing.test_invalid_threshold_raises_error" title="Link to this definition">¶</a></dt>
+<dd><p>Test that invalid threshold values raise errors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing.test_threshold_3_of_5">
+<span class="sig-name descname"><span class="pre">test_threshold_3_of_5</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing.test_threshold_3_of_5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing.test_threshold_3_of_5" title="Link to this definition">¶</a></dt>
+<dd><p>Test 3-of-5 threshold scheme</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSharing.test_threshold_limit_validation">
+<span class="sig-name descname"><span class="pre">test_threshold_limit_validation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSharing.test_threshold_limit_validation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSharing.test_threshold_limit_validation" title="Link to this definition">¶</a></dt>
+<dd><p>Test that excessive thresholds are rejected (MEDIUM-05).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSignature">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestThresholdSignature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSignature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSignature" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for ThresholdSignature class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSignature.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSignature.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSignature.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSignature.test_der_encoding">
+<span class="sig-name descname"><span class="pre">test_der_encoding</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSignature.test_der_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSignature.test_der_encoding" title="Link to this definition">¶</a></dt>
+<dd><p>Test DER encoding produces valid structure</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSignature.test_signature_equality">
+<span class="sig-name descname"><span class="pre">test_signature_equality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSignature.test_signature_equality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSignature.test_signature_equality" title="Link to this definition">¶</a></dt>
+<dd><p>Test ThresholdSignature equality comparison</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestThresholdSignature.test_signature_inequality">
+<span class="sig-name descname"><span class="pre">test_signature_inequality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestThresholdSignature.test_signature_inequality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestThresholdSignature.test_signature_inequality" title="Link to this definition">¶</a></dt>
+<dd><p>Test ThresholdSignature inequality</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 
@@ -621,7 +1271,140 @@ across the entire threshold ECDSA stack.</p>
 <li><a class="reference internal" href="#running-the-tests">Running the Tests</a></li>
 <li><a class="reference internal" href="#key-test-scenarios">Key Test Scenarios</a></li>
 <li><a class="reference internal" href="#related-modules">Related Modules</a></li>
-<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+<li><a class="reference internal" href="#module-threshold_test">API Reference</a><ul>
+<li><a class="reference internal" href="#threshold_test.TestCurveAgnostic"><code class="docutils literal notranslate"><span class="pre">TestCurveAgnostic</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestCurveAgnostic.test_curve_agnostic_prime256v1"><code class="docutils literal notranslate"><span class="pre">TestCurveAgnostic.test_curve_agnostic_prime256v1()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.setUp"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_3_of_5_threshold"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_3_of_5_threshold()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_complete_2_of_3_signing"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_complete_2_of_3_signing()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_different_participant_combinations"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_different_participant_combinations()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_insufficient_participants_raises_error"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_insufficient_participants_raises_error()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_invalid_threshold_raises_error"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_invalid_threshold_raises_error()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_keygen_interface"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_keygen_interface()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_multiple_messages_same_keys"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_multiple_messages_same_keys()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_signature_is_standard_ecdsa"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_signature_is_standard_ecdsa()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Complete.test_wrong_message_fails_verification"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Complete.test_wrong_message_fails_verification()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_DKG"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_DKG</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_DKG.setUp"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_DKG.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_DKG.test_2_of_3_dkg"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_DKG.test_2_of_3_dkg()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_DKG.test_all_parties_same_pubkey"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_DKG.test_all_parties_same_pubkey()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_DKG.test_dkg_computes_correct_public_key"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_DKG.test_dkg_computes_correct_public_key()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_DKG.test_dkg_rejects_empty_session_id"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_DKG.test_dkg_rejects_empty_session_id()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_DKG.test_dkg_rejects_none_session_id"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_DKG.test_dkg_rejects_none_session_id()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Presign"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Presign</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Presign.setUp"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Presign.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Presign.test_presign_generates_valid_presignature"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Presign.test_presign_generates_valid_presignature()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Presign.test_presign_rejects_empty_session_id"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Presign.test_presign_rejects_empty_session_id()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Presign.test_presign_rejects_none_session_id"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Presign.test_presign_rejects_none_session_id()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Presign.test_presignatures_have_same_r"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Presign.test_presignatures_have_same_r()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Sign"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Sign</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Sign.setUp"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Sign.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Sign.test_signature_share_generation"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Sign.test_signature_share_generation()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Sign.test_signature_share_verification"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Sign.test_signature_share_verification()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Sign.test_signature_verification_correct"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Sign.test_signature_verification_correct()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDKLS23_Sign.test_signature_verification_wrong_message"><code class="docutils literal notranslate"><span class="pre">TestDKLS23_Sign.test_signature_verification_wrong_message()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestDPF"><code class="docutils literal notranslate"><span class="pre">TestDPF</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestDPF.test_dpf_full_eval"><code class="docutils literal notranslate"><span class="pre">TestDPF.test_dpf_full_eval()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDPF.test_dpf_key_independence"><code class="docutils literal notranslate"><span class="pre">TestDPF.test_dpf_key_independence()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDPF.test_dpf_off_points"><code class="docutils literal notranslate"><span class="pre">TestDPF.test_dpf_off_points()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestDPF.test_dpf_single_point"><code class="docutils literal notranslate"><span class="pre">TestDPF.test_dpf_single_point()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestMPFSS"><code class="docutils literal notranslate"><span class="pre">TestMPFSS</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestMPFSS.test_mpfss_empty"><code class="docutils literal notranslate"><span class="pre">TestMPFSS.test_mpfss_empty()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMPFSS.test_mpfss_full_eval"><code class="docutils literal notranslate"><span class="pre">TestMPFSS.test_mpfss_full_eval()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMPFSS.test_mpfss_multiple_points"><code class="docutils literal notranslate"><span class="pre">TestMPFSS.test_mpfss_multiple_points()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMPFSS.test_mpfss_single_point"><code class="docutils literal notranslate"><span class="pre">TestMPFSS.test_mpfss_single_point()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestMaliciousParties"><code class="docutils literal notranslate"><span class="pre">TestMaliciousParties</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestMaliciousParties.setUpClass"><code class="docutils literal notranslate"><span class="pre">TestMaliciousParties.setUpClass()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMaliciousParties.test_dkg_insufficient_honest_parties"><code class="docutils literal notranslate"><span class="pre">TestMaliciousParties.test_dkg_insufficient_honest_parties()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMaliciousParties.test_dkg_invalid_share_detected"><code class="docutils literal notranslate"><span class="pre">TestMaliciousParties.test_dkg_invalid_share_detected()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMaliciousParties.test_dkg_wrong_commitment_detected"><code class="docutils literal notranslate"><span class="pre">TestMaliciousParties.test_dkg_wrong_commitment_detected()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMaliciousParties.test_mta_receiver_learns_only_chosen_message"><code class="docutils literal notranslate"><span class="pre">TestMaliciousParties.test_mta_receiver_learns_only_chosen_message()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMaliciousParties.test_presign_commitment_mismatch_detected"><code class="docutils literal notranslate"><span class="pre">TestMaliciousParties.test_presign_commitment_mismatch_detected()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMaliciousParties.test_signature_invalid_share_produces_invalid_sig"><code class="docutils literal notranslate"><span class="pre">TestMaliciousParties.test_signature_invalid_share_produces_invalid_sig()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestMtA"><code class="docutils literal notranslate"><span class="pre">TestMtA</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestMtA.setUp"><code class="docutils literal notranslate"><span class="pre">TestMtA.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMtA.test_mta_correctness"><code class="docutils literal notranslate"><span class="pre">TestMtA.test_mta_correctness()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMtA.test_mta_edge_case_near_order"><code class="docutils literal notranslate"><span class="pre">TestMtA.test_mta_edge_case_near_order()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMtA.test_mta_multiple_invocations"><code class="docutils literal notranslate"><span class="pre">TestMtA.test_mta_multiple_invocations()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMtA.test_mta_return_types"><code class="docutils literal notranslate"><span class="pre">TestMtA.test_mta_return_types()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMtA.test_mta_uses_real_ot"><code class="docutils literal notranslate"><span class="pre">TestMtA.test_mta_uses_real_ot()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestMtAwc"><code class="docutils literal notranslate"><span class="pre">TestMtAwc</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestMtAwc.setUp"><code class="docutils literal notranslate"><span class="pre">TestMtAwc.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMtAwc.test_mtawc_correctness"><code class="docutils literal notranslate"><span class="pre">TestMtAwc.test_mtawc_correctness()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestMtAwc.test_mtawc_proof_does_not_reveal_sender_bits"><code class="docutils literal notranslate"><span class="pre">TestMtAwc.test_mtawc_proof_does_not_reveal_sender_bits()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestOTExtension"><code class="docutils literal notranslate"><span class="pre">TestOTExtension</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestOTExtension.setUp"><code class="docutils literal notranslate"><span class="pre">TestOTExtension.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestOTExtension.test_base_ot_required_for_receiver_extend"><code class="docutils literal notranslate"><span class="pre">TestOTExtension.test_base_ot_required_for_receiver_extend()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestOTExtension.test_base_ot_required_for_sender_init"><code class="docutils literal notranslate"><span class="pre">TestOTExtension.test_base_ot_required_for_sender_init()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestOTExtension.test_ot_extension_alternating_bits"><code class="docutils literal notranslate"><span class="pre">TestOTExtension.test_ot_extension_alternating_bits()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestOTExtension.test_ot_extension_basic"><code class="docutils literal notranslate"><span class="pre">TestOTExtension.test_ot_extension_basic()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestOTExtension.test_sender_s_not_exposed"><code class="docutils literal notranslate"><span class="pre">TestOTExtension.test_sender_s_not_exposed()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestPedersenVSS"><code class="docutils literal notranslate"><span class="pre">TestPedersenVSS</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestPedersenVSS.setUp"><code class="docutils literal notranslate"><span class="pre">TestPedersenVSS.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestPedersenVSS.test_pedersen_vss_reconstruction"><code class="docutils literal notranslate"><span class="pre">TestPedersenVSS.test_pedersen_vss_reconstruction()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestPedersenVSS.test_pedersen_vss_verification"><code class="docutils literal notranslate"><span class="pre">TestPedersenVSS.test_pedersen_vss_verification()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestSilentOT"><code class="docutils literal notranslate"><span class="pre">TestSilentOT</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestSilentOT.test_silent_ot_basic"><code class="docutils literal notranslate"><span class="pre">TestSilentOT.test_silent_ot_basic()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSilentOT.test_silent_ot_choice_distribution"><code class="docutils literal notranslate"><span class="pre">TestSilentOT.test_silent_ot_choice_distribution()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSilentOT.test_silent_ot_different_messages"><code class="docutils literal notranslate"><span class="pre">TestSilentOT.test_silent_ot_different_messages()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSilentOT.test_silent_ot_larger"><code class="docutils literal notranslate"><span class="pre">TestSilentOT.test_silent_ot_larger()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSilentOT.test_silent_ot_messages_32_bytes"><code class="docutils literal notranslate"><span class="pre">TestSilentOT.test_silent_ot_messages_32_bytes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestSimpleOT"><code class="docutils literal notranslate"><span class="pre">TestSimpleOT</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestSimpleOT.setUp"><code class="docutils literal notranslate"><span class="pre">TestSimpleOT.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSimpleOT.test_ot_choice_one"><code class="docutils literal notranslate"><span class="pre">TestSimpleOT.test_ot_choice_one()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSimpleOT.test_ot_choice_zero"><code class="docutils literal notranslate"><span class="pre">TestSimpleOT.test_ot_choice_zero()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSimpleOT.test_ot_invalid_point_rejected"><code class="docutils literal notranslate"><span class="pre">TestSimpleOT.test_ot_invalid_point_rejected()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSimpleOT.test_ot_multiple_transfers"><code class="docutils literal notranslate"><span class="pre">TestSimpleOT.test_ot_multiple_transfers()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestSimpleOT.test_ot_reset_sender"><code class="docutils literal notranslate"><span class="pre">TestSimpleOT.test_ot_reset_sender()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing.setUp"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing.test_basic_sharing_and_reconstruction"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing.test_basic_sharing_and_reconstruction()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing.test_feldman_vss_detects_invalid_share"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing.test_feldman_vss_detects_invalid_share()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing.test_feldman_vss_verification"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing.test_feldman_vss_verification()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing.test_insufficient_shares_raises_error"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing.test_insufficient_shares_raises_error()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing.test_invalid_threshold_raises_error"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing.test_invalid_threshold_raises_error()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing.test_threshold_3_of_5"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing.test_threshold_3_of_5()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSharing.test_threshold_limit_validation"><code class="docutils literal notranslate"><span class="pre">TestThresholdSharing.test_threshold_limit_validation()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSignature"><code class="docutils literal notranslate"><span class="pre">TestThresholdSignature</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSignature.setUp"><code class="docutils literal notranslate"><span class="pre">TestThresholdSignature.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSignature.test_der_encoding"><code class="docutils literal notranslate"><span class="pre">TestThresholdSignature.test_der_encoding()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSignature.test_signature_equality"><code class="docutils literal notranslate"><span class="pre">TestThresholdSignature.test_signature_equality()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestThresholdSignature.test_signature_inequality"><code class="docutils literal notranslate"><span class="pre">TestThresholdSignature.test_signature_inequality()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
