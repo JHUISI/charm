@@ -6,7 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "charm-crypto"
+name = "charm-crypto-framework"
 dynamic = ["version"]
 description = "Charm is a framework for rapid prototyping of cryptosystems"
 readme = "README.md"

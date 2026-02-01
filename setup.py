@@ -211,7 +211,7 @@ if platform.system() in ['Linux', 'Windows']:
 # Package name follows PyPI conventions (lowercase, hyphenated)
 # The import name remains 'charm' for backward compatibility
 setup(
-    name='charm-crypto',
+    name='charm-crypto-framework',
     version=_charm_version,
     description='Charm is a framework for rapid prototyping of cryptosystems',
     long_description=open('README.md').read() if os.path.exists('README.md') else '',

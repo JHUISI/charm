@@ -28,10 +28,8 @@ Charm uses a hybrid design: performance-intensive mathematical operations are im
 
 ### Quick Install (pip)
 
-Once published to PyPI:
-
 ```bash
-pip install charm-crypto
+pip install charm-crypto-framework
 ```
 
 > **Note:** System libraries (GMP, PBC, OpenSSL) must be installed first. See [Prerequisites](#prerequisites) below.
