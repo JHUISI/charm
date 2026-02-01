@@ -47,7 +47,7 @@ The PyPI package name has been updated to follow Python packaging conventions:
      - New (v0.60)
    * - Package name
      - ``Charm-Crypto``
-     - ``charm-crypto``
+     - ``charm-crypto-framework``
    * - Import name
      - ``charm``
      - ``charm`` (unchanged)
@@ -58,7 +58,7 @@ The PyPI package name has been updated to follow Python packaging conventions:
     pip install Charm-Crypto
 
     # New
-    pip install charm-crypto
+    pip install charm-crypto-framework
 
 The import name remains ``charm``, so existing Python code continues to work without changes.
 
@@ -101,14 +101,14 @@ Removed Features
 
    **Migration**: Use standard pip uninstall::
 
-       pip uninstall charm-crypto
+       pip uninstall charm-crypto-framework
 
 3. **distribute_setup.py removed** - The legacy setuptools bootstrap script has been removed.
 
    **Migration**: Use modern pip/setuptools::
 
        pip install --upgrade pip setuptools wheel
-       pip install charm-crypto
+       pip install charm-crypto-framework
 
 CTR Counter Module Change
 """""""""""""""""""""""""
@@ -140,7 +140,7 @@ Before upgrading from v0.50 to v0.60:
 
 1. ☐ Verify Python version is 3.8+: ``python --version``
 2. ☐ Verify OpenSSL version is 3.x: ``openssl version``
-3. ☐ Update package name in requirements: ``Charm-Crypto`` → ``charm-crypto``
+3. ☐ Update package name in requirements: ``Charm-Crypto`` → ``charm-crypto-framework``
 4. ☐ Remove any ``python setup.py uninstall`` usage (use ``pip uninstall``)
 5. ☐ Check for direct ``_counter`` module usage (ensure code handles ``bytes``)
 6. ☐ Rebuild from source if using custom builds

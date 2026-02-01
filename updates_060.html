@@ -298,7 +298,7 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox/ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/bitstring.html">bitstring</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolbox/broadcast.html">broadcast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/broadcast.html">broadcast - Echo Broadcast Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/Commit.html">Commit - Commitment Schemes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/conversion.html">conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/DFA.html">DFA</a></li>
@@ -313,9 +313,9 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox/integergroup.html">integergroup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/iterate.html">iterate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/matrixops.html">matrixops</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolbox/mpc_utils.html">mpc_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/mpc_utils.html">mpc_utils - MPC Utility Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/msp.html">msp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolbox/mta.html">mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/mta.html">mta - Multiplicative-to-Additive Conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/node.html">node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/paddingschemes.html">paddingschemes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/pairingcurves.html">pairingcurves</a></li>
@@ -334,7 +334,7 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox/sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/specialprimes.html">specialprimes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolbox/threshold_sharing.html">threshold_sharing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/threshold_sharing.html">threshold_sharing - Threshold Secret Sharing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/xmlserialize.html">xmlserialize</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/zknode.html">zknode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/ZKProof.html">ZKProof</a></li>
@@ -352,7 +352,7 @@
 <li class="toctree-l2"><a class="reference internal" href="test/pkenc_test.html">pkenc_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="test/pksig_test.html">pksig_test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="test/rsa_alg_test.html">rsa_alg_test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="test/threshold_test.html">threshold_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/threshold_test.html">threshold_test - DKLS23 Threshold ECDSA Tests</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
@@ -471,7 +471,7 @@
 <tbody>
 <tr class="row-even"><td><p>Package name</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">Charm-Crypto</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">charm-crypto</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">charm-crypto-framework</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Import name</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">charm</span></code></p></td>
@@ -485,7 +485,7 @@
 <span class="n">pip</span> <span class="n">install</span> <span class="n">Charm</span><span class="o">-</span><span class="n">Crypto</span>
 
 <span class="c1"># New</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span><span class="o">-</span><span class="n">framework</span>
 </pre></div>
 </div>
 <p>The import name remains <code class="docutils literal notranslate"><span class="pre">charm</span></code>, so existing Python code continues to work without changes.</p>
@@ -539,14 +539,14 @@
 <li><p><strong>Python 2.x support removed</strong> - All Python 2 compatibility code has been removed from C extension modules.</p></li>
 <li><p><strong>UninstallCommand removed</strong> - The custom <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">uninstall</span></code> command has been removed due to use of deprecated <code class="docutils literal notranslate"><span class="pre">platform.linux_distribution()</span></code>.</p>
 <p><strong>Migration</strong>: Use standard pip uninstall:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">uninstall</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">uninstall</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span><span class="o">-</span><span class="n">framework</span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>distribute_setup.py removed</strong> - The legacy setuptools bootstrap script has been removed.</p>
 <p><strong>Migration</strong>: Use modern pip/setuptools:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">pip</span> <span class="n">setuptools</span> <span class="n">wheel</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span><span class="o">-</span><span class="n">framework</span>
 </pre></div>
 </div>
 </li>
@@ -578,7 +578,7 @@
 <ol class="arabic simple">
 <li><p>☐ Verify Python version is 3.8+: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code></p></li>
 <li><p>☐ Verify OpenSSL version is 3.x: <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">version</span></code></p></li>
-<li><p>☐ Update package name in requirements: <code class="docutils literal notranslate"><span class="pre">Charm-Crypto</span></code> → <code class="docutils literal notranslate"><span class="pre">charm-crypto</span></code></p></li>
+<li><p>☐ Update package name in requirements: <code class="docutils literal notranslate"><span class="pre">Charm-Crypto</span></code> → <code class="docutils literal notranslate"><span class="pre">charm-crypto-framework</span></code></p></li>
 <li><p>☐ Remove any <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">uninstall</span></code> usage (use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span></code>)</p></li>
 <li><p>☐ Check for direct <code class="docutils literal notranslate"><span class="pre">_counter</span></code> module usage (ensure code handles <code class="docutils literal notranslate"><span class="pre">bytes</span></code>)</p></li>
 <li><p>☐ Rebuild from source if using custom builds</p></li>
@@ -791,7 +791,7 @@ Migrate to the new <code class="docutils literal notranslate"><span class="pre">
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Jan 29, 2026</div>
+              Last updated on Feb 01, 2026</div>
           </div>
           <div class="right-details">
             
