@@ -52,6 +52,7 @@ autodoc_mock_imports = [
     'charm.core.math.pairing',
     'charm.core.math.elliptic_curve',
     'charm.core.math.integer',
+    'charm.core.crypto.cryptobase',
     'charm.config',
 ]
 #jsmath_path="jsMath/easy/load.js"

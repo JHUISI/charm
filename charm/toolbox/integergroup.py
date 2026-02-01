@@ -1,8 +1,36 @@
 try:
   #from charm.core.math.integer import integer,randomBits,random,randomPrime,isPrime,encode,decode,hashInt,bitsize,legendre,gcd,lcm,serialize,deserialize,int2Bytes,toInt
   from charm.core.math.integer import * #InitBenchmark,StartBenchmark,EndBenchmark,GetBenchmark,GetGeneralBenchmarks,ClearBenchmark
+  # Verify we got actual implementations, not mocks (for Sphinx autodoc)
+  _test = integer
 except Exception as err:
-  raise ImportError("Cannot import integer module. Ensure Charm crypto C extensions are compiled: %s" % err)
+  # Provide stub implementations for documentation purposes (Sphinx autodoc)
+  # These allow modules to be imported for documentation generation
+  # but will raise errors if actually used at runtime
+  class integer:
+      """Stub class for documentation. Requires C extension for actual use."""
+      pass
+  def randomBits(bits): raise NotImplementedError("Requires C extension")
+  def random(max): raise NotImplementedError("Requires C extension")
+  def randomPrime(bits, safe=False): raise NotImplementedError("Requires C extension")
+  def isPrime(n): raise NotImplementedError("Requires C extension")
+  def encode(M, p, q): raise NotImplementedError("Requires C extension")
+  def decode(element, p, q): raise NotImplementedError("Requires C extension")
+  def hashInt(args, p, q, flag): raise NotImplementedError("Requires C extension")
+  def bitsize(n): raise NotImplementedError("Requires C extension")
+  def legendre(a, p): raise NotImplementedError("Requires C extension")
+  def gcd(a, b): raise NotImplementedError("Requires C extension")
+  def lcm(a, b): raise NotImplementedError("Requires C extension")
+  def serialize(obj): raise NotImplementedError("Requires C extension")
+  def deserialize(data): raise NotImplementedError("Requires C extension")
+  def int2Bytes(n): raise NotImplementedError("Requires C extension")
+  def toInt(obj): raise NotImplementedError("Requires C extension")
+  def InitBenchmark(): raise NotImplementedError("Requires C extension")
+  def StartBenchmark(options): raise NotImplementedError("Requires C extension")
+  def EndBenchmark(): raise NotImplementedError("Requires C extension")
+  def GetBenchmark(option): raise NotImplementedError("Requires C extension")
+  def GetGeneralBenchmarks(): raise NotImplementedError("Requires C extension")
+  def ClearBenchmark(): raise NotImplementedError("Requires C extension")
     
 class IntegerGroup:
     def __init__(self, start=0):
