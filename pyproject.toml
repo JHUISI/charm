@@ -63,11 +63,11 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://charm-crypto.io/"
-Documentation = "https://charm-crypto.io/documentation"
+Homepage = "https://github.com/JHUISI/charm"
+Documentation = "https://jhuisi.github.io/charm/"
 Repository = "https://github.com/JHUISI/charm"
 Issues = "https://github.com/JHUISI/charm/issues"
-Changelog = "https://github.com/JHUISI/charm/blob/master/CHANGELOG"
+Changelog = "https://github.com/JHUISI/charm/blob/dev/CHANGELOG"
 
 [tool.setuptools]
 packages = [
