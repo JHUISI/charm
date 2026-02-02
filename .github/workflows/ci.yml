@@ -46,14 +46,19 @@ jobs:
         sudo make install
         sudo ldconfig
 
+    - name: Install Python build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # Install setuptools before building (required for Python 3.12+)
+        pip install setuptools wheel
+
     - name: Build Charm
       run: |
         ./configure.sh
         make
 
-    - name: Install Python dependencies
+    - name: Install Python test dependencies
       run: |
-        python -m pip install --upgrade pip
         pip install pytest pytest-timeout pyparsing hypothesis
 
     - name: Run tests
@@ -123,14 +128,19 @@ jobs:
         sudo make install
         sudo ldconfig
 
+    - name: Install Python build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # Install setuptools before building (required for Python 3.12+)
+        pip install setuptools wheel
+
     - name: Build Charm
       run: |
         ./configure.sh
         make
 
-    - name: Install Python dependencies
+    - name: Install Python test dependencies
       run: |
-        python -m pip install --upgrade pip
         pip install pytest pyparsing hypothesis atheris
 
     - name: Run policy parser fuzzer
