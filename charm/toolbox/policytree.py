@@ -4,6 +4,22 @@ from pyparsing import *
 from charm.toolbox.node import *
 import string
 
+# Compatibility shim for pyparsing 2.x vs 3.x
+# pyparsing 3.0+ uses snake_case (set_parse_action)
+# pyparsing 2.x uses camelCase (setParseAction)
+# This wrapper ensures compatibility with both versions
+def _set_parse_action(parser_element, *fns, **kwargs):
+    """
+    Compatibility wrapper for setParseAction/set_parse_action.
+    Works with both pyparsing 2.x (camelCase) and 3.x (snake_case).
+    """
+    if hasattr(parser_element, 'set_parse_action'):
+        # pyparsing 3.x - use modern snake_case method
+        return parser_element.set_parse_action(*fns, **kwargs)
+    else:
+        # pyparsing 2.x - use legacy camelCase method
+        return parser_element.setParseAction(*fns, **kwargs)
+
 objStack = []
 
 def createAttribute(s, loc, toks):
@@ -46,8 +62,8 @@ class PolicyParser:
 
     def getBNF(self):
         # supported operators => (OR, AND, <
-        OperatorOR = Literal("OR").setParseAction(downcaseTokens) | Literal("or")
-        OperatorAND = Literal("AND").setParseAction(downcaseTokens) | Literal("and")
+        OperatorOR = _set_parse_action(Literal("OR"), downcaseTokens) | Literal("or")
+        OperatorAND = _set_parse_action(Literal("AND"), downcaseTokens) | Literal("and")
         Operator = OperatorAND | OperatorOR
         lpar = Literal("(").suppress()
         rpar = Literal(")").suppress()
@@ -55,19 +71,19 @@ class PolicyParser:
         BinOperator = Literal("<=") | Literal(">=") | Literal("==") | Word("<>", max=1)
 
         # describes an individual leaf node
-        leafNode =  (Optional("!") + Word(alphanums+'-_./\\?!@#$^&*%')).setParseAction( createAttribute )
+        leafNode = _set_parse_action(Optional("!") + Word(alphanums+'-_./\\?!@#$^&*%'), createAttribute)
         # describes expressions such as (attr < value)
-        leafConditional = (Word(alphanums) + BinOperator + Word(nums)).setParseAction( parseNumConditional )
+        leafConditional = _set_parse_action(Word(alphanums) + BinOperator + Word(nums), parseNumConditional)
 
         # describes the node concept
-        node = leafConditional | leafNode 
+        node = leafConditional | leafNode
 
         expr = Forward()
         term = Forward()
-        atom = lpar + expr + rpar | (node).setParseAction( pushFirst )
-        term = atom + ZeroOrMore((Operator + term).setParseAction( pushFirst ))
-        expr << term + ZeroOrMore((Operator + term).setParseAction( pushFirst ))
-        finalPol = expr#.setParseAction( printStuff )
+        atom = lpar + expr + rpar | _set_parse_action(node, pushFirst)
+        term = atom + ZeroOrMore(_set_parse_action(Operator + term, pushFirst))
+        expr << term + ZeroOrMore(_set_parse_action(Operator + term, pushFirst))
+        finalPol = expr  # could add: _set_parse_action(expr, printStuff)
         return finalPol
     
     def evalStack(self, stack):

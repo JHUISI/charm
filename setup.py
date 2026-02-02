@@ -1,5 +1,4 @@
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
 from distutils.core import  Command, Extension
 from distutils.sysconfig import get_python_lib
 import os, platform, sys, shutil, re, fileinput
@@ -10,17 +9,6 @@ def replaceString(file,searchExp,replaceExp):
         if searchExp in line:
             line = line.replace(searchExp,replaceExp)
         sys.stdout.write(line)
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-    def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
-        import pytest
-        import sys
-        sys.exit(pytest.main(self.test_args))
 
 _ext_modules = []
 
@@ -253,7 +241,6 @@ setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 3',
@@ -262,8 +249,9 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
         'Programming Language :: C',
         'Topic :: Security :: Cryptography',
-    ],
-    cmdclass={'test': PyTest}
+    ]
 )

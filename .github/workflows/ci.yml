@@ -16,15 +16,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Python 3.12 excluded due to CI hanging issues - needs investigation
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.13', '3.14']
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |

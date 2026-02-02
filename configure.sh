@@ -502,7 +502,7 @@ if [ -n "$python_path" ]; then
             exit 1
         fi 
 else
-        for pyversion in python python3 python3.12 python3.11 python3.10 python3.9 python3.8
+        for pyversion in python python3 python3.14 python3.13 python3.12 python3.11 python3.10 python3.9 python3.8
         do 
             if (is_python_version `which $pyversion`); then
                 python3_found="yes"

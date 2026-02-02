@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=61.0",
+    "setuptools>=68.0",
     "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -10,7 +10,7 @@ name = "charm-crypto-framework"
 dynamic = ["version"]
 description = "Charm is a framework for rapid prototyping of cryptosystems"
 readme = "README.md"
-license = { text = "LGPL-3.0-or-later" }
+license = "LGPL-3.0-or-later"
 requires-python = ">=3.8"
 authors = [
     { name = "J. Ayo Akinyele", email = "jakinye3@jhu.edu" }
@@ -31,7 +31,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
     "Operating System :: Microsoft :: Windows",
@@ -41,6 +40,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: C",
     "Topic :: Security :: Cryptography",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -109,7 +110,7 @@ filterwarnings = [
 
 [tool.black]
 line-length = 100
-target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312', 'py313', 'py314']
 include = '\.pyi?$'
 exclude = '''
 /(

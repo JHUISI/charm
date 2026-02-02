@@ -41,7 +41,12 @@
 
 #include <Python.h>
 #include <structmember.h>
-#include <longintrepr.h>
+
+#if PY_MINOR_VERSION <= 10
+  #include <longintrepr.h>
+#else
+  #include <cpython/longintrepr.h>				/* for conversions */
+#endif
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
