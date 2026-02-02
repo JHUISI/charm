@@ -10,15 +10,28 @@ class BlumWilliamsInteger:
         pass
 
     def generatePrimes(self, n):
-        while True:
+        # Add safety limit to prevent infinite loops on Python 3.12+
+        # Blum-Williams primes (p ≡ 3 mod 4) are approximately 50% of all primes
+        # so we should find one within a reasonable number of attempts
+        max_attempts = 10000
+
+        for attempt in range(max_attempts):
             p = randomPrime(n)
             if(isPrime(p) and (((p-3)%4) == 0)):
                 break
+        else:
+            raise RuntimeError(
+                f"Could not generate Blum-Williams prime p after {max_attempts} attempts"
+            )
 
-        while True:
+        for attempt in range(max_attempts):
             q = randomPrime(n)
             if(isPrime(q) and (((q-3)%4) == 0) and not(q == p)):
                 break
+        else:
+            raise RuntimeError(
+                f"Could not generate Blum-Williams prime q after {max_attempts} attempts"
+            )
 
         return (p, q)
 
