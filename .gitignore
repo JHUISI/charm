@@ -1,6 +1,7 @@
 config.log
 config.mk
 MANIFEST
+Dockerfile.readme-test
 log.txt
 dist/
 build/
