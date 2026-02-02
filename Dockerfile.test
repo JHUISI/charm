@@ -1,0 +1,87 @@
+# Dockerfile for testing Charm-Crypto with Python 3.12+
+# This mirrors the GitHub Actions CI environment for local debugging
+#
+# Usage:
+#   docker build -f Dockerfile.test --build-arg PYTHON_VERSION=3.13 -t charm-test:3.13 .
+#   docker run -it --rm -v $(pwd):/workspace charm-test:3.13
+
+ARG PYTHON_VERSION=3.13
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies (mirrors CI environment)
+RUN apt-get update && apt-get install -y \
+    # Build tools
+    build-essential \
+    gcc \
+    g++ \
+    make \
+    flex \
+    bison \
+    libfl-dev \
+    wget \
+    git \
+    # Libraries
+    libgmp-dev \
+    libssl-dev \
+    # Python build dependencies
+    software-properties-common \
+    # Debugging tools
+    gdb \
+    strace \
+    valgrind \
+    vim \
+    less \
+    # Cleanup
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python from deadsnakes PPA (for 3.12+)
+ARG PYTHON_VERSION
+RUN add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y \
+    python${PYTHON_VERSION} \
+    python${PYTHON_VERSION}-dev \
+    python${PYTHON_VERSION}-venv \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set Python version as default
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 1 && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 1
+
+# Upgrade pip
+RUN python3 -m pip install --upgrade pip setuptools wheel
+
+# Build and install PBC library (mirrors CI)
+WORKDIR /tmp
+RUN wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz && \
+    tar -xzf pbc-1.0.0.tar.gz && \
+    cd pbc-1.0.0 && \
+    ./configure LDFLAGS="-lgmp" && \
+    make && \
+    make install && \
+    ldconfig && \
+    cd .. && \
+    rm -rf pbc-1.0.0 pbc-1.0.0.tar.gz
+
+# Verify OpenSSL version (should be 3.x on Ubuntu 22.04)
+RUN openssl version
+
+# Set working directory
+WORKDIR /workspace
+
+# Install Python dependencies (will be overridden by volume mount)
+# This layer is cached for faster rebuilds
+RUN pip install pytest pytest-timeout hypothesis pyparsing
+
+# Set environment variables
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+ENV PYTHONPATH=/workspace:$PYTHONPATH
+
+# Default command: run bash for interactive debugging
+CMD ["/bin/bash"]
+

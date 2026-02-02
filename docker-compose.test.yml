@@ -1,0 +1,94 @@
+# Docker Compose configuration for testing Charm-Crypto with multiple Python versions
+#
+# Usage:
+#   # Build all images
+#   docker-compose -f docker-compose.test.yml build
+#
+#   # Run tests on Python 3.13
+#   docker-compose -f docker-compose.test.yml run --rm py313 ./docker/test.sh
+#
+#   # Interactive shell on Python 3.13
+#   docker-compose -f docker-compose.test.yml run --rm py313
+#
+#   # Debug specific test
+#   docker-compose -f docker-compose.test.yml run --rm py313 ./docker/debug-test.sh test_name
+
+version: '3.8'
+
+services:
+  # Python 3.12 testing environment
+  py312:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        PYTHON_VERSION: "3.12"
+    image: charm-test:3.12
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - LD_LIBRARY_PATH=/usr/local/lib
+      - PYTHONPATH=/workspace
+      - PYTHON_VERSION=3.12
+    stdin_open: true
+    tty: true
+
+  # Python 3.13 testing environment
+  py313:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        PYTHON_VERSION: "3.13"
+    image: charm-test:3.13
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - LD_LIBRARY_PATH=/usr/local/lib
+      - PYTHONPATH=/workspace
+      - PYTHON_VERSION=3.13
+    stdin_open: true
+    tty: true
+
+  # Python 3.14 testing environment (if available)
+  py314:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        PYTHON_VERSION: "3.14"
+    image: charm-test:3.14
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - LD_LIBRARY_PATH=/usr/local/lib
+      - PYTHONPATH=/workspace
+      - PYTHON_VERSION=3.14
+    stdin_open: true
+    tty: true
+    profiles:
+      - experimental
+
+  # Python 3.11 baseline (for comparison)
+  py311:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        PYTHON_VERSION: "3.11"
+    image: charm-test:3.11
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - LD_LIBRARY_PATH=/usr/local/lib
+      - PYTHONPATH=/workspace
+      - PYTHON_VERSION=3.11
+    stdin_open: true
+    tty: true
+    profiles:
+      - baseline
+
