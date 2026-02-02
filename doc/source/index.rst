@@ -121,6 +121,7 @@ Release Notes
 .. toctree::
    :maxdepth: 1
 
+   updates_061
    updates_060
    updates_050
    updates
