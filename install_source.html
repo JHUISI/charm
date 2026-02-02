@@ -456,7 +456,7 @@ and make scripts.</p>
 <tr class="row-even"><td><p>pyparsing</p></td>
 <td><p>&gt;=2.1.5, &lt;4.0</p></td>
 <td><p>Yes</p></td>
-<td><p>Python parsing library</p></td>
+<td><p>See note below about version selection</p></td>
 </tr>
 <tr class="row-odd"><td><p>pytest</p></td>
 <td><p>latest</p></td>
@@ -465,6 +465,19 @@ and make scripts.</p>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>pyparsing Version Selection</strong></p>
+<p>Charm supports both pyparsing 2.x and 3.x, but the recommended version depends on your Python version:</p>
+<ul class="simple">
+<li><p><strong>Python 3.8</strong>: pyparsing 2.x or 3.x (both work)</p></li>
+<li><p><strong>Python 3.9+</strong>: pyparsing 3.x is <strong>recommended</strong> (3.1.0+ for Python 3.12+)</p></li>
+</ul>
+<p>pyparsing 2.4.7 (the last 2.x release) only officially supports Python up to 3.8.
+While it may work on newer Python versions, pyparsing 3.x is the officially supported
+version for Python 3.9 and later.</p>
+<p>Charm includes compatibility shims to work with both pyparsing 2.x and 3.x APIs.</p>
 </div>
 <p>Optional dependencies:</p>
 <ul class="simple">
@@ -766,15 +779,31 @@ instead of <code class="docutils literal notranslate"><span class="pre">/usr/loc
 </section>
 <section id="pyparsing-version-conflicts">
 <h3>pyparsing version conflicts<a class="headerlink" href="#pyparsing-version-conflicts" title="Link to this heading">¶</a></h3>
-<p>Charm requires a specific version range of pyparsing:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyparsing&gt;=2.1.5,&lt;4.0&#39;</span>
-</pre></div>
-</div>
-<p>If you have a newer version installed, you may need to create a virtual environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>charm-env
-<span class="nb">source</span><span class="w"> </span>charm-env/bin/activate
+<p>Charm supports pyparsing versions <code class="docutils literal notranslate"><span class="pre">&gt;=2.1.5,&lt;4.0</span></code> (both 2.x and 3.x series).</p>
+<p><strong>Recommended versions by Python version:</strong></p>
+<ul class="simple">
+<li><p><strong>Python 3.8</strong>: pyparsing 2.x or 3.x</p></li>
+<li><p><strong>Python 3.9-3.11</strong>: pyparsing 3.x recommended</p></li>
+<li><p><strong>Python 3.12+</strong>: pyparsing 3.1.0+ <strong>required</strong> (3.x with Python 3.12 support)</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># For Python 3.12+ (recommended for all Python 3.9+)</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyparsing&gt;=3.1.0,&lt;4.0&#39;</span>
+
+<span class="c1"># For Python 3.8 (either works)</span>
 pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyparsing&gt;=2.1.5,&lt;4.0&#39;</span>
 </pre></div>
+</div>
+<p>If you have pyparsing 4.x or an incompatible version installed, create a virtual environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>charm-env
+<span class="nb">source</span><span class="w"> </span>charm-env/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;pyparsing&gt;=3.1.0,&lt;4.0&#39;</span><span class="w">  </span><span class="c1"># For Python 3.9+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>pyparsing 2.4.7 (the last 2.x release) only officially supports Python up to 3.8.
+While it may work on newer Python versions, we recommend pyparsing 3.x for
+Python 3.9 and later to ensure full compatibility.</p>
 </div>
 </section>
 <section id="pbc-build-fails-with-gmp-errors">

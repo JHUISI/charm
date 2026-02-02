@@ -25,10 +25,23 @@ The following dependencies are required to build Charm:
 +-------------+------------------+----------+------------------------------------------+
 | OpenSSL     | 3.x              | Yes      | Cryptographic library                    |
 +-------------+------------------+----------+------------------------------------------+
-| pyparsing   | >=2.1.5, <4.0    | Yes      | Python parsing library                   |
+| pyparsing   | >=2.1.5, <4.0    | Yes      | See note below about version selection   |
 +-------------+------------------+----------+------------------------------------------+
 | pytest      | latest           | Testing  | For running test suite                   |
 +-------------+------------------+----------+------------------------------------------+
+
+.. note:: **pyparsing Version Selection**
+
+   Charm supports both pyparsing 2.x and 3.x, but the recommended version depends on your Python version:
+
+   - **Python 3.8**: pyparsing 2.x or 3.x (both work)
+   - **Python 3.9+**: pyparsing 3.x is **recommended** (3.1.0+ for Python 3.12+)
+
+   pyparsing 2.4.7 (the last 2.x release) only officially supports Python up to 3.8.
+   While it may work on newer Python versions, pyparsing 3.x is the officially supported
+   version for Python 3.9 and later.
+
+   Charm includes compatibility shims to work with both pyparsing 2.x and 3.x APIs.
 
 Optional dependencies:
 
@@ -410,19 +423,35 @@ instead of ``/usr/local`` on Intel Macs.
 pyparsing version conflicts
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Charm requires a specific version range of pyparsing:
+Charm supports pyparsing versions ``>=2.1.5,<4.0`` (both 2.x and 3.x series).
+
+**Recommended versions by Python version:**
+
+- **Python 3.8**: pyparsing 2.x or 3.x
+- **Python 3.9-3.11**: pyparsing 3.x recommended
+- **Python 3.12+**: pyparsing 3.1.0+ **required** (3.x with Python 3.12 support)
 
 .. code-block:: bash
 
+    # For Python 3.12+ (recommended for all Python 3.9+)
+    pip install 'pyparsing>=3.1.0,<4.0'
+
+    # For Python 3.8 (either works)
     pip install 'pyparsing>=2.1.5,<4.0'
 
-If you have a newer version installed, you may need to create a virtual environment:
+If you have pyparsing 4.x or an incompatible version installed, create a virtual environment:
 
 .. code-block:: bash
 
     python3 -m venv charm-env
     source charm-env/bin/activate
-    pip install 'pyparsing>=2.1.5,<4.0'
+    pip install 'pyparsing>=3.1.0,<4.0'  # For Python 3.9+
+
+.. note::
+
+   pyparsing 2.4.7 (the last 2.x release) only officially supports Python up to 3.8.
+   While it may work on newer Python versions, we recommend pyparsing 3.x for
+   Python 3.9 and later to ensure full compatibility.
 
 PBC build fails with GMP errors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
