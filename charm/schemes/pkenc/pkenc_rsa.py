@@ -42,7 +42,7 @@ class RSA():
         return (p, q, N, phi_N)
     
     def keygen(self, secparam=1024, params=None):
-        if params: 
+        if params:
             (N, e, d, p, q) = self.convert(params)
             phi_N = (p - 1) * (q - 1)
             pk = { 'N':N, 'e':e }
@@ -50,14 +50,42 @@ class RSA():
             return (pk, sk)
 
         (p, q, N, phi_N) = self.paramgen(secparam)
-        
-        while True:
-            e = random(phi_N)
-            if not gcd(e, phi_N) == 1:
-                continue
-            d = e ** -1
-            break
-        pk = { 'N':N, 'e':toInt(e) } # strip off \phi
+
+        # Use deterministic algorithm to find coprime value instead of random search
+        # This fixes Python 3.12+ hanging issue where random values share common factors
+        # Try common RSA public exponents first, then search incrementally
+        common_exponents = [65537, 3, 5, 17, 257, 641, 6700417]
+        e_value = None
+
+        for candidate in common_exponents:
+            # Use isCoPrime() method which properly checks gcd == 1
+            if phi_N.isCoPrime(candidate):
+                e_value = candidate
+                break
+
+        # If common exponents don't work, search incrementally starting from a larger value
+        if e_value is None:
+            e_value = 65537
+            max_iterations = 10000000  # Large limit for deterministic search
+
+            for iterations in range(max_iterations):
+                # Use isCoPrime() method which properly checks gcd == 1
+                if phi_N.isCoPrime(e_value):
+                    break
+                e_value += 2  # Only try odd numbers (even numbers can't be coprime with even phi_N)
+
+            # Check if we found a coprime value (either broke out of loop or on last iteration)
+            if not phi_N.isCoPrime(e_value):
+                raise RuntimeError(
+                    f"Could not find coprime value after {max_iterations} iterations. "
+                    f"phi_N={phi_N}, last e_value={e_value}, gcd(e_value, phi_N)={gcd(e_value, phi_N)}"
+                )
+
+        # Create modular integer with phi_N as modulus - this is required for modular inverse
+        # Similar to how Rabin does: integer(i) % pk['N']
+        e = integer(e_value, phi_N)
+        d = e ** -1  # Compute modular inverse
+        pk = { 'N':N, 'e':e_value } # Use the plain integer value for public key
         sk = { 'phi_N':phi_N, 'd':d , 'N':N}
 
         return (pk, sk)

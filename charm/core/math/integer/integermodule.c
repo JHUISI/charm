@@ -29,10 +29,38 @@
 
 #include "integermodule.h"
 
-#if PY_MINOR_VERSION <= 11
-  #define PythonLongVal(l) l->ob_digit
-#else 
+/*
+ * Python 3.12+ changed the internal structure of PyLongObject:
+ * - Old (Python 3.11-): ob_size stores digit count (via Py_SIZE()), ob_digit is the digit array
+ * - New (Python 3.12+): long_value.lv_tag stores digit count, sign, and flags; long_value.ob_digit is the digit array
+ *
+ * In Python 3.12+:
+ * - lv_tag bits 0-1: Sign (0=positive, 1=zero, 2=negative)
+ * - lv_tag bit 2: Reserved for immortality
+ * - lv_tag bits 3+: Unsigned digit count
+ *
+ * We need to use different macros to access the digit array and get the digit count.
+ */
+
+#if PY_MINOR_VERSION >= 12
   #define PythonLongVal(l)  l->long_value.ob_digit
+  #define _PYLONG_NON_SIZE_BITS 3
+  #define _PYLONG_SIGN_MASK 3
+  #define _PYLONG_SIGN_NEGATIVE 2
+  #define _PYLONG_SIGN_ZERO 1
+  /* Get the digit count from lv_tag (bits 3+) */
+  #define PythonLongDigitCount(l) ((Py_ssize_t)(((PyLongObject *)(l))->long_value.lv_tag >> _PYLONG_NON_SIZE_BITS))
+  /* Check if negative (sign bits == 2) */
+  #define PythonLongIsNegative(l) ((((PyLongObject *)(l))->long_value.lv_tag & _PYLONG_SIGN_MASK) == _PYLONG_SIGN_NEGATIVE)
+  /* Set the digit count and sign in lv_tag */
+  #define PythonLongSetTag(l, sign, size) (((PyLongObject *)(l))->long_value.lv_tag = ((1 - (sign)) | ((size_t)(size) << _PYLONG_NON_SIZE_BITS)))
+#else
+  #define PythonLongVal(l) l->ob_digit
+  /* In Python 3.11-, Py_SIZE() returns signed digit count (negative for negative numbers) */
+  #define PythonLongDigitCount(l) (Py_SIZE(l) < 0 ? -Py_SIZE(l) : Py_SIZE(l))
+  #define PythonLongIsNegative(l) (Py_SIZE(l) < 0)
+  /* Set the size (signed) */
+  #define PythonLongSetTag(l, sign, size) PYTHON_SET_SIZE(l, (sign) < 0 ? -(size) : (size))
 #endif
 
 #if PY_MINOR_VERSION <= 10
@@ -79,17 +107,16 @@ static inline size_t size(mpz_t n) {
 
 void longObjToMPZ(mpz_t m, PyObject * o) {
 	PyLongObject *p = (PyLongObject *) PyNumber_Long(o);
-	int size, i, tmp = Py_SIZE(p);
+	Py_ssize_t size, i;
 	int isNeg = FALSE;
 	mpz_t temp, temp2;
 	mpz_init(temp);
 	mpz_init(temp2);
-	if (tmp > 0)
-		size = tmp;
-	else {
-		size = -tmp;
-		isNeg = TRUE;
-	}
+
+	/* Use the new macros that work correctly on both Python 3.11- and 3.12+ */
+	size = PythonLongDigitCount(p);
+	isNeg = PythonLongIsNegative(p);
+
 	mpz_set_ui(m, 0);
 	for (i = 0; i < size; i++) {
 		mpz_set_ui(temp, PythonLongVal(p)[i]);
@@ -172,16 +199,24 @@ PyObject *mpzToLongObj(mpz_t m) {
 		PythonLongVal(l)[i] = (digit)(mpz_get_ui(temp) & PyLong_MASK);
 		mpz_fdiv_q_2exp(temp, temp, PyLong_SHIFT);
 	}
+	/* Normalize: remove leading zeros */
 	i = size;
 	while ((i > 0) && (PythonLongVal(l)[i - 1] == 0))
 		i--;
+	/* Set the size/sign using the appropriate method for the Python version */
+#if PY_MINOR_VERSION >= 12
+	/* Python 3.12+: Set lv_tag with sign and digit count */
+	int sign = isNeg ? -1 : (i == 0 ? 0 : 1);
+	PythonLongSetTag(l, sign, i);
+#else
+	/* Python 3.11-: Set ob_size (negative for negative numbers) */
 	if(isNeg) {
-		// Py_SET_SIZE(l,-i);
 		PYTHON_SET_SIZE(l, -i);
 	}
 	else {
 		PYTHON_SET_SIZE(l, i);
 	}
+#endif
 	mpz_clear(temp);
 	return (PyObject *) l;
 }
