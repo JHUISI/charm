@@ -1,3 +1,15 @@
+v0.61.1 release (PyPI installation fix)
+---------------------------------------
+- Fixed PyPI installation failure (AttributeError: 'NoneType' object has no attribute 'split')
+  - Added platform-aware default configuration for PyPI installation when config.mk doesn't exist
+  - Added pkg-config support for dynamic library detection on Linux/macOS
+  - Merges pkg-config results with fallback paths to handle libraries without .pc files (e.g., PBC)
+- Added read_version_file() to read version from VERSION file during PyPI installation
+- Fixed opt.get() calls to use default empty strings for LDFLAGS/CPPFLAGS
+- Improved cross-platform support:
+  - macOS: Detects Homebrew paths (Apple Silicon /opt/homebrew and Intel /usr/local)
+  - Linux: Uses standard paths (/usr/local/lib, /usr/lib, /usr/local/include, /usr/include)
+
 v0.61 release (Python 3.13 and 3.14 support)
 --------------------------------------------
 - Full Python 3.13 compatibility with fixes for removed private APIs:

@@ -14,14 +14,193 @@ _ext_modules = []
 
 def read_config(file):
     f = open(file, 'r')
-    lines = f.read().split('\n')   
+    lines = f.read().split('\n')
     config_key = {}
     for e in lines:
         if e.find('=') != -1:
            param = e.split('=')
-           config_key[ param[0] ] = param[1] 
+           config_key[ param[0] ] = param[1]
     f.close()
     return config_key
+
+def read_version_file():
+    """Read version from VERSION file, with fallback."""
+    try:
+        with open('VERSION', 'r') as f:
+            return f.read().strip()
+    except IOError:
+        return '0.0.0'  # Fallback version
+
+def run_pkg_config(package, flags):
+    """
+    Run pkg-config to get compiler/linker flags for a package.
+
+    Args:
+        package: The package name (e.g., 'gmp', 'pbc', 'openssl')
+        flags: The flags to request (e.g., '--cflags', '--libs', '--libs-only-L')
+
+    Returns:
+        The output string from pkg-config, or empty string if pkg-config fails.
+    """
+    import subprocess
+    try:
+        result = subprocess.run(
+            ['pkg-config', flags, package],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        # pkg-config not available or timed out
+        pass
+    return ''
+
+def get_pkg_config_flags(packages):
+    """
+    Get combined compiler and linker flags for multiple packages using pkg-config.
+
+    Args:
+        packages: List of package names to query (e.g., ['gmp', 'pbc', 'libcrypto'])
+
+    Returns:
+        Tuple of (cflags, ldflags) strings with all flags combined.
+    """
+    cflags_parts = []
+    ldflags_parts = []
+
+    for package in packages:
+        # Get include paths
+        cflags = run_pkg_config(package, '--cflags')
+        if cflags:
+            cflags_parts.append(cflags)
+
+        # Get library paths (just -L flags, not -l flags)
+        # We use --libs-only-L to get library directories
+        ldflags = run_pkg_config(package, '--libs-only-L')
+        if ldflags:
+            ldflags_parts.append(ldflags)
+
+    # Deduplicate flags while preserving order
+    def dedupe_flags(flags_str):
+        seen = set()
+        result = []
+        for flag in flags_str.split():
+            if flag not in seen:
+                seen.add(flag)
+                result.append(flag)
+        return ' '.join(result)
+
+    combined_cflags = dedupe_flags(' '.join(cflags_parts))
+    combined_ldflags = dedupe_flags(' '.join(ldflags_parts))
+
+    return combined_cflags, combined_ldflags
+
+def get_fallback_paths():
+    """
+    Get fallback library/include paths when pkg-config is not available.
+
+    Returns:
+        Tuple of (cflags, ldflags) strings with platform-specific paths.
+    """
+    system = platform.system()
+    ldflags_parts = []
+    cflags_parts = []
+
+    if system == 'Darwin':
+        # macOS: Check for Homebrew installation (both Apple Silicon and Intel)
+        homebrew_prefixes = ['/opt/homebrew', '/usr/local']
+        for prefix in homebrew_prefixes:
+            if os.path.exists(prefix):
+                lib_path = os.path.join(prefix, 'lib')
+                inc_path = os.path.join(prefix, 'include')
+                # Add paths if the directories exist
+                if os.path.isdir(lib_path):
+                    ldflags_parts.append(f'-L{lib_path}')
+                if os.path.isdir(inc_path):
+                    cflags_parts.append(f'-I{inc_path}')
+                break
+    elif system == 'Linux':
+        # Linux: Use standard system paths, plus common additional locations
+        # Check common library locations
+        for lib_path in ['/usr/local/lib', '/usr/lib', '/usr/lib/x86_64-linux-gnu']:
+            if os.path.isdir(lib_path):
+                ldflags_parts.append(f'-L{lib_path}')
+
+        # Check common include locations
+        for inc_path in ['/usr/local/include', '/usr/include']:
+            if os.path.isdir(inc_path):
+                cflags_parts.append(f'-I{inc_path}')
+
+    return ' '.join(cflags_parts), ' '.join(ldflags_parts)
+
+def merge_flags(flags1, flags2):
+    """
+    Merge two flag strings, deduplicating while preserving order.
+    """
+    seen = set()
+    result = []
+    for flag in (flags1 + ' ' + flags2).split():
+        if flag and flag not in seen:
+            seen.add(flag)
+            result.append(flag)
+    return ' '.join(result)
+
+def get_default_config():
+    """
+    Generate platform-aware default configuration for PyPI installation.
+
+    This is used when config.mk doesn't exist (e.g., when installing via
+    'pip install charm-crypto-framework' from PyPI). The defaults provide
+    sensible values for common platforms so the build can proceed.
+
+    The function attempts to use pkg-config to detect library paths for
+    gmp, pbc, and openssl. If pkg-config is not available or fails for
+    some packages, it merges the results with fallback platform-specific paths.
+
+    For local development, run ./configure.sh first to generate config.mk
+    with settings specific to your environment.
+    """
+    # Base configuration - enables all modules with PBC backend
+    config = {
+        'PAIR_MOD': 'yes',
+        'USE_PBC': 'yes',
+        'INT_MOD': 'yes',
+        'ECC_MOD': 'yes',
+        'DISABLE_BENCHMARK': 'no',
+        # These must be strings (even if empty) to avoid AttributeError on .split()
+        'LDFLAGS': '',
+        'CPPFLAGS': '',
+        'CHARM_CFLAGS': '',
+        'VERSION': read_version_file(),
+    }
+
+    # Required libraries for charm-crypto
+    # Note: 'libcrypto' is the pkg-config name for OpenSSL's crypto library
+    # Note: 'pbc' often doesn't have a pkg-config file, so we'll use fallback
+    required_packages = ['gmp', 'pbc', 'libcrypto']
+
+    # Try pkg-config first (works on Linux and macOS with Homebrew)
+    pkg_cflags, pkg_ldflags = get_pkg_config_flags(required_packages)
+
+    # Always get fallback paths - we'll merge them with pkg-config results
+    # This handles the case where some packages have pkg-config and some don't
+    # (e.g., PBC typically doesn't have a .pc file)
+    fallback_cflags, fallback_ldflags = get_fallback_paths()
+
+    if pkg_cflags or pkg_ldflags:
+        print("Using pkg-config for library detection (with fallback paths merged)")
+        # Merge pkg-config results with fallback paths
+        # pkg-config paths come first (more specific), fallback paths added after
+        config['CPPFLAGS'] = merge_flags(pkg_cflags, fallback_cflags)
+        config['LDFLAGS'] = merge_flags(pkg_ldflags, fallback_ldflags)
+    else:
+        print("pkg-config not available, using fallback paths")
+        config['CPPFLAGS'] = fallback_cflags
+        config['LDFLAGS'] = fallback_ldflags
+
+    return config
 
 print("Platform:", platform.system())
 config = os.environ.get('CONFIG_FILE')
@@ -35,13 +214,10 @@ else:
     try:
         opt = read_config(config)
     except IOError as e:
-        print("Warning, using default config vaules.")
+        print("Warning, using default config values.")
         print("You probably want to run ./configure.sh first.")
-        opt = {'PAIR_MOD':'yes',
-                'USE_PBC':'yes',
-                'INT_MOD':'yes',
-                'ECC_MOD':'yes'
-                }
+        print("Using platform-aware defaults for PyPI installation...")
+        opt = get_default_config()
 
 core_path = 'charm/core/'
 math_path = core_path + 'math/'
@@ -94,13 +270,21 @@ elif opt.get('USE_MIRACL') == 'yes' and opt.get('MIRACL_SS') == 'yes':
 else:
     sys.exit("Need to select which module to build for pairing.")
 
-_charm_version = opt.get('VERSION')
+# Get version from config, with fallback to VERSION file
+# This ensures version is always available even when config.mk is missing
+_charm_version = opt.get('VERSION') or read_version_file()
+
 lib_config_file = 'charm/config.py'
-# Get include dirs from both CHARM_CFLAGS and CPPFLAGS
+
+# Extract include directories from compiler flags
+# Default to empty string if flags are missing to avoid AttributeError on .split()
 inc_dirs = [s[2:] for s in opt.get('CHARM_CFLAGS', '').split() if s.startswith('-I')]
 inc_dirs += [s[2:] for s in opt.get('CPPFLAGS', '').split() if s.startswith('-I')]
-library_dirs = [s[2:] for s in opt.get('LDFLAGS').split() if s.startswith('-L')]
-runtime_library_dirs = [s[11:] for s in opt.get('LDFLAGS').split()
+
+# Extract library directories from linker flags
+# Default to empty string if LDFLAGS is missing (e.g., PyPI installation without config.mk)
+library_dirs = [s[2:] for s in opt.get('LDFLAGS', '').split() if s.startswith('-L')]
+runtime_library_dirs = [s[11:] for s in opt.get('LDFLAGS', '').split()
                         if s.lower().startswith('-wl,-rpath,')]
 if opt.get('PAIR_MOD') == 'yes':
     if opt.get('USE_PBC') == 'yes':
