@@ -10,7 +10,6 @@ name = "charm-crypto-framework"
 dynamic = ["version"]
 description = "Charm is a framework for rapid prototyping of cryptosystems"
 readme = "README.md"
-license = "LGPL-3.0-or-later"
 requires-python = ">=3.8"
 authors = [
     { name = "J. Ayo Akinyele", email = "jakinye3@jhu.edu" }
