@@ -34,6 +34,15 @@
 
 #include "pairingmodule2.h"
 
+/*
+ * Python 3.13+ made Py_IsFinalizing() public and removed _Py_IsFinalizing().
+ * For older versions, we need to use the private _Py_IsFinalizing().
+ */
+#if PY_MINOR_VERSION >= 13
+  #define CHARM_PY_IS_FINALIZING() Py_IsFinalizing()
+#else
+  #define CHARM_PY_IS_FINALIZING() _Py_IsFinalizing()
+#endif
 
 int exp_rule(Group_t lhs, Group_t rhs)
 {
@@ -1993,7 +2002,7 @@ static int pairings_free(PyObject *m) {
 	if(m != NULL && pairing_init_finished == FALSE) {
 		// Additional safety: Check if we're in a valid state to clean up
 		// Avoid calling miracl_clean() if Python is shutting down abnormally
-		if(!_Py_IsFinalizing()) {
+		if(!CHARM_PY_IS_FINALIZING()) {
 			miracl_clean(); // mirsys was called
 		}
 	}

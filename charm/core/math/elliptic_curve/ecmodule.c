@@ -29,6 +29,16 @@
 
 #include "ecmodule.h"
 
+/*
+ * Python 3.13+ made Py_IsFinalizing() public and removed _Py_IsFinalizing().
+ * For older versions, we need to use the private _Py_IsFinalizing().
+ */
+#if PY_MINOR_VERSION >= 13
+  #define CHARM_PY_IS_FINALIZING() Py_IsFinalizing()
+#else
+  #define CHARM_PY_IS_FINALIZING() _Py_IsFinalizing()
+#endif
+
 void printf_buffer_as_hex(uint8_t * data, size_t len)
 {
 #ifdef DEBUG
@@ -1884,7 +1894,7 @@ static int ec_clear(PyObject *m) {
 static int ec_free(PyObject *m) {
 	// Defensive cleanup for OpenSSL to prevent hangs during Python 3.12+ shutdown
 	// Only cleanup if not in abnormal finalization state
-	if(m != NULL && !_Py_IsFinalizing()) {
+	if(m != NULL && !CHARM_PY_IS_FINALIZING()) {
 		// Note: OpenSSL 1.1.0+ handles cleanup automatically
 		// This is a no-op for compatibility but prevents potential hangs
 	}

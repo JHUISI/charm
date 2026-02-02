@@ -69,6 +69,16 @@
   #define PYTHON_SET_SIZE(l, i) Py_SET_SIZE(l, i);
 #endif
 
+/*
+ * Python 3.13+ made Py_IsFinalizing() public and removed _Py_IsFinalizing().
+ * For older versions, we need to use the private _Py_IsFinalizing().
+ */
+#if PY_MINOR_VERSION >= 13
+  #define CHARM_PY_IS_FINALIZING() Py_IsFinalizing()
+#else
+  #define CHARM_PY_IS_FINALIZING() _Py_IsFinalizing()
+#endif
+
 struct module_state {
 	PyObject *error;
 #ifdef BENCHMARK_ENABLED
@@ -2449,7 +2459,7 @@ static int int_clear(PyObject *m) {
 static int int_free(PyObject *m) {
 	// Defensive cleanup for OpenSSL PRNG to prevent hangs during Python 3.12+ shutdown
 	// Only cleanup if not in abnormal finalization state
-	if(m != NULL && !_Py_IsFinalizing()) {
+	if(m != NULL && !CHARM_PY_IS_FINALIZING()) {
 		// Note: RAND_cleanup() was removed in OpenSSL 1.1.0
 		// Modern OpenSSL handles cleanup automatically
 		// This is a no-op for compatibility but prevents potential hangs
