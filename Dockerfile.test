@@ -46,12 +46,16 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
     python${PYTHON_VERSION} \
     python${PYTHON_VERSION}-dev \
     python${PYTHON_VERSION}-venv \
-    python3-pip \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Python version as default
+# Set Python version as default and create python3-config symlink
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${PYTHON_VERSION} 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 1
+    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_VERSION} 1 && \
+    ln -sf /usr/bin/python${PYTHON_VERSION}-config /usr/bin/python3-config
+
+# Install pip using get-pip.py (Python 3.12+ doesn't include distutils)
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
 
 # Upgrade pip
 RUN python3 -m pip install --upgrade pip setuptools wheel
