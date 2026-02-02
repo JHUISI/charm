@@ -23,9 +23,9 @@ The following dependencies are required to build Charm:
 +-------------+------------------+----------+------------------------------------------+
 | PBC         | 1.0.0            | Yes      | Pairing-Based Cryptography library       |
 +-------------+------------------+----------+------------------------------------------+
-| OpenSSL     | 1.x or 3.x       | Yes      | Cryptographic library                    |
+| OpenSSL     | 3.x              | Yes      | Cryptographic library                    |
 +-------------+------------------+----------+------------------------------------------+
-| pyparsing   | >=2.1.5, <2.4.1  | Yes      | Python parsing library                   |
+| pyparsing   | >=2.1.5, <4.0    | Yes      | Python parsing library                   |
 +-------------+------------------+----------+------------------------------------------+
 | pytest      | latest           | Testing  | For running test suite                   |
 +-------------+------------------+----------+------------------------------------------+
@@ -90,7 +90,7 @@ These instructions work for Ubuntu 22.04, 24.04, and recent Debian versions.
 
     python3 -m venv venv
     source venv/bin/activate
-    pip install 'pyparsing>=2.1.5,<2.4.1' pytest hypothesis
+    pip install 'pyparsing>=2.1.5,<4.0' pytest hypothesis
 
 **Step 4: Configure and build Charm**
 
@@ -147,7 +147,7 @@ These instructions work for Fedora 38+, RHEL 8+, CentOS Stream, Rocky Linux, and
 
     python3 -m venv venv
     source venv/bin/activate
-    pip install 'pyparsing>=2.1.5,<2.4.1' pytest hypothesis
+    pip install 'pyparsing>=2.1.5,<4.0' pytest hypothesis
 
 **Step 4: Configure and build Charm**
 
@@ -193,7 +193,7 @@ Arch Linux
 
     python -m venv venv
     source venv/bin/activate
-    pip install 'pyparsing>=2.1.5,<2.4.1' pytest hypothesis
+    pip install 'pyparsing>=2.1.5,<4.0' pytest hypothesis
 
 **Step 4: Configure and build Charm**
 
@@ -280,7 +280,7 @@ macOS with Homebrew (Intel and Apple Silicon)
 
     python3 -m venv venv
     source venv/bin/activate
-    pip install 'pyparsing>=2.1.5,<2.4.1' pytest hypothesis
+    pip install 'pyparsing>=2.1.5,<4.0' pytest hypothesis
 
 **Step 5: Configure and build Charm**
 
@@ -414,7 +414,7 @@ Charm requires a specific version range of pyparsing:
 
 .. code-block:: bash
 
-    pip install 'pyparsing>=2.1.5,<2.4.1'
+    pip install 'pyparsing>=2.1.5,<4.0'
 
 If you have a newer version installed, you may need to create a virtual environment:
 
@@ -422,7 +422,7 @@ If you have a newer version installed, you may need to create a virtual environm
 
     python3 -m venv charm-env
     source charm-env/bin/activate
-    pip install 'pyparsing>=2.1.5,<2.4.1'
+    pip install 'pyparsing>=2.1.5,<4.0'
 
 PBC build fails with GMP errors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

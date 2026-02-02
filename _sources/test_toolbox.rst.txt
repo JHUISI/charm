@@ -12,6 +12,7 @@ These tests demonstrate how to use the toolbox components and verify correct fun
 
    test/conversion_test
    test/ecgroup_test
+   test/integer_arithmetic_test
    test/paddingschemes_test
    test/policy_parser_stress_test
    test/secretshare_test
