@@ -19,8 +19,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Python 3.12+ excluded due to CI hanging issues - defensive fixes added but still experiencing failures
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        # Python 3.12+ re-enabled with per-test timeout to identify hanging tests
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
     - name: Checkout code
@@ -54,12 +54,14 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pyparsing hypothesis
+        pip install pytest pytest-timeout pyparsing hypothesis
 
     - name: Run tests
+      timeout-minutes: 15
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-        pytest
+        # Use --timeout to identify hanging tests (30s per test)
+        pytest --timeout=30 --timeout-method=thread
 
   security:
     runs-on: ubuntu-latest

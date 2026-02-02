@@ -13,8 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Python 3.12+ excluded due to CI hanging issues - defensive fixes added but still experiencing failures
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        # Python 3.12+ re-enabled with per-test timeout to identify hanging tests
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
     - uses: actions/checkout@v4
@@ -51,15 +51,16 @@ jobs:
         python setup.py build_ext --inplace
 
     - name: Install Python dependencies
-      run: pip install pyparsing pytest hypothesis
+      run: pip install pyparsing pytest pytest-timeout hypothesis
 
     - name: Run tests
-      timeout-minutes: 10
+      timeout-minutes: 15
       run: |
         export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
         # Skip benchmark tests which have platform-specific issues
+        # Use --timeout to identify hanging tests (30s per test)
         # Use --junit-xml to capture test results before potential segfault during cleanup
-        pytest -v charm/test/ --ignore=charm/test/benchmark/ --tb=long --junit-xml=test-results.xml || {
+        pytest -v charm/test/ --ignore=charm/test/benchmark/ --timeout=30 --timeout-method=thread --tb=long --junit-xml=test-results.xml || {
           # Check if tests passed but segfault occurred during cleanup
           if grep -q 'failures="0"' test-results.xml 2>/dev/null && grep -q 'errors="0"' test-results.xml 2>/dev/null; then
             echo "Tests passed but segfault occurred during Python cleanup (known issue with C extensions)"
@@ -120,14 +121,15 @@ jobs:
         python setup.py build_ext --inplace
 
     - name: Install Python dependencies
-      run: pip install pyparsing pytest hypothesis
+      run: pip install pyparsing pytest pytest-timeout hypothesis
 
     - name: Run tests
-      timeout-minutes: 10
+      timeout-minutes: 15
       run: |
         # Skip benchmark tests which have platform-specific issues
+        # Use --timeout to identify hanging tests (30s per test)
         # Use --junit-xml to capture test results before potential segfault during cleanup
-        pytest -v charm/test/ --ignore=charm/test/benchmark/ --tb=long --junit-xml=test-results.xml || {
+        pytest -v charm/test/ --ignore=charm/test/benchmark/ --timeout=30 --timeout-method=thread --tb=long --junit-xml=test-results.xml || {
           # Check if tests passed but segfault occurred during cleanup
           if grep -q 'failures="0"' test-results.xml 2>/dev/null && grep -q 'errors="0"' test-results.xml 2>/dev/null; then
             echo "Tests passed but segfault occurred during Python cleanup (known issue with C extensions)"
