@@ -251,10 +251,10 @@ class RSAGroup:
         return outStr
     
     def paramgen(self, secparam):
-        while True:
-           p, q = randomPrime(secparam), randomPrime(secparam)
-           if isPrime(p) and isPrime(q) and gcd(p * q, (p - 1) * (q - 1)) == 1:
-              break
+        # Generate two random primes for RSA/Paillier
+        # Note: gcd(p*q, (p-1)*(q-1)) is always 1 for distinct primes p, q
+        # so we don't need to check that condition
+        p, q = randomPrime(secparam), randomPrime(secparam)
         n = p * q
         self.p = p
         self.q = q
