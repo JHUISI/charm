@@ -56,8 +56,19 @@ class ChamHash_HW09(ChamHash):
         phi_N = (p-1)*(q-1)
         J = group.random(N)
         e = group.random(phi_N)
+
+        # Safety timeout to prevent infinite loops (especially on Python 3.12+)
+        max_iterations = 10000
+        iterations = 0
         while (not gcd(e, phi_N) == 1):
             e = group.random(phi_N)
+            iterations += 1
+            if iterations >= max_iterations:
+                raise RuntimeError(
+                    f"Could not find coprime value after {max_iterations} iterations. "
+                    f"phi_N={phi_N}, last e={e}, gcd(e, phi_N)={gcd(e, phi_N)}"
+                )
+
         pk = { 'secparam': secparam, 'N': N, 'J': J, 'e': e }
         sk = { 'p': p, 'q': q }
         return (pk, sk)
