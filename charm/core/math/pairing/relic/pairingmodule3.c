@@ -314,9 +314,14 @@ void	Element_dealloc(Element* self)
 			element_pp_clear(self->e_pp, self->element_type);
 		}
 		element_clear(self->e);
-		Py_DECREF(self->pairing);
+		// Defensive: Use Py_XDECREF instead of Py_DECREF to handle NULL safely
+		// and check if pairing object is valid before decrementing
+		// This prevents crashes with immortal objects in Python 3.12+ (PEP 683)
+		if(self->pairing != NULL) {
+			Py_XDECREF(self->pairing);
+		}
 	}
-	
+
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 

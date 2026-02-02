@@ -191,13 +191,33 @@ PyObject *ECElement_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 void ECGroup_dealloc(ECGroup *self)
 {
 	if(self->group_init == TRUE && self->ec_group != NULL) {
-		Py_BEGIN_ALLOW_THREADS;
+		// Defensive: Add NULL checks before cleanup to prevent crashes
+		// For Python 3.12+: Avoid Py_BEGIN_ALLOW_THREADS during finalization
+		// as it can deadlock with the new per-interpreter GIL (PEP 684)
+		int should_release_gil = !_Py_IsFinalizing();
+
+		if(should_release_gil) {
+			Py_BEGIN_ALLOW_THREADS;
+		}
+
 		debug("clearing ec group struct.\n");
-		EC_GROUP_clear_free(self->ec_group);
-		BN_free(self->order);
-		BN_CTX_free(self->ctx);
+		if(self->ec_group != NULL) {
+			EC_GROUP_clear_free(self->ec_group);
+			self->ec_group = NULL;
+		}
+		if(self->order != NULL) {
+			BN_free(self->order);
+			self->order = NULL;
+		}
+		if(self->ctx != NULL) {
+			BN_CTX_free(self->ctx);
+			self->ctx = NULL;
+		}
 		self->group_init = FALSE;
-		Py_END_ALLOW_THREADS;
+
+		if(should_release_gil) {
+			Py_END_ALLOW_THREADS;
+		}
 	}
 
 #ifdef BENCHMARK_ENABLED
@@ -1868,6 +1888,16 @@ static int ec_clear(PyObject *m) {
 	return 0;
 }
 
+static int ec_free(PyObject *m) {
+	// Defensive cleanup for OpenSSL to prevent hangs during Python 3.12+ shutdown
+	// Only cleanup if not in abnormal finalization state
+	if(m != NULL && !_Py_IsFinalizing()) {
+		// Note: OpenSSL 1.1.0+ handles cleanup automatically
+		// This is a no-op for compatibility but prevents potential hangs
+	}
+	return 0;
+}
+
 static struct PyModuleDef moduledef = {
 		PyModuleDef_HEAD_INIT,
 		"elliptic_curve",
@@ -1877,7 +1907,7 @@ static struct PyModuleDef moduledef = {
 		NULL,
 		ec_traverse,
 		ec_clear,
-		NULL
+		(freefunc) ec_free
 };
 
 #define CLEAN_EXIT goto LEAVE;

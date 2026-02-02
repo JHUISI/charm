@@ -298,9 +298,14 @@ void	Element_dealloc(Element* self)
 	// add reference count to objects
 	if(self->elem_initialized) {
 		element_delete(self->element_type, self->e);
-		Py_DECREF(self->pairing);
+		// Defensive: Use Py_XDECREF instead of Py_DECREF to handle NULL safely
+		// and check if pairing object is valid before decrementing
+		// This prevents crashes with immortal objects in Python 3.12+ (PEP 683)
+		if(self->pairing != NULL) {
+			Py_XDECREF(self->pairing);
+		}
 	}
-	
+
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -1982,8 +1987,16 @@ static int pairings_clear(PyObject *m) {
 }
 
 static int pairings_free(PyObject *m) {
-	if(pairing_init_finished == FALSE)
-		miracl_clean(); // mirsys was called
+	// Defensive check: Only call miracl_clean if module state is valid
+	// This prevents hangs during Python 3.12+ shutdown when module state
+	// may be corrupted or already cleaned up
+	if(m != NULL && pairing_init_finished == FALSE) {
+		// Additional safety: Check if we're in a valid state to clean up
+		// Avoid calling miracl_clean() if Python is shutting down abnormally
+		if(!_Py_IsFinalizing()) {
+			miracl_clean(); // mirsys was called
+		}
+	}
 	return 0;
 }
 

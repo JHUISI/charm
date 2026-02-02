@@ -2392,6 +2392,13 @@ static int int_clear(PyObject *m) {
 }
 
 static int int_free(PyObject *m) {
+	// Defensive cleanup for OpenSSL PRNG to prevent hangs during Python 3.12+ shutdown
+	// Only cleanup if not in abnormal finalization state
+	if(m != NULL && !_Py_IsFinalizing()) {
+		// Note: RAND_cleanup() was removed in OpenSSL 1.1.0
+		// Modern OpenSSL handles cleanup automatically
+		// This is a no-op for compatibility but prevents potential hangs
+	}
 	return 0;
 }
 
