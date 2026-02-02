@@ -1466,12 +1466,24 @@ static PyObject *genRandomPrime(PyObject *self, PyObject *args) {
 			BIGNUM *bn = BN_new();
 			/* This routine generates safe prime only when safe=TRUE in which prime, p is selected
 			 * iff (p-1)/2 is also prime.
+			 *
+			 * Use BN_generate_prime_ex() instead of deprecated BN_generate_prime().
+			 * This fixes Python 3.12+ hanging issues with prime generation.
 			 */
+			int result;
 			if(safe == TRUE) // safe is non-zero
-				BN_generate_prime(bn, bits, safe, NULL, NULL, NULL, NULL);
+				result = BN_generate_prime_ex(bn, bits, safe, NULL, NULL, NULL);
 			else
 				/* generate strong primes only */
-				BN_generate_prime(bn, bits, FALSE, NULL, NULL, NULL, NULL);
+				result = BN_generate_prime_ex(bn, bits, FALSE, NULL, NULL, NULL);
+
+			if (!result) {
+				BN_free(bn);
+				mpz_clear(rop->e);
+				mpz_clear(rop->m);
+				PyMem_Free(rop);
+				EXIT_IF(TRUE, "BN_generate_prime_ex failed");
+			}
 
 			debug("Safe prime => ");
 			print_bn_dec(bn);
