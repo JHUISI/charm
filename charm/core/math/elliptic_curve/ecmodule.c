@@ -192,13 +192,8 @@ void ECGroup_dealloc(ECGroup *self)
 {
 	if(self->group_init == TRUE && self->ec_group != NULL) {
 		// Defensive: Add NULL checks before cleanup to prevent crashes
-		// For Python 3.12+: Avoid Py_BEGIN_ALLOW_THREADS during finalization
-		// as it can deadlock with the new per-interpreter GIL (PEP 684)
-		int should_release_gil = !_Py_IsFinalizing();
-
-		if(should_release_gil) {
-			Py_BEGIN_ALLOW_THREADS;
-		}
+		// Release GIL during cleanup operations for thread safety
+		Py_BEGIN_ALLOW_THREADS;
 
 		debug("clearing ec group struct.\n");
 		if(self->ec_group != NULL) {
@@ -215,9 +210,7 @@ void ECGroup_dealloc(ECGroup *self)
 		}
 		self->group_init = FALSE;
 
-		if(should_release_gil) {
-			Py_END_ALLOW_THREADS;
-		}
+		Py_END_ALLOW_THREADS;
 	}
 
 #ifdef BENCHMARK_ENABLED
