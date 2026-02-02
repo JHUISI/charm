@@ -28,9 +28,10 @@ from charm.toolbox.redundancyschemes import InMessageRedundancy
 from charm.toolbox.conversion import Conversion
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.specialprimes import BlumWilliamsInteger
-from math import ceil 
+from math import ceil
 
 debug = False
+
 class Rabin():
     def __init__(self, modulus=BlumWilliamsInteger()):
         self.modulustype = modulus

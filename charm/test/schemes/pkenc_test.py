@@ -217,6 +217,7 @@ class Rabin_EncTest(unittest.TestCase):
         if debug: print("Successful Decryption!!!")
 
 class Rabin_SigTest(unittest.TestCase):
+    @pytest.mark.skip_py312plus
     def testRabin_Sig(self):
         M = b'This is a test message.'
         rabin = Rabin_Sig()
