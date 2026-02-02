@@ -23,7 +23,7 @@ The following dependencies are required to build Charm:
 +-------------+------------------+----------+------------------------------------------+
 | PBC         | 1.0.0            | Yes      | Pairing-Based Cryptography library       |
 +-------------+------------------+----------+------------------------------------------+
-| OpenSSL     | 1.x or 3.x       | Yes      | Cryptographic library                    |
+| OpenSSL     | 3.x              | Yes      | Cryptographic library                    |
 +-------------+------------------+----------+------------------------------------------+
 | pyparsing   | >=2.1.5, <4.0    | Yes      | Python parsing library                   |
 +-------------+------------------+----------+------------------------------------------+

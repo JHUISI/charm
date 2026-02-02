@@ -34,7 +34,10 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
+        # Install OpenSSL 3.x explicitly (libssl-dev on Ubuntu 22.04+ is OpenSSL 3.x)
         sudo apt-get install -y flex bison libfl-dev libgmp-dev libssl-dev
+        # Verify OpenSSL version
+        openssl version
         wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
         tar -xzf pbc-1.0.0.tar.gz
         cd pbc-1.0.0
@@ -103,7 +106,10 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update
+        # Install OpenSSL 3.x explicitly (libssl-dev on Ubuntu 22.04+ is OpenSSL 3.x)
         sudo apt-get install -y flex bison libfl-dev libgmp-dev libssl-dev
+        # Verify OpenSSL version
+        openssl version
 
     - name: Build and install PBC
       run: |
