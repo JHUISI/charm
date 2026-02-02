@@ -53,16 +53,17 @@ void printf_buffer_as_hex(uint8_t * data, size_t len)
 
 void setBigNum(PyLongObject *obj, BIGNUM **value) {
 	// convert Python long object to temporary decimal string
-#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 14
-	/* for Python 3.14+ - _PyLong_Format was removed, use PyObject_Str */
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 13
+	/*
+	 * For Python 3.13+: _PyLong_Format was removed in Python 3.13.
+	 * Use PyObject_Str to convert the integer to a string.
+	 */
 	PyObject *strObj = PyObject_Str((PyObject *)obj);
 	const char *tmp_str = PyUnicode_AsUTF8(strObj);
 #elif PY_MAJOR_VERSION >= 3
 	/*
-	 * for Python 3.x (3.3+)
+	 * For Python 3.3-3.12: Use _PyLong_Format (private API).
 	 * Use PyUnicode_AsUTF8 to get a proper null-terminated UTF-8 string.
-	 * PyUnicode_DATA returns raw bytes that may not be null-terminated,
-	 * which can cause segfaults on Python 3.13+.
 	 */
 	PyObject *strObj = _PyLong_Format((PyObject *)obj, 10);
 	const char *tmp_str = PyUnicode_AsUTF8(strObj);
