@@ -54,7 +54,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pyparsing==2.1.5 hypothesis
+        pip install pytest pyparsing hypothesis
 
     - name: Run tests
       run: |
