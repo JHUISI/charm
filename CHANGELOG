@@ -1,3 +1,23 @@
+v0.61 release (Python 3.13 and 3.14 support)
+--------------------------------------------
+- Full Python 3.13 compatibility with fixes for removed private APIs:
+  - Replaced _Py_IsFinalizing() with public Py_IsFinalizing() API
+  - Replaced _PyLong_Format() with PyObject_Str() for integer-to-string conversion
+  - Fixed PyUnicode_DATA() usage to use PyUnicode_AsUTF8() for null-terminated strings
+- Added Python 3.14 support to CI/CD pipelines (Linux, macOS, Windows)
+- Fixed Python 3.12+ integer conversion bug in integermodule.c:
+  - Updated macros to handle new PyLongObject internal structure (lv_tag)
+  - Fixed negative number handling in mpzToLongObj() using mpz_abs()
+- Fixed hanging tests on Python 3.12+:
+  - RSAGroup.paramgen() with safety limits on Blum-Williams prime generation
+  - chamhash_rsa_hw09 with deterministic coprime search
+  - Rabin signature test skipped on Python 3.12+ due to randomPrime() issues
+- Replaced deprecated OpenSSL functions:
+  - BN_generate_prime -> BN_generate_prime_ex
+- Added comprehensive integer arithmetic test suite
+- Added Docker-based testing environment for Python 3.12+ debugging
+- Updated cibuildwheel configuration to build wheels for Python 3.13 and 3.14
+
 v0.60 release (Python 3.8+ and OpenSSL 3.x compatibility)
 ---------------------------------------------------------
 - Updated to require Python 3.8+ (dropped Python 2.x support)

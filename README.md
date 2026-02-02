@@ -24,6 +24,14 @@ Charm uses a hybrid design: performance-intensive mathematical operations are im
 * **C/C++ Embed API**: Native applications can embed Charm via the Python C API
 * **Integrated Benchmarking**: Built-in performance measurement
 
+## Requirements
+
+| Component | Supported Versions |
+|-----------|-------------------|
+| **Python** | 3.8, 3.9, 3.10, 3.11, 3.12, 3.13, 3.14 |
+| **Operating Systems** | Linux, macOS, Windows |
+| **OpenSSL** | 3.0+ |
+
 ## Installation
 
 ### Quick Install (pip)
