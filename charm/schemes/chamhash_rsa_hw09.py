@@ -21,7 +21,7 @@
 '''
 
 from charm.toolbox.Hash import ChamHash,Hash
-from charm.toolbox.integergroup import IntegerGroupQ,gcd
+from charm.toolbox.integergroup import IntegerGroupQ,gcd,integer
 from charm.toolbox.conversion import Conversion
 
 debug=False
@@ -55,15 +55,32 @@ class ChamHash_HW09(ChamHash):
         
         phi_N = (p-1)*(q-1)
         J = group.random(N)
-        e = group.random(phi_N)
 
-        # Safety timeout to prevent infinite loops (especially on Python 3.12+)
-        max_iterations = 10000
-        iterations = 0
-        while (not gcd(e, phi_N) == 1):
-            e = group.random(phi_N)
-            iterations += 1
-            if iterations >= max_iterations:
+        # Use deterministic algorithm to find coprime value instead of random search
+        # This fixes Python 3.12+ hanging issue where random values share common factors
+        # Try common RSA public exponents first, then search incrementally
+        common_exponents = [65537, 3, 5, 17, 257, 641, 6700417]
+        e = None
+
+        for candidate in common_exponents:
+            # Use isCoPrime() method which properly checks gcd == 1
+            if phi_N.isCoPrime(candidate):
+                e = integer(candidate)
+                break
+
+        # If common exponents don't work, search incrementally starting from a larger value
+        if e is None:
+            e = integer(65537)
+            max_iterations = 10000000  # Large limit for deterministic search
+
+            for iterations in range(max_iterations):
+                # Use isCoPrime() method which properly checks gcd == 1
+                if phi_N.isCoPrime(e):
+                    break
+                e += 2  # Only try odd numbers (even numbers can't be coprime with even phi_N)
+
+            # Check if we found a coprime value (either broke out of loop or on last iteration)
+            if not phi_N.isCoPrime(e):
                 raise RuntimeError(
                     f"Could not find coprime value after {max_iterations} iterations. "
                     f"phi_N={phi_N}, last e={e}, gcd(e, phi_N)={gcd(e, phi_N)}"
