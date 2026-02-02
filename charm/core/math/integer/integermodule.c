@@ -195,6 +195,14 @@ PyObject *mpzToLongObj(mpz_t m) {
 	if (!l)
 		return NULL;
 	mpz_init_set(temp, m);
+	/* Work with absolute value for digit extraction.
+	 * mpz_fdiv_q_2exp does floor division, which gives incorrect results
+	 * for negative numbers (e.g., -5 / 2 = -3 with floor, not -2).
+	 * By using the absolute value, we extract digits correctly and
+	 * apply the sign at the end. */
+	if (isNeg) {
+		mpz_abs(temp, temp);
+	}
 	for (i = 0; i < size; i++) {
 		PythonLongVal(l)[i] = (digit)(mpz_get_ui(temp) & PyLong_MASK);
 		mpz_fdiv_q_2exp(temp, temp, PyLong_SHIFT);
