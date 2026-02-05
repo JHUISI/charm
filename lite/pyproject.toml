@@ -1,0 +1,76 @@
+[build-system]
+requires = [
+    "setuptools>=68.0",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "charm-crypto-lite"
+version = "0.1.0"
+description = "Lightweight elliptic curve cryptography from the Charm framework (OpenSSL-only, no GMP/PBC)"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "J. Ayo Akinyele", email = "jakinye3@jhu.edu" }
+]
+maintainers = [
+    { name = "J. Ayo Akinyele", email = "jakinye3@jhu.edu" }
+]
+keywords = [
+    "cryptography",
+    "elliptic curves",
+    "secp256k1",
+    "hash-to-curve",
+    "openssl",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: C",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+# NO DEPENDENCIES - this is the key advantage of charm-crypto-lite
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "build",
+    "twine",
+]
+
+[project.urls]
+Homepage = "https://github.com/JHUISI/charm"
+Documentation = "https://jhuisi.github.io/charm/"
+Repository = "https://github.com/JHUISI/charm"
+Issues = "https://github.com/JHUISI/charm/issues"
+
+[tool.setuptools]
+packages = [
+    "charm_lite",
+    "charm_lite.core",
+    "charm_lite.core.math",
+    "charm_lite.toolbox",
+]
+include-package-data = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
