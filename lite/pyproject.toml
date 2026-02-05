@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "charm-crypto-lite"
-version = "0.1.0"
+version = "0.61.1"
 description = "Lightweight elliptic curve cryptography from the Charm framework (OpenSSL-only, no GMP/PBC)"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -63,7 +63,10 @@ Issues = "https://github.com/JHUISI/charm/issues"
 packages = [
     "charm_lite",
     "charm_lite.core",
+    "charm_lite.core.benchmark",
     "charm_lite.core.math",
+    "charm_lite.core.math.elliptic_curve",
+    "charm_lite.core.utilities",
     "charm_lite.toolbox",
 ]
 include-package-data = true

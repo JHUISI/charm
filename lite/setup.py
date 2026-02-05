@@ -61,11 +61,12 @@ inc_dirs, lib_dirs = get_openssl_paths()
 # Paths relative to this setup.py
 core_path = 'charm_lite/core/'
 math_path = core_path + 'math/'
+ec_path = math_path + 'elliptic_curve/'
 utils_path = core_path + 'utilities/'
 benchmark_path = core_path + 'benchmark/'
 
-# Add local include paths
-inc_dirs = [utils_path, benchmark_path] + inc_dirs
+# Add local include paths (including EC module path for ecmodule.h)
+inc_dirs = [ec_path, utils_path, benchmark_path] + inc_dirs
 
 # Benchmark enabled by default
 _macros = [('BENCHMARK_ENABLED', '1')]
