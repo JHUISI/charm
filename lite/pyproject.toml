@@ -30,6 +30,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -76,4 +77,26 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
+
+[tool.cibuildwheel]
+# Build for Python 3.8-3.13
+build = "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+
+# Skip musllinux and PyPy
+skip = "*-musllinux_* pp*"
+
+# Test command to verify wheels work
+test-command = "python -c \"from charm_lite.toolbox.ecgroup import ECGroup; print('OK')\""
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64", "aarch64"]
+before-all = "yum install -y openssl-devel || apt-get update && apt-get install -y libssl-dev"
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+before-all = "brew install openssl@3"
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]
+before-all = "choco install openssl -y"
 

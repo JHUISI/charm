@@ -1,0 +1,196 @@
+name: Build charm-crypto-lite wheels
+
+on:
+  push:
+    branches:
+      - dev
+      - 'explore/charm-crypto-lite'
+    tags:
+      - 'lite-v*'
+    paths:
+      - 'lite/**'
+      - '.github/workflows/build-lite-wheels.yml'
+  pull_request:
+    branches:
+      - dev
+    paths:
+      - 'lite/**'
+  workflow_dispatch:
+    inputs:
+      publish_to_pypi:
+        description: 'Publish to PyPI'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (for Linux aarch64)
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21
+        with:
+          package-dir: lite
+          output-dir: wheelhouse
+        env:
+          # Build for Python 3.8-3.13 (3.14 when available in cibuildwheel)
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_SKIP: "*-musllinux_* pp*"
+          
+          # Linux: Build for x86_64 and aarch64
+          CIBW_ARCHS_LINUX: "x86_64 aarch64"
+          
+          # macOS: Build for x86_64 and arm64
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          
+          # Windows: Build for x86_64 only (AMD64)
+          CIBW_ARCHS_WINDOWS: "AMD64"
+          
+          # Linux: Install OpenSSL dev libraries
+          CIBW_BEFORE_ALL_LINUX: |
+            yum install -y openssl-devel || apt-get update && apt-get install -y libssl-dev
+          
+          # macOS: Install OpenSSL via Homebrew
+          CIBW_BEFORE_ALL_MACOS: |
+            brew install openssl@3
+          
+          # Windows: Install OpenSSL via vcpkg
+          CIBW_BEFORE_ALL_WINDOWS: |
+            choco install openssl -y
+          
+          # Windows: Set OpenSSL paths
+          CIBW_ENVIRONMENT_WINDOWS: >
+            OPENSSL_ROOT_DIR="C:\\Program Files\\OpenSSL-Win64"
+            LIB="C:\\Program Files\\OpenSSL-Win64\\lib;$LIB"
+            INCLUDE="C:\\Program Files\\OpenSSL-Win64\\include;$INCLUDE"
+          
+          # macOS: Set OpenSSL paths for both architectures
+          CIBW_ENVIRONMENT_MACOS: >
+            LDFLAGS="-L/opt/homebrew/opt/openssl@3/lib -L/usr/local/opt/openssl@3/lib"
+            CPPFLAGS="-I/opt/homebrew/opt/openssl@3/include -I/usr/local/opt/openssl@3/include"
+            PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig:/usr/local/opt/openssl@3/lib/pkgconfig"
+          
+          # Test the built wheels
+          CIBW_TEST_COMMAND: |
+            python -c "from charm_lite.toolbox.ecgroup import ECGroup, ZR, G; from charm_lite.toolbox.eccurve import secp256k1; g = ECGroup(secp256k1); print('OK')"
+          
+          # Repair wheels (Linux: auditwheel, macOS: delocate)
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair -w {dest_dir} {wheel}"
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: "delocate-wheel -w {dest_dir} -v {wheel}"
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build sdist
+        run: |
+          cd lite
+          pip install build
+          python -m build --sdist
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: lite/dist/*.tar.gz
+
+  test_wheels:
+    name: Test wheels on ${{ matrix.os }} - Python ${{ matrix.python }}
+    needs: build_wheels
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]
+        python: ['3.9', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Download wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse
+
+      - name: Install wheel
+        shell: bash
+        run: |
+          pip install wheelhouse/*.whl || pip install --find-links=wheelhouse charm-crypto-lite
+
+      - name: Run tests
+        run: |
+          python -c "
+          from charm_lite.toolbox.ecgroup import ECGroup, ZR, G
+          from charm_lite.toolbox.eccurve import secp256k1
+          from charm_lite.toolbox.PKEnc import PKEnc
+
+          group = ECGroup(secp256k1)
+          g = group.generator()
+          x = group.random(ZR)
+          pk = g ** x
+          h = g ** group.random(ZR)
+          p = pk * h
+          data = group.serialize(pk)
+          pk2 = group.deserialize(data)
+          assert pk == pk2
+          print('All tests passed!')
+          "
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_wheels, build_sdist, test_wheels]
+    runs-on: ubuntu-latest
+    if: >
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/lite-v')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_to_pypi == 'true')
+
+    environment:
+      name: pypi
+      url: https://pypi.org/project/charm-crypto-lite/
+
+    permissions:
+      id-token: write  # Required for trusted publishing
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
