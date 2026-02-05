@@ -1,112 +1,121 @@
 # charm-crypto-lite
 
-Lightweight elliptic curve cryptography from the [Charm Crypto Framework](https://github.com/JHUISI/charm).
+**Minimal elliptic curve cryptography for Python** — a lightweight subset of the [Charm Crypto Framework](https://github.com/JHUISI/charm).
 
-## Overview
+## Why charm-crypto-lite?
 
-`charm-crypto-lite` provides **only** the OpenSSL-based elliptic curve operations from Charm, without GMP or PBC dependencies. This makes it:
+| | charm-crypto-lite | charm-crypto-framework |
+|---|---|---|
+| **Python dependencies** | **None** | pyparsing |
+| **C library dependencies** | OpenSSL only | OpenSSL + GMP + PBC |
+| **Scope** | secp256k1 EC operations | Full crypto toolkit |
+| **Use case** | ECDSA, Schnorr, ECDH | ABE, IBE, pairing-based crypto |
 
-- **Easy to install** - Only requires OpenSSL development libraries
-- **Lightweight** - Minimal dependencies, fast installation
-- **Focused** - EC operations only, no pairing-based cryptography
+**Use charm-crypto-lite if you:**
+- Only need elliptic curve operations on secp256k1 (Bitcoin/Ethereum curve)
+- Want zero Python dependencies and minimal C dependencies
+- Need a lightweight package for serverless/containerized environments
 
-## Features
-
-- Elliptic curve operations on standard curves (secp256k1, prime256v1, etc.)
-- Hash-to-curve functionality
-- Point serialization/deserialization
-- Scalar multiplication and point addition
-- Random element generation
+**Use [charm-crypto-framework](https://pypi.org/project/charm-crypto-framework/) if you:**
+- Need pairing-based cryptography (ABE, IBE, signatures)
+- Need multiple curve types or pairing groups
+- Are building advanced cryptographic protocols
 
 ## Installation
-
-### Prerequisites
-
-**macOS (Homebrew):**
-```bash
-brew install openssl
-```
-
-**Ubuntu/Debian:**
-```bash
-sudo apt-get install libssl-dev python3-dev build-essential
-```
-
-### Install from PyPI
 
 ```bash
 pip install charm-crypto-lite
 ```
 
-### Build from Source
+**Prerequisites:** OpenSSL development libraries
 
 ```bash
-git clone https://github.com/JHUISI/charm.git
-cd charm/lite
-pip install -e .
+# macOS
+brew install openssl
+
+# Ubuntu/Debian
+sudo apt-get install libssl-dev python3-dev build-essential
 ```
 
-## Usage
+## Quick Start
 
 ```python
 from charm_lite.toolbox.ecgroup import ECGroup, ZR, G
 from charm_lite.toolbox.eccurve import secp256k1
 
-# Initialize group with secp256k1 curve
 group = ECGroup(secp256k1)
 
-# Generate random elements
-g = group.random(G)   # Random point on curve
-x = group.random(ZR)  # Random scalar
+# Get the generator point
+g = group.generator()
 
-# Scalar multiplication
-h = g ** x
+# Generate random scalar (private key)
+x = group.random(ZR)
 
-# Hash to curve point
-h = group.hash(b"message", G)
+# Scalar multiplication: public_key = g^x
+pk = g ** x
 
-# Hash to scalar
-s = group.hash(b"data", ZR)
+# Point addition (multiplicative notation): p = h * k
+h = g ** group.random(ZR)
+p = pk * h
 
 # Serialization
-data = group.serialize(h)
-h2 = group.deserialize(data)
-assert h == h2
+data = group.serialize(pk)
+pk2 = group.deserialize(data)
+assert pk == pk2
 ```
 
-## Supported Curves
+## API Reference
 
-All OpenSSL-supported curves are available, including:
+### ECGroup Operations
 
-- `secp256k1` (Bitcoin curve)
-- `prime256v1` (NIST P-256)
-- `secp384r1` (NIST P-384)
-- `secp521r1` (NIST P-521)
+| Operation | Syntax | Description |
+|-----------|--------|-------------|
+| Generator | `group.generator()` | Get curve generator point G |
+| Random scalar | `group.random(ZR)` | Random scalar in field |
+| Random point | `group.random(G)` | Random point on curve |
+| Scalar multiply | `g ** x` | Point × scalar |
+| Point add | `h * k` | Point + point (multiplicative notation) |
+| Point negate | `-h` | Additive inverse |
+| Scalar add | `x + y` | Field addition |
+| Scalar multiply | `x * y` | Field multiplication |
+| Scalar invert | `~x` | Multiplicative inverse |
+| Serialize | `group.serialize(elem)` | To bytes |
+| Deserialize | `group.deserialize(data)` | From bytes |
+| Group order | `group.order()` | Curve order n |
 
-See `charm_lite.toolbox.eccurve` for the full list.
+### PKEnc Base Class
+
+For building encryption schemes:
+
+```python
+from charm_lite.toolbox.PKEnc import PKEnc
+
+class MyScheme(PKEnc):
+    def keygen(self): ...
+    def encrypt(self, pk, msg): ...
+    def decrypt(self, sk, ct): ...
+```
 
 ## Migrating to Full Charm
-
-If you later need pairing-based cryptography (ABE, IBE, etc.), you can migrate to the full Charm framework:
 
 ```bash
 pip uninstall charm-crypto-lite
 pip install charm-crypto-framework
 ```
 
-The API is compatible - just change your imports:
+Change imports from `charm_lite` to `charm`:
 
 ```python
-# From charm-crypto-lite
+# Before
 from charm_lite.toolbox.ecgroup import ECGroup
 
-# To full Charm
+# After
 from charm.toolbox.ecgroup import ECGroup
 ```
 
 ## License
 
-LGPL-3.0-or-later (same as Charm Crypto Framework)
+LGPL-3.0-or-later
 
 ## Links
 
