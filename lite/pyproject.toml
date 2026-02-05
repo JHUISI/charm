@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "charm-crypto-lite"
-version = "0.61.1"
+version = "0.61.2"
 description = "Lightweight elliptic curve cryptography from the Charm framework (OpenSSL-only, no GMP/PBC)"
 readme = "README.md"
 requires-python = ">=3.8"
