@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -416,55 +416,90 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
           <section id="changes-in-v0-50">
 <h1>Changes in v0.50<a class="headerlink" href="#changes-in-v0-50" title="Link to this heading">¶</a></h1>
+<p>This release includes new cryptographic schemes, platform improvements, and bug fixes.</p>
+<section id="new-schemes">
+<h2>New Schemes<a class="headerlink" href="#new-schemes" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>error handling updates to base modules</p></li>
+<li><p>Added implementation of private aggregate of time series data by Marc Joye et al.</p></li>
+<li><p>Added Abe’s blind signature scheme [AO00, A01]</p></li>
+<li><p>Added hibenc_lew11.py</p></li>
+<li><p>Added Goldwasser-Micali pkenc scheme</p></li>
+<li><p>Added Leontiadis-Elkhyiaoui-Molva scheme</p></li>
+<li><p>Added four more ABE schemes</p></li>
+<li><p>Re-added Time-based proxy re-encryption scheme implementation for py3</p></li>
+<li><p>Added non-monotonic CP-ABE scheme by Yamada, Attrapadung, Hanaoka, Kunihiro</p></li>
+<li><p>Added BBS98 proxy re-encryption scheme</p></li>
+<li><p>Added implementation of AFGH06 scheme</p></li>
+<li><p>Added first NAL16 scheme</p></li>
+<li><p>Added NAL16b (CCA_21 version of NAL16a)</p></li>
+<li><p>Added scheme from Rouselakis and Waters (maabe_rw12.py)</p></li>
+<li><p>Ciphertext-policy ABE schemes implemented under asymmetric pairing groups (any policy represented as a monotone span program can be handled)</p></li>
+</ul>
+</section>
+<section id="proxy-re-encryption">
+<h2>Proxy Re-Encryption<a class="headerlink" href="#proxy-re-encryption" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Interface for Proxy Re-Encryption schemes (charm.toolbox.PREnc)</p></li>
+<li><p>Adapted BBS98 to PREnc interface</p></li>
+</ul>
+</section>
+<section id="core-improvements">
+<h2>Core Improvements<a class="headerlink" href="#core-improvements" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Error handling updates to base modules</p></li>
 <li><p>CL03: length of e is now verified, verifyCommit() and header added</p></li>
 <li><p>SHA1(m_i) for doctest (verifyCommit) added</p></li>
-<li><p>added implementation of private aggregate of time series data by Marc Joye et al.</p></li>
-<li><p>added Abe’s blind signature scheme [AO00, A01]</p></li>
-<li><p>updated to install file for windows and nsis script.</p></li>
-<li><p>fixed typo in protocol_a00.py and protocol_ao00.py</p></li>
-<li><p>added hibenc_lew11.py</p></li>
-<li><p>added Goldwasser-Micali pkenc scheme</p></li>
-<li><p>added Leontiadis-Elkhyiaoui-Molva scheme</p></li>
-<li><p>added four more ABE schemes</p></li>
-<li><p>re-added Time-based proxy re-encryption scheme implementation for py3</p></li>
-<li><p>added non-monotonic CP-ABE scheme by Yamada, Attrapadung, Hanaoka, Kunihiro</p></li>
-<li><p>update libtomcrypt headers to v1.17</p></li>
-<li><p>fix configure.sh: detect python better. thanks to Neal H. Walfield</p></li>
-<li><p>fix decrypt error when plaintext=0 for Paillier scheme. Closes #97</p></li>
-<li><p>added BBS98 proxy re-encryption scheme</p></li>
-<li><p>added omplementation of AFGH06 scheme</p></li>
-<li><p>interface for Proxy Re-Encryption schemes (charm.toolbox.PREnc)</p></li>
-<li><p>adapted BBS98 to PREnc interface</p></li>
-<li><p>added first NAL16 scheme</p></li>
-<li><p>added NAL16b (CCA_21 version of NAL16a)</p></li>
-<li><p>added scheme from Rouselakis and Waters (maabe_rw12.py)</p></li>
-<li><p>added hash support to wrapped pbc ecc elements (pairingmodule.c)</p></li>
-<li><p>added support for uncompressed curves elements (de)serialization.</p></li>
-<li><p>improved arguments management in (de)serialize methods of the c pairingmodule.</p></li>
-<li><p>improved error management in deserialize c pairingmodule</p></li>
-<li><p>improved error management in pairing product routine of pairinggroup.c</p></li>
-<li><p>improved error handling for initialize and initPP, new preproc attribute.</p></li>
-<li><p>changed hash function from sha1 to sha256 everywhere appropriate</p></li>
-<li><p>simplified encode/decode of messages in ECGroups. Squashed some bugs related to BN_bin2bn/BN_bn2bin</p></li>
-<li><p>updated configure.sh to support ARM (android, raspberry pi, include armv7l support)</p></li>
-<li><p>renamed sha1 to sha2 and update version to v0.5</p></li>
-<li><p>added py2.7 compatibility for pairing group serialize/deserialize</p></li>
-<li><p>added Dockerfile to document installation process</p></li>
-<li><p>fixed compilation errors with OpenSSL 1.1.0 caused by API change</p></li>
-<li><p>ciphertext-policy ABE schemes implemented under asymmetric pairing groups. Any policy represented as a monotone span program can be handled.</p></li>
-<li><p>added support for Mac OS X 10.11+</p></li>
-<li><p>added documentation</p></li>
-<li><p>scheme contributions, bug fixes and/or various improvements from &#64;adelapie, &#64;leontiad, &#64;nikosft, &#64;0xwille, &#64;artjomb, &#64;cygnusv, &#64;lferr, &#64;denniss17, &#64;locksmithone, &#64;leafac, &#64;ElectroSuccess, &#64;sagrawal87. Thanks to all!</p></li>
+<li><p>Added hash support to wrapped pbc ecc elements (pairingmodule.c)</p></li>
+<li><p>Added support for uncompressed curves elements (de)serialization</p></li>
+<li><p>Improved arguments management in (de)serialize methods of the c pairingmodule</p></li>
+<li><p>Improved error management in deserialize c pairingmodule</p></li>
+<li><p>Improved error management in pairing product routine of pairinggroup.c</p></li>
+<li><p>Improved error handling for initialize and initPP, new preproc attribute</p></li>
+<li><p>Changed hash function from sha1 to sha256 everywhere appropriate</p></li>
+<li><p>Simplified encode/decode of messages in ECGroups (squashed bugs related to BN_bin2bn/BN_bn2bin)</p></li>
+<li><p>Added py2.7 compatibility for pairing group serialize/deserialize</p></li>
 </ul>
+</section>
+<section id="platform-support">
+<h2>Platform Support<a class="headerlink" href="#platform-support" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Updated configure.sh to support ARM (android, raspberry pi, include armv7l support)</p></li>
+<li><p>Added support for Mac OS X 10.11+</p></li>
+<li><p>Updated to install file for windows and nsis script</p></li>
+<li><p>Added Dockerfile to document installation process</p></li>
+<li><p>Fixed compilation errors with OpenSSL 1.1.0 caused by API change</p></li>
+</ul>
+</section>
+<section id="bug-fixes">
+<h2>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed typo in protocol_a00.py and protocol_ao00.py</p></li>
+<li><p>Fix configure.sh: detect python better (thanks to Neal H. Walfield)</p></li>
+<li><p>Fix decrypt error when plaintext=0 for Paillier scheme (closes #97)</p></li>
+<li><p>Update libtomcrypt headers to v1.17</p></li>
+<li><p>Renamed sha1 to sha2 and update version to v0.5</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added documentation</p></li>
+</ul>
+</section>
+<section id="contributors">
+<h2>Contributors<a class="headerlink" href="#contributors" title="Link to this heading">¶</a></h2>
+<p>Scheme contributions, bug fixes and/or various improvements from:
+&#64;adelapie, &#64;leontiad, &#64;nikosft, &#64;0xwille, &#64;artjomb, &#64;cygnusv, &#64;lferr,
+&#64;denniss17, &#64;locksmithone, &#64;leafac, &#64;ElectroSuccess, &#64;sagrawal87.</p>
+<p>Thanks to all!</p>
+</section>
 </section>
 
         </article>
@@ -502,7 +537,7 @@
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Feb 07, 2026</div>
+              Last updated on Feb 08, 2026</div>
           </div>
           <div class="right-details">
             
@@ -511,8 +546,33 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Changes in v0.50</a><ul>
+<li><a class="reference internal" href="#new-schemes">New Schemes</a></li>
+<li><a class="reference internal" href="#proxy-re-encryption">Proxy Re-Encryption</a></li>
+<li><a class="reference internal" href="#core-improvements">Core Improvements</a></li>
+<li><a class="reference internal" href="#platform-support">Platform Support</a></li>
+<li><a class="reference internal" href="#bug-fixes">Bug Fixes</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#contributors">Contributors</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
