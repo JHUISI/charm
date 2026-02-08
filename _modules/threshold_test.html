@@ -279,6 +279,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../threshold.html">Threshold ECDSA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../test_vectors.html">Schemes with Test Vectors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
@@ -317,6 +318,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/mta.html">mta</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/node.html">node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/paillier_mta.html">paillier_mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/paillier_zkproofs.html">paillier_zkproofs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/pairingcurves.html">pairingcurves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/pairinggroup.html">pairinggroup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/PKEnc.html">PKEnc - Public-Key Encryption</a></li>
@@ -445,6 +448,18 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.dkls23_dkg</span><span class="w"> </span><span class="kn">import</span> <span class="n">DKLS23_DKG</span><span class="p">,</span> <span class="n">KeyShare</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.dkls23_presign</span><span class="w"> </span><span class="kn">import</span> <span class="n">DKLS23_Presign</span><span class="p">,</span> <span class="n">Presignature</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.dkls23_sign</span><span class="w"> </span><span class="kn">import</span> <span class="n">DKLS23_Sign</span><span class="p">,</span> <span class="n">DKLS23</span><span class="p">,</span> <span class="n">ThresholdSignature</span>
+
+<span class="c1"># Import GG18 protocol components</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.gg18_dkg</span><span class="w"> </span><span class="kn">import</span> <span class="n">GG18_DKG</span><span class="p">,</span> <span class="n">GG18_KeyShare</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.gg18_sign</span><span class="w"> </span><span class="kn">import</span> <span class="n">GG18_Sign</span><span class="p">,</span> <span class="n">GG18</span><span class="p">,</span> <span class="n">GG18_Signature</span>
+
+<span class="c1"># Import CGGMP21 protocol components</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.cggmp21_proofs</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">RingPedersenParams</span><span class="p">,</span> <span class="n">RingPedersenGenerator</span><span class="p">,</span> <span class="n">CGGMP21_ZKProofs</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.cggmp21_dkg</span><span class="w"> </span><span class="kn">import</span> <span class="n">CGGMP21_DKG</span><span class="p">,</span> <span class="n">CGGMP21_KeyShare</span><span class="p">,</span> <span class="n">SecurityAbort</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.cggmp21_presign</span><span class="w"> </span><span class="kn">import</span> <span class="n">CGGMP21_Presign</span><span class="p">,</span> <span class="n">CGGMP21_Presignature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.cggmp21_sign</span><span class="w"> </span><span class="kn">import</span> <span class="n">CGGMP21_Sign</span><span class="p">,</span> <span class="n">CGGMP21</span><span class="p">,</span> <span class="n">CGGMP21_Signature</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
@@ -2491,6 +2506,542 @@
 
 
 
+<div class="viewcode-block" id="TestGG18_DKG">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_DKG">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestGG18_DKG</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests for GG18 Distributed Key Generation&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestGG18_DKG.setUp">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_DKG.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAGroup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestGG18_DKG.test_2_of_3_dkg">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_DKG.test_2_of_3_dkg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_2_of_3_dkg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test 2-of-3 distributed key generation for GG18&quot;&quot;&quot;</span>
+        <span class="n">dkg</span> <span class="o">=</span> <span class="n">GG18_DKG</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;test-gg18-dkg-2of3&quot;</span>
+
+        <span class="c1"># Round 1: Each party generates secret, Feldman commitments, and Paillier keys</span>
+        <span class="n">party_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round1</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">session_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">round1_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+        <span class="n">private_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+
+        <span class="c1"># All parties should have Paillier public keys in their messages</span>
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">round1_msgs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">&#39;paillier_pk&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">&#39;commitments&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Round 2: Generate shares for other parties</span>
+        <span class="n">round2_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round2</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">private_states</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round1_msgs</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">shares_for_others</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+        <span class="n">states_r2</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+
+        <span class="c1"># Round 3: Finalize key shares</span>
+        <span class="n">key_shares</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">party_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="n">received</span> <span class="o">=</span> <span class="p">{</span><span class="n">sender</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares_for_others</span><span class="p">[</span><span class="n">sender</span><span class="p">][</span><span class="n">party_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">sender</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)}</span>
+            <span class="n">ks</span><span class="p">,</span> <span class="n">complaint</span> <span class="o">=</span> <span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round3</span><span class="p">(</span><span class="n">party_id</span><span class="p">,</span> <span class="n">states_r2</span><span class="p">[</span><span class="n">party_id</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">received</span><span class="p">,</span> <span class="n">round1_msgs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">complaint</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Party </span><span class="si">{</span><span class="n">party_id</span><span class="si">}</span><span class="s2"> should not have complaints&quot;</span><span class="p">)</span>
+            <span class="n">key_shares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span>
+
+        <span class="c1"># All parties should have valid GG18_KeyShare objects</span>
+        <span class="k">for</span> <span class="n">ks</span> <span class="ow">in</span> <span class="n">key_shares</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">ks</span><span class="p">,</span> <span class="n">GG18_KeyShare</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">ks</span><span class="o">.</span><span class="n">paillier</span><span class="p">)</span>  <span class="c1"># Should have Paillier keypair</span></div>
+
+
+<div class="viewcode-block" id="TestGG18_DKG.test_all_parties_same_pubkey">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_DKG.test_all_parties_same_pubkey">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_all_parties_same_pubkey</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;All parties should derive the same public key in GG18&quot;&quot;&quot;</span>
+        <span class="n">dkg</span> <span class="o">=</span> <span class="n">GG18_DKG</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;test-gg18-same-pubkey&quot;</span>
+
+        <span class="c1"># Run full DKG</span>
+        <span class="n">party_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round1</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">session_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">round1_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+        <span class="n">priv_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+
+        <span class="n">round2_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round2</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">priv_states</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round1_msgs</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">shares_for_others</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+        <span class="n">states_r2</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+
+        <span class="n">key_shares</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">party_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="n">received</span> <span class="o">=</span> <span class="p">{</span><span class="n">sender</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares_for_others</span><span class="p">[</span><span class="n">sender</span><span class="p">][</span><span class="n">party_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">sender</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)}</span>
+            <span class="n">ks</span><span class="p">,</span> <span class="n">complaint</span> <span class="o">=</span> <span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round3</span><span class="p">(</span><span class="n">party_id</span><span class="p">,</span> <span class="n">states_r2</span><span class="p">[</span><span class="n">party_id</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">received</span><span class="p">,</span> <span class="n">round1_msgs</span><span class="p">)</span>
+            <span class="n">key_shares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span>
+
+        <span class="c1"># All should have same public key X</span>
+        <span class="n">pub_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">ks</span><span class="o">.</span><span class="n">X</span> <span class="k">for</span> <span class="n">ks</span> <span class="ow">in</span> <span class="n">key_shares</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">pk</span> <span class="o">==</span> <span class="n">pub_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">pk</span> <span class="ow">in</span> <span class="n">pub_keys</span><span class="p">),</span>
+                        <span class="s2">&quot;All parties should have same public key&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestGG18_Sign">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Sign">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestGG18_Sign</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests for GG18 signing protocol&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestGG18_Sign.setUp">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Sign.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAGroup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestGG18_Sign.test_signature_verification_correct">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Sign.test_signature_verification_correct">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_signature_verification_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that valid ECDSA signatures verify correctly with GG18&quot;&quot;&quot;</span>
+        <span class="n">signer</span> <span class="o">=</span> <span class="n">GG18_Sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="c1"># Create a valid ECDSA signature manually</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>  <span class="c1"># private key</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>  <span class="c1"># public key</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>  <span class="c1"># nonce</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">k</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">zr</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;test message for GG18&quot;</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">_hash_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Standard ECDSA: s = k^{-1}(e + rx)</span>
+
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">GG18_Signature</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">signer</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span> <span class="s2">&quot;Valid signature should verify&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestGG18_Sign.test_signature_verification_wrong_message">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Sign.test_signature_verification_wrong_message">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_signature_verification_wrong_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that signature verification fails with wrong message&quot;&quot;&quot;</span>
+        <span class="n">signer</span> <span class="o">=</span> <span class="n">GG18_Sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">pk</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">x</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">g</span> <span class="o">**</span> <span class="n">k</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">zr</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;original message&quot;</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">_hash_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">GG18_Signature</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">signer</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;wrong message&quot;</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                         <span class="s2">&quot;Signature should not verify with wrong message&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestGG18_Complete">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Complete">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestGG18_Complete</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;End-to-end tests for complete GG18 protocol&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestGG18_Complete.setUp">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Complete.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAGroup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestGG18_Complete.test_complete_2_of_3_signing">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Complete.test_complete_2_of_3_signing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_complete_2_of_3_signing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Complete flow: keygen -&gt; sign -&gt; verify for GG18&quot;&quot;&quot;</span>
+        <span class="n">gg18</span> <span class="o">=</span> <span class="n">GG18</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="c1"># Step 1: Distributed Key Generation</span>
+        <span class="n">public_key</span><span class="p">,</span> <span class="n">key_shares</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">key_shares</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Should have 3 key shares&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Step 2: Sign a message (GG18 has no presigning - 4 interactive rounds)</span>
+        <span class="n">participants</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Hello, GG18 threshold ECDSA!&quot;</span>
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="n">GG18_Signature</span><span class="p">)</span>
+
+        <span class="c1"># Step 3: Verify signature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">gg18</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                        <span class="s2">&quot;GG18 signature should verify correctly&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestGG18_Complete.test_different_participant_combinations">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Complete.test_different_participant_combinations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_different_participant_combinations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that any 2 of 3 parties can sign with GG18&quot;&quot;&quot;</span>
+        <span class="n">gg18</span> <span class="o">=</span> <span class="n">GG18</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="n">public_key</span><span class="p">,</span> <span class="n">key_shares</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Test message for any 2 of 3 with GG18&quot;</span>
+
+        <span class="c1"># Test all possible 2-party combinations</span>
+        <span class="n">combinations</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+
+        <span class="k">for</span> <span class="n">participants</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">:</span>
+            <span class="n">sig</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">gg18</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                            <span class="sa">f</span><span class="s2">&quot;GG18 signature with participants </span><span class="si">{</span><span class="n">participants</span><span class="si">}</span><span class="s2"> should verify&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestGG18_Complete.test_3_of_5_threshold">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestGG18_Complete.test_3_of_5_threshold">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_3_of_5_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test 3-of-5 threshold scheme with GG18&quot;&quot;&quot;</span>
+        <span class="n">gg18</span> <span class="o">=</span> <span class="n">GG18</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="n">public_key</span><span class="p">,</span> <span class="n">key_shares</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+        <span class="c1"># Sign with exactly 3 participants</span>
+        <span class="n">participants</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;GG18 3-of-5 threshold test&quot;</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">gg18</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                        <span class="s2">&quot;GG18 3-of-5 signature should verify&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestCGGMP21_Proofs">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Proofs">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestCGGMP21_Proofs</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests for CGGMP21 zero-knowledge proofs&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestCGGMP21_Proofs.setUp">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Proofs.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAGroup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_Proofs.test_ring_pedersen_generation">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Proofs.test_ring_pedersen_generation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_ring_pedersen_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test Ring-Pedersen parameter generation&quot;&quot;&quot;</span>
+        <span class="n">rpg</span> <span class="o">=</span> <span class="n">RingPedersenGenerator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">,</span> <span class="n">trapdoor</span> <span class="o">=</span> <span class="n">rpg</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">RingPedersenParams</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">t</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestCGGMP21_DKG">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_DKG">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestCGGMP21_DKG</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests for CGGMP21 Distributed Key Generation&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestCGGMP21_DKG.setUp">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_DKG.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAGroup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_DKG.test_2_of_3_dkg">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_DKG.test_2_of_3_dkg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_2_of_3_dkg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test 2-of-3 distributed key generation for CGGMP21&quot;&quot;&quot;</span>
+        <span class="n">dkg</span> <span class="o">=</span> <span class="n">CGGMP21_DKG</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>  <span class="c1"># Additional generator for Pedersen VSS</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;test-cggmp21-dkg-2of3&quot;</span>
+
+        <span class="c1"># Round 1: Each party generates secret, Pedersen commitments, and Paillier keys</span>
+        <span class="n">party_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round1</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">session_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">round1_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+        <span class="n">private_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+
+        <span class="c1"># All parties should have Paillier public keys in their messages</span>
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">round1_msgs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">&#39;paillier_pk&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s1">&#39;commitment&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>  <span class="c1"># Hash commitment (actual commitments in round 2)</span>
+
+        <span class="c1"># Round 2: Generate shares for other parties</span>
+        <span class="n">round2_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round2</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">private_states</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round1_msgs</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">shares_for_others</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+        <span class="n">states_r2</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+
+        <span class="c1"># Round 3: Finalize key shares</span>
+        <span class="n">key_shares</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">party_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="n">received</span> <span class="o">=</span> <span class="p">{</span><span class="n">sender</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares_for_others</span><span class="p">[</span><span class="n">sender</span><span class="p">][</span><span class="n">party_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">sender</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)}</span>
+            <span class="n">ks</span><span class="p">,</span> <span class="n">complaint</span> <span class="o">=</span> <span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round3</span><span class="p">(</span><span class="n">party_id</span><span class="p">,</span> <span class="n">states_r2</span><span class="p">[</span><span class="n">party_id</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">received</span><span class="p">,</span> <span class="n">round1_msgs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">complaint</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Party </span><span class="si">{</span><span class="n">party_id</span><span class="si">}</span><span class="s2"> should not have complaints&quot;</span><span class="p">)</span>
+            <span class="n">key_shares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span>
+
+        <span class="c1"># All parties should have valid CGGMP21_KeyShare objects</span>
+        <span class="k">for</span> <span class="n">ks</span> <span class="ow">in</span> <span class="n">key_shares</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">ks</span><span class="p">,</span> <span class="n">CGGMP21_KeyShare</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">ks</span><span class="o">.</span><span class="n">paillier</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_DKG.test_all_parties_same_pubkey">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_DKG.test_all_parties_same_pubkey">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_all_parties_same_pubkey</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;All parties should derive the same public key in CGGMP21&quot;&quot;&quot;</span>
+        <span class="n">dkg</span> <span class="o">=</span> <span class="n">CGGMP21_DKG</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;test-cggmp21-same-pubkey&quot;</span>
+
+        <span class="c1"># Run full DKG</span>
+        <span class="n">party_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round1</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">session_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">round1_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+        <span class="n">priv_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+
+        <span class="n">round2_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round2</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">priv_states</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round1_msgs</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">shares_for_others</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+        <span class="n">states_r2</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+
+        <span class="n">key_shares</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">party_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="n">received</span> <span class="o">=</span> <span class="p">{</span><span class="n">sender</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares_for_others</span><span class="p">[</span><span class="n">sender</span><span class="p">][</span><span class="n">party_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">sender</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)}</span>
+            <span class="n">ks</span><span class="p">,</span> <span class="n">complaint</span> <span class="o">=</span> <span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round3</span><span class="p">(</span><span class="n">party_id</span><span class="p">,</span> <span class="n">states_r2</span><span class="p">[</span><span class="n">party_id</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">received</span><span class="p">,</span> <span class="n">round1_msgs</span><span class="p">)</span>
+            <span class="n">key_shares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ks</span><span class="p">)</span>
+
+        <span class="c1"># All should have same public key X</span>
+        <span class="n">pub_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">ks</span><span class="o">.</span><span class="n">X</span> <span class="k">for</span> <span class="n">ks</span> <span class="ow">in</span> <span class="n">key_shares</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">pk</span> <span class="o">==</span> <span class="n">pub_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">pk</span> <span class="ow">in</span> <span class="n">pub_keys</span><span class="p">),</span>
+                        <span class="s2">&quot;All parties should have same public key&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestCGGMP21_Presign">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Presign">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestCGGMP21_Presign</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests for CGGMP21 presigning protocol&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestCGGMP21_Presign.setUp">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Presign.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAGroup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_Presign.test_presign_generates_valid_presignature">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Presign.test_presign_generates_valid_presignature">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_presign_generates_valid_presignature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that CGGMP21 presigning produces valid presignature objects&quot;&quot;&quot;</span>
+        <span class="c1"># First run DKG to get key shares</span>
+        <span class="n">dkg</span> <span class="o">=</span> <span class="n">CGGMP21_DKG</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;test-cggmp21-presign&quot;</span>
+
+        <span class="c1"># DKG</span>
+        <span class="n">party_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round1</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">session_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">round1_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+        <span class="n">priv_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">party_states</span><span class="p">]</span>
+
+        <span class="n">round2_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round2</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">priv_states</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round1_msgs</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">shares_for_others</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+        <span class="n">states_r2</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round2_results</span><span class="p">]</span>
+
+        <span class="n">key_shares</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">party_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="n">received</span> <span class="o">=</span> <span class="p">{</span><span class="n">sender</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">shares_for_others</span><span class="p">[</span><span class="n">sender</span><span class="p">][</span><span class="n">party_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">sender</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)}</span>
+            <span class="n">ks</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dkg</span><span class="o">.</span><span class="n">keygen_round3</span><span class="p">(</span><span class="n">party_id</span><span class="p">,</span> <span class="n">states_r2</span><span class="p">[</span><span class="n">party_id</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">received</span><span class="p">,</span> <span class="n">round1_msgs</span><span class="p">)</span>
+            <span class="n">key_shares</span><span class="p">[</span><span class="n">party_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">ks</span>
+
+        <span class="c1"># Now run presigning with participants 1 and 2</span>
+        <span class="n">presign</span> <span class="o">=</span> <span class="n">CGGMP21_Presign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">participants</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">presign_session_id</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;presign-session-1&quot;</span>
+
+        <span class="c1"># Round 1</span>
+        <span class="n">r1_results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">broadcast</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">presign</span><span class="o">.</span><span class="n">presign_round1</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">key_shares</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">presign_session_id</span><span class="p">)</span>
+            <span class="n">r1_results</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">broadcast</span>
+            <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="c1"># Round 2</span>
+        <span class="n">r1_msgs_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">r1_results</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">r2_broadcasts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">r2_p2p</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">broadcast</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">presign</span><span class="o">.</span><span class="n">presign_round2</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">r1_msgs_list</span><span class="p">)</span>
+            <span class="n">r2_broadcasts</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">broadcast</span>
+            <span class="n">r2_p2p</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">p2p</span>
+            <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="c1"># Collect p2p messages</span>
+        <span class="n">recv_r2</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">:</span> <span class="p">{</span><span class="n">s</span><span class="p">:</span> <span class="n">r2_p2p</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="n">r</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">participants</span> <span class="k">if</span> <span class="n">s</span> <span class="o">!=</span> <span class="n">r</span><span class="p">}</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">}</span>
+
+        <span class="c1"># Round 3</span>
+        <span class="n">r2_broadcasts_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">r2_broadcasts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">presigs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">presig</span><span class="p">,</span> <span class="n">broadcast</span> <span class="o">=</span> <span class="n">presign</span><span class="o">.</span><span class="n">presign_round3</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">r2_broadcasts_list</span><span class="p">,</span> <span class="n">recv_r2</span><span class="p">[</span><span class="n">pid</span><span class="p">])</span>
+            <span class="n">presigs</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">presig</span>
+
+        <span class="c1"># Verify all presignatures are valid</span>
+        <span class="k">for</span> <span class="n">pid</span><span class="p">,</span> <span class="n">presig</span> <span class="ow">in</span> <span class="n">presigs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">presig</span><span class="p">,</span> <span class="n">CGGMP21_Presignature</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestCGGMP21_Complete">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Complete">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestCGGMP21_Complete</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;End-to-end tests for complete CGGMP21 protocol&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestCGGMP21_Complete.setUp">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Complete.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAGroup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">RSAGroup</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_Complete.test_complete_2_of_3_with_presigning">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Complete.test_complete_2_of_3_with_presigning">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_complete_2_of_3_with_presigning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Complete flow: keygen -&gt; presign -&gt; sign -&gt; verify for CGGMP21&quot;&quot;&quot;</span>
+        <span class="n">cggmp</span> <span class="o">=</span> <span class="n">CGGMP21</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="c1"># Step 1: Distributed Key Generation</span>
+        <span class="n">public_key</span><span class="p">,</span> <span class="n">key_shares</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">key_shares</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Should have 3 key shares&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Step 2: Generate presignatures (optional in CGGMP21)</span>
+        <span class="n">participants</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">presignatures</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">presign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">presignatures</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Should have 2 presignatures&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Step 3: Sign a message using presignatures</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Hello, CGGMP21 threshold ECDSA!&quot;</span>
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">presignatures</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="n">CGGMP21_Signature</span><span class="p">)</span>
+
+        <span class="c1"># Step 4: Verify signature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">cggmp</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                        <span class="s2">&quot;CGGMP21 signature should verify correctly&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_Complete.test_different_participant_combinations">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Complete.test_different_participant_combinations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_different_participant_combinations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that any 2 of 3 parties can sign with CGGMP21&quot;&quot;&quot;</span>
+        <span class="n">cggmp</span> <span class="o">=</span> <span class="n">CGGMP21</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="n">public_key</span><span class="p">,</span> <span class="n">key_shares</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Test message for any 2 of 3 with CGGMP21&quot;</span>
+
+        <span class="c1"># Test all possible 2-party combinations</span>
+        <span class="n">combinations</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+
+        <span class="k">for</span> <span class="n">participants</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">:</span>
+            <span class="n">presigs</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">presign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="n">sig</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">presigs</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">cggmp</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                            <span class="sa">f</span><span class="s2">&quot;CGGMP21 signature with participants </span><span class="si">{</span><span class="n">participants</span><span class="si">}</span><span class="s2"> should verify&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_Complete.test_3_of_5_threshold">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_Complete.test_3_of_5_threshold">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_3_of_5_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test 3-of-5 threshold scheme with CGGMP21&quot;&quot;&quot;</span>
+        <span class="n">cggmp</span> <span class="o">=</span> <span class="n">CGGMP21</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="n">public_key</span><span class="p">,</span> <span class="n">key_shares</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">keygen</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># Sign with exactly 3 participants</span>
+        <span class="n">participants</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+        <span class="n">presigs</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">presign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;CGGMP21 3-of-5 threshold test&quot;</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">presigs</span><span class="p">,</span> <span class="n">participants</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">cggmp</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                        <span class="s2">&quot;CGGMP21 3-of-5 signature should verify&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestCGGMP21_IdentifiableAbort">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_IdentifiableAbort">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestCGGMP21_IdentifiableAbort</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests for CGGMP21 identifiable abort feature&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TestCGGMP21_IdentifiableAbort.setUp">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_IdentifiableAbort.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_IdentifiableAbort.test_security_abort_exception">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_exception">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_security_abort_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test SecurityAbort exception is properly defined&quot;&quot;&quot;</span>
+        <span class="c1"># Test that SecurityAbort can be raised and caught</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SecurityAbort</span><span class="p">)</span> <span class="k">as</span> <span class="n">ctx</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SecurityAbort</span><span class="p">(</span><span class="s2">&quot;Party 2 provided invalid proof&quot;</span><span class="p">,</span> <span class="n">accused_party</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">exc</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">exception</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">accused_party</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">&quot;Party 2&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="TestCGGMP21_IdentifiableAbort.test_security_abort_with_evidence">
+<a class="viewcode-back" href="../test/threshold_test.html#threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_with_evidence">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_security_abort_with_evidence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test SecurityAbort with evidence&quot;&quot;&quot;</span>
+        <span class="n">evidence</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;invalid_share&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;0x1234&#39;</span><span class="p">,</span> <span class="s1">&#39;commitment&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;0xabcd&#39;</span><span class="p">}</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SecurityAbort</span><span class="p">)</span> <span class="k">as</span> <span class="n">ctx</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SecurityAbort</span><span class="p">(</span>
+                <span class="s2">&quot;Party 3 share does not match commitment&quot;</span><span class="p">,</span>
+                <span class="n">accused_party</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">evidence</span><span class="o">=</span><span class="n">evidence</span>
+            <span class="p">)</span>
+
+        <span class="n">exc</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">exception</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">accused_party</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">evidence</span><span class="p">,</span> <span class="n">evidence</span><span class="p">)</span></div>
+</div>
+
+
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 </pre></div>
@@ -2511,7 +3062,7 @@
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Feb 02, 2026</div>
+              Last updated on Feb 07, 2026</div>
           </div>
           <div class="right-details">
             

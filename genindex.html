@@ -278,6 +278,7 @@
 <li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="threshold.html">Threshold ECDSA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Schemes with Test Vectors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
@@ -316,6 +317,8 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox/mta.html">mta</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/node.html">node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/paillier_mta.html">paillier_mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/paillier_zkproofs.html">paillier_zkproofs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/pairingcurves.html">pairingcurves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/pairinggroup.html">pairinggroup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/PKEnc.html">PKEnc - Public-Key Encryption</a></li>
@@ -663,7 +666,11 @@
           <li><a href="toolbox/zknode.html#zknode.BinNode">(class in zknode)</a>
 </li>
         </ul></li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierRangeProof.bit_commitments">bit_commitments (paillier_zkproofs.PaillierRangeProof attribute)</a>
+</li>
         <li><a href="toolbox/mpc_utils.html#mpc_utils.bit_decompose">bit_decompose() (in module mpc_utils)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierRangeProof.bit_proofs">bit_proofs (paillier_zkproofs.PaillierRangeProof attribute)</a>
 </li>
         <li><a href="toolbox/ABEnumeric.html#charm.toolbox.ABEnumeric.BitOverflowError">BitOverflowError</a>
 </li>
@@ -761,6 +768,8 @@
 </li>
         <li><a href="charm/schemes/pksig/pksig_hw.html#pksig_hw.HW.ceilog">ceilog() (pksig_hw.HW method)</a>
 </li>
+        <li><a href="threshold.html#charm.schemes.threshold.CGGMP21">CGGMP21 (class in charm.schemes.threshold)</a>
+</li>
         <li>
     cgw15
 
@@ -770,8 +779,14 @@
         </ul></li>
         <li><a href="charm/schemes/abenc/cgw15.html#cgw15.CGW15CPABE">CGW15CPABE (class in cgw15)</a>
 </li>
-        <li><a href="toolbox/ZKProof.html#ZKProof.Proof.challenge">challenge (ZKProof.Proof attribute)</a>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierDLogProof.challenge">challenge (paillier_zkproofs.PaillierDLogProof attribute)</a>
+
+        <ul>
+          <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierEncProof.challenge">(paillier_zkproofs.PaillierEncProof attribute)</a>
 </li>
+          <li><a href="toolbox/ZKProof.html#ZKProof.Proof.challenge">(ZKProof.Proof attribute)</a>
+</li>
+        </ul></li>
         <li><a href="toolbox/Hash.html#Hash.ChamHash">ChamHash (class in Hash)</a>
 </li>
         <li>
@@ -812,6 +827,13 @@
         </ul></li>
         <li><a href="toolbox/reCompiler.html#reCompiler.CharacterSet">CharacterSet (class in reCompiler)</a>
 </li>
+        <li>
+    charm.schemes.threshold
+
+        <ul>
+          <li><a href="threshold.html#module-charm.schemes.threshold">module</a>
+</li>
+        </ul></li>
         <li>
     charm.toolbox.ABEnc
 
@@ -971,9 +993,17 @@
         </ul></li>
         <li><a href="toolbox/Commit.html#Commit.Commitment">Commitment (class in Commit)</a>
 </li>
-        <li><a href="toolbox/ZKProof.html#ZKProof.Proof.commitment">commitment (ZKProof.Proof attribute)</a>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierEncProof.commitment">commitment (paillier_zkproofs.PaillierEncProof attribute)</a>
+
+        <ul>
+          <li><a href="toolbox/ZKProof.html#ZKProof.Proof.commitment">(ZKProof.Proof attribute)</a>
 </li>
+        </ul></li>
         <li><a href="charm/schemes/pksig/pksig_ps03.html#pksig_ps03.PS01.commitment">commitment() (pksig_ps03.PS01 method)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierDLogProof.commitment_c">commitment_c (paillier_zkproofs.PaillierDLogProof attribute)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierDLogProof.commitment_Q">commitment_Q (paillier_zkproofs.PaillierDLogProof attribute)</a>
 </li>
         <li><a href="toolbox/FSA.html#FSA.compileConjunction">compileConjunction() (in module FSA)</a>
 
@@ -1348,6 +1378,8 @@
         </ul></li>
         <li><a href="toolbox/FSA.html#FSA.difference">difference() (in module FSA)</a>
 </li>
+        <li><a href="threshold.html#charm.schemes.threshold.DKLS23">DKLS23 (class in charm.schemes.threshold)</a>
+</li>
         <li><a href="toolbox/iterate.html#iterate.dotprod">dotprod() (in module iterate)</a>
 </li>
         <li><a href="toolbox/iterate.html#iterate.dotprod2">dotprod2() (in module iterate)</a>
@@ -1689,6 +1721,8 @@
 </li>
         <li><a href="charm/schemes/abenc/abenc_ca_cpabe_ar17.html#abenc_ca_cpabe_ar17.CaCpabeAr.generate_kek_for_user_with_attr">generate_kek_for_user_with_attr() (abenc_ca_cpabe_ar17.CaCpabeAr method)</a>
 </li>
+        <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtA.generate_keypair">generate_keypair() (paillier_mta.PaillierMtA method)</a>
+</li>
         <li><a href="toolbox/specialprimes.html#specialprimes.BlumWilliamsInteger.generateBlumWilliamsInteger">generateBlumWilliamsInteger() (specialprimes.BlumWilliamsInteger method)</a>
 </li>
         <li><a href="toolbox/specialprimes.html#specialprimes.BlumWilliamsInteger.generatePrimes">generatePrimes() (specialprimes.BlumWilliamsInteger method)</a>
@@ -1832,6 +1866,8 @@
 </li>
         </ul></li>
         <li><a href="toolbox/schemebase.html#schemebase.SchemeBase.getTypes">getTypes() (schemebase.SchemeBase class method)</a>
+</li>
+        <li><a href="threshold.html#charm.schemes.threshold.GG18">GG18 (class in charm.schemes.threshold)</a>
 </li>
         <li><a href="toolbox/enum.html#enum.global_enum">global_enum() (in module enum)</a>
 </li>
@@ -2234,6 +2270,12 @@
 </li>
           <li><a href="charm/schemes/abenc/cgw15.html#cgw15.CGW15CPABE.keygen">(cgw15.CGW15CPABE method)</a>
 </li>
+          <li><a href="threshold.html#charm.schemes.threshold.CGGMP21.keygen">(charm.schemes.threshold.CGGMP21 method)</a>
+</li>
+          <li><a href="threshold.html#charm.schemes.threshold.DKLS23.keygen">(charm.schemes.threshold.DKLS23 method)</a>
+</li>
+          <li><a href="threshold.html#charm.schemes.threshold.GG18.keygen">(charm.schemes.threshold.GG18 method)</a>
+</li>
           <li><a href="charm/schemes/abenc/dabe_aw11.html#dabe_aw11.Dabe.keygen">(dabe_aw11.Dabe method)</a>
 </li>
           <li><a href="charm/adapters/dabenc_adapt_hybrid.html#dabenc_adapt_hybrid.HybridABEncMA.keygen">(dabenc_adapt_hybrid.HybridABEncMA method)</a>
@@ -2571,6 +2613,8 @@
 </li>
           <li><a href="test/chamhash_rsa_hw09_test.html#module-chamhash_rsa_hw09_test">chamhash_rsa_hw09_test</a>
 </li>
+          <li><a href="threshold.html#module-charm.schemes.threshold">charm.schemes.threshold</a>
+</li>
           <li><a href="toolbox/ABEnc.html#module-charm.toolbox.ABEnc">charm.toolbox.ABEnc</a>
 </li>
           <li><a href="toolbox/ABEncMultiAuth.html#module-charm.toolbox.ABEncMultiAuth">charm.toolbox.ABEncMultiAuth</a>
@@ -2664,6 +2708,10 @@
           <li><a href="toolbox/paddingschemes.html#module-paddingschemes">paddingschemes</a>
 </li>
           <li><a href="test/paddingschemes_test.html#module-paddingschemes_test">paddingschemes_test</a>
+</li>
+          <li><a href="toolbox/paillier_mta.html#module-paillier_mta">paillier_mta</a>
+</li>
+          <li><a href="toolbox/paillier_zkproofs.html#module-paillier_zkproofs">paillier_zkproofs</a>
 </li>
           <li><a href="toolbox/pairingcurves.html#module-pairingcurves">pairingcurves</a>
 </li>
@@ -2978,6 +3026,34 @@
 </li>
         <li><a href="test/pkenc_test.html#pkenc_test.Pai99Test">Pai99Test (class in pkenc_test)</a>
 </li>
+        <li>
+    paillier_mta
+
+        <ul>
+          <li><a href="toolbox/paillier_mta.html#module-paillier_mta">module</a>
+</li>
+        </ul></li>
+        <li>
+    paillier_zkproofs
+
+        <ul>
+          <li><a href="toolbox/paillier_zkproofs.html#module-paillier_zkproofs">module</a>
+</li>
+        </ul></li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierDLogProof">PaillierDLogProof (class in paillier_zkproofs)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierEncProof">PaillierEncProof (class in paillier_zkproofs)</a>
+</li>
+        <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierKeyPair">PaillierKeyPair (class in paillier_mta)</a>
+</li>
+        <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtA">PaillierMtA (class in paillier_mta)</a>
+</li>
+        <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtAwc">PaillierMtAwc (class in paillier_mta)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierRangeProof">PaillierRangeProof (class in paillier_zkproofs)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierZKProofs">PaillierZKProofs (class in paillier_zkproofs)</a>
+</li>
         <li><a href="toolbox/pairinggroup.html#pairinggroup.PairingGroup.pair_prod">pair_prod() (pairinggroup.PairingGroup method)</a>
 </li>
         <li>
@@ -3246,6 +3322,8 @@
           <li><a href="charm/schemes/pksig/pksig_hess.html#module-pksig_hess">module</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     pksig_hw
 
@@ -3253,8 +3331,6 @@
           <li><a href="charm/schemes/pksig/pksig_hw.html#module-pksig_hw">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     pksig_lamport
 
@@ -3382,6 +3458,12 @@
 </li>
         <li><a href="toolbox/ABEnumeric.html#charm.toolbox.ABEnumeric.preprocess_numeric_policy">preprocess_numeric_policy() (in module charm.toolbox.ABEnumeric)</a>
 </li>
+        <li><a href="threshold.html#charm.schemes.threshold.CGGMP21.presign">presign() (charm.schemes.threshold.CGGMP21 method)</a>
+
+        <ul>
+          <li><a href="threshold.html#charm.schemes.threshold.DKLS23.presign">(charm.schemes.threshold.DKLS23 method)</a>
+</li>
+        </ul></li>
         <li><a href="charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.Prf">Prf (class in pksig_rsa_hw09)</a>
 </li>
         <li><a href="charm/schemes/abenc/abenc_ca_cpabe_ar17.html#abenc_ca_cpabe_ar17.UsersBinaryTree.print_tree">print_tree() (abenc_ca_cpabe_ar17.UsersBinaryTree method)</a>
@@ -3454,6 +3536,10 @@
           <li><a href="toolbox/ZKProof.html#ZKProof.ZKProofBase.prove">(ZKProof.ZKProofBase method)</a>
 </li>
         </ul></li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierZKProofs.prove_dlog_equality">prove_dlog_equality() (paillier_zkproofs.PaillierZKProofs method)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierZKProofs.prove_encryption_knowledge">prove_encryption_knowledge() (paillier_zkproofs.PaillierZKProofs method)</a>
+</li>
         <li><a href="charm/schemes/protocol_schnorr91.html#protocol_schnorr91.SchnorrZK.prover_state1">prover_state1() (protocol_schnorr91.SchnorrZK method)</a>
 
         <ul>
@@ -3590,6 +3676,8 @@
           <li><a href="charm/schemes/pksig/pksig_rsa_hw09.html#pksig_rsa_hw09.randomQR">(in module pksig_rsa_hw09)</a>
 </li>
         </ul></li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierRangeProof.range_bound_bits">range_bound_bits (paillier_zkproofs.PaillierRangeProof attribute)</a>
+</li>
         <li><a href="toolbox/PREnc.html#PREnc.PREnc.re_encrypt">re_encrypt() (PREnc.PREnc method)</a>
 </li>
         <li><a href="toolbox/reCompiler.html#reCompiler.SymbolRECompiler.readChar">readChar() (reCompiler.SymbolRECompiler method)</a>
@@ -3609,7 +3697,11 @@
         <ul>
           <li><a href="toolbox/mta.html#mta.MtAwc.receiver_round1">(mta.MtAwc method)</a>
 </li>
+          <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtA.receiver_round1">(paillier_mta.PaillierMtA method)</a>
+</li>
         </ul></li>
+        <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtAwc.receiver_round1_with_proof">receiver_round1_with_proof() (paillier_mta.PaillierMtAwc method)</a>
+</li>
         <li><a href="toolbox/mta.html#mta.MtA.receiver_round2">receiver_round2() (mta.MtA method)</a>
 </li>
         <li><a href="charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.receiver_transfer4">receiver_transfer4() (protocol_cns07.ObliviousTransfer method)</a>
@@ -3683,6 +3775,16 @@
         <li><a href="toolbox/policytree.html#policytree.PolicyParser.requiredAttributes">requiredAttributes() (policytree.PolicyParser method)</a>
 </li>
         <li><a href="toolbox/ZKProof.html#ZKProof.Proof.response">response (ZKProof.Proof attribute)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierEncProof.response_m">response_m (paillier_zkproofs.PaillierEncProof attribute)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierDLogProof.response_r">response_r (paillier_zkproofs.PaillierDLogProof attribute)</a>
+
+        <ul>
+          <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierEncProof.response_r">(paillier_zkproofs.PaillierEncProof attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierDLogProof.response_x">response_x (paillier_zkproofs.PaillierDLogProof attribute)</a>
 </li>
         <li><a href="toolbox/FSA.html#FSA.reverse">reverse() (in module FSA)</a>
 </li>
@@ -3795,13 +3897,21 @@
         <ul>
           <li><a href="toolbox/mta.html#mta.MtAwc.sender_round1">(mta.MtAwc method)</a>
 </li>
+          <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtA.sender_round1">(paillier_mta.PaillierMtA method)</a>
+</li>
         </ul></li>
+        <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtAwc.sender_round1_with_proof">sender_round1_with_proof() (paillier_mta.PaillierMtAwc method)</a>
+</li>
         <li><a href="toolbox/mta.html#mta.MtA.sender_round2">sender_round2() (mta.MtA method)</a>
 
         <ul>
           <li><a href="toolbox/mta.html#mta.MtAwc.sender_round2">(mta.MtAwc method)</a>
 </li>
+          <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtA.sender_round2">(paillier_mta.PaillierMtA method)</a>
+</li>
         </ul></li>
+        <li><a href="toolbox/paillier_mta.html#paillier_mta.PaillierMtAwc.sender_round2_with_verify">sender_round2_with_verify() (paillier_mta.PaillierMtAwc method)</a>
+</li>
         <li><a href="charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer5">sender_transfer5() (protocol_cns07.ObliviousTransfer method)</a>
 </li>
         <li><a href="charm/schemes/protocol_cns07.html#protocol_cns07.ObliviousTransfer.sender_transfer7">sender_transfer7() (protocol_cns07.ObliviousTransfer method)</a>
@@ -3950,14 +4060,30 @@
           <li><a href="toolbox/PREnc.html#PREnc.PREnc.setup">(PREnc.PREnc method)</a>
 </li>
         </ul></li>
-        <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Complete.setUp">setUp() (threshold_test.TestDKLS23_Complete method)</a>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Complete.setUp">setUp() (threshold_test.TestCGGMP21_Complete method)</a>
 
         <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_DKG.setUp">(threshold_test.TestCGGMP21_DKG method)</a>
+</li>
+          <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_IdentifiableAbort.setUp">(threshold_test.TestCGGMP21_IdentifiableAbort method)</a>
+</li>
+          <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Presign.setUp">(threshold_test.TestCGGMP21_Presign method)</a>
+</li>
+          <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Proofs.setUp">(threshold_test.TestCGGMP21_Proofs method)</a>
+</li>
+          <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Complete.setUp">(threshold_test.TestDKLS23_Complete method)</a>
+</li>
           <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_DKG.setUp">(threshold_test.TestDKLS23_DKG method)</a>
 </li>
           <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Presign.setUp">(threshold_test.TestDKLS23_Presign method)</a>
 </li>
           <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Sign.setUp">(threshold_test.TestDKLS23_Sign method)</a>
+</li>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_Complete.setUp">(threshold_test.TestGG18_Complete method)</a>
+</li>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_DKG.setUp">(threshold_test.TestGG18_DKG method)</a>
+</li>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_Sign.setUp">(threshold_test.TestGG18_Sign method)</a>
 </li>
           <li><a href="test/threshold_test.html#threshold_test.TestMtA.setUp">(threshold_test.TestMtA method)</a>
 </li>
@@ -3974,6 +4100,8 @@
           <li><a href="test/threshold_test.html#threshold_test.TestThresholdSignature.setUp">(threshold_test.TestThresholdSignature method)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="charm/schemes/abenc/waters11.html#waters11.Waters11.setup">setup() (waters11.Waters11 method)</a>
 
         <ul>
@@ -3996,8 +4124,6 @@
           <li><a href="test/threshold_test.html#threshold_test.TestMaliciousParties.setUpClass">(threshold_test.TestMaliciousParties class method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="charm/schemes/pksig/pksig_cl03.html#pksig_cl03.SHA1">SHA1() (in module pksig_cl03)</a>
 
         <ul>
@@ -4092,6 +4218,12 @@
           <li><a href="charm/schemes/blindsig_ps16.html#blindsig_ps16.PS_SigMultiMessage.sign">(blindsig_ps16.PS_SigMultiMessage method)</a>
 </li>
           <li><a href="charm/schemes/blindsig_ps16.html#blindsig_ps16.PS_SigSingleMessage.sign">(blindsig_ps16.PS_SigSingleMessage method)</a>
+</li>
+          <li><a href="threshold.html#charm.schemes.threshold.CGGMP21.sign">(charm.schemes.threshold.CGGMP21 method)</a>
+</li>
+          <li><a href="threshold.html#charm.schemes.threshold.DKLS23.sign">(charm.schemes.threshold.DKLS23 method)</a>
+</li>
+          <li><a href="threshold.html#charm.schemes.threshold.GG18.sign">(charm.schemes.threshold.GG18 method)</a>
 </li>
           <li><a href="toolbox/IBSig.html#IBSig.IBSig.sign">(IBSig.IBSig method)</a>
 </li>
@@ -4279,16 +4411,34 @@
           <li><a href="charm/schemes/abenc/abenc_tbpre_lww14.html#abenc_tbpre_lww14.test">(in module abenc_tbpre_lww14)</a>
 </li>
         </ul></li>
-        <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_DKG.test_2_of_3_dkg">test_2_of_3_dkg() (threshold_test.TestDKLS23_DKG method)</a>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_DKG.test_2_of_3_dkg">test_2_of_3_dkg() (threshold_test.TestCGGMP21_DKG method)</a>
+
+        <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_DKG.test_2_of_3_dkg">(threshold_test.TestDKLS23_DKG method)</a>
 </li>
-        <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Complete.test_3_of_5_threshold">test_3_of_5_threshold() (threshold_test.TestDKLS23_Complete method)</a>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_DKG.test_2_of_3_dkg">(threshold_test.TestGG18_DKG method)</a>
 </li>
+        </ul></li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Complete.test_3_of_5_threshold">test_3_of_5_threshold() (threshold_test.TestCGGMP21_Complete method)</a>
+
+        <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Complete.test_3_of_5_threshold">(threshold_test.TestDKLS23_Complete method)</a>
+</li>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_Complete.test_3_of_5_threshold">(threshold_test.TestGG18_Complete method)</a>
+</li>
+        </ul></li>
         <li><a href="test/integer_arithmetic_test.html#integer_arithmetic_test.Python312CompatibilityTest.test_65537_regression">test_65537_regression() (integer_arithmetic_test.Python312CompatibilityTest method)</a>
 </li>
         <li><a href="test/integer_arithmetic_test.html#integer_arithmetic_test.ArithmeticOperationsTest.test_addition">test_addition() (integer_arithmetic_test.ArithmeticOperationsTest method)</a>
 </li>
-        <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_DKG.test_all_parties_same_pubkey">test_all_parties_same_pubkey() (threshold_test.TestDKLS23_DKG method)</a>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_DKG.test_all_parties_same_pubkey">test_all_parties_same_pubkey() (threshold_test.TestCGGMP21_DKG method)</a>
+
+        <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_DKG.test_all_parties_same_pubkey">(threshold_test.TestDKLS23_DKG method)</a>
 </li>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_DKG.test_all_parties_same_pubkey">(threshold_test.TestGG18_DKG method)</a>
+</li>
+        </ul></li>
         <li><a href="test/test_policy_expression.html#test_policy_expression.TestPolicyExpressionSpec.test_allAND_policy_expressions">test_allAND_policy_expressions() (test_policy_expression.TestPolicyExpressionSpec method)</a>
 </li>
         <li><a href="test/policy_parser_stress_test.html#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_attr_name_all_caps">test_attr_name_all_caps() (policy_parser_stress_test.NumericAttributeEdgeCaseTest method)</a>
@@ -4334,6 +4484,12 @@
         <li><a href="test/integer_arithmetic_test.html#integer_arithmetic_test.ArithmeticOperationsTest.test_comparison">test_comparison() (integer_arithmetic_test.ArithmeticOperationsTest method)</a>
 </li>
         <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Complete.test_complete_2_of_3_signing">test_complete_2_of_3_signing() (threshold_test.TestDKLS23_Complete method)</a>
+
+        <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_Complete.test_complete_2_of_3_signing">(threshold_test.TestGG18_Complete method)</a>
+</li>
+        </ul></li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Complete.test_complete_2_of_3_with_presigning">test_complete_2_of_3_with_presigning() (threshold_test.TestCGGMP21_Complete method)</a>
 </li>
         <li><a href="test/policy_parser_stress_test.html#policy_parser_stress_test.NumericAttributeTest.test_compound_numeric_policy">test_compound_numeric_policy() (policy_parser_stress_test.NumericAttributeTest method)</a>
 </li>
@@ -4349,8 +4505,14 @@
 </li>
         <li><a href="test/threshold_test.html#threshold_test.TestThresholdSignature.test_der_encoding">test_der_encoding() (threshold_test.TestThresholdSignature method)</a>
 </li>
-        <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Complete.test_different_participant_combinations">test_different_participant_combinations() (threshold_test.TestDKLS23_Complete method)</a>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Complete.test_different_participant_combinations">test_different_participant_combinations() (threshold_test.TestCGGMP21_Complete method)</a>
+
+        <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Complete.test_different_participant_combinations">(threshold_test.TestDKLS23_Complete method)</a>
 </li>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_Complete.test_different_participant_combinations">(threshold_test.TestGG18_Complete method)</a>
+</li>
+        </ul></li>
         <li><a href="test/integer_arithmetic_test.html#integer_arithmetic_test.Python312CompatibilityTest.test_digit_boundary_values">test_digit_boundary_values() (integer_arithmetic_test.Python312CompatibilityTest method)</a>
 </li>
         <li><a href="test/integer_arithmetic_test.html#integer_arithmetic_test.ArithmeticOperationsTest.test_division">test_division() (integer_arithmetic_test.ArithmeticOperationsTest method)</a>
@@ -4575,8 +4737,6 @@
 </li>
         <li><a href="test/threshold_test.html#threshold_test.TestPedersenVSS.test_pedersen_vss_reconstruction">test_pedersen_vss_reconstruction() (threshold_test.TestPedersenVSS method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="test/threshold_test.html#threshold_test.TestPedersenVSS.test_pedersen_vss_verification">test_pedersen_vss_verification() (threshold_test.TestPedersenVSS method)</a>
 </li>
         <li>
@@ -4586,14 +4746,20 @@
           <li><a href="test/test_policy_expression.html#module-test_policy_expression">module</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="test/test_policy_expression.html#test_policy_expression.TestPolicyExpressionSpec.test_policy_expression_spec">test_policy_expression_spec() (test_policy_expression.TestPolicyExpressionSpec method)</a>
 </li>
         <li><a href="test/policy_parser_stress_test.html#policy_parser_stress_test.NumericAttributeEdgeCaseTest.test_policy_without_numeric">test_policy_without_numeric() (policy_parser_stress_test.NumericAttributeEdgeCaseTest method)</a>
 </li>
         <li><a href="test/threshold_test.html#threshold_test.TestMaliciousParties.test_presign_commitment_mismatch_detected">test_presign_commitment_mismatch_detected() (threshold_test.TestMaliciousParties method)</a>
 </li>
-        <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Presign.test_presign_generates_valid_presignature">test_presign_generates_valid_presignature() (threshold_test.TestDKLS23_Presign method)</a>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Presign.test_presign_generates_valid_presignature">test_presign_generates_valid_presignature() (threshold_test.TestCGGMP21_Presign method)</a>
+
+        <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Presign.test_presign_generates_valid_presignature">(threshold_test.TestDKLS23_Presign method)</a>
 </li>
+        </ul></li>
         <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Presign.test_presign_rejects_empty_session_id">test_presign_rejects_empty_session_id() (threshold_test.TestDKLS23_Presign method)</a>
 </li>
         <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Presign.test_presign_rejects_none_session_id">test_presign_rejects_none_session_id() (threshold_test.TestDKLS23_Presign method)</a>
@@ -4608,11 +4774,17 @@
 </li>
         <li><a href="test/policy_parser_stress_test.html#policy_parser_stress_test.PolicyParserStressTest.test_random_policies">test_random_policies() (policy_parser_stress_test.PolicyParserStressTest method)</a>
 </li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Proofs.test_ring_pedersen_generation">test_ring_pedersen_generation() (threshold_test.TestCGGMP21_Proofs method)</a>
+</li>
         <li><a href="test/integer_arithmetic_test.html#integer_arithmetic_test.IntegerConversionTest.test_round_trip_conversion">test_round_trip_conversion() (integer_arithmetic_test.IntegerConversionTest method)</a>
 </li>
         <li><a href="test/integer_arithmetic_test.html#integer_arithmetic_test.IntegrationSchemeTest.test_rsa_coprime_search_pattern">test_rsa_coprime_search_pattern() (integer_arithmetic_test.IntegrationSchemeTest method)</a>
 </li>
         <li><a href="test/integer_arithmetic_test.html#integer_arithmetic_test.IntegrationSchemeTest.test_rsa_encryption_decryption_pattern">test_rsa_encryption_decryption_pattern() (integer_arithmetic_test.IntegrationSchemeTest method)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_exception">test_security_abort_exception() (threshold_test.TestCGGMP21_IdentifiableAbort method)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_with_evidence">test_security_abort_with_evidence() (threshold_test.TestCGGMP21_IdentifiableAbort method)</a>
 </li>
         <li><a href="test/threshold_test.html#threshold_test.TestOTExtension.test_sender_s_not_exposed">test_sender_s_not_exposed() (threshold_test.TestOTExtension method)</a>
 </li>
@@ -4633,9 +4805,17 @@
         <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Sign.test_signature_share_verification">test_signature_share_verification() (threshold_test.TestDKLS23_Sign method)</a>
 </li>
         <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Sign.test_signature_verification_correct">test_signature_verification_correct() (threshold_test.TestDKLS23_Sign method)</a>
+
+        <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_Sign.test_signature_verification_correct">(threshold_test.TestGG18_Sign method)</a>
 </li>
+        </ul></li>
         <li><a href="test/threshold_test.html#threshold_test.TestDKLS23_Sign.test_signature_verification_wrong_message">test_signature_verification_wrong_message() (threshold_test.TestDKLS23_Sign method)</a>
+
+        <ul>
+          <li><a href="test/threshold_test.html#threshold_test.TestGG18_Sign.test_signature_verification_wrong_message">(threshold_test.TestGG18_Sign method)</a>
 </li>
+        </ul></li>
         <li><a href="test/threshold_test.html#threshold_test.TestSilentOT.test_silent_ot_basic">test_silent_ot_basic() (threshold_test.TestSilentOT method)</a>
 </li>
         <li><a href="test/threshold_test.html#threshold_test.TestSilentOT.test_silent_ot_choice_distribution">test_silent_ot_choice_distribution() (threshold_test.TestSilentOT method)</a>
@@ -4714,6 +4894,16 @@
 </li>
         <li><a href="test/pksig_test.html#pksig_test.BoyenTest.testBoyen">testBoyen() (pksig_test.BoyenTest method)</a>
 </li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Complete">TestCGGMP21_Complete (class in threshold_test)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_DKG">TestCGGMP21_DKG (class in threshold_test)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_IdentifiableAbort">TestCGGMP21_IdentifiableAbort (class in threshold_test)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Presign">TestCGGMP21_Presign (class in threshold_test)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestCGGMP21_Proofs">TestCGGMP21_Proofs (class in threshold_test)</a>
+</li>
         <li><a href="test/chamhash_adm05_test.html#chamhash_adm05_test.ChamHash_Adm05Test.testChamHash_Adm05">testChamHash_Adm05() (chamhash_adm05_test.ChamHash_Adm05Test method)</a>
 </li>
         <li><a href="test/chamhash_rsa_hw09_test.html#chamhash_rsa_hw09_test.ChamHash_HW09Test.testChamHash_HW09">testChamHash_HW09() (chamhash_rsa_hw09_test.ChamHash_HW09Test method)</a>
@@ -4759,6 +4949,12 @@
         <li><a href="test/encap_bchk05_test.html#encap_bchk05_test.EncapBCHKTest.testEncapBCHK">testEncapBCHK() (encap_bchk05_test.EncapBCHKTest method)</a>
 </li>
         <li><a href="test/paddingschemes_test.html#paddingschemes_test.Pkcs7PaddingTest.testFull">testFull() (paddingschemes_test.Pkcs7PaddingTest method)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestGG18_Complete">TestGG18_Complete (class in threshold_test)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestGG18_DKG">TestGG18_DKG (class in threshold_test)</a>
+</li>
+        <li><a href="test/threshold_test.html#threshold_test.TestGG18_Sign">TestGG18_Sign (class in threshold_test)</a>
 </li>
         <li><a href="test/pksig_test.html#pksig_test.HessTest.testHess">testHess() (pksig_test.HessTest method)</a>
 </li>
@@ -5047,6 +5243,8 @@
 </li>
           <li><a href="charm/schemes/blindsig_ps16.html#blindsig_ps16.PS_SigSingleMessage.verify">(blindsig_ps16.PS_SigSingleMessage method)</a>
 </li>
+          <li><a href="threshold.html#charm.schemes.threshold.GG18.verify">(charm.schemes.threshold.GG18 method)</a>
+</li>
           <li><a href="toolbox/IBSig.html#IBSig.IBSig.verify">(IBSig.IBSig method)</a>
 </li>
           <li><a href="toolbox/paddingschemes.html#paddingschemes.PSSPadding.verify">(paddingschemes.PSSPadding method)</a>
@@ -5117,6 +5315,10 @@
         <li><a href="charm/schemes/aggrsign_bls.html#aggrsign_bls.BLSAggregation.verify_aggregate_sig_vulnerable">verify_aggregate_sig_vulnerable() (aggrsign_bls.BLSAggregation method)</a>
 </li>
         <li><a href="toolbox/broadcast.html#broadcast.EchoBroadcast.verify_consistency">verify_consistency() (broadcast.EchoBroadcast method)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierZKProofs.verify_dlog_equality">verify_dlog_equality() (paillier_zkproofs.PaillierZKProofs method)</a>
+</li>
+        <li><a href="toolbox/paillier_zkproofs.html#paillier_zkproofs.PaillierZKProofs.verify_encryption_knowledge">verify_encryption_knowledge() (paillier_zkproofs.PaillierZKProofs method)</a>
 </li>
         <li><a href="toolbox/threshold_sharing.html#threshold_sharing.PedersenVSS.verify_pedersen_share">verify_pedersen_share() (threshold_sharing.PedersenVSS method)</a>
 </li>
@@ -5264,7 +5466,7 @@
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Feb 02, 2026</div>
+              Last updated on Feb 07, 2026</div>
           </div>
           <div class="right-details">
             

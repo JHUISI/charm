@@ -1,0 +1,964 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Schemes with Test Vectors" href="test_vectors.html"><link rel="prev" title="pksig_waters09" href="charm/schemes/pksig/pksig_waters09.html">
+        <link rel="prefetch" href="_static/charm_logo.png" as="image">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Threshold ECDSA - Charm-Crypto v0.61</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #2980b9;
+  --color-brand-content: #2980b9;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Charm-Crypto v0.61</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/charm_logo.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="miracl.html">Building MIRACL for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mobile.html">Android Build (Deprecated)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">How To Get Started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cryptographers.html">For Cryptographers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">For App Developers</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/blindsig_ps16.html">blindsig_ps16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/chamhash_adm05.html">chamhash_adm05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/chamhash_rsa_hw09.html">chamhash_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/encap_bchk05.html">encap_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/joye_scheme.html">joye_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/lem_scheme.html">lem_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pk_vrf.html">pk_vrf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pre_mg07.html">pre_mg07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/protocol_a01.html">protocol_a01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/protocol_ao00.html">protocol_ao00</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/protocol_cns07.html">protocol_cns07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/protocol_schnorr91.html">protocol_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/sigma1.html">sigma1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/sigma2.html">sigma2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/sigma3.html">sigma3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_accountability_jyjxgd20.html">abenc_accountability_jyjxgd20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_bsw07.html">abenc_bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_ca_cpabe_ar17.html">abenc_ca_cpabe_ar17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_dacmacs_yj14.html">abenc_dacmacs_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_lsw08.html">abenc_lsw08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_maabe_rw15.html">abenc_maabe_rw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_maabe_yj14.html">abenc_maabe_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_tbpre_lww14.html">abenc_tbpre_lww14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_unmcpabe_yahk14.html">abenc_unmcpabe_yahk14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_waters09.html">abenc_waters09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_yct14.html">abenc_yct14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/abenc_yllc15.html">abenc_yllc15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/ac17.html">ac17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/bsw07.html">bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/cgw15.html">cgw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/dabe_aw11.html">dabe_aw11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/dfa_fe12.html">dfa_fe12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/pk_hve08.html">pk_hve08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/abenc/waters11.html">waters11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pkenc/pkenc_cs98.html">pkenc_cs98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pkenc/pkenc_elgamal85.html">pkenc_elgamal85</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pkenc/pkenc_gm82.html">pkenc_gm82</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pkenc/pkenc_paillier99.html">pkenc_paillier99</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pkenc/pkenc_rabin.html">pkenc_rabin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pkenc/pkenc_rsa.html">pkenc_rsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_bls04.html">pksig_bls04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_boyen.html">pksig_boyen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_chch.html">pksig_chch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_chp.html">pksig_chp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_cl03.html">pksig_cl03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_cl04.html">pksig_cl04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_cllww12_z.html">pksig_cllww12_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_CW13_z.html">pksig_CW13_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_cyh.html">pksig_cyh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_dsa.html">pksig_dsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_ecdsa.html">pksig_ecdsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_hess.html">pksig_hess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_hw.html">pksig_hw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_lamport.html">pksig_lamport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_ps01.html">pksig_ps01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_ps02.html">pksig_ps02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_ps03.html">pksig_ps03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_rsa_hw09.html">pksig_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_schnorr91.html">pksig_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_waters.html">pksig_waters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_waters05.html">pksig_waters05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Threshold ECDSA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Schemes with Test Vectors</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/dabenc_adapt_hybrid.html">dabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/ibenc_adapt_hybrid.html">ibenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/ibenc_adapt_identityhash.html">ibenc_adapt_identityhash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/kpabenc_adapt_hybrid.html">kpabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/pkenc_adapt_bchk05.html">pkenc_adapt_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/pkenc_adapt_chk04.html">pkenc_adapt_chk04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/pkenc_adapt_hybrid.html">pkenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/bitstring.html">bitstring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/broadcast.html">broadcast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/Commit.html">Commit - Commitment Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/conversion.html">conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/DFA.html">DFA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/eccurve.html">eccurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/ecgroup.html">ecgroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/enum.html">enum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/FSA.html">FSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/Hash.html">Hash - Hash Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/hash_module.html">hash_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/IBEnc.html">IBEnc - Identity-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/IBSig.html">IBSig - Identity-Based Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/integergroup.html">integergroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/iterate.html">iterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/matrixops.html">matrixops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/mpc_utils.html">mpc_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/msp.html">msp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/mta.html">mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/node.html">node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/paillier_mta.html">paillier_mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/paillier_zkproofs.html">paillier_zkproofs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/pairingcurves.html">pairingcurves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/pairinggroup.html">pairinggroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/PKEnc.html">PKEnc - Public-Key Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/PKSig.html">PKSig - Public-Key Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/policy_expression_spec.html">policy_expression_spec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/policytree.html">policytree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/PREnc.html">PREnc - Proxy Re-Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/reCompiler.html">reCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/redundancyschemes.html">redundancyschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/schemebase.html">schemebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/secretshare.html">secretshare - Secret Sharing Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/secretutil.html">secretutil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/securerandom.html">securerandom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/specialprimes.html">specialprimes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/threshold_sharing.html">threshold_sharing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/xmlserialize.html">xmlserialize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/zknode.html">zknode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/ZKProof.html">ZKProof</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/rsa_alg_test.html">rsa_alg_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/threshold_test.html">threshold_test</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="test/conversion_test.html">conversion_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/ecgroup_test.html">ecgroup_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/integer_arithmetic_test.html">integer_arithmetic_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/paddingschemes_test.html">paddingschemes_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/policy_parser_stress_test.html">policy_parser_stress_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/secretshare_test.html">secretshare_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/symcrypto_test.html">symcrypto_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test/test_policy_expression.html">test_policy_expression</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="updates_061.html">Changes in v0.61</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updates.html">Changes in v0.43</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/blob/dev/doc/source/threshold.rst?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/edit/dev/doc/source/threshold.rst" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-charm.schemes.threshold">
+<span id="threshold-ecdsa"></span><span id="threshold"></span><h1>Threshold ECDSA<a class="headerlink" href="#module-charm.schemes.threshold" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Threshold ECDSA enables <em>t-of-n</em> distributed signing, where any <em>t</em> parties out of <em>n</em>
+can collaboratively produce a valid ECDSA signature without any single party ever
+holding the complete private key. This is essential for:</p>
+<ul class="simple">
+<li><p><strong>Cryptocurrency wallets</strong> — Multi-signature security for Bitcoin, Ethereum, XRPL</p></li>
+<li><p><strong>Key management</strong> — Distributed custody without single points of failure</p></li>
+<li><p><strong>Regulatory compliance</strong> — Separation of duties for signing authority</p></li>
+</ul>
+<p>Charm provides three production-ready threshold ECDSA implementations:</p>
+<ul class="simple">
+<li><p><strong>GG18</strong> — Classic Paillier-based scheme (Gennaro &amp; Goldfeder 2018)</p></li>
+<li><p><strong>CGGMP21</strong> — UC-secure with identifiable aborts (Canetti et al. 2021)</p></li>
+<li><p><strong>DKLS23</strong> — Non-interactive presigning with OT-based MtA (Doerner et al. 2023)</p></li>
+</ul>
+<p>All schemes support <strong>secp256k1</strong> (Bitcoin, XRPL) and other elliptic curves.</p>
+</section>
+<section id="scheme-comparison">
+<h2>Scheme Comparison<a class="headerlink" href="#scheme-comparison" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-given docutils container" id="id1">
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Threshold ECDSA Scheme Comparison</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>GG18</p></th>
+<th class="head"><p>CGGMP21</p></th>
+<th class="head"><p>DKLS23</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Security Model</strong></p></td>
+<td><p>ROM (Random Oracle)</p></td>
+<td><p>UC (Composable)</p></td>
+<td><p>ROM (Random Oracle)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Assumption</strong></p></td>
+<td><p>DCR + ROM</p></td>
+<td><p>DCR + Strong RSA</p></td>
+<td><p>DDH + ROM</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>DKG Rounds</strong></p></td>
+<td><p>3</p></td>
+<td><p>3</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Signing Rounds</strong></p></td>
+<td><p>4 (interactive)</p></td>
+<td><p>3 presign + 1 sign</p></td>
+<td><p>3 presign + 1 sign</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Presigning</strong></p></td>
+<td><p>❌ No</p></td>
+<td><p>✅ Yes</p></td>
+<td><p>✅ Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Identifiable Aborts</strong></p></td>
+<td><p>❌ No</p></td>
+<td><p>✅ Yes</p></td>
+<td><p>❌ No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>MtA Protocol</strong></p></td>
+<td><p>Paillier-based</p></td>
+<td><p>Paillier-based</p></td>
+<td><p>OT-based</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Best For</strong></p></td>
+<td><p>Simple deployments</p></td>
+<td><p>High security needs</p></td>
+<td><p>Low-latency signing</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>When to use each scheme:</strong></p>
+<ul class="simple">
+<li><p><strong>GG18</strong>: Simple threshold signing without presigning requirements</p></li>
+<li><p><strong>CGGMP21</strong>: When you need UC security, identifiable aborts, or proactive refresh</p></li>
+<li><p><strong>DKLS23</strong>: When you need fast online signing with pre-computed presignatures</p></li>
+</ul>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
+<p><strong>GG18 (2-of-3 threshold signing):</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ecgroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold</span><span class="w"> </span><span class="kn">import</span> <span class="n">GG18</span>
+
+<span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+<span class="n">gg18</span> <span class="o">=</span> <span class="n">GG18</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Distributed key generation (3 rounds)</span>
+<span class="n">key_shares</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+
+<span class="c1"># Interactive signing with 2 parties (4 rounds)</span>
+<span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Bitcoin transaction hash&quot;</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">message</span><span class="p">)</span>
+
+<span class="c1"># Standard ECDSA verification</span>
+<span class="k">assert</span> <span class="n">gg18</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>CGGMP21 with presigning:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold</span><span class="w"> </span><span class="kn">import</span> <span class="n">CGGMP21</span>
+
+<span class="n">cggmp</span> <span class="o">=</span> <span class="n">CGGMP21</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">key_shares</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+
+<span class="c1"># Presigning (can be done offline, 3 rounds)</span>
+<span class="n">presignatures</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">presign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="c1"># Fast online signing (1 round)</span>
+<span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;XRPL payment transaction&quot;</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">message</span><span class="p">,</span> <span class="n">presignatures</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>DKLS23 with XRPL integration:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold</span><span class="w"> </span><span class="kn">import</span> <span class="n">DKLS23</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.xrpl_wallet</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">XRPLThresholdWallet</span><span class="p">,</span> <span class="n">XRPLClient</span>
+<span class="p">)</span>
+
+<span class="n">dkls</span> <span class="o">=</span> <span class="n">DKLS23</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">key_shares</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">dkls</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+
+<span class="c1"># Create XRPL wallet from threshold public key</span>
+<span class="n">wallet</span> <span class="o">=</span> <span class="n">XRPLThresholdWallet</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">public_key</span><span class="p">)</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">XRPLClient</span><span class="p">(</span><span class="n">is_testnet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># See examples/xrpl_memo_demo.py for complete flow</span>
+</pre></div>
+</div>
+</section>
+<section id="gg18-protocol-details">
+<h2>GG18 Protocol Details<a class="headerlink" href="#gg18-protocol-details" title="Link to this heading">¶</a></h2>
+<p><strong>Reference:</strong> <a class="reference external" href="https://eprint.iacr.org/2019/114.pdf">Gennaro &amp; Goldfeder 2018</a></p>
+<p>GG18 is a classic threshold ECDSA scheme using Paillier encryption for the
+Multiplicative-to-Additive (MtA) protocol. It provides a straightforward
+implementation without presigning.</p>
+<p><strong>Key Features:</strong></p>
+<ul class="simple">
+<li><p><strong>Paillier-based MtA</strong>: Secure multiplication using homomorphic encryption</p></li>
+<li><p><strong>Feldman VSS</strong>: Verifiable secret sharing for key distribution</p></li>
+<li><p><strong>Interactive Signing</strong>: 4-round protocol for signature generation</p></li>
+</ul>
+<p><strong>Protocol Phases:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Distributed Key Generation (3 rounds)</strong></p>
+<ul class="simple">
+<li><p>Round 1: Commit to secret shares</p></li>
+<li><p>Round 2: Reveal commitments, distribute Feldman VSS shares</p></li>
+<li><p>Round 3: Verify shares, compute public key X = g^x</p></li>
+</ul>
+</li>
+<li><p><strong>Interactive Signing (4 rounds)</strong></p>
+<ul class="simple">
+<li><p>Round 1: Generate k_i, γ_i; broadcast commitments</p></li>
+<li><p>Round 2: MtA for k*γ and k*x products</p></li>
+<li><p>Round 3: Reveal δ_i, compute R = g^{1/k}</p></li>
+<li><p>Round 4: Compute and combine signature shares s_i</p></li>
+</ul>
+</li>
+</ol>
+<p><strong>Security:</strong> ROM (Random Oracle Model) with DCR assumption.</p>
+</section>
+<section id="cggmp21-protocol-details">
+<h2>CGGMP21 Protocol Details<a class="headerlink" href="#cggmp21-protocol-details" title="Link to this heading">¶</a></h2>
+<p><strong>Reference:</strong> <a class="reference external" href="https://eprint.iacr.org/2021/060">Canetti et al. 2021</a></p>
+<p>CGGMP21 provides UC-secure threshold ECDSA with identifiable aborts. If a party
+misbehaves, the protocol can identify the malicious party with cryptographic proof.</p>
+<p><strong>Key Features:</strong></p>
+<ul class="simple">
+<li><p><strong>UC Security</strong>: Composable security in the Universal Composability framework</p></li>
+<li><p><strong>Identifiable Aborts</strong>: Malicious parties are identified with evidence</p></li>
+<li><p><strong>Presigning</strong>: Offline computation for fast online signing</p></li>
+<li><p><strong>Ring-Pedersen Parameters</strong>: Used for ZK proofs (Π^{log}, Π^{aff-g}, Π^{mul})</p></li>
+</ul>
+<p><strong>Protocol Phases:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Distributed Key Generation (3 rounds)</strong>
+- Uses Pedersen VSS for verifiable secret sharing
+- Generates Ring-Pedersen parameters for ZK proofs
+- All parties compute consistent public key X = g^x</p></li>
+<li><p><strong>Presigning (3 rounds, optional)</strong>
+- Round 1: Generate k_i, γ_i; Paillier encrypt k_i
+- Round 2: MtA with ZK proofs for k*γ and k*x
+- Round 3: Compute δ_i, verify proofs, output presignature</p></li>
+<li><p><strong>Online Signing (1 round)</strong>
+- Use presignature to compute signature share
+- Combine shares for final signature</p></li>
+</ol>
+<p><strong>Identifiable Aborts:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.cggmp21_sign</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecurityAbort</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">message</span><span class="p">,</span> <span class="n">presigs</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">SecurityAbort</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Malicious party: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">party_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Evidence: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">evidence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="dkls23-protocol-details">
+<h2>DKLS23 Protocol Details<a class="headerlink" href="#dkls23-protocol-details" title="Link to this heading">¶</a></h2>
+<p><strong>Reference:</strong> <a class="reference external" href="https://eprint.iacr.org/2023/765">Doerner et al. 2023</a></p>
+<p>DKLS23 uses OT-based (Oblivious Transfer) MtA instead of Paillier encryption,
+providing efficient presigning with non-interactive online signing.</p>
+<p><strong>Key Features:</strong></p>
+<ul class="simple">
+<li><p><strong>OT-based MtA</strong>: Uses Silent OT for efficient multiplication</p></li>
+<li><p><strong>Non-interactive Presigning</strong>: Presignatures can be computed independently</p></li>
+<li><p><strong>Fast Online Phase</strong>: Single round for signature generation</p></li>
+</ul>
+<p><strong>Protocol Phases:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Distributed Key Generation (3 rounds)</strong>
+- Similar to GG18 with Feldman VSS
+- Outputs key shares and public key</p></li>
+<li><p><strong>Presigning (3 rounds)</strong>
+- Uses OT extension for MtA protocol
+- Generates presignature (R, k-share, χ-share)</p></li>
+<li><p><strong>Online Signing (1 round)</strong>
+- Compute signature share from presignature
+- Combine for final ECDSA signature</p></li>
+</ol>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h2>
+<section id="gg18">
+<h3>GG18<a class="headerlink" href="#gg18" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="charm.schemes.threshold.GG18">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.schemes.threshold.</span></span><span class="sig-name descname"><span class="pre">GG18</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/gg18_sign.html#GG18"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.GG18" title="Link to this definition">¶</a></dt>
+<dd><p>GG18 threshold ECDSA scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> – ECGroup instance (e.g., secp256k1)</p></li>
+<li><p><strong>threshold</strong> – Minimum parties required to sign (t)</p></li>
+<li><p><strong>num_parties</strong> – Total number of parties (n)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.GG18.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/gg18_sign.html#GG18.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.GG18.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Perform distributed key generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple of (key_shares, public_key)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.GG18.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_shares</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/gg18_sign.html#GG18.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.GG18.sign" title="Link to this definition">¶</a></dt>
+<dd><p>Generate threshold signature (interactive, 4 rounds).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key_shares</strong> – List of t key shares</p></li>
+<li><p><strong>message</strong> – Message bytes to sign</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ThresholdSignature object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.GG18.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">public_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signature</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/gg18_sign.html#GG18.verify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.GG18.verify" title="Link to this definition">¶</a></dt>
+<dd><p>Verify ECDSA signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if valid, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="cggmp21">
+<h3>CGGMP21<a class="headerlink" href="#cggmp21" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="charm.schemes.threshold.CGGMP21">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.schemes.threshold.</span></span><span class="sig-name descname"><span class="pre">CGGMP21</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/cggmp21_sign.html#CGGMP21"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.CGGMP21" title="Link to this definition">¶</a></dt>
+<dd><p>CGGMP21 UC-secure threshold ECDSA with identifiable aborts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> – ECGroup instance</p></li>
+<li><p><strong>threshold</strong> – Minimum parties required (t)</p></li>
+<li><p><strong>num_parties</strong> – Total parties (n)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.CGGMP21.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/cggmp21_sign.html#CGGMP21.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.CGGMP21.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Perform DKG with Pedersen VSS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple of (key_shares, public_key)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.CGGMP21.presign">
+<span class="sig-name descname"><span class="pre">presign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_shares</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/cggmp21_sign.html#CGGMP21.presign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.CGGMP21.presign" title="Link to this definition">¶</a></dt>
+<dd><p>Generate presignatures (offline, 3 rounds).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key_shares</strong> – List of t key shares</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of presignature objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.CGGMP21.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_shares</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presignatures</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/cggmp21_sign.html#CGGMP21.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.CGGMP21.sign" title="Link to this definition">¶</a></dt>
+<dd><p>Generate signature. Uses presignatures if provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key_shares</strong> – List of t key shares</p></li>
+<li><p><strong>message</strong> – Message bytes</p></li>
+<li><p><strong>presignatures</strong> – Optional presignatures from presign()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ThresholdSignature object</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>SecurityAbort</strong> – If malicious behavior detected</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="dkls23">
+<h3>DKLS23<a class="headerlink" href="#dkls23" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="charm.schemes.threshold.DKLS23">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">charm.schemes.threshold.</span></span><span class="sig-name descname"><span class="pre">DKLS23</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_parties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/dkls23_sign.html#DKLS23"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.DKLS23" title="Link to this definition">¶</a></dt>
+<dd><p>DKLS23 threshold ECDSA with OT-based MtA.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> – ECGroup instance</p></li>
+<li><p><strong>threshold</strong> – Minimum parties required (t)</p></li>
+<li><p><strong>num_parties</strong> – Total parties (n)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.DKLS23.keygen">
+<span class="sig-name descname"><span class="pre">keygen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/dkls23_sign.html#DKLS23.keygen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.DKLS23.keygen" title="Link to this definition">¶</a></dt>
+<dd><p>Perform distributed key generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple of (key_shares, public_key)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.DKLS23.presign">
+<span class="sig-name descname"><span class="pre">presign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_shares</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/dkls23_sign.html#DKLS23.presign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.DKLS23.presign" title="Link to this definition">¶</a></dt>
+<dd><p>Generate presignatures using Silent OT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of presignature objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="charm.schemes.threshold.DKLS23.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_shares</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presignatures</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/charm/schemes/threshold/dkls23_sign.html#DKLS23.sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#charm.schemes.threshold.DKLS23.sign" title="Link to this definition">¶</a></dt>
+<dd><p>Generate signature from presignatures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ThresholdSignature object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>GG18</strong>: R. Gennaro and S. Goldfeder, “Fast Multiparty Threshold ECDSA with Fast
+Trustless Setup,” ACM CCS 2018. <a class="reference external" href="https://eprint.iacr.org/2019/114.pdf">ePrint 2019/114</a></p></li>
+<li><p><strong>CGGMP21</strong>: R. Canetti, R. Gennaro, S. Goldfeder, N. Makriyannis, and U. Peled,
+“UC Non-Interactive, Proactive, Threshold ECDSA with Identifiable Aborts,”
+ACM CCS 2020. <a class="reference external" href="https://eprint.iacr.org/2021/060">ePrint 2021/060</a></p></li>
+<li><p><strong>DKLS23</strong>: J. Doerner, Y. Kondi, E. Lee, and A. Shelat, “Threshold ECDSA in
+Three Rounds,” IEEE S&amp;P 2023. <a class="reference external" href="https://eprint.iacr.org/2023/765">ePrint 2023/765</a></p></li>
+</ul>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="schemes.html"><span class="doc">Implemented Schemes</span></a> — All implemented cryptographic schemes</p></li>
+<li><p><a class="reference internal" href="zkp_compiler.html"><span class="doc">ZKP Compiler</span></a> — ZKP compiler (used by CGGMP21)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">examples/xrpl_memo_demo.py</span></code> — XRPL testnet integration example</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="test_vectors.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Schemes with Test Vectors</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="charm/schemes/pksig/pksig_waters09.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">pksig_waters09</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2013-2026, Johns Hopkins University ISI
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Feb 07, 2026</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Threshold ECDSA</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#scheme-comparison">Scheme Comparison</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#gg18-protocol-details">GG18 Protocol Details</a></li>
+<li><a class="reference internal" href="#cggmp21-protocol-details">CGGMP21 Protocol Details</a></li>
+<li><a class="reference internal" href="#dkls23-protocol-details">DKLS23 Protocol Details</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a><ul>
+<li><a class="reference internal" href="#gg18">GG18</a><ul>
+<li><a class="reference internal" href="#charm.schemes.threshold.GG18"><code class="docutils literal notranslate"><span class="pre">GG18</span></code></a><ul>
+<li><a class="reference internal" href="#charm.schemes.threshold.GG18.keygen"><code class="docutils literal notranslate"><span class="pre">GG18.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#charm.schemes.threshold.GG18.sign"><code class="docutils literal notranslate"><span class="pre">GG18.sign()</span></code></a></li>
+<li><a class="reference internal" href="#charm.schemes.threshold.GG18.verify"><code class="docutils literal notranslate"><span class="pre">GG18.verify()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cggmp21">CGGMP21</a><ul>
+<li><a class="reference internal" href="#charm.schemes.threshold.CGGMP21"><code class="docutils literal notranslate"><span class="pre">CGGMP21</span></code></a><ul>
+<li><a class="reference internal" href="#charm.schemes.threshold.CGGMP21.keygen"><code class="docutils literal notranslate"><span class="pre">CGGMP21.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#charm.schemes.threshold.CGGMP21.presign"><code class="docutils literal notranslate"><span class="pre">CGGMP21.presign()</span></code></a></li>
+<li><a class="reference internal" href="#charm.schemes.threshold.CGGMP21.sign"><code class="docutils literal notranslate"><span class="pre">CGGMP21.sign()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dkls23">DKLS23</a><ul>
+<li><a class="reference internal" href="#charm.schemes.threshold.DKLS23"><code class="docutils literal notranslate"><span class="pre">DKLS23</span></code></a><ul>
+<li><a class="reference internal" href="#charm.schemes.threshold.DKLS23.keygen"><code class="docutils literal notranslate"><span class="pre">DKLS23.keygen()</span></code></a></li>
+<li><a class="reference internal" href="#charm.schemes.threshold.DKLS23.presign"><code class="docutils literal notranslate"><span class="pre">DKLS23.presign()</span></code></a></li>
+<li><a class="reference internal" href="#charm.schemes.threshold.DKLS23.sign"><code class="docutils literal notranslate"><span class="pre">DKLS23.sign()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=da26a6b9"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

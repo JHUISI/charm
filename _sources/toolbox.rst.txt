@@ -38,6 +38,8 @@ primitives like symmetric encryption and hash functions.
    toolbox/mta
    toolbox/node
    toolbox/paddingschemes
+   toolbox/paillier_mta
+   toolbox/paillier_zkproofs
    toolbox/pairingcurves
    toolbox/pairinggroup
    toolbox/PKEnc

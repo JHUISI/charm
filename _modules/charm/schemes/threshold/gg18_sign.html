@@ -1,0 +1,1179 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html">
+        <link rel="prefetch" href="../../../../_static/charm_logo.png" as="image">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>charm.schemes.threshold.gg18_sign - Charm-Crypto v0.61</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #2980b9;
+  --color-brand-content: #2980b9;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #3498db;
+  --color-brand-content: #3498db;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../index.html"><div class="brand">Charm-Crypto v0.61</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../../../_static/charm_logo.png" alt="Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../install_source.html">Platform Install Manual</a><input aria-label="Toggle navigation of Platform Install Manual" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../miracl.html">Building MIRACL for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../relic.html">Building RELIC for Charm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../mobile.html">Android Build (Deprecated)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorial.html">How To Get Started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cryptographers.html">For Cryptographers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developers.html">For App Developers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/blindsig_ps16.html">blindsig_ps16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/chamhash_adm05.html">chamhash_adm05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/chamhash_rsa_hw09.html">chamhash_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/encap_bchk05.html">encap_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/joye_scheme.html">joye_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/lem_scheme.html">lem_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pk_vrf.html">pk_vrf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pre_mg07.html">pre_mg07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/protocol_a01.html">protocol_a01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/protocol_ao00.html">protocol_ao00</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/protocol_cns07.html">protocol_cns07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/protocol_schnorr91.html">protocol_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/sigma1.html">sigma1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/sigma2.html">sigma2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/sigma3.html">sigma3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_accountability_jyjxgd20.html">abenc_accountability_jyjxgd20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_bsw07.html">abenc_bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_ca_cpabe_ar17.html">abenc_ca_cpabe_ar17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_dacmacs_yj14.html">abenc_dacmacs_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_lsw08.html">abenc_lsw08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_maabe_rw15.html">abenc_maabe_rw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_maabe_yj14.html">abenc_maabe_yj14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_tbpre_lww14.html">abenc_tbpre_lww14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_unmcpabe_yahk14.html">abenc_unmcpabe_yahk14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_waters09.html">abenc_waters09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_yct14.html">abenc_yct14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/abenc_yllc15.html">abenc_yllc15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/ac17.html">ac17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/bsw07.html">bsw07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/cgw15.html">cgw15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/dabe_aw11.html">dabe_aw11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/dfa_fe12.html">dfa_fe12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/pk_hve08.html">pk_hve08</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/abenc/waters11.html">waters11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pkenc/pkenc_cs98.html">pkenc_cs98</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pkenc/pkenc_elgamal85.html">pkenc_elgamal85</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pkenc/pkenc_gm82.html">pkenc_gm82</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pkenc/pkenc_paillier99.html">pkenc_paillier99</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pkenc/pkenc_rabin.html">pkenc_rabin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pkenc/pkenc_rsa.html">pkenc_rsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_bls04.html">pksig_bls04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_boyen.html">pksig_boyen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_chch.html">pksig_chch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_chp.html">pksig_chp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_cl03.html">pksig_cl03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_cl04.html">pksig_cl04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_cllww12_z.html">pksig_cllww12_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_CW13_z.html">pksig_CW13_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_cyh.html">pksig_cyh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_dsa.html">pksig_dsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_ecdsa.html">pksig_ecdsa</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_hess.html">pksig_hess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_hw.html">pksig_hw</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_lamport.html">pksig_lamport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_ps01.html">pksig_ps01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_ps02.html">pksig_ps02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_ps03.html">pksig_ps03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_rsa_hw09.html">pksig_rsa_hw09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_schnorr91.html">pksig_schnorr91</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_waters.html">pksig_waters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_waters05.html">pksig_waters05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threshold.html">Threshold ECDSA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../test_vectors.html">Schemes with Test Vectors</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/dabenc_adapt_hybrid.html">dabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/ibenc_adapt_hybrid.html">ibenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/ibenc_adapt_identityhash.html">ibenc_adapt_identityhash</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/kpabenc_adapt_hybrid.html">kpabenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/pkenc_adapt_bchk05.html">pkenc_adapt_bchk05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/pkenc_adapt_chk04.html">pkenc_adapt_chk04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/pkenc_adapt_hybrid.html">pkenc_adapt_hybrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../charm/adapters/pksig_adapt_naor01.html">pksig_adapt_naor01</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../toolbox.html">Toolbox Classes</a><input aria-label="Toggle navigation of Toolbox Classes" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/ABEnc.html">ABEnc - Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/ABEncMultiAuth.html">ABEncMultiAuth - Multi-Authority Attribute-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/ABEnumeric.html">ABEnumeric - Numeric Attribute Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/bitstring.html">bitstring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/broadcast.html">broadcast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/Commit.html">Commit - Commitment Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/conversion.html">conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/DFA.html">DFA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/eccurve.html">eccurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/ecgroup.html">ecgroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/enum.html">enum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/FSA.html">FSA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/Hash.html">Hash - Hash Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/hash_module.html">hash_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/IBEnc.html">IBEnc - Identity-Based Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/IBSig.html">IBSig - Identity-Based Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/integergroup.html">integergroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/iterate.html">iterate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/matrixops.html">matrixops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/mpc_utils.html">mpc_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/msp.html">msp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/mta.html">mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/node.html">node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/paillier_mta.html">paillier_mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/paillier_zkproofs.html">paillier_zkproofs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/pairingcurves.html">pairingcurves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/pairinggroup.html">pairinggroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/PKEnc.html">PKEnc - Public-Key Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/PKSig.html">PKSig - Public-Key Signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/policy_expression_spec.html">policy_expression_spec</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/policytree.html">policytree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/PREnc.html">PREnc - Proxy Re-Encryption</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/reCompiler.html">reCompiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/redundancyschemes.html">redundancyschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/schemebase.html">schemebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/secretshare.html">secretshare - Secret Sharing Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/secretutil.html">secretutil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/securerandom.html">securerandom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/sigmaprotocol.html">sigmaprotocol - Sigma Protocols (Zero-Knowledge Proofs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/specialprimes.html">specialprimes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/symcrypto.html">symcrypto - Symmetric Cryptography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/threshold_sharing.html">threshold_sharing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/xmlserialize.html">xmlserialize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/zknode.html">zknode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../toolbox/ZKProof.html">ZKProof</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../zkp_compiler.html">ZKP Compiler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../test_schemes.html">Scheme Test Code</a><input aria-label="Toggle navigation of Scheme Test Code" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/chamhash_adm05_test.html">chamhash_adm05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/chamhash_rsa_hw09_test.html">chamhash_rsa_hw09_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/dabe_aw11_test.html">dabe_aw11_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/encap_bchk05_test.html">encap_bchk05_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/pk_vrf_test.html">pk_vrf_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/pkenc_test.html">pkenc_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/pksig_test.html">pksig_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/rsa_alg_test.html">rsa_alg_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/threshold_test.html">threshold_test</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../test_toolbox.html">Toolbox Test Code</a><input aria-label="Toggle navigation of Toolbox Test Code" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/conversion_test.html">conversion_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/ecgroup_test.html">ecgroup_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/integer_arithmetic_test.html">integer_arithmetic_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/paddingschemes_test.html">paddingschemes_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/policy_parser_stress_test.html">policy_parser_stress_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/secretshare_test.html">secretshare_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/symcrypto_test.html">symcrypto_test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../test/test_policy_expression.html">test_policy_expression</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../updates_061.html">Changes in v0.61</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../updates_060.html">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../updates.html">Changes in v0.43</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for charm.schemes.threshold.gg18_sign</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">GG18 Threshold ECDSA Signing Protocol</span>
+
+<span class="sd">| From: &quot;Fast Multiparty Threshold ECDSA with Fast Trustless Setup&quot;</span>
+<span class="sd">| By:   Rosario Gennaro, Steven Goldfeder</span>
+<span class="sd">| Published: CCS 2018 / ePrint 2019/114</span>
+<span class="sd">| URL:  https://eprint.iacr.org/2019/114.pdf</span>
+
+<span class="sd">* type:          threshold signature</span>
+<span class="sd">* setting:       Elliptic Curve + Paillier</span>
+<span class="sd">* assumption:    DDH, DCR, ROM</span>
+
+<span class="sd">This module implements the GG18 threshold ECDSA signing protocol.</span>
+<span class="sd">Unlike DKLS23, GG18 uses Paillier-based MtA and requires 4 interactive</span>
+<span class="sd">rounds for each signature (no presigning).</span>
+
+<span class="sd">Protocol Overview (4 rounds):</span>
+<span class="sd">1. Round 1: Generate k_i, gamma_i, broadcast commitment C_i = H(g^{gamma_i})</span>
+<span class="sd">2. Round 2: Broadcast g^{gamma_i}, run MtA protocols</span>
+<span class="sd">3. Round 3: Broadcast delta_i = k_i * gamma_i, compute R</span>
+<span class="sd">4. Round 4: Compute and broadcast signature share s_i</span>
+
+<span class="sd">:Authors: J. Ayo Akinyele</span>
+<span class="sd">:Date:    02/2026</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ecgroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECGroup</span><span class="p">,</span> <span class="n">ZR</span><span class="p">,</span> <span class="n">G</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.integergroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSAGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.PKSig</span><span class="w"> </span><span class="kn">import</span> <span class="n">PKSig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.paillier_mta</span><span class="w"> </span><span class="kn">import</span> <span class="n">PaillierMtA</span><span class="p">,</span> <span class="n">PaillierKeyPair</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.gg18_dkg</span><span class="w"> </span><span class="kn">import</span> <span class="n">GG18_DKG</span><span class="p">,</span> <span class="n">GG18_KeyShare</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.core.engine.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">objectToBytes</span><span class="p">,</span> <span class="n">bytesToObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+
+<span class="c1"># Type aliases</span>
+<span class="n">ZRElement</span> <span class="o">=</span> <span class="n">Any</span>
+<span class="n">GElement</span> <span class="o">=</span> <span class="n">Any</span>
+<span class="n">ECGroupType</span> <span class="o">=</span> <span class="n">Any</span>
+<span class="n">PartyId</span> <span class="o">=</span> <span class="nb">int</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GG18_Signature</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;GG18 threshold ECDSA signature (r, s).&quot;&quot;&quot;</span>
+    <span class="n">r</span><span class="p">:</span> <span class="n">ZRElement</span>
+    <span class="n">s</span><span class="p">:</span> <span class="n">ZRElement</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ZRElement</span><span class="p">,</span> <span class="n">ZRElement</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GG18_Sign</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    GG18 4-round interactive signing protocol.</span>
+<span class="sd">    </span>
+<span class="sd">    Uses Paillier-based MtA for multiplicative-to-additive conversion.</span>
+<span class="sd">    No presigning - all 4 rounds required for each signature.</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.eccurve import secp256k1</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.integergroup import RSAGroup</span>
+<span class="sd">    &gt;&gt;&gt; group = ECGroup(secp256k1)</span>
+<span class="sd">    &gt;&gt;&gt; rsa_group = RSAGroup()</span>
+<span class="sd">    &gt;&gt;&gt; signer = GG18_Sign(group, rsa_group, paillier_bits=512)  # Small for test</span>
+<span class="sd">    &gt;&gt;&gt; g = group.random(G)</span>
+<span class="sd">    &gt;&gt;&gt; signer is not None</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ec_group</span><span class="p">:</span> <span class="n">ECGroupType</span><span class="p">,</span> <span class="n">rsa_group</span><span class="p">:</span> <span class="n">RSAGroup</span><span class="p">,</span>
+                 <span class="n">paillier_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize GG18 signing protocol.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ec_group: EC group (e.g., ECGroup(secp256k1))</span>
+<span class="sd">            rsa_group: RSA group for Paillier</span>
+<span class="sd">            paillier_bits: Paillier modulus bit length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ec_group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">rsa_group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ec_group</span><span class="o">.</span><span class="n">order</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mta</span> <span class="o">=</span> <span class="n">PaillierMtA</span><span class="p">(</span><span class="n">rsa_group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_hash_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZRElement</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hash message to curve scalar using SHA-256.&quot;&quot;&quot;</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+        <span class="n">h_int</span> <span class="o">=</span> <span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">h_int</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_hash_commitment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">GElement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute commitment hash for round 1.&quot;&quot;&quot;</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;GG18_COMMIT:&quot;</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">sign_round1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">party_id</span><span class="p">:</span> <span class="n">PartyId</span><span class="p">,</span> <span class="n">key_share</span><span class="p">:</span> <span class="n">GG18_KeyShare</span><span class="p">,</span>
+                    <span class="n">participants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PartyId</span><span class="p">],</span> <span class="n">generator</span><span class="p">:</span> <span class="n">GElement</span><span class="p">,</span>
+                    <span class="n">session_id</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Round 1: Generate k_i, gamma_i, broadcast commitment.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            party_id: This party&#39;s identifier</span>
+<span class="sd">            key_share: Party&#39;s key share from DKG</span>
+<span class="sd">            participants: List of participating parties (t parties)</span>
+<span class="sd">            generator: EC generator point g</span>
+<span class="sd">            session_id: Unique signing session identifier</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (broadcast_msg, private_state)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Sample random values</span>
+        <span class="n">k_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        <span class="n">gamma_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ZR</span><span class="p">)</span>
+        
+        <span class="c1"># Compute Gamma_i = g^{gamma_i}</span>
+        <span class="n">Gamma_i</span> <span class="o">=</span> <span class="n">generator</span> <span class="o">**</span> <span class="n">gamma_i</span>
+        
+        <span class="c1"># Commitment to Gamma_i</span>
+        <span class="n">commitment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash_commitment</span><span class="p">(</span><span class="n">Gamma_i</span><span class="p">)</span>
+        
+        <span class="n">broadcast_msg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;party_id&#39;</span><span class="p">:</span> <span class="n">party_id</span><span class="p">,</span>
+            <span class="s1">&#39;session_id&#39;</span><span class="p">:</span> <span class="n">session_id</span><span class="p">,</span>
+            <span class="s1">&#39;commitment&#39;</span><span class="p">:</span> <span class="n">commitment</span><span class="p">,</span>
+        <span class="p">}</span>
+        
+        <span class="n">private_state</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;party_id&#39;</span><span class="p">:</span> <span class="n">party_id</span><span class="p">,</span>
+            <span class="s1">&#39;session_id&#39;</span><span class="p">:</span> <span class="n">session_id</span><span class="p">,</span>
+            <span class="s1">&#39;k_i&#39;</span><span class="p">:</span> <span class="n">k_i</span><span class="p">,</span>
+            <span class="s1">&#39;gamma_i&#39;</span><span class="p">:</span> <span class="n">gamma_i</span><span class="p">,</span>
+            <span class="s1">&#39;Gamma_i&#39;</span><span class="p">:</span> <span class="n">Gamma_i</span><span class="p">,</span>
+            <span class="s1">&#39;generator&#39;</span><span class="p">:</span> <span class="n">generator</span><span class="p">,</span>
+            <span class="s1">&#39;participants&#39;</span><span class="p">:</span> <span class="n">participants</span><span class="p">,</span>
+            <span class="s1">&#39;key_share&#39;</span><span class="p">:</span> <span class="n">key_share</span><span class="p">,</span>
+        <span class="p">}</span>
+        
+        <span class="k">return</span> <span class="n">broadcast_msg</span><span class="p">,</span> <span class="n">private_state</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">sign_round2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">party_id</span><span class="p">:</span> <span class="n">PartyId</span><span class="p">,</span> <span class="n">private_state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                    <span class="n">all_round1_msgs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+                    <span class="n">message</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="n">PartyId</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Round 2: Reveal Gamma_i, start MtA protocols.</span>
+
+<span class="sd">        Each party sends:</span>
+<span class="sd">        - Broadcast: Gamma_i reveal</span>
+<span class="sd">        - P2P: Enc(k_i) to each other party for MtA (k*gamma and k*x)</span>
+<span class="sd">        - P2P: gamma_i and x_i for the other party to use in their MtA</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            party_id: This party&#39;s identifier</span>
+<span class="sd">            private_state: State from round 1</span>
+<span class="sd">            all_round1_msgs: Commitments from all parties</span>
+<span class="sd">            message: Message to sign</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (broadcast_msg, p2p_msgs, updated_state)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Gamma_i</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;Gamma_i&#39;</span><span class="p">]</span>
+        <span class="n">k_i</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;k_i&#39;</span><span class="p">]</span>
+        <span class="n">gamma_i</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;gamma_i&#39;</span><span class="p">]</span>
+        <span class="n">key_share</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;key_share&#39;</span><span class="p">]</span>
+        <span class="n">participants</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;participants&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Store message hash</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="c1"># Verify commitments from other parties</span>
+        <span class="n">round1_by_party</span> <span class="o">=</span> <span class="p">{</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;party_id&#39;</span><span class="p">]:</span> <span class="n">msg</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">all_round1_msgs</span><span class="p">}</span>
+
+        <span class="c1"># Broadcast reveal of Gamma_i</span>
+        <span class="n">broadcast_msg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;party_id&#39;</span><span class="p">:</span> <span class="n">party_id</span><span class="p">,</span>
+            <span class="s1">&#39;Gamma_i&#39;</span><span class="p">:</span> <span class="n">Gamma_i</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Prepare MtA messages for each other party</span>
+        <span class="c1"># For MtA: party i sends Enc(k_i) under their own key</span>
+        <span class="c1"># Other party will compute response using their gamma_j/x_j</span>
+        <span class="n">p2p_msgs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">mta_sender_states</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">other_id</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other_id</span> <span class="o">!=</span> <span class="n">party_id</span><span class="p">:</span>
+                <span class="c1"># MtA sender step: encrypt k_i under MY Paillier key</span>
+                <span class="c1"># Other party will compute homomorphically and send response back</span>
+                <span class="n">mta_msg_kg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mta</span><span class="o">.</span><span class="n">sender_round1</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">k_i</span><span class="p">),</span> <span class="n">key_share</span><span class="o">.</span><span class="n">paillier</span><span class="p">)</span>
+                <span class="n">mta_msg_kx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mta</span><span class="o">.</span><span class="n">sender_round1</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">k_i</span><span class="p">),</span> <span class="n">key_share</span><span class="o">.</span><span class="n">paillier</span><span class="p">)</span>
+
+                <span class="n">p2p_msgs</span><span class="p">[</span><span class="n">other_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;from&#39;</span><span class="p">:</span> <span class="n">party_id</span><span class="p">,</span>
+                    <span class="s1">&#39;mta_k_gamma&#39;</span><span class="p">:</span> <span class="n">mta_msg_kg</span><span class="p">,</span>
+                    <span class="s1">&#39;mta_k_x&#39;</span><span class="p">:</span> <span class="n">mta_msg_kx</span><span class="p">,</span>
+                    <span class="c1"># Include this party&#39;s gamma and x for the OTHER party&#39;s MtA receiver step</span>
+                    <span class="s1">&#39;gamma_i&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">gamma_i</span><span class="p">),</span>
+                    <span class="s1">&#39;x_i&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">key_share</span><span class="o">.</span><span class="n">x_i</span><span class="p">),</span>
+                <span class="p">}</span>
+
+                <span class="n">mta_sender_states</span><span class="p">[</span><span class="n">other_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;k_gamma_sender&#39;</span><span class="p">:</span> <span class="n">mta_msg_kg</span><span class="p">,</span>
+                    <span class="s1">&#39;k_x_sender&#39;</span><span class="p">:</span> <span class="n">mta_msg_kx</span><span class="p">,</span>
+                <span class="p">}</span>
+
+        <span class="c1"># Update state</span>
+        <span class="n">updated_state</span> <span class="o">=</span> <span class="n">private_state</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">updated_state</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span>
+        <span class="n">updated_state</span><span class="p">[</span><span class="s1">&#39;mta_sender_states&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mta_sender_states</span>
+        <span class="n">updated_state</span><span class="p">[</span><span class="s1">&#39;round1_by_party&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">round1_by_party</span>
+
+        <span class="k">return</span> <span class="n">broadcast_msg</span><span class="p">,</span> <span class="n">p2p_msgs</span><span class="p">,</span> <span class="n">updated_state</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">sign_round3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">party_id</span><span class="p">:</span> <span class="n">PartyId</span><span class="p">,</span> <span class="n">private_state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                    <span class="n">all_round2_broadcasts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+                    <span class="n">received_p2p_msgs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">PartyId</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Round 3: Verify reveals, complete MtA, broadcast delta_i.</span>
+
+<span class="sd">        For MtA(k_i, gamma_j): party i is sender, party j is receiver</span>
+<span class="sd">        - Party i sent Enc(k_i) in round 2</span>
+<span class="sd">        - Party j received it and will compute response</span>
+<span class="sd">        - Party j gets beta_j, party i gets alpha_i</span>
+
+<span class="sd">        Since we need alpha_i (from MtA where I&#39;m sender) and beta_i (from MtA where I&#39;m receiver),</span>
+<span class="sd">        but in a single P2P round we can only do one direction, we use a simplified approach:</span>
+
+<span class="sd">        For a 2-party MtA(a, b) where result is a*b:</span>
+<span class="sd">        - We split it as: party_i computes k_i * gamma_j_received_from_j</span>
+<span class="sd">        - This gives correct additive shares when summed across all parties</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            party_id: This party&#39;s identifier</span>
+<span class="sd">            private_state: State from round 2</span>
+<span class="sd">            all_round2_broadcasts: Gamma reveals from all parties</span>
+<span class="sd">            received_p2p_msgs: P2P MtA messages received</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (broadcast_msg, updated_state)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">k_i</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;k_i&#39;</span><span class="p">]</span>
+        <span class="n">gamma_i</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;gamma_i&#39;</span><span class="p">]</span>
+        <span class="n">key_share</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;key_share&#39;</span><span class="p">]</span>
+        <span class="n">participants</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;participants&#39;</span><span class="p">]</span>
+        <span class="n">round1_by_party</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;round1_by_party&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Verify Gamma reveals match commitments</span>
+        <span class="n">round2_by_party</span> <span class="o">=</span> <span class="p">{</span><span class="n">msg</span><span class="p">[</span><span class="s1">&#39;party_id&#39;</span><span class="p">]:</span> <span class="n">msg</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">all_round2_broadcasts</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">Gamma</span> <span class="o">=</span> <span class="n">round2_by_party</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;Gamma_i&#39;</span><span class="p">]</span>
+            <span class="n">expected_commit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash_commitment</span><span class="p">(</span><span class="n">Gamma</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">round1_by_party</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;commitment&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">expected_commit</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Party </span><span class="si">{</span><span class="n">pid</span><span class="si">}</span><span class="s2"> commitment mismatch&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Compute R = product of all Gamma_i</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">round2_by_party</span><span class="p">[</span><span class="n">participants</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;Gamma_i&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">round2_by_party</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;Gamma_i&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Simplified MtA: compute additive share of k*gamma and k*x locally</span>
+        <span class="c1"># Each party computes their share of the sum:</span>
+        <span class="c1"># sum(k_i * gamma_i) for all i = k * gamma where k = sum(k_i), gamma = sum(gamma_i)</span>
+        <span class="c1">#</span>
+        <span class="c1"># For threshold signing, we need k^{-1} * x, which we&#39;ll get by:</span>
+        <span class="c1"># - delta = k * gamma (used to compute R, then inverted)</span>
+        <span class="c1"># - sigma = k * x (the private key component)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Party i&#39;s contribution:</span>
+        <span class="c1"># - delta_i: k_i * gamma_i + sum over j≠i of (cross terms)</span>
+        <span class="c1"># - sigma_i: k_i * x_i + sum over j≠i of (cross terms)</span>
+        <span class="c1">#</span>
+        <span class="c1"># In the simplified version (semi-honest), we use:</span>
+        <span class="c1"># - delta_i = k_i * (sum of all gamma from broadcasts)</span>
+        <span class="c1"># - But we need to be careful about the reconstruction</span>
+
+        <span class="c1"># Actually, the correct approach for threshold is:</span>
+        <span class="c1"># Each party holds a share x_i of x, and in signing:</span>
+        <span class="c1"># - k = sum(k_i) (random, generated freshly)</span>
+        <span class="c1"># - gamma = sum(gamma_i) (random, generated freshly, used for R = g^{gamma^{-1}})</span>
+        <span class="c1"># - Wait, that&#39;s not right either...</span>
+
+        <span class="c1"># Let me reconsider: In GG18:</span>
+        <span class="c1"># - Each party samples k_i, gamma_i</span>
+        <span class="c1"># - Gamma_i = g^{gamma_i}</span>
+        <span class="c1"># - R = product(Gamma_i) = g^{sum(gamma_i)} = g^{gamma}</span>
+        <span class="c1"># - Then delta = k * gamma = sum_i sum_j (k_i * gamma_j)</span>
+        <span class="c1"># - Each party computes delta_i = sum_j (k_i * gamma_j) = k_i * gamma (where gamma = sum gamma_j)</span>
+        <span class="c1"># - Then sum(delta_i) = sum_i(k_i * gamma) = k * gamma = delta ✓</span>
+
+        <span class="c1"># So each party needs to know sum of all gamma values!</span>
+        <span class="c1"># From broadcasts, we have Gamma_j = g^{gamma_j}, but not gamma_j directly</span>
+        <span class="c1"># In the P2P messages, I added gamma_j values, so we can use those</span>
+
+        <span class="c1"># Compute sum of all gamma values (including own)</span>
+        <span class="n">gamma_sum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">gamma_i</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">other_id</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other_id</span> <span class="o">!=</span> <span class="n">party_id</span> <span class="ow">and</span> <span class="n">other_id</span> <span class="ow">in</span> <span class="n">received_p2p_msgs</span><span class="p">:</span>
+                <span class="n">gamma_sum</span> <span class="o">=</span> <span class="p">(</span><span class="n">gamma_sum</span> <span class="o">+</span> <span class="n">received_p2p_msgs</span><span class="p">[</span><span class="n">other_id</span><span class="p">][</span><span class="s1">&#39;gamma_i&#39;</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
+
+        <span class="c1"># Compute x = sum of all x_j * lambda_j (Lagrange interpolation at 0)</span>
+        <span class="c1"># Each party contributes x_j * lambda_j to reconstruct x</span>
+        <span class="n">x_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="n">party_id</span><span class="p">:</span>
+                <span class="n">x_j</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">key_share</span><span class="o">.</span><span class="n">x_i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x_j</span> <span class="o">=</span> <span class="n">received_p2p_msgs</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;x_i&#39;</span><span class="p">]</span>
+            <span class="n">lambda_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_lagrange_coeff</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">participants</span><span class="p">)</span>
+            <span class="n">x_total</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_total</span> <span class="o">+</span> <span class="n">x_j</span> <span class="o">*</span> <span class="n">lambda_j</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
+
+        <span class="c1"># delta_i = k_i * gamma (where gamma = sum of all gamma_j)</span>
+        <span class="n">delta_i_int</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">k_i</span><span class="p">)</span> <span class="o">*</span> <span class="n">gamma_sum</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
+        <span class="n">delta_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">delta_i_int</span><span class="p">)</span>
+
+        <span class="c1"># sigma_i = k_i * x (party i&#39;s additive share of k*x)</span>
+        <span class="c1"># When summed: sum(sigma_i) = sum(k_i) * x = k * x</span>
+        <span class="n">sigma_i_int</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">k_i</span><span class="p">)</span> <span class="o">*</span> <span class="n">x_total</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
+        <span class="n">sigma_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="n">sigma_i_int</span><span class="p">)</span>
+
+        <span class="n">broadcast_msg</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;party_id&#39;</span><span class="p">:</span> <span class="n">party_id</span><span class="p">,</span>
+            <span class="s1">&#39;delta_i&#39;</span><span class="p">:</span> <span class="n">delta_i</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">updated_state</span> <span class="o">=</span> <span class="n">private_state</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">updated_state</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span>
+        <span class="n">updated_state</span><span class="p">[</span><span class="s1">&#39;delta_i&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta_i</span>
+        <span class="n">updated_state</span><span class="p">[</span><span class="s1">&#39;sigma_i&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigma_i</span>
+        <span class="n">updated_state</span><span class="p">[</span><span class="s1">&#39;round2_by_party&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">round2_by_party</span>
+        <span class="n">updated_state</span><span class="p">[</span><span class="s1">&#39;gamma_sum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gamma_sum</span>
+
+        <span class="k">return</span> <span class="n">broadcast_msg</span><span class="p">,</span> <span class="n">updated_state</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_lagrange_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">party_id</span><span class="p">:</span> <span class="n">PartyId</span><span class="p">,</span>
+                                 <span class="n">participants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PartyId</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute Lagrange coefficient for a party in a set of participants.&quot;&quot;&quot;</span>
+        <span class="c1"># lambda_i = product_{j != i} (0 - j) / (i - j) = product_{j != i} (-j) / (i - j)</span>
+        <span class="c1"># = product_{j != i} j / (j - i)</span>
+        <span class="n">lambda_i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="n">party_id</span><span class="p">:</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="n">j</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="n">party_id</span>
+                <span class="c1"># Compute modular inverse of denom</span>
+                <span class="n">denom_inv</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">denom</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+                <span class="n">lambda_i</span> <span class="o">=</span> <span class="p">(</span><span class="n">lambda_i</span> <span class="o">*</span> <span class="n">num</span> <span class="o">*</span> <span class="n">denom_inv</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
+
+        <span class="k">return</span> <span class="n">lambda_i</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">sign_round4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">party_id</span><span class="p">:</span> <span class="n">PartyId</span><span class="p">,</span> <span class="n">private_state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                    <span class="n">all_round3_msgs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ZRElement</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Round 4: Compute and return signature share.</span>
+
+<span class="sd">        GG18 Signature Formula:</span>
+<span class="sd">        - delta = k * gamma = sum(delta_i)</span>
+<span class="sd">        - R_raw = g^gamma (from round 3)</span>
+<span class="sd">        - R = R_raw^{delta^{-1}} = g^{gamma / (k*gamma)} = g^{1/k}</span>
+<span class="sd">        - r = x-coordinate of R (mod q)</span>
+<span class="sd">        - sigma = k * x = sum(sigma_i)</span>
+<span class="sd">        - s = (e + r*x) * k^{-1}</span>
+<span class="sd">        - Since we have k*x (sigma) and k*gamma (delta):</span>
+<span class="sd">        - s = (e + r*sigma/k) * k^{-1} = e/k + r*sigma/k^2</span>
+<span class="sd">        - Hmm, this doesn&#39;t simplify nicely with what we have...</span>
+
+<span class="sd">        Actually in GG18:</span>
+<span class="sd">        - s_i = k_i * e + r * sigma_i (where sigma_i is party i&#39;s share of k*x)</span>
+<span class="sd">        - s = sum(s_i) / delta = (k*e + r*k*x) / (k*gamma) = (e + rx) / gamma</span>
+<span class="sd">        - But we want s = k^{-1}(e + rx), and R = g^{1/k}</span>
+<span class="sd">        - So we need R = g^gamma and s = (e + rx) * gamma / delta</span>
+<span class="sd">        - Since delta = k*gamma, s = (e + rx) / k ✓</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            party_id: This party&#39;s identifier</span>
+<span class="sd">            private_state: State from round 3</span>
+<span class="sd">            all_round3_msgs: Delta broadcasts from all parties</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (signature_share, proof)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span>
+        <span class="n">R_raw</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>  <span class="c1"># g^{sum(gamma_i)} = g^gamma</span>
+        <span class="n">sigma_i</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;sigma_i&#39;</span><span class="p">]</span>
+        <span class="n">k_i</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;k_i&#39;</span><span class="p">]</span>
+        <span class="n">participants</span> <span class="o">=</span> <span class="n">private_state</span><span class="p">[</span><span class="s1">&#39;participants&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Compute delta = sum of all delta_i = k * gamma</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">all_round3_msgs</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">+</span> <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;delta_i&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Compute delta inverse</span>
+        <span class="n">delta_inv</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># R = g^{gamma} * delta^{-1} = g^{gamma / (k*gamma)} = g^{1/k}</span>
+        <span class="c1"># This gives us the correct R for ECDSA where R = g^{k^{-1}} (or equivalently k*G in additive notation)</span>
+        <span class="c1"># Actually wait - in standard ECDSA, R = k*G = g^k, not g^{1/k}</span>
+        <span class="c1"># So R_raw = g^gamma, and we need R = g^{1/k}</span>
+        <span class="c1"># Since delta = k*gamma, delta^{-1} = 1/(k*gamma)</span>
+        <span class="c1"># R = R_raw^{delta^{-1}} = g^{gamma * 1/(k*gamma)} = g^{1/k}</span>
+        <span class="c1"># But standard ECDSA uses R = g^k... let me re-read GG18</span>
+        <span class="c1">#</span>
+        <span class="c1"># In GG18 Section 4.2: R = g^{delta^{-1}} where delta = k*gamma</span>
+        <span class="c1"># and gamma = product of all Gamma_i where Gamma_i = g^{gamma_i}</span>
+        <span class="c1"># So R = (product Gamma_i)^{delta^{-1}} = g^{gamma * delta^{-1}} = g^{1/k}</span>
+        <span class="c1">#</span>
+        <span class="c1"># Then r = H(R) (x-coordinate)</span>
+        <span class="c1"># s = k(e + rx) = delta/gamma * (e + rx)</span>
+        <span class="c1">#</span>
+        <span class="c1"># For verification: g^{s^{-1} * e} * pk^{s^{-1} * r} = R</span>
+        <span class="c1"># = g^{(e+rx)/s} = g^{(e+rx) * gamma / (delta*(e+rx))} = g^{gamma/delta} = g^{1/k} = R ✓</span>
+
+        <span class="n">R</span> <span class="o">=</span> <span class="n">R_raw</span> <span class="o">**</span> <span class="n">delta_inv</span>
+
+        <span class="c1"># Compute r = x-coordinate of R (mod q)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">zr</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+
+        <span class="c1"># Compute signature share</span>
+        <span class="c1"># s = k(e + rx) = (e*k + r*k*x) = e*sum(k_i) + r*sum(sigma_i)</span>
+        <span class="c1"># Each party computes: s_i = e*k_i + r*sigma_i</span>
+        <span class="n">s_i</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span> <span class="n">k_i</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">sigma_i</span><span class="p">)</span>
+
+        <span class="n">proof</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;party_id&#39;</span><span class="p">:</span> <span class="n">party_id</span><span class="p">,</span>
+            <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="n">R</span><span class="p">,</span>
+            <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span>
+            <span class="s1">&#39;delta&#39;</span><span class="p">:</span> <span class="n">delta</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">s_i</span><span class="p">,</span> <span class="n">proof</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine_signatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signature_shares</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">PartyId</span><span class="p">,</span> <span class="n">ZRElement</span><span class="p">],</span>
+                          <span class="n">R</span><span class="p">:</span> <span class="n">GElement</span><span class="p">,</span> <span class="n">participants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PartyId</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GG18_Signature</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combine signature shares into final signature.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            signature_shares: Dict mapping party_id to signature share</span>
+<span class="sd">            R: Combined R point from round 3</span>
+<span class="sd">            participants: List of participating parties</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GG18_Signature object with (r, s)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">zr</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+
+        <span class="c1"># Sum signature shares (additive reconstruction)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">party_id</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">party_id</span> <span class="ow">in</span> <span class="n">signature_shares</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">signature_shares</span><span class="p">[</span><span class="n">party_id</span><span class="p">]</span>
+
+        <span class="c1"># Low-s normalization</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_s</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">GG18_Signature</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_s</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">ZRElement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZRElement</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize s to low-s form (BIP-62 compliant).&quot;&quot;&quot;</span>
+        <span class="n">s_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span>
+        <span class="n">half_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">//</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">s_int</span> <span class="o">&gt;</span> <span class="n">half_order</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">ZR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">-</span> <span class="n">s_int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">public_key</span><span class="p">:</span> <span class="n">GElement</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="n">GG18_Signature</span><span class="p">,</span>
+               <span class="n">message</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">GElement</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify ECDSA signature.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            public_key: Combined public key</span>
+<span class="sd">            signature: GG18_Signature to verify</span>
+<span class="sd">            message: Original message</span>
+<span class="sd">            generator: EC generator point</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if valid, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">signature</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">signature</span><span class="o">.</span><span class="n">s</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hash_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="c1"># s^{-1}</span>
+        <span class="n">s_inv</span> <span class="o">=</span> <span class="n">s</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># u1 = e * s^{-1}, u2 = r * s^{-1}</span>
+        <span class="n">u1</span> <span class="o">=</span> <span class="n">e</span> <span class="o">*</span> <span class="n">s_inv</span>
+        <span class="n">u2</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">s_inv</span>
+
+        <span class="c1"># R&#39; = g^{u1} * pk^{u2}</span>
+        <span class="n">R_prime</span> <span class="o">=</span> <span class="p">(</span><span class="n">generator</span> <span class="o">**</span> <span class="n">u1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">public_key</span> <span class="o">**</span> <span class="n">u2</span><span class="p">)</span>
+
+        <span class="c1"># r&#39; = x-coordinate of R&#39;</span>
+        <span class="n">r_prime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">zr</span><span class="p">(</span><span class="n">R_prime</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">r</span> <span class="o">==</span> <span class="n">r_prime</span>
+
+
+<div class="viewcode-block" id="GG18">
+<a class="viewcode-back" href="../../../../threshold.html#charm.schemes.threshold.GG18">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GG18</span><span class="p">(</span><span class="n">PKSig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    GG18 Threshold ECDSA Signature Scheme.</span>
+
+<span class="sd">    Implements the full threshold ECDSA protocol from Gennaro &amp; Goldfeder 2019.</span>
+<span class="sd">    Extends PKSig base class with keygen(), sign(), verify() interface.</span>
+
+<span class="sd">    Features:</span>
+<span class="sd">    - t-of-n threshold signatures</span>
+<span class="sd">    - Paillier-based MtA protocol</span>
+<span class="sd">    - 4-round interactive signing</span>
+<span class="sd">    - No presigning (each signature requires full protocol)</span>
+
+<span class="sd">    Security:</span>
+<span class="sd">    - Assumption: DDH, DCR (Decisional Composite Residuosity), ROM</span>
+<span class="sd">    - Definition: EU-CMA (Existential Unforgeability under Chosen Message Attack)</span>
+
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.eccurve import secp256k1</span>
+<span class="sd">    &gt;&gt;&gt; from charm.toolbox.integergroup import RSAGroup</span>
+<span class="sd">    &gt;&gt;&gt; group = ECGroup(secp256k1)</span>
+<span class="sd">    &gt;&gt;&gt; rsa_group = RSAGroup()</span>
+<span class="sd">    &gt;&gt;&gt; gg18 = GG18(group, rsa_group, threshold=2, num_parties=3, paillier_bits=512)</span>
+<span class="sd">    &gt;&gt;&gt; gg18 is not None</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ec_group</span><span class="p">:</span> <span class="n">ECGroupType</span><span class="p">,</span> <span class="n">rsa_group</span><span class="p">:</span> <span class="n">RSAGroup</span><span class="p">,</span>
+                 <span class="n">threshold</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_parties</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2048</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize GG18 threshold ECDSA.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ec_group: EC group (e.g., ECGroup(secp256k1))</span>
+<span class="sd">            rsa_group: RSA group for Paillier</span>
+<span class="sd">            threshold: Minimum parties to sign (t)</span>
+<span class="sd">            num_parties: Total parties (n)</span>
+<span class="sd">            paillier_bits: Paillier modulus bit length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">PKSig</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="n">secDef</span><span class="o">=</span><span class="s1">&#39;EU_CMA&#39;</span><span class="p">,</span> <span class="n">assumption</span><span class="o">=</span><span class="s1">&#39;DDH+DCR&#39;</span><span class="p">,</span>
+                        <span class="n">messageSpace</span><span class="o">=</span><span class="s1">&#39;arbitrary&#39;</span><span class="p">,</span> <span class="n">secModel</span><span class="o">=</span><span class="s1">&#39;ROM&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">ec_group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_group</span> <span class="o">=</span> <span class="n">rsa_group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">num_parties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paillier_bits</span> <span class="o">=</span> <span class="n">paillier_bits</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dkg</span> <span class="o">=</span> <span class="n">GG18_DKG</span><span class="p">(</span><span class="n">ec_group</span><span class="p">,</span> <span class="n">rsa_group</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">num_parties</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_signer</span> <span class="o">=</span> <span class="n">GG18_Sign</span><span class="p">(</span><span class="n">ec_group</span><span class="p">,</span> <span class="n">rsa_group</span><span class="p">,</span> <span class="n">paillier_bits</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GG18.keygen">
+<a class="viewcode-back" href="../../../../threshold.html#charm.schemes.threshold.GG18.keygen">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keygen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GElement</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">GElement</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">GG18_KeyShare</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate threshold key shares.</span>
+
+<span class="sd">        This is a convenience wrapper that simulates the 3-round DKG.</span>
+<span class="sd">        In practice, each party runs the DKG rounds interactively.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            generator: EC generator point (uses random if None)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (public_key, list of key shares)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">generator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="n">session_id</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;GG18_KEYGEN_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">generator</span><span class="p">)[:</span><span class="mi">16</span><span class="p">]</span>
+
+        <span class="c1"># Round 1: All parties generate secrets and commitments</span>
+        <span class="n">round1_results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">msg</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dkg</span><span class="o">.</span><span class="n">keygen_round1</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">session_id</span><span class="p">)</span>
+            <span class="n">round1_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">msg</span><span class="p">,</span> <span class="n">state</span><span class="p">))</span>
+
+        <span class="n">round1_msgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round1_results</span><span class="p">]</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">round1_results</span><span class="p">]</span>
+
+        <span class="c1"># Round 2: Prepare shares</span>
+        <span class="n">round2_results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">shares</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dkg</span><span class="o">.</span><span class="n">keygen_round2</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round1_msgs</span><span class="p">)</span>
+            <span class="n">round2_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">shares</span><span class="p">,</span> <span class="n">state</span><span class="p">))</span>
+            <span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="c1"># Collect shares for each party</span>
+        <span class="n">received_shares</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">recv</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">received_shares</span><span class="p">[</span><span class="n">recv</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">send</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">received_shares</span><span class="p">[</span><span class="n">recv</span><span class="p">][</span><span class="n">send</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">round2_results</span><span class="p">[</span><span class="n">send</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">recv</span><span class="p">]</span>
+
+        <span class="c1"># Round 3: Compute final key shares</span>
+        <span class="n">key_shares</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">key_share</span><span class="p">,</span> <span class="n">complaint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dkg</span><span class="o">.</span><span class="n">keygen_round3</span><span class="p">(</span>
+                <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">states</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">received_shares</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">round1_msgs</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">complaint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DKG failed: complaint from party </span><span class="si">{</span><span class="n">complaint</span><span class="p">[</span><span class="s1">&#39;accuser&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">key_shares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key_share</span><span class="p">)</span>
+
+        <span class="n">public_key</span> <span class="o">=</span> <span class="n">key_shares</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">X</span>
+        <span class="k">return</span> <span class="n">public_key</span><span class="p">,</span> <span class="n">key_shares</span></div>
+
+
+<div class="viewcode-block" id="GG18.sign">
+<a class="viewcode-back" href="../../../../threshold.html#charm.schemes.threshold.GG18.sign">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_shares</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GG18_KeyShare</span><span class="p">],</span> <span class="n">message</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+             <span class="n">participants</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">PartyId</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">generator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GElement</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GG18_Signature</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate threshold signature.</span>
+
+<span class="sd">        Convenience wrapper that simulates the 4-round signing protocol.</span>
+<span class="sd">        In practice, each party runs the signing rounds interactively.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key_shares: List of participating parties&#39; key shares</span>
+<span class="sd">            message: Message to sign</span>
+<span class="sd">            participants: List of participating party IDs (default: first t)</span>
+<span class="sd">            generator: EC generator point</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GG18_Signature object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_shares</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Need at least </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="si">}</span><span class="s2"> key shares&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">participants</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">participants</span> <span class="o">=</span> <span class="p">[</span><span class="n">ks</span><span class="o">.</span><span class="n">party_id</span> <span class="k">for</span> <span class="n">ks</span> <span class="ow">in</span> <span class="n">key_shares</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="n">generator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Derive from first key share&#39;s verification key</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="n">session_id</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;GG18_SIGN_&quot;</span> <span class="o">+</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
+
+        <span class="c1"># Get key shares for participants</span>
+        <span class="n">ks_by_party</span> <span class="o">=</span> <span class="p">{</span><span class="n">ks</span><span class="o">.</span><span class="n">party_id</span><span class="p">:</span> <span class="n">ks</span> <span class="k">for</span> <span class="n">ks</span> <span class="ow">in</span> <span class="n">key_shares</span><span class="p">}</span>
+
+        <span class="c1"># Round 1</span>
+        <span class="n">round1_results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">msg</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer</span><span class="o">.</span><span class="n">sign_round1</span><span class="p">(</span>
+                <span class="n">pid</span><span class="p">,</span> <span class="n">ks_by_party</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">participants</span><span class="p">,</span> <span class="n">generator</span><span class="p">,</span> <span class="n">session_id</span>
+            <span class="p">)</span>
+            <span class="n">round1_results</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+            <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="n">round1_msgs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">round1_results</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="c1"># Round 2</span>
+        <span class="n">round2_broadcasts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">round2_p2p</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">broadcast</span><span class="p">,</span> <span class="n">p2p</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer</span><span class="o">.</span><span class="n">sign_round2</span><span class="p">(</span>
+                <span class="n">pid</span><span class="p">,</span> <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">round1_msgs</span><span class="p">,</span> <span class="n">message</span>
+            <span class="p">)</span>
+            <span class="n">round2_broadcasts</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">broadcast</span>
+            <span class="n">round2_p2p</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">p2p</span>
+            <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="n">round2_msgs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">round2_broadcasts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="c1"># Collect P2P messages for each party</span>
+        <span class="n">received_p2p</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">recv_pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">received_p2p</span><span class="p">[</span><span class="n">recv_pid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">send_pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">send_pid</span> <span class="o">!=</span> <span class="n">recv_pid</span> <span class="ow">and</span> <span class="n">recv_pid</span> <span class="ow">in</span> <span class="n">round2_p2p</span><span class="p">[</span><span class="n">send_pid</span><span class="p">]:</span>
+                    <span class="n">received_p2p</span><span class="p">[</span><span class="n">recv_pid</span><span class="p">][</span><span class="n">send_pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">round2_p2p</span><span class="p">[</span><span class="n">send_pid</span><span class="p">][</span><span class="n">recv_pid</span><span class="p">]</span>
+
+        <span class="c1"># Round 3</span>
+        <span class="n">round3_results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">broadcast</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer</span><span class="o">.</span><span class="n">sign_round3</span><span class="p">(</span>
+                <span class="n">pid</span><span class="p">,</span> <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">round2_msgs</span><span class="p">,</span> <span class="n">received_p2p</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">round3_results</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">broadcast</span>
+            <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="n">round3_msgs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">round3_results</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="c1"># Round 4</span>
+        <span class="n">signature_shares</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">s_i</span><span class="p">,</span> <span class="n">proof</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer</span><span class="o">.</span><span class="n">sign_round4</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">states</span><span class="p">[</span><span class="n">pid</span><span class="p">],</span> <span class="n">round3_msgs</span><span class="p">)</span>
+            <span class="n">signature_shares</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">s_i</span>
+            <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">R</span> <span class="o">=</span> <span class="n">proof</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Combine signatures</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer</span><span class="o">.</span><span class="n">combine_signatures</span><span class="p">(</span><span class="n">signature_shares</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">participants</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GG18.verify">
+<a class="viewcode-back" href="../../../../threshold.html#charm.schemes.threshold.GG18.verify">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">public_key</span><span class="p">:</span> <span class="n">GElement</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+               <span class="n">signature</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GG18_Signature</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ZRElement</span><span class="p">,</span> <span class="n">ZRElement</span><span class="p">]],</span>
+               <span class="n">generator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GElement</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify ECDSA signature.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            public_key: Combined public key</span>
+<span class="sd">            message: Original message</span>
+<span class="sd">            signature: GG18_Signature or (r, s) tuple</span>
+<span class="sd">            generator: EC generator point</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if valid, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">generator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">signature</span> <span class="o">=</span> <span class="n">GG18_Signature</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="n">signature</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">signature</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signer</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="n">signature</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">generator</span><span class="p">)</span></div>
+</div>
+
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2013-2026, Johns Hopkins University ISI
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Feb 07, 2026</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../../_static/documentation_options.js?v=da26a6b9"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

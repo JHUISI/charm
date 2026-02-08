@@ -280,6 +280,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../threshold.html">Threshold ECDSA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../test_vectors.html">Schemes with Test Vectors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
@@ -318,6 +319,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/mta.html">mta</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/node.html">node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/paillier_mta.html">paillier_mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../toolbox/paillier_zkproofs.html">paillier_zkproofs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/pairingcurves.html">pairingcurves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/pairinggroup.html">pairinggroup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../toolbox/PKEnc.html">PKEnc - Public-Key Encryption</a></li>
@@ -427,6 +430,125 @@
 - DKLS23_Presign: Presigning protocol
 - DKLS23_Sign: Signing protocol
 - DKLS23: Complete threshold ECDSA protocol</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Complete">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestCGGMP21_Complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Complete" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>End-to-end tests for complete CGGMP21 protocol</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Complete.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Complete.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Complete.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Complete.test_3_of_5_threshold">
+<span class="sig-name descname"><span class="pre">test_3_of_5_threshold</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Complete.test_3_of_5_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Complete.test_3_of_5_threshold" title="Link to this definition">¶</a></dt>
+<dd><p>Test 3-of-5 threshold scheme with CGGMP21</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Complete.test_complete_2_of_3_with_presigning">
+<span class="sig-name descname"><span class="pre">test_complete_2_of_3_with_presigning</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Complete.test_complete_2_of_3_with_presigning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Complete.test_complete_2_of_3_with_presigning" title="Link to this definition">¶</a></dt>
+<dd><p>Complete flow: keygen -&gt; presign -&gt; sign -&gt; verify for CGGMP21</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Complete.test_different_participant_combinations">
+<span class="sig-name descname"><span class="pre">test_different_participant_combinations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Complete.test_different_participant_combinations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Complete.test_different_participant_combinations" title="Link to this definition">¶</a></dt>
+<dd><p>Test that any 2 of 3 parties can sign with CGGMP21</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_DKG">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestCGGMP21_DKG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_DKG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_DKG" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for CGGMP21 Distributed Key Generation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_DKG.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_DKG.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_DKG.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_DKG.test_2_of_3_dkg">
+<span class="sig-name descname"><span class="pre">test_2_of_3_dkg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_DKG.test_2_of_3_dkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_DKG.test_2_of_3_dkg" title="Link to this definition">¶</a></dt>
+<dd><p>Test 2-of-3 distributed key generation for CGGMP21</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_DKG.test_all_parties_same_pubkey">
+<span class="sig-name descname"><span class="pre">test_all_parties_same_pubkey</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_DKG.test_all_parties_same_pubkey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_DKG.test_all_parties_same_pubkey" title="Link to this definition">¶</a></dt>
+<dd><p>All parties should derive the same public key in CGGMP21</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_IdentifiableAbort">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestCGGMP21_IdentifiableAbort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_IdentifiableAbort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_IdentifiableAbort" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for CGGMP21 identifiable abort feature</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_IdentifiableAbort.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_IdentifiableAbort.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_IdentifiableAbort.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_exception">
+<span class="sig-name descname"><span class="pre">test_security_abort_exception</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_IdentifiableAbort.test_security_abort_exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_exception" title="Link to this definition">¶</a></dt>
+<dd><p>Test SecurityAbort exception is properly defined</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_with_evidence">
+<span class="sig-name descname"><span class="pre">test_security_abort_with_evidence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_IdentifiableAbort.test_security_abort_with_evidence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_with_evidence" title="Link to this definition">¶</a></dt>
+<dd><p>Test SecurityAbort with evidence</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Presign">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestCGGMP21_Presign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Presign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Presign" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for CGGMP21 presigning protocol</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Presign.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Presign.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Presign.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Presign.test_presign_generates_valid_presignature">
+<span class="sig-name descname"><span class="pre">test_presign_generates_valid_presignature</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Presign.test_presign_generates_valid_presignature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Presign.test_presign_generates_valid_presignature" title="Link to this definition">¶</a></dt>
+<dd><p>Test that CGGMP21 presigning produces valid presignature objects</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Proofs">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestCGGMP21_Proofs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Proofs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Proofs" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for CGGMP21 zero-knowledge proofs</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Proofs.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Proofs.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Proofs.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestCGGMP21_Proofs.test_ring_pedersen_generation">
+<span class="sig-name descname"><span class="pre">test_ring_pedersen_generation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCGGMP21_Proofs.test_ring_pedersen_generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCGGMP21_Proofs.test_ring_pedersen_generation" title="Link to this definition">¶</a></dt>
+<dd><p>Test Ring-Pedersen parameter generation</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="threshold_test.TestCurveAgnostic">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestCurveAgnostic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestCurveAgnostic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestCurveAgnostic" title="Link to this definition">¶</a></dt>
@@ -653,6 +775,87 @@ the protocol is curve-agnostic.</p>
 <dt class="sig sig-object py" id="threshold_test.TestDPF.test_dpf_single_point">
 <span class="sig-name descname"><span class="pre">test_dpf_single_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestDPF.test_dpf_single_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestDPF.test_dpf_single_point" title="Link to this definition">¶</a></dt>
 <dd><p>Test DPF correctness at target point.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Complete">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestGG18_Complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Complete" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>End-to-end tests for complete GG18 protocol</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Complete.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Complete.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Complete.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Complete.test_3_of_5_threshold">
+<span class="sig-name descname"><span class="pre">test_3_of_5_threshold</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Complete.test_3_of_5_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Complete.test_3_of_5_threshold" title="Link to this definition">¶</a></dt>
+<dd><p>Test 3-of-5 threshold scheme with GG18</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Complete.test_complete_2_of_3_signing">
+<span class="sig-name descname"><span class="pre">test_complete_2_of_3_signing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Complete.test_complete_2_of_3_signing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Complete.test_complete_2_of_3_signing" title="Link to this definition">¶</a></dt>
+<dd><p>Complete flow: keygen -&gt; sign -&gt; verify for GG18</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Complete.test_different_participant_combinations">
+<span class="sig-name descname"><span class="pre">test_different_participant_combinations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Complete.test_different_participant_combinations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Complete.test_different_participant_combinations" title="Link to this definition">¶</a></dt>
+<dd><p>Test that any 2 of 3 parties can sign with GG18</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_DKG">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestGG18_DKG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_DKG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_DKG" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for GG18 Distributed Key Generation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_DKG.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_DKG.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_DKG.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_DKG.test_2_of_3_dkg">
+<span class="sig-name descname"><span class="pre">test_2_of_3_dkg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_DKG.test_2_of_3_dkg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_DKG.test_2_of_3_dkg" title="Link to this definition">¶</a></dt>
+<dd><p>Test 2-of-3 distributed key generation for GG18</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_DKG.test_all_parties_same_pubkey">
+<span class="sig-name descname"><span class="pre">test_all_parties_same_pubkey</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_DKG.test_all_parties_same_pubkey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_DKG.test_all_parties_same_pubkey" title="Link to this definition">¶</a></dt>
+<dd><p>All parties should derive the same public key in GG18</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Sign">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">threshold_test.</span></span><span class="sig-name descname"><span class="pre">TestGG18_Sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Sign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Sign" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<p>Tests for GG18 signing protocol</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Sign.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Sign.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Sign.setUp" title="Link to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Sign.test_signature_verification_correct">
+<span class="sig-name descname"><span class="pre">test_signature_verification_correct</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Sign.test_signature_verification_correct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Sign.test_signature_verification_correct" title="Link to this definition">¶</a></dt>
+<dd><p>Test that valid ECDSA signatures verify correctly with GG18</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold_test.TestGG18_Sign.test_signature_verification_wrong_message">
+<span class="sig-name descname"><span class="pre">test_signature_verification_wrong_message</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/threshold_test.html#TestGG18_Sign.test_signature_verification_wrong_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold_test.TestGG18_Sign.test_signature_verification_wrong_message" title="Link to this definition">¶</a></dt>
+<dd><p>Test that signature verification fails with wrong message</p>
 </dd></dl>
 
 </dd></dl>
@@ -1103,7 +1306,7 @@ signature shares is detectable.</p>
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Feb 02, 2026</div>
+              Last updated on Feb 07, 2026</div>
           </div>
           <div class="right-details">
             
@@ -1125,6 +1328,35 @@ signature shares is detectable.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">threshold_test</a><ul>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Complete"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Complete</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Complete.setUp"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Complete.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Complete.test_3_of_5_threshold"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Complete.test_3_of_5_threshold()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Complete.test_complete_2_of_3_with_presigning"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Complete.test_complete_2_of_3_with_presigning()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Complete.test_different_participant_combinations"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Complete.test_different_participant_combinations()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_DKG"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_DKG</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_DKG.setUp"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_DKG.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_DKG.test_2_of_3_dkg"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_DKG.test_2_of_3_dkg()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_DKG.test_all_parties_same_pubkey"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_DKG.test_all_parties_same_pubkey()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_IdentifiableAbort"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_IdentifiableAbort</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_IdentifiableAbort.setUp"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_IdentifiableAbort.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_exception"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_IdentifiableAbort.test_security_abort_exception()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_IdentifiableAbort.test_security_abort_with_evidence"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_IdentifiableAbort.test_security_abort_with_evidence()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Presign"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Presign</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Presign.setUp"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Presign.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Presign.test_presign_generates_valid_presignature"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Presign.test_presign_generates_valid_presignature()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Proofs"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Proofs</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Proofs.setUp"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Proofs.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestCGGMP21_Proofs.test_ring_pedersen_generation"><code class="docutils literal notranslate"><span class="pre">TestCGGMP21_Proofs.test_ring_pedersen_generation()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#threshold_test.TestCurveAgnostic"><code class="docutils literal notranslate"><span class="pre">TestCurveAgnostic</span></code></a><ul>
 <li><a class="reference internal" href="#threshold_test.TestCurveAgnostic.test_curve_agnostic_prime256v1"><code class="docutils literal notranslate"><span class="pre">TestCurveAgnostic.test_curve_agnostic_prime256v1()</span></code></a></li>
 </ul>
@@ -1172,6 +1404,25 @@ signature shares is detectable.</p>
 <li><a class="reference internal" href="#threshold_test.TestDPF.test_dpf_key_independence"><code class="docutils literal notranslate"><span class="pre">TestDPF.test_dpf_key_independence()</span></code></a></li>
 <li><a class="reference internal" href="#threshold_test.TestDPF.test_dpf_off_points"><code class="docutils literal notranslate"><span class="pre">TestDPF.test_dpf_off_points()</span></code></a></li>
 <li><a class="reference internal" href="#threshold_test.TestDPF.test_dpf_single_point"><code class="docutils literal notranslate"><span class="pre">TestDPF.test_dpf_single_point()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Complete"><code class="docutils literal notranslate"><span class="pre">TestGG18_Complete</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Complete.setUp"><code class="docutils literal notranslate"><span class="pre">TestGG18_Complete.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Complete.test_3_of_5_threshold"><code class="docutils literal notranslate"><span class="pre">TestGG18_Complete.test_3_of_5_threshold()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Complete.test_complete_2_of_3_signing"><code class="docutils literal notranslate"><span class="pre">TestGG18_Complete.test_complete_2_of_3_signing()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Complete.test_different_participant_combinations"><code class="docutils literal notranslate"><span class="pre">TestGG18_Complete.test_different_participant_combinations()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_DKG"><code class="docutils literal notranslate"><span class="pre">TestGG18_DKG</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestGG18_DKG.setUp"><code class="docutils literal notranslate"><span class="pre">TestGG18_DKG.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_DKG.test_2_of_3_dkg"><code class="docutils literal notranslate"><span class="pre">TestGG18_DKG.test_2_of_3_dkg()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_DKG.test_all_parties_same_pubkey"><code class="docutils literal notranslate"><span class="pre">TestGG18_DKG.test_all_parties_same_pubkey()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Sign"><code class="docutils literal notranslate"><span class="pre">TestGG18_Sign</span></code></a><ul>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Sign.setUp"><code class="docutils literal notranslate"><span class="pre">TestGG18_Sign.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Sign.test_signature_verification_correct"><code class="docutils literal notranslate"><span class="pre">TestGG18_Sign.test_signature_verification_correct()</span></code></a></li>
+<li><a class="reference internal" href="#threshold_test.TestGG18_Sign.test_signature_verification_wrong_message"><code class="docutils literal notranslate"><span class="pre">TestGG18_Sign.test_signature_verification_wrong_message()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#threshold_test.TestMPFSS"><code class="docutils literal notranslate"><span class="pre">TestMPFSS</span></code></a><ul>

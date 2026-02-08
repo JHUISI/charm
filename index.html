@@ -280,6 +280,7 @@
 <li class="toctree-l2"><a class="reference internal" href="charm/schemes/pksig/pksig_waters09.html">pksig_waters09</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="threshold.html">Threshold ECDSA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Schemes with Test Vectors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
@@ -318,6 +319,8 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox/mta.html">mta</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/node.html">node</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/paddingschemes.html">paddingschemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/paillier_mta.html">paillier_mta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox/paillier_zkproofs.html">paillier_zkproofs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/pairingcurves.html">pairingcurves</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/pairinggroup.html">pairinggroup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox/PKEnc.html">PKEnc - Public-Key Encryption</a></li>
@@ -432,6 +435,7 @@ while promoting the reuse of components.</p>
 <li><p><strong>Elliptic curve groups</strong> — NIST curves, secp256k1, Curve25519 via OpenSSL</p></li>
 <li><p><strong>Integer groups</strong> — RSA, DSA, safe primes for classical schemes</p></li>
 <li><p><strong>50+ implemented schemes</strong> — ABE, IBE, signatures, commitments, and more</p></li>
+<li><p><strong>Threshold ECDSA / MPC</strong> — GG18, CGGMP21, DKLS23 for distributed signing (Bitcoin, XRPL)</p></li>
 <li><p><strong>ZKP compiler</strong> — Schnorr proofs, Σ-protocols, AND/OR compositions</p></li>
 <li><p><strong>Serialization</strong> — Convert group elements to bytes for storage/transmission</p></li>
 </ul>
@@ -476,6 +480,27 @@ while promoting the reuse of components.</p>
 <span class="n">decrypted</span> <span class="o">=</span> <span class="n">cpabe</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">master_public</span><span class="p">,</span> <span class="n">user_key</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
 </pre></div>
 </div>
+<p><strong>Threshold ECDSA</strong> (MPC-based signing for Bitcoin/XRPL):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ecgroup</span><span class="w"> </span><span class="kn">import</span> <span class="n">ECGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.eccurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">secp256k1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold</span><span class="w"> </span><span class="kn">import</span> <span class="n">GG18</span><span class="p">,</span> <span class="n">CGGMP21</span><span class="p">,</span> <span class="n">DKLS23</span>
+
+<span class="n">group</span> <span class="o">=</span> <span class="n">ECGroup</span><span class="p">(</span><span class="n">secp256k1</span><span class="p">)</span>
+
+<span class="c1"># GG18: Classic threshold ECDSA (2-of-3)</span>
+<span class="n">gg18</span> <span class="o">=</span> <span class="n">GG18</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">key_shares</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">gg18</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="sa">b</span><span class="s2">&quot;transaction&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">gg18</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">public_key</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;transaction&quot;</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+
+<span class="c1"># CGGMP21: UC-secure with identifiable aborts</span>
+<span class="n">cggmp</span> <span class="o">=</span> <span class="n">CGGMP21</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_parties</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">key_shares</span><span class="p">,</span> <span class="n">public_key</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">keygen</span><span class="p">()</span>
+<span class="n">presigs</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">presign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>  <span class="c1"># Offline</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">cggmp</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">key_shares</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="sa">b</span><span class="s2">&quot;tx&quot;</span><span class="p">,</span> <span class="n">presigs</span><span class="p">)</span>  <span class="c1"># Online</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="threshold.html"><span class="doc">Threshold ECDSA</span></a> for detailed documentation and API reference.</p>
 </section>
 <section id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h2>
@@ -519,6 +544,7 @@ while promoting the reuse of components.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="schemes.html">Implemented Schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="threshold.html">Threshold ECDSA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Schemes with Test Vectors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adapters.html">Scheme Adapters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="toolbox.html">Toolbox Classes</a></li>
@@ -589,7 +615,7 @@ while promoting the reuse of components.</p>
             
             <a href="https://github.com/pradyunsg/furo">Furo</a>
             <div class="last-updated">
-              Last updated on Feb 02, 2026</div>
+              Last updated on Feb 07, 2026</div>
           </div>
           <div class="right-details">
             
