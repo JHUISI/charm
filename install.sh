@@ -429,18 +429,22 @@ configure_shell() {
 # Print Usage
 #######################################
 usage() {
+    local BOLD='\033[1m'
+    local RESET='\033[0m'
+    echo -e "${BOLD}Charm-Crypto Installation Script v${CHARM_VERSION}${RESET}"
+    echo ""
+    echo -e "${BOLD}Supported Platforms:${RESET}"
     cat << EOF
-Charm-Crypto Installation Script v${CHARM_VERSION}
-
-Supported Platforms:
   - Ubuntu/Debian (and derivatives: Linux Mint, Pop!_OS)
   - Fedora/RHEL/CentOS (and derivatives: Rocky, Alma, Oracle Linux)
   - Arch Linux (and derivatives: Manjaro, EndeavourOS, Artix)
   - macOS (Intel and Apple Silicon)
 
-Usage: $0 [OPTIONS]
-
-Options:
+EOF
+    echo -e "${BOLD}Usage:${RESET} $0 [OPTIONS]"
+    echo ""
+    echo -e "${BOLD}Options:${RESET}"
+    cat << EOF
   --from-pypi     Install from PyPI (default, recommended)
   --from-source   Clone and build from source
   --deps-only     Only install system dependencies and PBC
@@ -449,7 +453,9 @@ Options:
   --python=PATH   Path to Python interpreter
   --help, -h      Show this help message
 
-Examples:
+EOF
+    echo -e "${BOLD}Examples:${RESET}"
+    cat << EOF
   # Default installation (recommended)
   curl -sSL https://raw.githubusercontent.com/JHUISI/charm/dev/install.sh | bash
 
