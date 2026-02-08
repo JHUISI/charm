@@ -1,3 +1,12 @@
+Release Notes
+=============
+
+.. toctree::
+   :maxdepth: 1
+
+   updates_062
+   updates_061
+
 Changes in v0.43
 =======================
 

@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Changes in v0.50" href="updates_050.html"><link rel="prev" title="Changes in v0.61" href="updates_061.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Release Notes" href="updates.html">
         <link rel="prefetch" href="_static/charm_logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Changes in v0.60 - Charm-Crypto v0.62</title>
+        <title>Changes in v0.62 - Charm-Crypto v0.62</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -372,10 +372,10 @@
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="updates_061.html">Changes in v0.61</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Changes in v0.60</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updates_060.html">Changes in v0.60</a></li>
 <li class="toctree-l1"><a class="reference internal" href="updates_050.html">Changes in v0.50</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="updates.html">Release Notes</a><input aria-label="Toggle navigation of Release Notes" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="updates_062.html">Changes in v0.62</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="updates.html">Release Notes</a><input aria-label="Toggle navigation of Release Notes" checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Changes in v0.62</a></li>
 <li class="toctree-l2"><a class="reference internal" href="updates_061.html">Changes in v0.61</a></li>
 </ul>
 </li>
@@ -400,12 +400,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/JHUISI/charm/blob/dev/doc/source/updates_060.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/blob/dev/doc/source/updates_062.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/JHUISI/charm/edit/dev/doc/source/updates_060.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/edit/dev/doc/source/updates_062.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -422,347 +422,184 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="changes-in-v0-60">
-<h1>Changes in v0.60<a class="headerlink" href="#changes-in-v0-60" title="Link to this heading">¶</a></h1>
-<p>This release includes significant updates to dependencies, Python compatibility improvements, and new cryptographic schemes.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This release contains <strong>breaking changes</strong>. Please review the migration guide below before upgrading.</p>
-</div>
-<section id="breaking-changes-and-migration-guide">
-<h2>Breaking Changes and Migration Guide<a class="headerlink" href="#breaking-changes-and-migration-guide" title="Link to this heading">¶</a></h2>
-<p>This section documents changes that may require modifications to existing code when upgrading from v0.50 to v0.60.</p>
-<section id="python-version-requirements">
-<h3>Python Version Requirements<a class="headerlink" href="#python-version-requirements" title="Link to this heading">¶</a></h3>
-<p><strong>Python 2.x and Python 3.5-3.7 are no longer supported.</strong></p>
+          <section id="changes-in-v0-62">
+<h1>Changes in v0.62<a class="headerlink" href="#changes-in-v0-62" title="Link to this heading">¶</a></h1>
+<p>This release introduces production-ready threshold ECDSA implementations supporting
+distributed key generation, presigning, and signing protocols for applications like
+cryptocurrency wallets, multi-party custody, and decentralized signing services.</p>
+<section id="new-threshold-ecdsa-schemes">
+<h2>New Threshold ECDSA Schemes<a class="headerlink" href="#new-threshold-ecdsa-schemes" title="Link to this heading">¶</a></h2>
+<p>Three complete threshold ECDSA implementations have been added to the <code class="docutils literal notranslate"><span class="pre">charm.schemes.threshold</span></code> package:</p>
+<p><strong>GG18 (Gennaro-Goldfeder 2018)</strong></p>
+<p>The GG18 protocol implements threshold ECDSA using Paillier-based multiplicative-to-additive (MtA) conversion:</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 30.0%" />
-<col style="width: 35.0%" />
-<col style="width: 35.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>Aspect</p></th>
-<th class="head"><p>Old (v0.50)</p></th>
-<th class="head"><p>New (v0.60)</p></th>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Minimum Python</p></td>
-<td><p>2.7 / 3.x</p></td>
-<td><p><strong>3.8+</strong></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gg18_dkg.py</span></code></p></td>
+<td><p>Distributed Key Generation using Feldman VSS</p></td>
 </tr>
-<tr class="row-odd"><td><p>Tested versions</p></td>
-<td><p>2.7, 3.5-3.9</p></td>
-<td><p>3.8, 3.9, 3.10, 3.11, 3.12</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gg18_sign.py</span></code></p></td>
+<td><p>Interactive signing protocol (4 rounds)</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><strong>Migration</strong>: Upgrade to Python 3.8 or later before installing v0.60.</p>
-</section>
-<section id="package-name-change">
-<h3>Package Name Change<a class="headerlink" href="#package-name-change" title="Link to this heading">¶</a></h3>
-<p>The PyPI package name has been updated to follow Python packaging conventions:</p>
+<p><em>Features:</em> Paillier-based MtA, DCR assumption security, secp256k1 curve support.</p>
+<p><strong>CGGMP21 (Canetti et al. 2021)</strong></p>
+<p>The CGGMP21 protocol provides UC-secure threshold ECDSA with identifiable aborts:</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 30.0%" />
-<col style="width: 35.0%" />
-<col style="width: 35.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>Aspect</p></th>
-<th class="head"><p>Old (v0.50)</p></th>
-<th class="head"><p>New (v0.60)</p></th>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Package name</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">Charm-Crypto</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">charm-crypto-framework</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cggmp21_proofs.py</span></code></p></td>
+<td><p>Zero-knowledge proofs (Π-enc, Π-log*, Π-aff-g, etc.)</p></td>
 </tr>
-<tr class="row-odd"><td><p>Import name</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">charm</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">charm</span></code> (unchanged)</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cggmp21_dkg.py</span></code></p></td>
+<td><p>Distributed Key Generation with Ring-Pedersen parameters</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cggmp21_presign.py</span></code></p></td>
+<td><p>Optional presigning for faster online phase</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cggmp21_sign.py</span></code></p></td>
+<td><p>Signing with identifiable abort support</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><strong>Migration</strong>: Update pip commands and requirements files:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">Charm</span><span class="o">-</span><span class="n">Crypto</span>
-
-<span class="c1"># New</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span><span class="o">-</span><span class="n">framework</span>
-</pre></div>
-</div>
-<p>The import name remains <code class="docutils literal notranslate"><span class="pre">charm</span></code>, so existing Python code continues to work without changes.</p>
-</section>
-<section id="dependency-version-changes">
-<h3>Dependency Version Changes<a class="headerlink" href="#dependency-version-changes" title="Link to this heading">¶</a></h3>
+<p><em>Features:</em> UC-security, identifiable aborts, optional presigning, Ring-Pedersen ZK proofs.</p>
+<p><strong>DKLS23 (Doerner et al. 2023)</strong></p>
+<p>The DKLS23 protocol uses oblivious transfer for efficient threshold signing:</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 25.0%" />
-<col style="width: 25.0%" />
-<col style="width: 25.0%" />
-<col style="width: 25.0%" />
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>Dependency</p></th>
-<th class="head"><p>Old (v0.50)</p></th>
-<th class="head"><p>New (v0.60)</p></th>
-<th class="head"><p>Impact</p></th>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>PBC Library</p></td>
-<td><p>0.5.14</p></td>
-<td><p><strong>1.0.0</strong></p></td>
-<td><p>Low (API compatible)</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dkls23_dkg.py</span></code></p></td>
+<td><p>Distributed Key Generation</p></td>
 </tr>
-<tr class="row-odd"><td><p>pyparsing</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">&gt;=2.1.5,&lt;2.4.1</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">&gt;=2.1.5,&lt;4.0</span></code></p></td>
-<td><p>Low (more permissive)</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dkls23_presign.py</span></code></p></td>
+<td><p>Non-interactive presigning</p></td>
 </tr>
-<tr class="row-even"><td><p>OpenSSL</p></td>
-<td><p>1.0.x / 1.1.x</p></td>
-<td><p><strong>3.x</strong></p></td>
-<td><p>Medium</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dkls23_sign.py</span></code></p></td>
+<td><p>Fast online signing phase</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><strong>OpenSSL Migration</strong>: Ensure OpenSSL 3.x is installed:</p>
-<ul class="simple">
-<li><p>macOS: <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">openssl&#64;3</span></code></p></li>
-<li><p>Ubuntu/Debian: <code class="docutils literal notranslate"><span class="pre">apt</span> <span class="pre">install</span> <span class="pre">libssl-dev</span></code></p></li>
-<li><p>Fedora/RHEL: <code class="docutils literal notranslate"><span class="pre">dnf</span> <span class="pre">install</span> <span class="pre">openssl-devel</span></code></p></li>
-</ul>
+<p><em>Features:</em> OT-based MtA, non-interactive presigning, fast online signing.</p>
 </section>
-<section id="removed-features">
-<h3>Removed Features<a class="headerlink" href="#removed-features" title="Link to this heading">¶</a></h3>
-<ol class="arabic">
-<li><p><strong>Python 2.x support removed</strong> - All Python 2 compatibility code has been removed from C extension modules.</p></li>
-<li><p><strong>UninstallCommand removed</strong> - The custom <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">uninstall</span></code> command has been removed due to use of deprecated <code class="docutils literal notranslate"><span class="pre">platform.linux_distribution()</span></code>.</p>
-<p><strong>Migration</strong>: Use standard pip uninstall:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">uninstall</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span><span class="o">-</span><span class="n">framework</span>
-</pre></div>
-</div>
-</li>
-<li><p><strong>distribute_setup.py removed</strong> - The legacy setuptools bootstrap script has been removed.</p>
-<p><strong>Migration</strong>: Use modern pip/setuptools:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">pip</span> <span class="n">setuptools</span> <span class="n">wheel</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span><span class="o">-</span><span class="n">framework</span>
-</pre></div>
-</div>
-</li>
-</ol>
-</section>
-<section id="ctr-counter-module-change">
-<h3>CTR Counter Module Change<a class="headerlink" href="#ctr-counter-module-change" title="Link to this heading">¶</a></h3>
-<p>The low-level <code class="docutils literal notranslate"><span class="pre">_counter</span></code> module now returns <code class="docutils literal notranslate"><span class="pre">bytes</span></code> instead of <code class="docutils literal notranslate"><span class="pre">str</span></code> from counter operations.</p>
-<p><strong>Impact</strong>: Medium - Only affects code that directly uses the <code class="docutils literal notranslate"><span class="pre">_counter</span></code> module.</p>
-<p><strong>Migration</strong>: If you use the <code class="docutils literal notranslate"><span class="pre">_counter</span></code> module directly, ensure your code handles <code class="docutils literal notranslate"><span class="pre">bytes</span></code> objects:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># The counter now returns bytes</span>
-<span class="n">counter_value</span> <span class="o">=</span> <span class="n">counter</span><span class="p">()</span>  <span class="c1"># Returns bytes, not str</span>
-</pre></div>
-</div>
-<p>Most users access CTR mode through <code class="docutils literal notranslate"><span class="pre">SymmetricCryptoAbstraction</span></code> which handles this internally.</p>
-</section>
-<section id="internal-implementation-changes-non-breaking">
-<h3>Internal Implementation Changes (Non-Breaking)<a class="headerlink" href="#internal-implementation-changes-non-breaking" title="Link to this heading">¶</a></h3>
-<p>The following changes are internal and should not affect user code:</p>
-<ul class="simple">
-<li><p>Hash functions now use OpenSSL EVP API instead of deprecated low-level functions</p></li>
-<li><p>Windows PRNG seeding uses <code class="docutils literal notranslate"><span class="pre">RAND_poll()</span></code> instead of deprecated <code class="docutils literal notranslate"><span class="pre">RAND_screen()</span></code></p></li>
-<li><p>Integer module uses <code class="docutils literal notranslate"><span class="pre">PyLong_*</span></code> functions (Python 3 native) instead of <code class="docutils literal notranslate"><span class="pre">PyInt_*</span></code></p></li>
-</ul>
-</section>
-<section id="migration-checklist">
-<h3>Migration Checklist<a class="headerlink" href="#migration-checklist" title="Link to this heading">¶</a></h3>
-<p>Before upgrading from v0.50 to v0.60:</p>
-<ol class="arabic simple">
-<li><p>☐ Verify Python version is 3.8+: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code></p></li>
-<li><p>☐ Verify OpenSSL version is 3.x: <code class="docutils literal notranslate"><span class="pre">openssl</span> <span class="pre">version</span></code></p></li>
-<li><p>☐ Update package name in requirements: <code class="docutils literal notranslate"><span class="pre">Charm-Crypto</span></code> → <code class="docutils literal notranslate"><span class="pre">charm-crypto-framework</span></code></p></li>
-<li><p>☐ Remove any <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">uninstall</span></code> usage (use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span></code>)</p></li>
-<li><p>☐ Check for direct <code class="docutils literal notranslate"><span class="pre">_counter</span></code> module usage (ensure code handles <code class="docutils literal notranslate"><span class="pre">bytes</span></code>)</p></li>
-<li><p>☐ Rebuild from source if using custom builds</p></li>
-</ol>
-</section>
-</section>
-<section id="dependency-updates">
-<h2>Dependency Updates<a class="headerlink" href="#dependency-updates" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>PBC Library upgraded from 0.5.14 to 1.0.0</strong> - The Pairing-Based Cryptography library has been updated to its latest release (June 2025). This is a drop-in replacement with no API changes, maintaining full backward compatibility with existing pairing-based schemes.</p></li>
-<li><p>Updated documentation and build scripts to reflect PBC 1.0.0 URLs and paths</p></li>
-<li><p>Updated CI/CD pipeline for PBC 1.0.0 builds</p></li>
-<li><p><strong>pyparsing constraint relaxed</strong> - Now allows pyparsing 2.x and 3.x (<code class="docutils literal notranslate"><span class="pre">&gt;=2.1.5,&lt;4.0</span></code>)</p></li>
-<li><p><strong>OpenSSL 3.x support</strong> - Full compatibility with OpenSSL 3.x across all C extension modules</p></li>
-</ul>
-</section>
-<section id="python-compatibility">
-<h2>Python Compatibility<a class="headerlink" href="#python-compatibility" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>Python 3.8+ required</strong> - Minimum Python version is now 3.8</p></li>
-<li><p><strong>Python 3.12+ support</strong> - Fixed <code class="docutils literal notranslate"><span class="pre">PyLongObject</span></code> internal structure changes in Python 3.12+ (Issues #326, #313)</p></li>
-<li><p>Added <code class="docutils literal notranslate"><span class="pre">PY_SSIZE_T_CLEAN</span></code> macro definition for Python 3.10+ compatibility</p></li>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">Py_SET_SIZE</span></code> behavior changes in Python 3.12+</p></li>
-<li><p>Optimized <code class="docutils literal notranslate"><span class="pre">longObjToMPZ</span></code> by removing temporary variables</p></li>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">PyLong_SHIFT</span></code> definition for Windows 64-bit builds</p></li>
-<li><p>Added support for Python 3.11 and 3.12 in testing</p></li>
-<li><p>Modernized CTR counter module to use Python 3 Bytes API</p></li>
-</ul>
-</section>
-<section id="new-schemes">
-<h2>New Schemes<a class="headerlink" href="#new-schemes" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>CP-ABE with Privacy Protection and Accountability</strong> - Implemented CP hiding ABE scheme from “Attribute Based Encryption with Privacy Protection and Accountability for CloudIoT”</p></li>
-<li><p><strong>User Collusion Avoidance CP-ABE</strong> - Implemented scheme with efficient attribute revocation for cloud storage</p></li>
-<li><p><strong>PS Signature Schemes</strong> - Added Pointcheval-Sanders signature implementations</p></li>
-<li><p><strong>Certificateless Public Key Cryptography</strong> - Added CLPKC scheme</p></li>
-<li><p><strong>Lamport OTS</strong> - Implemented Lamport One-Time Signature scheme</p></li>
-</ul>
-</section>
-<section id="numeric-attribute-comparisons">
-<h2>Numeric Attribute Comparisons<a class="headerlink" href="#numeric-attribute-comparisons" title="Link to this heading">¶</a></h2>
-<p>This release introduces support for numeric attribute comparisons in CP-ABE policies,
-implementing the “bag of bits” technique from the Bethencourt-Sahai-Waters (BSW07) paper.</p>
-<p><strong>Features:</strong></p>
-<ul class="simple">
-<li><p>Support for numeric comparisons in policies: <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">==</span></code></p></li>
-<li><p>Automatic conversion of numeric comparisons to bit-level attribute expressions</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">NumericAttributeHelper</span></code> class for easy policy expansion and attribute generation</p></li>
-<li><p>Negation support via equivalent expression conversion</p></li>
-</ul>
-<p><strong>Example Usage:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.toolbox.ABEnumeric</span><span class="w"> </span><span class="kn">import</span> <span class="n">NumericAttributeHelper</span>
-
-<span class="c1"># Create helper with 8-bit integers (values 0-255)</span>
-<span class="n">helper</span> <span class="o">=</span> <span class="n">NumericAttributeHelper</span><span class="p">(</span><span class="n">num_bits</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-
-<span class="c1"># Expand policy with numeric comparisons</span>
-<span class="n">policy</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">expand_policy</span><span class="p">(</span><span class="s2">&quot;age &gt;= 21 and level &gt; 5&quot;</span><span class="p">)</span>
-
-<span class="c1"># Generate user attributes for key generation</span>
-<span class="n">user_attrs</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">user_attributes</span><span class="p">({</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;admin&#39;</span><span class="p">})</span>
-</pre></div>
-</div>
-<p><strong>Negation Limitation:</strong></p>
-<p>The underlying Monotone Span Program (MSP) does not support logical negation.
-Use the <code class="docutils literal notranslate"><span class="pre">negate_comparison()</span></code> function to convert negated comparisons to equivalent
-positive forms:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">(age</span> <span class="pre">&gt;=</span> <span class="pre">21)</span></code> → <code class="docutils literal notranslate"><span class="pre">age</span> <span class="pre">&lt;</span> <span class="pre">21</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">(age</span> <span class="pre">==</span> <span class="pre">21)</span></code> → <code class="docutils literal notranslate"><span class="pre">(age</span> <span class="pre">&lt;</span> <span class="pre">21)</span> <span class="pre">or</span> <span class="pre">(age</span> <span class="pre">&gt;</span> <span class="pre">21)</span></code></p></li>
-</ul>
-<p>See <a class="reference internal" href="toolbox/ABEnumeric.html"><span class="doc">ABEnumeric - Numeric Attribute Encoding</span></a> for complete documentation.</p>
-</section>
-<section id="zkp-compiler-v0-60-0-70">
-<h2>ZKP Compiler (v0.60-0.70)<a class="headerlink" href="#zkp-compiler-v0-60-0-70" title="Link to this heading">¶</a></h2>
-<p>This release introduces a new secure Zero-Knowledge Proof (ZKP) compiler module that provides
-a type-safe, formally verified approach to constructing ZKP protocols.</p>
-<p><strong>New Proof Types:</strong></p>
-<ul class="simple">
-<li><p><strong>Schnorr Proofs</strong> - Standard discrete log proofs with Fiat-Shamir transform</p></li>
-<li><p><strong>DLEQ Proofs</strong> - Discrete Log Equality proofs for proving equality of discrete logs</p></li>
-<li><p><strong>Representation Proofs</strong> - Proofs of knowledge of a representation in multiple bases</p></li>
-<li><p><strong>AND Composition</strong> - Combine multiple proofs with logical AND</p></li>
-<li><p><strong>OR Composition</strong> - Combine multiple proofs with logical OR (witness-indistinguishable)</p></li>
-<li><p><strong>Range Proofs</strong> - Efficient proofs that a committed value lies within a range</p></li>
-</ul>
-<p><strong>Key Features:</strong></p>
-<ul class="simple">
-<li><p><strong>Batch Verification</strong> - Verify multiple proofs efficiently with significant performance gains</p></li>
-<li><p><strong>BN254 Curve Support</strong> - 128-bit security level with optimized pairing operations</p></li>
-<li><p><strong>Type-Safe API</strong> - Compile-time verification of proof structure</p></li>
-<li><p><strong>Fiat-Shamir Heuristic</strong> - Automatic conversion from interactive to non-interactive proofs</p></li>
-</ul>
-<p><strong>Deprecation Notice:</strong></p>
-<p>The legacy <code class="docutils literal notranslate"><span class="pre">zkp_generator</span></code> module is deprecated and will be removed in v0.80.
-Migrate to the new <code class="docutils literal notranslate"><span class="pre">zkp_compiler</span></code> module for improved security and performance.</p>
-<p><strong>Performance Benchmarks:</strong></p>
+<section id="new-toolbox-modules">
+<h2>New Toolbox Modules<a class="headerlink" href="#new-toolbox-modules" title="Link to this heading">¶</a></h2>
+<p>Supporting infrastructure has been added to the <code class="docutils literal notranslate"><span class="pre">charm.toolbox</span></code> package:</p>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 40.0%" />
 <col style="width: 30.0%" />
-<col style="width: 30.0%" />
+<col style="width: 70.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>Operation</p></th>
-<th class="head"><p>Single Proof</p></th>
-<th class="head"><p>Batch (100 proofs)</p></th>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Schnorr Prove</p></td>
-<td><p>0.8ms</p></td>
-<td><p>45ms</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mpc_utils.py</span></code></p></td>
+<td><p>MPC utilities for commitment and broadcast protocols</p></td>
 </tr>
-<tr class="row-odd"><td><p>Schnorr Verify</p></td>
-<td><p>1.2ms</p></td>
-<td><p>35ms (batch)</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mta.py</span></code></p></td>
+<td><p>Abstract Multiplicative-to-Additive protocol interface</p></td>
 </tr>
-<tr class="row-even"><td><p>DLEQ Prove</p></td>
-<td><p>1.5ms</p></td>
-<td><p>85ms</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">paillier_mta.py</span></code></p></td>
+<td><p>Paillier-based MtA implementation for GG18/CGGMP21</p></td>
 </tr>
-<tr class="row-odd"><td><p>DLEQ Verify</p></td>
-<td><p>2.1ms</p></td>
-<td><p>60ms (batch)</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">paillier_zkproofs.py</span></code></p></td>
+<td><p>Zero-knowledge proofs for Paillier encryption</p></td>
 </tr>
-<tr class="row-even"><td><p>Range Proof (64-bit)</p></td>
-<td><p>15ms</p></td>
-<td><p>800ms</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">threshold_sharing.py</span></code></p></td>
+<td><p>Threshold secret sharing (Feldman VSS, Pedersen VSS)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">broadcast.py</span></code></p></td>
+<td><p>Broadcast channel implementation for MPC protocols</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>See <span class="xref std std-doc">toolbox/zkp_compiler</span> for complete documentation.</p>
 </section>
-<section id="build-system">
-<h2>Build System<a class="headerlink" href="#build-system" title="Link to this heading">¶</a></h2>
+<section id="documentation-improvements">
+<h2>Documentation Improvements<a class="headerlink" href="#documentation-improvements" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Modern Python packaging</strong> - Added <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> following PEP 517/518 standards</p></li>
-<li><p>Added GitHub Actions CI/CD workflow replacing Travis CI</p></li>
-<li><p>Updated <code class="docutils literal notranslate"><span class="pre">configure.sh</span></code> to support ARM64/AARCH64 architectures (Apple Silicon, etc.)</p></li>
-<li><p>Updated <code class="docutils literal notranslate"><span class="pre">configure.sh</span></code> to detect Python 3.8-3.12</p></li>
-<li><p>Fixed multiple definition errors in benchmark module</p></li>
-<li><p>Improved Relic library integration</p></li>
-<li><p>Added type stubs (<code class="docutils literal notranslate"><span class="pre">.pyi</span></code> files) for C extension modules</p></li>
+<li><p>Added comprehensive threshold ECDSA guide (<code class="docutils literal notranslate"><span class="pre">threshold.rst</span></code>) with:
+- Protocol comparison table (GG18, CGGMP21, DKLS23)
+- Distributed key generation tutorial
+- Signing examples with code samples
+- Security considerations and best practices</p></li>
+<li><p>Updated <code class="docutils literal notranslate"><span class="pre">schemes.rst</span></code> with Threshold Signatures section</p></li>
+<li><p>Updated <code class="docutils literal notranslate"><span class="pre">zkp_compiler.rst</span></code> with CGGMP21 reference</p></li>
+<li><p>Enhanced README Features section highlighting all cryptographic capabilities</p></li>
 </ul>
 </section>
-<section id="bug-fixes">
-<h2>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>Fixed segmentation faults in EC and pairing modules (PY_SSIZE_T_CLEAN)</p></li>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">downcaseTokens</span></code> function missing from <code class="docutils literal notranslate"><span class="pre">policytree.py</span></code></p></li>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">coeff</span></code> key handling in <code class="docutils literal notranslate"><span class="pre">recoverCoefficients</span></code> method</p></li>
-<li><p>Fixed integer hashing issues</p></li>
-<li><p>Improved EC bignum conversion</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">math.gcd</span></code> instead of deprecated <code class="docutils literal notranslate"><span class="pre">fractions.gcd</span></code></p></li>
-<li><p>Support all-AND policy expressions for testing ABE schemes</p></li>
-<li><p>Fixed AEC.c cipher mode issues with Python 3.10+</p></li>
-<li><p>Removed deprecated <code class="docutils literal notranslate"><span class="pre">platform.linux_distribution()</span></code> usage</p></li>
-</ul>
+<section id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading">¶</a></h2>
+<p><strong>Threshold Signing with CGGMP21:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">charm.schemes.threshold.cggmp21_sign</span><span class="w"> </span><span class="kn">import</span> <span class="n">CGGMP21</span>
+
+<span class="c1"># Initialize with t-of-n threshold (e.g., 2-of-3)</span>
+<span class="n">scheme</span> <span class="o">=</span> <span class="n">CGGMP21</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="s1">&#39;secp256k1&#39;</span><span class="p">)</span>
+
+<span class="c1"># Distributed key generation</span>
+<span class="n">dkg_outputs</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">dkg</span><span class="p">(</span><span class="n">party_ids</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;P1&#39;</span><span class="p">,</span> <span class="s1">&#39;P2&#39;</span><span class="p">,</span> <span class="s1">&#39;P3&#39;</span><span class="p">])</span>
+
+<span class="c1"># Sign a message</span>
+<span class="n">message</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Hello, threshold ECDSA!&quot;</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">dkg_outputs</span><span class="p">,</span> <span class="n">signing_parties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;P1&#39;</span><span class="p">,</span> <span class="s1">&#39;P2&#39;</span><span class="p">])</span>
+
+<span class="c1"># Verify signature</span>
+<span class="k">assert</span> <span class="n">scheme</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">signature</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
-<section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>Updated README with comprehensive Linux/Unix build instructions</p></li>
-<li><p>Added platform-specific installation guides for Ubuntu/Debian, Fedora/RHEL/CentOS, Arch Linux</p></li>
-<li><p>Updated links to point to jhuisi.github.io</p></li>
-<li><p>Added macOS tutorial for Apple Silicon</p></li>
-</ul>
+<section id="upgrade-notes">
+<h2>Upgrade Notes<a class="headerlink" href="#upgrade-notes" title="Link to this heading">¶</a></h2>
+<p>This release is fully backward compatible with v0.61. No code changes are required
+when upgrading. The new threshold ECDSA modules are optional and can be imported
+as needed.</p>
+<p><strong>Installation:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">charm</span><span class="o">-</span><span class="n">crypto</span><span class="o">-</span><span class="n">framework</span>
+</pre></div>
+</div>
 </section>
 <section id="contributors">
 <h2>Contributors<a class="headerlink" href="#contributors" title="Link to this heading">¶</a></h2>
-<p>Thanks to all contributors for this release, including bug fixes, new schemes, and compatibility improvements.</p>
+<ul class="simple">
+<li><p><strong>J. Ayo Akinyele</strong> - GG18 and CGGMP21 implementations</p></li>
+<li><p><strong>Elton de Souza</strong> - DKLS23 implementation</p></li>
+</ul>
+<p>Thanks to all contributors for making Charm a comprehensive cryptographic toolkit
+supporting both traditional schemes (ABE, IBE, signatures) and modern MPC protocols.</p>
 </section>
 </section>
 
@@ -771,23 +608,15 @@ Migrate to the new <code class="docutils literal notranslate"><span class="pre">
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="updates_050.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Changes in v0.50</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="updates_061.html">
+          
+          <a class="prev-page" href="updates.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Changes in v0.61</div>
+                <div class="title">Release Notes</div>
                 
               </div>
             </a>
@@ -822,25 +651,12 @@ Migrate to the new <code class="docutils literal notranslate"><span class="pre">
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Changes in v0.60</a><ul>
-<li><a class="reference internal" href="#breaking-changes-and-migration-guide">Breaking Changes and Migration Guide</a><ul>
-<li><a class="reference internal" href="#python-version-requirements">Python Version Requirements</a></li>
-<li><a class="reference internal" href="#package-name-change">Package Name Change</a></li>
-<li><a class="reference internal" href="#dependency-version-changes">Dependency Version Changes</a></li>
-<li><a class="reference internal" href="#removed-features">Removed Features</a></li>
-<li><a class="reference internal" href="#ctr-counter-module-change">CTR Counter Module Change</a></li>
-<li><a class="reference internal" href="#internal-implementation-changes-non-breaking">Internal Implementation Changes (Non-Breaking)</a></li>
-<li><a class="reference internal" href="#migration-checklist">Migration Checklist</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#dependency-updates">Dependency Updates</a></li>
-<li><a class="reference internal" href="#python-compatibility">Python Compatibility</a></li>
-<li><a class="reference internal" href="#new-schemes">New Schemes</a></li>
-<li><a class="reference internal" href="#numeric-attribute-comparisons">Numeric Attribute Comparisons</a></li>
-<li><a class="reference internal" href="#zkp-compiler-v0-60-0-70">ZKP Compiler (v0.60-0.70)</a></li>
-<li><a class="reference internal" href="#build-system">Build System</a></li>
-<li><a class="reference internal" href="#bug-fixes">Bug Fixes</a></li>
-<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#">Changes in v0.62</a><ul>
+<li><a class="reference internal" href="#new-threshold-ecdsa-schemes">New Threshold ECDSA Schemes</a></li>
+<li><a class="reference internal" href="#new-toolbox-modules">New Toolbox Modules</a></li>
+<li><a class="reference internal" href="#documentation-improvements">Documentation Improvements</a></li>
+<li><a class="reference internal" href="#example-usage">Example Usage</a></li>
+<li><a class="reference internal" href="#upgrade-notes">Upgrade Notes</a></li>
 <li><a class="reference internal" href="#contributors">Contributors</a></li>
 </ul>
 </li>
