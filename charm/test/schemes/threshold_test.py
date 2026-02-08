@@ -40,6 +40,18 @@ from charm.schemes.threshold.dkls23_dkg import DKLS23_DKG, KeyShare
 from charm.schemes.threshold.dkls23_presign import DKLS23_Presign, Presignature
 from charm.schemes.threshold.dkls23_sign import DKLS23_Sign, DKLS23, ThresholdSignature
 
+# Import GG18 protocol components
+from charm.schemes.threshold.gg18_dkg import GG18_DKG, GG18_KeyShare
+from charm.schemes.threshold.gg18_sign import GG18_Sign, GG18, GG18_Signature
+
+# Import CGGMP21 protocol components
+from charm.schemes.threshold.cggmp21_proofs import (
+    RingPedersenParams, RingPedersenGenerator, CGGMP21_ZKProofs
+)
+from charm.schemes.threshold.cggmp21_dkg import CGGMP21_DKG, CGGMP21_KeyShare, SecurityAbort
+from charm.schemes.threshold.cggmp21_presign import CGGMP21_Presign, CGGMP21_Presignature
+from charm.schemes.threshold.cggmp21_sign import CGGMP21_Sign, CGGMP21, CGGMP21_Signature
+
 import os
 
 debug = False
@@ -1786,6 +1798,446 @@ class TestSilentOT(unittest.TestCase):
         # m0 and m1 should be different for each OT
         for i, (m0, m1) in enumerate(receiver_msgs):
             self.assertNotEqual(m0, m1, f"m0 and m1 should differ at i={i}")
+
+
+class TestGG18_DKG(unittest.TestCase):
+    """Tests for GG18 Distributed Key Generation"""
+
+    def setUp(self):
+        self.group = ECGroup(secp256k1)
+        from charm.toolbox.integergroup import RSAGroup
+        self.rsa_group = RSAGroup()
+
+    def test_2_of_3_dkg(self):
+        """Test 2-of-3 distributed key generation for GG18"""
+        dkg = GG18_DKG(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+        session_id = b"test-gg18-dkg-2of3"
+
+        # Round 1: Each party generates secret, Feldman commitments, and Paillier keys
+        party_states = [dkg.keygen_round1(i+1, g, session_id) for i in range(3)]
+        round1_msgs = [state[0] for state in party_states]
+        private_states = [state[1] for state in party_states]
+
+        # All parties should have Paillier public keys in their messages
+        for msg in round1_msgs:
+            self.assertIn('paillier_pk', msg)
+            self.assertIn('commitments', msg)
+
+        # Round 2: Generate shares for other parties
+        round2_results = [dkg.keygen_round2(i+1, private_states[i], round1_msgs) for i in range(3)]
+        shares_for_others = [r[0] for r in round2_results]
+        states_r2 = [r[1] for r in round2_results]
+
+        # Round 3: Finalize key shares
+        key_shares = []
+        for party_id in range(1, 4):
+            received = {sender+1: shares_for_others[sender][party_id] for sender in range(3)}
+            ks, complaint = dkg.keygen_round3(party_id, states_r2[party_id-1], received, round1_msgs)
+            self.assertIsNone(complaint, f"Party {party_id} should not have complaints")
+            key_shares.append(ks)
+
+        # All parties should have valid GG18_KeyShare objects
+        for ks in key_shares:
+            self.assertIsInstance(ks, GG18_KeyShare)
+            self.assertIsNotNone(ks.paillier)  # Should have Paillier keypair
+
+    def test_all_parties_same_pubkey(self):
+        """All parties should derive the same public key in GG18"""
+        dkg = GG18_DKG(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+        session_id = b"test-gg18-same-pubkey"
+
+        # Run full DKG
+        party_states = [dkg.keygen_round1(i+1, g, session_id) for i in range(3)]
+        round1_msgs = [s[0] for s in party_states]
+        priv_states = [s[1] for s in party_states]
+
+        round2_results = [dkg.keygen_round2(i+1, priv_states[i], round1_msgs) for i in range(3)]
+        shares_for_others = [r[0] for r in round2_results]
+        states_r2 = [r[1] for r in round2_results]
+
+        key_shares = []
+        for party_id in range(1, 4):
+            received = {sender+1: shares_for_others[sender][party_id] for sender in range(3)}
+            ks, complaint = dkg.keygen_round3(party_id, states_r2[party_id-1], received, round1_msgs)
+            key_shares.append(ks)
+
+        # All should have same public key X
+        pub_keys = [ks.X for ks in key_shares]
+        self.assertTrue(all(pk == pub_keys[0] for pk in pub_keys),
+                        "All parties should have same public key")
+
+
+class TestGG18_Sign(unittest.TestCase):
+    """Tests for GG18 signing protocol"""
+
+    def setUp(self):
+        self.group = ECGroup(secp256k1)
+        from charm.toolbox.integergroup import RSAGroup
+        self.rsa_group = RSAGroup()
+
+    def test_signature_verification_correct(self):
+        """Test that valid ECDSA signatures verify correctly with GG18"""
+        signer = GG18_Sign(self.group, self.rsa_group)
+        g = self.group.random(G)
+
+        # Create a valid ECDSA signature manually
+        x = self.group.random(ZR)  # private key
+        pk = g ** x  # public key
+        k = self.group.random(ZR)  # nonce
+        R = g ** k
+        r = self.group.zr(R)
+
+        message = b"test message for GG18"
+        e = signer._hash_message(message)
+        s = (e + r * x) * (k ** -1)  # Standard ECDSA: s = k^{-1}(e + rx)
+
+        sig = GG18_Signature(r, s)
+
+        self.assertTrue(signer.verify(pk, sig, message, g), "Valid signature should verify")
+
+    def test_signature_verification_wrong_message(self):
+        """Test that signature verification fails with wrong message"""
+        signer = GG18_Sign(self.group, self.rsa_group)
+        g = self.group.random(G)
+
+        x = self.group.random(ZR)
+        pk = g ** x
+        k = self.group.random(ZR)
+        R = g ** k
+        r = self.group.zr(R)
+
+        message = b"original message"
+        e = signer._hash_message(message)
+        s = (e + r * x) * (k ** -1)
+        sig = GG18_Signature(r, s)
+
+        self.assertFalse(signer.verify(pk, sig, b"wrong message", g),
+                         "Signature should not verify with wrong message")
+
+
+class TestGG18_Complete(unittest.TestCase):
+    """End-to-end tests for complete GG18 protocol"""
+
+    def setUp(self):
+        self.group = ECGroup(secp256k1)
+        from charm.toolbox.integergroup import RSAGroup
+        self.rsa_group = RSAGroup()
+
+    def test_complete_2_of_3_signing(self):
+        """Complete flow: keygen -> sign -> verify for GG18"""
+        gg18 = GG18(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+
+        # Step 1: Distributed Key Generation
+        public_key, key_shares = gg18.keygen(g)
+
+        self.assertEqual(len(key_shares), 3, "Should have 3 key shares")
+
+        # Step 2: Sign a message (GG18 has no presigning - 4 interactive rounds)
+        participants = [1, 2]
+        message = b"Hello, GG18 threshold ECDSA!"
+        signature = gg18.sign(key_shares, message, participants, g)
+
+        self.assertIsInstance(signature, GG18_Signature)
+
+        # Step 3: Verify signature
+        self.assertTrue(gg18.verify(public_key, message, signature, g),
+                        "GG18 signature should verify correctly")
+
+    def test_different_participant_combinations(self):
+        """Test that any 2 of 3 parties can sign with GG18"""
+        gg18 = GG18(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+
+        public_key, key_shares = gg18.keygen(g)
+        message = b"Test message for any 2 of 3 with GG18"
+
+        # Test all possible 2-party combinations
+        combinations = [[1, 2], [1, 3], [2, 3]]
+
+        for participants in combinations:
+            sig = gg18.sign(key_shares, message, participants, g)
+            self.assertTrue(gg18.verify(public_key, message, sig, g),
+                            f"GG18 signature with participants {participants} should verify")
+
+    def test_3_of_5_threshold(self):
+        """Test 3-of-5 threshold scheme with GG18"""
+        gg18 = GG18(self.group, self.rsa_group, threshold=3, num_parties=5, paillier_bits=512)
+        g = self.group.random(G)
+
+        public_key, key_shares = gg18.keygen(g)
+
+        # Sign with exactly 3 participants
+        participants = [1, 3, 5]
+        message = b"GG18 3-of-5 threshold test"
+        sig = gg18.sign(key_shares, message, participants, g)
+
+        self.assertTrue(gg18.verify(public_key, message, sig, g),
+                        "GG18 3-of-5 signature should verify")
+
+
+class TestCGGMP21_Proofs(unittest.TestCase):
+    """Tests for CGGMP21 zero-knowledge proofs"""
+
+    def setUp(self):
+        self.group = ECGroup(secp256k1)
+        from charm.toolbox.integergroup import RSAGroup
+        self.rsa_group = RSAGroup()
+
+    def test_ring_pedersen_generation(self):
+        """Test Ring-Pedersen parameter generation"""
+        rpg = RingPedersenGenerator(self.rsa_group)
+        params, trapdoor = rpg.generate(bits=512)
+
+        self.assertIsInstance(params, RingPedersenParams)
+        self.assertIsNotNone(params.N)
+        self.assertIsNotNone(params.s)
+        self.assertIsNotNone(params.t)
+
+
+class TestCGGMP21_DKG(unittest.TestCase):
+    """Tests for CGGMP21 Distributed Key Generation"""
+
+    def setUp(self):
+        self.group = ECGroup(secp256k1)
+        from charm.toolbox.integergroup import RSAGroup
+        self.rsa_group = RSAGroup()
+
+    def test_2_of_3_dkg(self):
+        """Test 2-of-3 distributed key generation for CGGMP21"""
+        dkg = CGGMP21_DKG(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+        h = self.group.random(G)  # Additional generator for Pedersen VSS
+        session_id = b"test-cggmp21-dkg-2of3"
+
+        # Round 1: Each party generates secret, Pedersen commitments, and Paillier keys
+        party_states = [dkg.keygen_round1(i+1, g, h, session_id) for i in range(3)]
+        round1_msgs = [state[0] for state in party_states]
+        private_states = [state[1] for state in party_states]
+
+        # All parties should have Paillier public keys in their messages
+        for msg in round1_msgs:
+            self.assertIn('paillier_pk', msg)
+            self.assertIn('commitment', msg)  # Hash commitment (actual commitments in round 2)
+
+        # Round 2: Generate shares for other parties
+        round2_results = [dkg.keygen_round2(i+1, private_states[i], round1_msgs) for i in range(3)]
+        shares_for_others = [r[0] for r in round2_results]
+        states_r2 = [r[1] for r in round2_results]
+
+        # Round 3: Finalize key shares
+        key_shares = []
+        for party_id in range(1, 4):
+            received = {sender+1: shares_for_others[sender][party_id] for sender in range(3)}
+            ks, complaint = dkg.keygen_round3(party_id, states_r2[party_id-1], received, round1_msgs)
+            self.assertIsNone(complaint, f"Party {party_id} should not have complaints")
+            key_shares.append(ks)
+
+        # All parties should have valid CGGMP21_KeyShare objects
+        for ks in key_shares:
+            self.assertIsInstance(ks, CGGMP21_KeyShare)
+            self.assertIsNotNone(ks.paillier)
+
+    def test_all_parties_same_pubkey(self):
+        """All parties should derive the same public key in CGGMP21"""
+        dkg = CGGMP21_DKG(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+        h = self.group.random(G)
+        session_id = b"test-cggmp21-same-pubkey"
+
+        # Run full DKG
+        party_states = [dkg.keygen_round1(i+1, g, h, session_id) for i in range(3)]
+        round1_msgs = [s[0] for s in party_states]
+        priv_states = [s[1] for s in party_states]
+
+        round2_results = [dkg.keygen_round2(i+1, priv_states[i], round1_msgs) for i in range(3)]
+        shares_for_others = [r[0] for r in round2_results]
+        states_r2 = [r[1] for r in round2_results]
+
+        key_shares = []
+        for party_id in range(1, 4):
+            received = {sender+1: shares_for_others[sender][party_id] for sender in range(3)}
+            ks, complaint = dkg.keygen_round3(party_id, states_r2[party_id-1], received, round1_msgs)
+            key_shares.append(ks)
+
+        # All should have same public key X
+        pub_keys = [ks.X for ks in key_shares]
+        self.assertTrue(all(pk == pub_keys[0] for pk in pub_keys),
+                        "All parties should have same public key")
+
+
+class TestCGGMP21_Presign(unittest.TestCase):
+    """Tests for CGGMP21 presigning protocol"""
+
+    def setUp(self):
+        self.group = ECGroup(secp256k1)
+        from charm.toolbox.integergroup import RSAGroup
+        self.rsa_group = RSAGroup()
+
+    def test_presign_generates_valid_presignature(self):
+        """Test that CGGMP21 presigning produces valid presignature objects"""
+        # First run DKG to get key shares
+        dkg = CGGMP21_DKG(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+        h = self.group.random(G)
+        session_id = b"test-cggmp21-presign"
+
+        # DKG
+        party_states = [dkg.keygen_round1(i+1, g, h, session_id) for i in range(3)]
+        round1_msgs = [s[0] for s in party_states]
+        priv_states = [s[1] for s in party_states]
+
+        round2_results = [dkg.keygen_round2(i+1, priv_states[i], round1_msgs) for i in range(3)]
+        shares_for_others = [r[0] for r in round2_results]
+        states_r2 = [r[1] for r in round2_results]
+
+        key_shares = {}
+        for party_id in range(1, 4):
+            received = {sender+1: shares_for_others[sender][party_id] for sender in range(3)}
+            ks, _ = dkg.keygen_round3(party_id, states_r2[party_id-1], received, round1_msgs)
+            key_shares[party_id] = ks
+
+        # Now run presigning with participants 1 and 2
+        presign = CGGMP21_Presign(self.group, self.rsa_group, paillier_bits=512)
+        participants = [1, 2]
+        presign_session_id = b"presign-session-1"
+
+        # Round 1
+        r1_results = {}
+        states = {}
+        for pid in participants:
+            broadcast, state = presign.presign_round1(pid, key_shares[pid], participants, g, presign_session_id)
+            r1_results[pid] = broadcast
+            states[pid] = state
+
+        # Round 2
+        r1_msgs_list = list(r1_results.values())
+        r2_broadcasts = {}
+        r2_p2p = {}
+        for pid in participants:
+            broadcast, p2p, state = presign.presign_round2(pid, states[pid], r1_msgs_list)
+            r2_broadcasts[pid] = broadcast
+            r2_p2p[pid] = p2p
+            states[pid] = state
+
+        # Collect p2p messages
+        recv_r2 = {r: {s: r2_p2p[s][r] for s in participants if s != r} for r in participants}
+
+        # Round 3
+        r2_broadcasts_list = list(r2_broadcasts.values())
+        presigs = {}
+        for pid in participants:
+            presig, broadcast = presign.presign_round3(pid, states[pid], r2_broadcasts_list, recv_r2[pid])
+            presigs[pid] = presig
+
+        # Verify all presignatures are valid
+        for pid, presig in presigs.items():
+            self.assertIsInstance(presig, CGGMP21_Presignature)
+
+
+class TestCGGMP21_Complete(unittest.TestCase):
+    """End-to-end tests for complete CGGMP21 protocol"""
+
+    def setUp(self):
+        self.group = ECGroup(secp256k1)
+        from charm.toolbox.integergroup import RSAGroup
+        self.rsa_group = RSAGroup()
+
+    def test_complete_2_of_3_with_presigning(self):
+        """Complete flow: keygen -> presign -> sign -> verify for CGGMP21"""
+        cggmp = CGGMP21(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+        h = self.group.random(G)
+
+        # Step 1: Distributed Key Generation
+        public_key, key_shares = cggmp.keygen(g, h)
+
+        self.assertEqual(len(key_shares), 3, "Should have 3 key shares")
+
+        # Step 2: Generate presignatures (optional in CGGMP21)
+        participants = [1, 2]
+        presignatures = cggmp.presign(key_shares, participants, g)
+
+        self.assertEqual(len(presignatures), 2, "Should have 2 presignatures")
+
+        # Step 3: Sign a message using presignatures
+        message = b"Hello, CGGMP21 threshold ECDSA!"
+        signature = cggmp.sign(key_shares, message, presignatures, participants, g)
+
+        self.assertIsInstance(signature, CGGMP21_Signature)
+
+        # Step 4: Verify signature
+        self.assertTrue(cggmp.verify(public_key, message, signature, g),
+                        "CGGMP21 signature should verify correctly")
+
+    def test_different_participant_combinations(self):
+        """Test that any 2 of 3 parties can sign with CGGMP21"""
+        cggmp = CGGMP21(self.group, self.rsa_group, threshold=2, num_parties=3, paillier_bits=512)
+        g = self.group.random(G)
+        h = self.group.random(G)
+
+        public_key, key_shares = cggmp.keygen(g, h)
+        message = b"Test message for any 2 of 3 with CGGMP21"
+
+        # Test all possible 2-party combinations
+        combinations = [[1, 2], [1, 3], [2, 3]]
+
+        for participants in combinations:
+            presigs = cggmp.presign(key_shares, participants, g)
+            sig = cggmp.sign(key_shares, message, presigs, participants, g)
+            self.assertTrue(cggmp.verify(public_key, message, sig, g),
+                            f"CGGMP21 signature with participants {participants} should verify")
+
+    def test_3_of_5_threshold(self):
+        """Test 3-of-5 threshold scheme with CGGMP21"""
+        cggmp = CGGMP21(self.group, self.rsa_group, threshold=3, num_parties=5, paillier_bits=512)
+        g = self.group.random(G)
+        h = self.group.random(G)
+
+        public_key, key_shares = cggmp.keygen(g, h)
+
+        # Sign with exactly 3 participants
+        participants = [1, 3, 5]
+        presigs = cggmp.presign(key_shares, participants, g)
+        message = b"CGGMP21 3-of-5 threshold test"
+        sig = cggmp.sign(key_shares, message, presigs, participants, g)
+
+        self.assertTrue(cggmp.verify(public_key, message, sig, g),
+                        "CGGMP21 3-of-5 signature should verify")
+
+
+class TestCGGMP21_IdentifiableAbort(unittest.TestCase):
+    """Tests for CGGMP21 identifiable abort feature"""
+
+    def setUp(self):
+        self.group = ECGroup(secp256k1)
+
+    def test_security_abort_exception(self):
+        """Test SecurityAbort exception is properly defined"""
+        # Test that SecurityAbort can be raised and caught
+        with self.assertRaises(SecurityAbort) as ctx:
+            raise SecurityAbort("Party 2 provided invalid proof", accused_party=2)
+
+        exc = ctx.exception
+        self.assertEqual(exc.accused_party, 2)
+        self.assertIn("Party 2", str(exc))
+
+    def test_security_abort_with_evidence(self):
+        """Test SecurityAbort with evidence"""
+        evidence = {'invalid_share': b'0x1234', 'commitment': b'0xabcd'}
+
+        with self.assertRaises(SecurityAbort) as ctx:
+            raise SecurityAbort(
+                "Party 3 share does not match commitment",
+                accused_party=3,
+                evidence=evidence
+            )
+
+        exc = ctx.exception
+        self.assertEqual(exc.accused_party, 3)
+        self.assertEqual(exc.evidence, evidence)
 
 
 if __name__ == '__main__':
