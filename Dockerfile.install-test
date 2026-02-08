@@ -1,0 +1,33 @@
+# Dockerfile for testing the install.sh script
+# Tests the minimal installation script on Ubuntu 22.04
+#
+# Usage:
+#   docker build -f Dockerfile.install-test -t charm-install-test .
+#   docker run --rm charm-install-test
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install only minimal prerequisites (curl, bash)
+# The install.sh should handle everything else
+RUN apt-get update && apt-get install -y \
+    curl \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the installation script
+COPY install.sh /tmp/install.sh
+RUN chmod +x /tmp/install.sh
+
+# Run the installation script with --no-sudo (running as root in container)
+# Using --from-pypi (default mode)
+RUN /tmp/install.sh --no-sudo
+
+# Set library path
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+# Run verification tests
+CMD ["python3", "-c", "from charm.toolbox.pairinggroup import PairingGroup; g = PairingGroup('SS512'); print('SUCCESS: PairingGroup works!')"]
+

@@ -1,0 +1,24 @@
+# Dockerfile for testing Charm-Crypto install script on Arch Linux
+#
+# Usage:
+#   docker build --platform linux/amd64 -f Dockerfile.install-test-arch -t charm-install-test-arch .
+#   docker run --platform linux/amd64 --rm charm-install-test-arch
+
+FROM --platform=linux/amd64 archlinux:latest
+
+# Update package database and install only curl and bash
+RUN pacman -Syu --noconfirm && pacman -S --noconfirm curl bash
+
+# Copy the install script
+COPY install.sh /tmp/install.sh
+RUN chmod +x /tmp/install.sh
+
+# Run the install script without sudo (we're root in the container)
+RUN /tmp/install.sh --no-sudo
+
+# Set up library path
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+# Verify the installation
+CMD ["python3", "-c", "from charm.toolbox.pairinggroup import PairingGroup; g = PairingGroup('SS512'); print('SUCCESS: PairingGroup works!')"]
+
