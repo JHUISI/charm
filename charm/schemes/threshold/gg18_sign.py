@@ -20,7 +20,7 @@ Protocol Overview (4 rounds):
 3. Round 3: Broadcast delta_i = k_i * gamma_i, compute R
 4. Round 4: Compute and broadcast signature share s_i
 
-:Authors: Charm Developers
+:Authors: J. Ayo Akinyele
 :Date:    02/2026
 '''
 

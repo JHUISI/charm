@@ -19,7 +19,7 @@ Protocol Overview (3 rounds):
 2. Round 2: Send VSS shares to other parties
 3. Round 3: Verify shares, compute final key share and public key
 
-:Authors: Charm Developers
+:Authors: J. Ayo Akinyele
 :Date:    02/2026
 '''
 

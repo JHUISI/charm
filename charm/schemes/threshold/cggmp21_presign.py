@@ -19,7 +19,7 @@ Protocol Overview (3 rounds):
 2. Round 2: Run MtA protocols with proofs
 3. Round 3: Reveal, verify, compute R and presignature
 
-:Authors: Charm Developers
+:Authors: J. Ayo Akinyele
 :Date:    02/2026
 '''
 

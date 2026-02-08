@@ -20,7 +20,7 @@ Key features:
 - Optional presigning for fast signing
 - Proactive security support
 
-:Authors: Charm Developers
+:Authors: J. Ayo Akinyele
 :Date:    02/2026
 '''
 

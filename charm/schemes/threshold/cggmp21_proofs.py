@@ -17,7 +17,7 @@ This module implements the ZK proofs needed for CGGMP21:
 - Π^{aff-g}: Prove affine operation on Paillier ciphertext
 - Π^{mul}: Prove multiplication of Paillier ciphertexts
 
-:Authors: Charm Developers
+:Authors: J. Ayo Akinyele
 :Date:    02/2026
 '''
 

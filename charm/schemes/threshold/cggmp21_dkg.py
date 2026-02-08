@@ -21,7 +21,7 @@ Protocol Overview (3 rounds):
 2. Round 2: Send VSS shares with decommitments
 3. Round 3: Verify shares, compute key share with abort identification
 
-:Authors: Charm Developers
+:Authors: J. Ayo Akinyele
 :Date:    02/2026
 '''
 
