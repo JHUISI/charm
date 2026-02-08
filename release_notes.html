@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Scheme Adapters" href="adapters.html"><link rel="prev" title="Threshold ECDSA" href="threshold.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Changes in v0.62" href="updates_062.html"><link rel="prev" title="test_policy_expression" href="test/test_policy_expression.html">
         <link rel="prefetch" href="_static/charm_logo.png" as="image">
 
     <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Schemes with Test Vectors - Charm-Crypto v0.62</title>
+        <title>Release Notes - Charm-Crypto v0.62</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -179,7 +179,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -212,7 +212,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cryptographers.html">For Cryptographers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers.html">For App Developers</a></li>
 </ul>
-<ul class="current">
+<ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="schemes.html">Implemented Schemes</a><input aria-label="Toggle navigation of Implemented Schemes" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="charm/schemes/aggrsign_bls.html">aggrsign_bls</a></li>
 <li class="toctree-l2"><a class="reference internal" href="charm/schemes/aggrsign_MuSig.html">aggrsign_MuSig</a></li>
@@ -281,7 +281,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="threshold.html">Threshold ECDSA</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Schemes with Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Schemes with Test Vectors</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="adapters.html">Scheme Adapters</a><input aria-label="Toggle navigation of Scheme Adapters" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="charm/adapters/abenc_adapt_hybrid.html">abenc_adapt_hybrid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="charm/adapters/dabenc_adapt_hybrid.html">dabenc_adapt_hybrid</a></li>
@@ -370,8 +370,8 @@
 </ul>
 </li>
 </ul>
-<ul>
-<li class="toctree-l1 has-children"><a class="reference internal" href="release_notes.html">Release Notes</a><input aria-label="Toggle navigation of Release Notes" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<ul class="current">
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Release Notes</a><input aria-label="Toggle navigation of Release Notes" checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="updates_062.html">Changes in v0.62</a></li>
 <li class="toctree-l2"><a class="reference internal" href="updates_061.html">Changes in v0.61</a></li>
 <li class="toctree-l2"><a class="reference internal" href="updates_060.html">Changes in v0.60</a></li>
@@ -399,12 +399,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/JHUISI/charm/blob/dev/doc/source/test_vectors.rst?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/blob/dev/doc/source/release_notes.rst?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/JHUISI/charm/edit/dev/doc/source/test_vectors.rst" rel="edit" title="Edit this page">
+  <a class="muted-link" href="https://github.com/JHUISI/charm/edit/dev/doc/source/release_notes.rst" rel="edit" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -416,252 +416,59 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="schemes-with-test-vectors">
-<span id="test-vectors"></span><h1>Schemes with Test Vectors<a class="headerlink" href="#schemes-with-test-vectors" title="Link to this heading">¶</a></h1>
-<p>This section documents cryptographic schemes that have formal test vectors verifying
-their mathematical correctness and security properties. Test vectors are essential for:</p>
-<ul class="simple">
-<li><p><strong>Verification</strong>: Ensuring implementations match theoretical specifications</p></li>
-<li><p><strong>Interoperability</strong>: Validating consistency across different implementations</p></li>
-<li><p><strong>Security Auditing</strong>: Demonstrating resistance to known attacks</p></li>
+          <section id="release-notes">
+<h1>Release Notes<a class="headerlink" href="#release-notes" title="Link to this heading">¶</a></h1>
+<p>This section contains release notes for all versions of Charm-Crypto,
+documenting new features, improvements, bug fixes, and breaking changes.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="updates_062.html">Changes in v0.62</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="updates_062.html#new-threshold-ecdsa-schemes">New Threshold ECDSA Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_062.html#new-toolbox-modules">New Toolbox Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_062.html#documentation-improvements">Documentation Improvements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_062.html#example-usage">Example Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_062.html#upgrade-notes">Upgrade Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_062.html#contributors">Contributors</a></li>
 </ul>
-<p>Each scheme below includes test vectors that verify fundamental properties from the
-original papers and relevant standards.</p>
-<section id="bls-signatures">
-<h2>BLS Signatures<a class="headerlink" href="#bls-signatures" title="Link to this heading">¶</a></h2>
-<p><strong>Implementation</strong>: <code class="xref py py-mod docutils literal notranslate"><span class="pre">charm.schemes.pksig.pksig_bls04</span></code></p>
-<p><strong>Test Vectors</strong>: <code class="docutils literal notranslate"><span class="pre">charm/test/vectors/test_bls_vectors.py</span></code></p>
-<p><strong>References</strong>:</p>
-<ul class="simple">
-<li><p>Boneh, Lynn, Shacham: “Short Signatures from the Weil Pairing” (2004)</p></li>
-<li><p>IETF draft-irtf-cfrg-bls-signature</p></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="updates_061.html">Changes in v0.61</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="updates_061.html#python-3-13-compatibility">Python 3.13 Compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_061.html#python-3-14-support">Python 3.14 Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_061.html#python-3-12-integer-conversion-bug-fix">Python 3.12+ Integer Conversion Bug Fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_061.html#bug-fixes">Bug Fixes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_061.html#testing-infrastructure">Testing Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_061.html#supported-versions">Supported Versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_061.html#upgrade-notes">Upgrade Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_061.html#contributors">Contributors</a></li>
 </ul>
-<section id="mathematical-properties">
-<h3>Mathematical Properties<a class="headerlink" href="#mathematical-properties" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper colwidths-given docutils container">
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 40.0%" />
-<col style="width: 40.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Vector ID</p></th>
-<th class="head"><p>Property</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>BLS-1</p></td>
-<td><p>Verification Equation</p></td>
-<td><p><span class="math notranslate nohighlight">\(e(\sigma, g) = e(H(m), pk)\)</span> where <span class="math notranslate nohighlight">\(\sigma = H(m)^{sk}\)</span></p></td>
-</tr>
-<tr class="row-odd"><td><p>BLS-2</p></td>
-<td><p>Determinism</p></td>
-<td><p>Same (sk, m) always produces identical signature</p></td>
-</tr>
-<tr class="row-even"><td><p>BLS-3</p></td>
-<td><p>Message Binding</p></td>
-<td><p>Different messages produce different signatures</p></td>
-</tr>
-<tr class="row-odd"><td><p>BLS-4</p></td>
-<td><p>Key Binding</p></td>
-<td><p>Signature under sk₁ does not verify under pk₂</p></td>
-</tr>
-<tr class="row-even"><td><p>BLS-5</p></td>
-<td><p>Message Integrity</p></td>
-<td><p>Modified message fails verification</p></td>
-</tr>
-<tr class="row-odd"><td><p>BLS-6</p></td>
-<td><p>Bilinearity</p></td>
-<td><p><span class="math notranslate nohighlight">\(e(g^a, h^b) = e(g, h)^{ab}\)</span></p></td>
-</tr>
-<tr class="row-even"><td><p>BLS-7</p></td>
-<td><p>Non-degeneracy</p></td>
-<td><p><span class="math notranslate nohighlight">\(e(g, h) \neq 1\)</span> for generators g, h</p></td>
-</tr>
-</tbody>
-</table>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="updates_060.html">Changes in v0.60</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#breaking-changes-and-migration-guide">Breaking Changes and Migration Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#dependency-updates">Dependency Updates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#python-compatibility">Python Compatibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#new-schemes">New Schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#numeric-attribute-comparisons">Numeric Attribute Comparisons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#zkp-compiler-v0-60-0-70">ZKP Compiler (v0.60-0.70)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#build-system">Build System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#bug-fixes">Bug Fixes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates_060.html#contributors">Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="updates_050.html">Changes in v0.50</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updates.html">Changes in v0.43</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="updates.html#integer-module">Integer Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates.html#benchmarking">Benchmarking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="updates.html#serialization">Serialization</a></li>
+</ul>
+</li>
+</ul>
 </div>
-</section>
-<section id="known-answer-tests-kats">
-<h3>Known Answer Tests (KATs)<a class="headerlink" href="#known-answer-tests-kats" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p><strong>BLS-KAT-1</strong>: Signature structure (valid G1 element)</p></li>
-<li><p><strong>BLS-KAT-2</strong>: Empty message handling</p></li>
-<li><p><strong>BLS-KAT-3</strong>: Large message handling (10KB+)</p></li>
-</ul>
-</section>
-<section id="security-tests">
-<h3>Security Tests<a class="headerlink" href="#security-tests" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p><strong>BLS-SEC-1</strong>: Identity element rejection</p></li>
-<li><p><strong>BLS-SEC-2</strong>: Random signature rejection</p></li>
-</ul>
-</section>
-</section>
-<section id="pedersen-commitments">
-<h2>Pedersen Commitments<a class="headerlink" href="#pedersen-commitments" title="Link to this heading">¶</a></h2>
-<p><strong>Implementation</strong>: <code class="xref py py-mod docutils literal notranslate"><span class="pre">charm.schemes.commit.commit_pedersen92</span></code></p>
-<p><strong>Test Vectors</strong>: <code class="docutils literal notranslate"><span class="pre">charm/test/vectors/test_pedersen_vectors.py</span></code></p>
-<p><strong>References</strong>:</p>
-<ul class="simple">
-<li><p>Pedersen: “Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing” (1992)</p></li>
-</ul>
-<section id="id1">
-<h3>Mathematical Properties<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper colwidths-given docutils container">
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 40.0%" />
-<col style="width: 40.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Vector ID</p></th>
-<th class="head"><p>Property</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>PEDERSEN-1</p></td>
-<td><p>Commitment Correctness</p></td>
-<td><p><span class="math notranslate nohighlight">\(C = g^m \cdot h^r\)</span></p></td>
-</tr>
-<tr class="row-odd"><td><p>PEDERSEN-2</p></td>
-<td><p>Decommitment Verification</p></td>
-<td><p>Valid (C, r, m) tuple verifies</p></td>
-</tr>
-<tr class="row-even"><td><p>PEDERSEN-3</p></td>
-<td><p>Binding Property</p></td>
-<td><p>Cannot decommit to different message</p></td>
-</tr>
-<tr class="row-odd"><td><p>PEDERSEN-4</p></td>
-<td><p>Randomness Binding</p></td>
-<td><p>Cannot decommit with wrong randomness</p></td>
-</tr>
-<tr class="row-even"><td><p>PEDERSEN-5</p></td>
-<td><p>Hiding Property</p></td>
-<td><p>Same message, different randomness → different commitments</p></td>
-</tr>
-<tr class="row-odd"><td><p>PEDERSEN-6</p></td>
-<td><p>Homomorphic Property</p></td>
-<td><p><span class="math notranslate nohighlight">\(C(m_1, r_1) \cdot C(m_2, r_2) = C(m_1+m_2, r_1+r_2)\)</span></p></td>
-</tr>
-<tr class="row-even"><td><p>PEDERSEN-7</p></td>
-<td><p>Homomorphic Decommitment</p></td>
-<td><p>Product of commitments decommits with sum of values</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="edge-cases">
-<h3>Edge Cases<a class="headerlink" href="#edge-cases" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p><strong>PEDERSEN-EDGE-1</strong>: Zero message</p></li>
-<li><p><strong>PEDERSEN-EDGE-2</strong>: Message = 1</p></li>
-<li><p><strong>PEDERSEN-EDGE-3</strong>: Negative message (modular arithmetic)</p></li>
-</ul>
-</section>
-<section id="id2">
-<h3>Security Tests<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p><strong>PEDERSEN-SEC-1</strong>: Generator independence (g ≠ h)</p></li>
-<li><p><strong>PEDERSEN-SEC-2</strong>: Non-trivial commitment (not identity)</p></li>
-<li><p><strong>PEDERSEN-SEC-3</strong>: Random commitment rejection</p></li>
-</ul>
-</section>
-</section>
-<section id="schnorr-zero-knowledge-proofs">
-<h2>Schnorr Zero-Knowledge Proofs<a class="headerlink" href="#schnorr-zero-knowledge-proofs" title="Link to this heading">¶</a></h2>
-<p><strong>Implementation</strong>: <code class="xref py py-mod docutils literal notranslate"><span class="pre">charm.zkp_compiler.schnorr_proof</span></code></p>
-<p><strong>Test Vectors</strong>: <code class="docutils literal notranslate"><span class="pre">charm/test/vectors/test_schnorr_vectors.py</span></code></p>
-<p><strong>References</strong>:</p>
-<ul class="simple">
-<li><p>Schnorr: “Efficient Signature Generation by Smart Cards” (1991)</p></li>
-<li><p>RFC 8235: Schnorr Non-interactive Zero-Knowledge Proof</p></li>
-<li><p>Fiat-Shamir heuristic for non-interactive proofs</p></li>
-</ul>
-<section id="id3">
-<h3>Mathematical Properties<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper colwidths-given docutils container">
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 40.0%" />
-<col style="width: 40.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Vector ID</p></th>
-<th class="head"><p>Property</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>SCHNORR-1</p></td>
-<td><p>Completeness (Interactive)</p></td>
-<td><p>Honest prover always convinces honest verifier</p></td>
-</tr>
-<tr class="row-odd"><td><p>SCHNORR-2</p></td>
-<td><p>Completeness (Non-Interactive)</p></td>
-<td><p>Valid non-interactive proof always verifies</p></td>
-</tr>
-<tr class="row-even"><td><p>SCHNORR-3</p></td>
-<td><p>Soundness</p></td>
-<td><p>Wrong witness cannot produce valid proof</p></td>
-</tr>
-<tr class="row-odd"><td><p>SCHNORR-4</p></td>
-<td><p>Verification Equation</p></td>
-<td><p><span class="math notranslate nohighlight">\(g^z = u \cdot h^c\)</span> where <span class="math notranslate nohighlight">\(z = r + c \cdot x\)</span></p></td>
-</tr>
-<tr class="row-even"><td><p>SCHNORR-5</p></td>
-<td><p>Challenge Binding</p></td>
-<td><p>Challenge deterministically derived via Fiat-Shamir</p></td>
-</tr>
-<tr class="row-odd"><td><p>SCHNORR-6</p></td>
-<td><p>Zero-Knowledge (Simulation)</p></td>
-<td><p>Proofs can be simulated without witness</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="id4">
-<h3>Edge Cases<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p><strong>SCHNORR-EDGE-1</strong>: Identity commitment rejection</p></li>
-<li><p><strong>SCHNORR-EDGE-2</strong>: Zero secret (x = 0)</p></li>
-<li><p><strong>SCHNORR-EDGE-3</strong>: Secret = 1</p></li>
-<li><p><strong>SCHNORR-EDGE-4</strong>: Large secret (near group order)</p></li>
-</ul>
-</section>
-<section id="serialization-tests">
-<h3>Serialization Tests<a class="headerlink" href="#serialization-tests" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p><strong>SCHNORR-SER-1</strong>: Serialize/deserialize roundtrip</p></li>
-<li><p><strong>SCHNORR-SER-2</strong>: Serialization format (bytes)</p></li>
-</ul>
-</section>
-</section>
-<section id="running-test-vectors">
-<h2>Running Test Vectors<a class="headerlink" href="#running-test-vectors" title="Link to this heading">¶</a></h2>
-<p>Run all test vectors:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">charm</span><span class="o">/</span><span class="n">test</span><span class="o">/</span><span class="n">vectors</span><span class="o">/</span> <span class="o">-</span><span class="n">v</span>
-</pre></div>
-</div>
-<p>Run specific scheme vectors:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pytest</span> <span class="n">charm</span><span class="o">/</span><span class="n">test</span><span class="o">/</span><span class="n">vectors</span><span class="o">/</span><span class="n">test_bls_vectors</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span>
-<span class="n">pytest</span> <span class="n">charm</span><span class="o">/</span><span class="n">test</span><span class="o">/</span><span class="n">vectors</span><span class="o">/</span><span class="n">test_pedersen_vectors</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span>
-<span class="n">pytest</span> <span class="n">charm</span><span class="o">/</span><span class="n">test</span><span class="o">/</span><span class="n">vectors</span><span class="o">/</span><span class="n">test_schnorr_vectors</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">v</span>
-</pre></div>
-</div>
-</section>
 </section>
 
         </article>
@@ -669,23 +476,23 @@ original papers and relevant standards.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="adapters.html">
+          <a class="next-page" href="updates_062.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Scheme Adapters</div>
+                <div class="title">Changes in v0.62</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="threshold.html">
+          <a class="prev-page" href="test/test_policy_expression.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Threshold ECDSA</div>
+                <div class="title">test_policy_expression</div>
                 
               </div>
             </a>
@@ -708,45 +515,8 @@ original papers and relevant standards.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Schemes with Test Vectors</a><ul>
-<li><a class="reference internal" href="#bls-signatures">BLS Signatures</a><ul>
-<li><a class="reference internal" href="#mathematical-properties">Mathematical Properties</a></li>
-<li><a class="reference internal" href="#known-answer-tests-kats">Known Answer Tests (KATs)</a></li>
-<li><a class="reference internal" href="#security-tests">Security Tests</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pedersen-commitments">Pedersen Commitments</a><ul>
-<li><a class="reference internal" href="#id1">Mathematical Properties</a></li>
-<li><a class="reference internal" href="#edge-cases">Edge Cases</a></li>
-<li><a class="reference internal" href="#id2">Security Tests</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#schnorr-zero-knowledge-proofs">Schnorr Zero-Knowledge Proofs</a><ul>
-<li><a class="reference internal" href="#id3">Mathematical Properties</a></li>
-<li><a class="reference internal" href="#id4">Edge Cases</a></li>
-<li><a class="reference internal" href="#serialization-tests">Serialization Tests</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#running-test-vectors">Running Test Vectors</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
@@ -755,6 +525,5 @@ original papers and relevant standards.</p>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

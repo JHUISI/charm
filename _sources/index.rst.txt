@@ -145,12 +145,9 @@ Release Notes
 -------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   updates_061
-   updates_060
-   updates_050
-   updates
+   release_notes
 
 Links
 -----
