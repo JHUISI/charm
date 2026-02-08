@@ -66,7 +66,38 @@ Charm uses a hybrid design: performance-intensive mathematical operations are im
 
 ## Installation
 
+### One-Line Install (Recommended)
+
+The easiest way to install Charm is using the automated install script, which handles all system dependencies:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/JHUISI/charm/dev/install.sh | bash
+```
+
+**Supported platforms:**
+- Ubuntu/Debian (and derivatives: Linux Mint, Pop!_OS)
+- Fedora/RHEL/CentOS (and derivatives: Rocky, Alma, Oracle Linux)
+- Arch Linux (and derivatives: Manjaro, EndeavourOS)
+- macOS (Intel and Apple Silicon)
+
+**Install options:**
+```bash
+# Default: install from PyPI (recommended)
+curl -sSL ... | bash
+
+# Install from source (for development)
+curl -sSL ... | bash -s -- --from-source
+
+# Only install system dependencies (for manual pip install)
+curl -sSL ... | bash -s -- --deps-only
+
+# See all options
+./install.sh --help
+```
+
 ### Quick Install (pip)
+
+If you prefer to install dependencies manually:
 
 ```bash
 pip install charm-crypto-framework
