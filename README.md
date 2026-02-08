@@ -11,22 +11,48 @@ Charm uses a hybrid design: performance-intensive mathematical operations are im
 
 ## Features
 
-* **Mathematical Settings**: Integer rings/fields, bilinear (BN254) and non-bilinear Elliptic Curve groups
-* **Base Crypto Library**: Symmetric encryption, hash functions, PRNGs
-* **Standard APIs**: Digital signatures, encryption, commitments
-* **Protocol Engine**: Simplifies multi-party protocol implementation
-* **Threshold Cryptography / MPC**: Production-ready threshold ECDSA implementations
+### Advanced Cryptographic Schemes
+
+* **Attribute-Based Encryption (ABE)**: Fine-grained access control encryption
+  - Ciphertext-Policy ABE (CP-ABE): BSW07, Waters09, FAME
+  - Key-Policy ABE (KP-ABE): LSW08, GPSW06
+  - Multi-Authority ABE, Decentralized ABE
+* **Identity-Based Encryption (IBE)**: Encryption using identities as public keys
+  - Waters05, Boneh-Boyen (BB04), Boneh-Franklin
+* **Pairing-Based Cryptography**: BN254, BLS12-381 curve support (~128-bit security)
+  - Bilinear pairings for advanced protocols
+  - Efficient implementation via PBC library
+* **Digital Signatures**: Comprehensive signature scheme library
+  - Pairing-based: BLS (Ethereum 2.0), Waters, CL04, Boyen
+  - Elliptic curve: ECDSA, Schnorr, EdDSA
+  - Standard: RSA, DSA, Lamport
+  - Aggregate/Multi-signatures: BLS aggregation, MuSig
+* **Public-Key Encryption**: Standard and advanced PKE schemes
+  - ElGamal, RSA, Paillier (homomorphic), Cramer-Shoup
+* **Commitments & Secret Sharing**: Pedersen commitments, Feldman/Pedersen VSS
+
+### Threshold Cryptography / MPC
+
+* **Threshold ECDSA**: Production-ready t-of-n distributed signing
   - GG18 (Gennaro-Goldfeder 2018) — Classic Paillier-based threshold ECDSA
   - CGGMP21 (Canetti et al. 2021) — UC-secure with identifiable aborts
   - DKLS23 (Doerner et al. 2023) — Non-interactive presigning with OT-based MtA
   - Supports secp256k1 (Bitcoin, XRPL) and other curves
-* **ZKP Compiler**: Production-ready compiler for interactive and non-interactive zero-knowledge proofs
-  - Discrete Log Equality (DLEQ) proofs
+
+### Zero-Knowledge Proofs
+
+* **ZKP Compiler**: Production-ready compiler for interactive and non-interactive proofs
+  - Schnorr proofs, Discrete Log Equality (DLEQ)
   - Knowledge of Representation proofs
-  - AND/OR composition
-  - Range proofs
-  - Batch verification
-  - Used internally by CGGMP21 for Paillier-based ZK proofs
+  - AND/OR composition for complex statements
+  - Range proofs via bit decomposition
+  - Batch verification for improved performance
+
+### Infrastructure & Tools
+
+* **Mathematical Settings**: Integer rings/fields, bilinear and non-bilinear EC groups
+* **Base Crypto Library**: Symmetric encryption (AES), hash functions, PRNGs
+* **Protocol Engine**: Simplifies multi-party protocol implementation
 * **C/C++ Embed API**: Native applications can embed Charm via the Python C API
 * **Integrated Benchmarking**: Built-in performance measurement
 
