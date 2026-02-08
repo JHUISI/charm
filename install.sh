@@ -45,6 +45,26 @@ HOMEBREW_PREFIX=""
 PYTHON=""
 SUDO=""
 
+# Track temp directories for cleanup on error
+CLEANUP_DIRS=""
+
+# Cleanup function for error handling
+cleanup() {
+    local exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo -e "${RED}[ERROR]${NC} Installation failed with exit code $exit_code" >&2
+    fi
+    # Clean up any temp directories we created
+    if [ -n "$CLEANUP_DIRS" ]; then
+        for dir in $CLEANUP_DIRS; do
+            if [ -d "$dir" ]; then
+                rm -rf "$dir" 2>/dev/null || true
+            fi
+        done
+    fi
+}
+trap cleanup EXIT
+
 #######################################
 # Logging functions
 #######################################
@@ -96,11 +116,16 @@ detect_python() {
         for py in python3.12 python3.11 python3.10 python3.9 python3.8 python3; do
             if command -v "$py" &> /dev/null; then
                 local version
-                version=$("$py" -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+                # Use format() instead of f-strings for Python 2.x compatibility during detection
+                version=$("$py" -c "import sys; print('{0}.{1}'.format(sys.version_info.major, sys.version_info.minor))" 2>/dev/null)
+                if [ -z "$version" ]; then
+                    continue
+                fi
                 local major minor
                 major=$(echo "$version" | cut -d. -f1)
                 minor=$(echo "$version" | cut -d. -f2)
-                if [ "$major" -ge 3 ] && [ "$minor" -ge 8 ]; then
+                # Check for Python 3.8+ (major > 3, or major == 3 and minor >= 8)
+                if [ "$major" -gt 3 ] || { [ "$major" -eq 3 ] && [ "$minor" -ge 8 ]; }; then
                     PYTHON="$py"
                     break
                 fi
@@ -160,7 +185,20 @@ install_deps_macos() {
         fi
     fi
 
-    brew install gmp openssl@3 wget python@3 || true
+    # Issue #4: Install each package separately with proper error handling
+    # Only ignore "already installed" warnings, not genuine failures
+    local brew_packages="gmp openssl@3 wget python@3"
+    for pkg in $brew_packages; do
+        if brew list "$pkg" &>/dev/null; then
+            info "$pkg is already installed"
+        else
+            info "Installing $pkg..."
+            if ! brew install "$pkg"; then
+                error "Failed to install $pkg"
+                fatal "Homebrew package installation failed. Please check the error above."
+            fi
+        fi
+    done
     success "macOS dependencies installed"
 }
 
@@ -173,10 +211,23 @@ install_system_deps() {
             install_deps_fedora
             ;;
         rhel|centos|rocky|alma|ol)
-            # RHEL-based distros may need EPEL
-            if ! $SUDO dnf repolist | grep -q epel; then
+            # Issue #5: RHEL-based distros may need EPEL - improved detection for RHEL 9+
+            if ! $SUDO dnf repolist 2>/dev/null | grep -qi epel; then
                 info "Enabling EPEL repository..."
-                $SUDO dnf install -y epel-release 2>/dev/null || true
+                # Try epel-release first (works on CentOS, Rocky, Alma)
+                if $SUDO dnf install -y epel-release 2>/dev/null; then
+                    success "EPEL repository enabled via epel-release"
+                # For RHEL proper, try the EPEL RPM directly
+                elif command -v subscription-manager &> /dev/null; then
+                    # Get RHEL major version
+                    local rhel_version
+                    rhel_version=$(rpm -E %rhel 2>/dev/null || echo "9")
+                    info "Attempting to install EPEL for RHEL ${rhel_version}..."
+                    $SUDO dnf install -y "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${rhel_version}.noarch.rpm" 2>/dev/null || \
+                        warn "Could not install EPEL - some packages may not be available"
+                else
+                    warn "Could not enable EPEL repository - some packages may not be available"
+                fi
             fi
             install_deps_fedora
             ;;
@@ -224,32 +275,54 @@ install_pbc() {
         return 0
     fi
 
-    local TMPDIR
-    TMPDIR=$(mktemp -d)
-    cd "$TMPDIR"
+    local PBC_TMPDIR
+    PBC_TMPDIR=$(mktemp -d)
+    CLEANUP_DIRS="$CLEANUP_DIRS $PBC_TMPDIR"
+    cd "$PBC_TMPDIR"
 
     info "Downloading PBC from ${PBC_URL}..."
-    wget -q "$PBC_URL" -O "pbc-${PBC_VERSION}.tar.gz"
+    # Issue #10: Use curl as fallback if wget is not available
+    if command -v wget &> /dev/null; then
+        wget -q "$PBC_URL" -O "pbc-${PBC_VERSION}.tar.gz"
+    elif command -v curl &> /dev/null; then
+        curl -sSL "$PBC_URL" -o "pbc-${PBC_VERSION}.tar.gz"
+    else
+        fatal "Neither wget nor curl found. Please install one of them."
+    fi
     tar xzf "pbc-${PBC_VERSION}.tar.gz"
     cd "pbc-${PBC_VERSION}"
 
     info "Configuring PBC..."
 
-    # PBC's configure script requires yywrap from libfl, but modern flex doesn't always provide it
-    # Create a stub library if needed
-    if ! echo 'int yywrap(void) { return 1; }' | gcc -c -x c - -o /tmp/yywrap.o 2>/dev/null; then
-        warn "Could not create yywrap stub"
+    # Issue #2 & #3: PBC's configure script requires yywrap from libfl, but modern flex doesn't always provide it
+    # Create a stub library in our temp directory (not hardcoded /tmp)
+    local STUB_DIR="${PBC_TMPDIR}/stubs"
+    mkdir -p "$STUB_DIR"
+    local STUB_LDFLAGS=""
+
+    if echo 'int yywrap(void) { return 1; }' | gcc -c -x c - -o "${STUB_DIR}/yywrap.o" 2>/dev/null; then
+        if ar rcs "${STUB_DIR}/libfl.a" "${STUB_DIR}/yywrap.o" 2>/dev/null; then
+            STUB_LDFLAGS="-L${STUB_DIR}"
+            info "Created yywrap stub library at ${STUB_DIR}/libfl.a"
+        else
+            warn "Could not create libfl.a archive - PBC build may fail if flex doesn't provide yywrap"
+        fi
     else
-        ar rcs /tmp/libfl.a /tmp/yywrap.o 2>/dev/null || true
+        warn "Could not compile yywrap stub - PBC build may fail if flex doesn't provide yywrap"
+    fi
+
+    # Add -lfl to link our stub library if we created it
+    local FL_LINK=""
+    if [ -n "$STUB_LDFLAGS" ]; then
+        FL_LINK="-lfl"
     fi
 
     if [ "$DISTRO" = "macos" ]; then
         ./configure --prefix="$PREFIX" \
-            LDFLAGS="-L${HOMEBREW_PREFIX}/lib -lgmp" \
+            LDFLAGS="-L${HOMEBREW_PREFIX}/lib ${STUB_LDFLAGS} ${FL_LINK} -lgmp" \
             CPPFLAGS="-I${HOMEBREW_PREFIX}/include"
     else
-        # Add /tmp to library path for our stub libfl if needed
-        ./configure --prefix="$PREFIX" LDFLAGS="-L/tmp -lgmp"
+        ./configure --prefix="$PREFIX" LDFLAGS="${STUB_LDFLAGS} ${FL_LINK} -lgmp"
     fi
 
     info "Building PBC (this may take a few minutes)..."
@@ -260,14 +333,20 @@ install_pbc() {
     info "Installing PBC..."
     $SUDO make install
 
-    # Update library cache on Linux
+    # Issue #7: Update library cache on Linux - use full path or check existence
     if [ "$OS" = "Linux" ]; then
-        $SUDO ldconfig
+        if command -v ldconfig &> /dev/null; then
+            $SUDO ldconfig
+        elif [ -x /sbin/ldconfig ]; then
+            $SUDO /sbin/ldconfig
+        else
+            warn "ldconfig not found - you may need to run 'sudo ldconfig' manually"
+        fi
     fi
 
     # Cleanup
     cd /
-    rm -rf "$TMPDIR"
+    rm -rf "$PBC_TMPDIR"
 
     success "PBC library installed to ${PREFIX}"
 }
@@ -288,13 +367,30 @@ install_from_pypi() {
         export CPPFLAGS="-I${PREFIX}/include -I${HOMEBREW_PREFIX}/include"
     fi
 
-    # Arch Linux and some other distros use PEP 668 which requires --break-system-packages
+    # Issue #6: Detect PEP 668 (externally managed Python) by checking for EXTERNALLY-MANAGED marker
+    # This works on Ubuntu 23.04+, Fedora 38+, Debian 12+, Arch, and other modern distros
     local PIP_EXTRA_ARGS=""
-    if [ -f /etc/arch-release ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "manjaro" ]; then
+    local python_lib_path
+    python_lib_path=$($PYTHON -c "import sys; print('{0}/lib/python{1}.{2}'.format(sys.prefix, sys.version_info.major, sys.version_info.minor))" 2>/dev/null)
+
+    # Check for EXTERNALLY-MANAGED marker in Python's lib path or common system locations
+    local pep668_detected="no"
+    if [ -n "$python_lib_path" ] && [ -f "${python_lib_path}/EXTERNALLY-MANAGED" ]; then
+        pep668_detected="yes"
+    elif [ -f /usr/lib/python3/EXTERNALLY-MANAGED ]; then
+        pep668_detected="yes"
+    elif find /usr/lib -maxdepth 2 -name "EXTERNALLY-MANAGED" -print -quit 2>/dev/null | grep -q .; then
+        pep668_detected="yes"
+    fi
+
+    if [ "$pep668_detected" = "yes" ]; then
+        info "Detected PEP 668 externally managed Python environment"
         PIP_EXTRA_ARGS="--break-system-packages"
     fi
 
+    # shellcheck disable=SC2086
     $PYTHON -m pip install --upgrade pip $PIP_EXTRA_ARGS
+    # shellcheck disable=SC2086
     $PYTHON -m pip install "charm-crypto-framework==${CHARM_VERSION}" $PIP_EXTRA_ARGS
 
     success "Charm-Crypto installed from PyPI"
@@ -303,12 +399,14 @@ install_from_pypi() {
 install_from_source() {
     info "Installing Charm-Crypto from source..."
 
-    local TMPDIR
-    TMPDIR=$(mktemp -d)
-    cd "$TMPDIR"
+    local SOURCE_TMPDIR
+    SOURCE_TMPDIR=$(mktemp -d)
+    CLEANUP_DIRS="$CLEANUP_DIRS $SOURCE_TMPDIR"
+    cd "$SOURCE_TMPDIR"
 
-    info "Cloning Charm repository..."
-    git clone "$CHARM_REPO"
+    # Issue #11: Use --depth 1 for faster clone (only need latest commit)
+    info "Cloning Charm repository (shallow clone)..."
+    git clone --depth 1 "$CHARM_REPO"
     cd charm
 
     info "Configuring Charm..."
@@ -326,13 +424,20 @@ install_from_source() {
     info "Installing Charm..."
     $SUDO make install
 
+    # Issue #7: Use full path or check existence for ldconfig
     if [ "$OS" = "Linux" ]; then
-        $SUDO ldconfig
+        if command -v ldconfig &> /dev/null; then
+            $SUDO ldconfig
+        elif [ -x /sbin/ldconfig ]; then
+            $SUDO /sbin/ldconfig
+        else
+            warn "ldconfig not found - you may need to run 'sudo ldconfig' manually"
+        fi
     fi
 
     # Cleanup
     cd /
-    rm -rf "$TMPDIR"
+    rm -rf "$SOURCE_TMPDIR"
 
     success "Charm-Crypto installed from source"
 }
@@ -354,8 +459,8 @@ verify_installation() {
     local TESTS_PASSED=0
     local TESTS_TOTAL=3
 
-    # Test 1: Version check
-    if $PYTHON -c "import charm; print(f'Version: {charm.__version__}')" 2>/dev/null; then
+    # Test 1: Version check (Issue #8: use format() instead of f-string for consistency)
+    if $PYTHON -c "import charm; print('Version: {0}'.format(charm.__version__))" 2>/dev/null; then
         success "Version check passed"
         TESTS_PASSED=$((TESTS_PASSED + 1))
     else
@@ -394,10 +499,18 @@ verify_installation() {
 configure_shell() {
     info "Configuring shell environment..."
 
+    # Issue #9: Add fish shell support
     local SHELL_RC=""
+    local IS_FISH="no"
     case "${SHELL:-/bin/bash}" in
         */zsh) SHELL_RC="$HOME/.zshrc" ;;
         */bash) SHELL_RC="$HOME/.bashrc" ;;
+        */fish)
+            SHELL_RC="$HOME/.config/fish/config.fish"
+            IS_FISH="yes"
+            # Ensure fish config directory exists
+            mkdir -p "$HOME/.config/fish"
+            ;;
         *) SHELL_RC="$HOME/.profile" ;;
     esac
 
@@ -409,14 +522,23 @@ configure_shell() {
     fi
 
     if [ -n "$LIB_VAR" ]; then
-        local ENV_LINE="export ${LIB_VAR}=${PREFIX}/lib:\$${LIB_VAR}"
-
         if ! grep -q "charm-crypto" "$SHELL_RC" 2>/dev/null; then
-            {
-                echo ""
-                echo "# charm-crypto library paths (added by install.sh)"
-                echo "$ENV_LINE"
-            } >> "$SHELL_RC"
+            if [ "$IS_FISH" = "yes" ]; then
+                # Fish shell uses different syntax
+                {
+                    echo ""
+                    echo "# charm-crypto library paths (added by install.sh)"
+                    echo "set -gx ${LIB_VAR} ${PREFIX}/lib \$${LIB_VAR}"
+                } >> "$SHELL_RC"
+            else
+                # POSIX-compatible shells (bash, zsh, sh)
+                local ENV_LINE="export ${LIB_VAR}=${PREFIX}/lib:\$${LIB_VAR}"
+                {
+                    echo ""
+                    echo "# charm-crypto library paths (added by install.sh)"
+                    echo "$ENV_LINE"
+                } >> "$SHELL_RC"
+            fi
             info "Added library paths to $SHELL_RC"
             warn "Run 'source $SHELL_RC' or restart your shell to apply changes"
         else
