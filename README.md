@@ -15,12 +15,18 @@ Charm uses a hybrid design: performance-intensive mathematical operations are im
 * **Base Crypto Library**: Symmetric encryption, hash functions, PRNGs
 * **Standard APIs**: Digital signatures, encryption, commitments
 * **Protocol Engine**: Simplifies multi-party protocol implementation
+* **Threshold Cryptography / MPC**: Production-ready threshold ECDSA implementations
+  - GG18 (Gennaro-Goldfeder 2018) — Classic Paillier-based threshold ECDSA
+  - CGGMP21 (Canetti et al. 2021) — UC-secure with identifiable aborts
+  - DKLS23 (Doerner et al. 2023) — Non-interactive presigning with OT-based MtA
+  - Supports secp256k1 (Bitcoin, XRPL) and other curves
 * **ZKP Compiler**: Production-ready compiler for interactive and non-interactive zero-knowledge proofs
   - Discrete Log Equality (DLEQ) proofs
   - Knowledge of Representation proofs
   - AND/OR composition
   - Range proofs
   - Batch verification
+  - Used internally by CGGMP21 for Paillier-based ZK proofs
 * **C/C++ Embed API**: Native applications can embed Charm via the Python C API
 * **Integrated Benchmarking**: Built-in performance measurement
 
@@ -100,8 +106,8 @@ make test-zkp        # ZKP compiler tests
 make test-adapters   # Adapter tests
 make test-embed      # C/C++ embed API tests
 
-# Threshold ECDSA (DKLS23) tests
-pytest charm/test/schemes/threshold_test.py -v
+# Threshold ECDSA tests (GG18, CGGMP21, DKLS23)
+pytest charm/test/schemes/threshold_test.py -v -k "GG18 or CGGMP21 or DKLS23"
 
 # Run with coverage
 pytest --cov=charm charm/test/ -v
@@ -204,34 +210,77 @@ assert ecdsa.verify(pk, signature, tx_hash)
 > **Note:** Production XRPL implementations should use canonical binary serialization
 > per [XRPL documentation](https://xrpl.org/serialization.html).
 
-### Threshold ECDSA (DKLS23) with XRPL testnet
+### Threshold ECDSA
 
-Charm also includes a threshold ECDSA scheme based on DKLS23, together with an XRPL
-testnet demo that shows how to use it end to end.
+Charm provides three production-ready threshold ECDSA implementations for MPC-based signing.
+All support secp256k1 (Bitcoin, XRPL) and other elliptic curves.
+
+**GG18 (2-of-3 threshold signing):**
 
 ```python
-from charm.toolbox.eccurve import secp256k1
 from charm.toolbox.ecgroup import ECGroup
-from charm.core.math.elliptic_curve import G
-from charm.schemes.threshold.dkls23_sign import DKLS23
-from charm.schemes.threshold.xrpl_wallet import (
-    XRPLThresholdWallet,
-    XRPLClient,
-    sign_xrpl_transaction,
-    create_payment_with_memo,
-    get_secp256k1_generator,
-)
+from charm.toolbox.eccurve import secp256k1
+from charm.schemes.threshold import GG18
 
 group = ECGroup(secp256k1)
+gg18 = GG18(group, threshold=2, num_parties=3)
+
+# Distributed key generation
+key_shares, public_key = gg18.keygen()
+
+# Sign with 2 of 3 parties (interactive, 4 rounds)
+message = b"Bitcoin transaction hash"
+signature = gg18.sign(key_shares[:2], message)
+assert gg18.verify(public_key, message, signature)
+```
+
+**CGGMP21 with presigning (UC-secure, identifiable aborts):**
+
+```python
+from charm.schemes.threshold import CGGMP21
+
+cggmp = CGGMP21(group, threshold=2, num_parties=3)
+key_shares, public_key = cggmp.keygen()
+
+# Optional presigning (can be done offline)
+presignatures = cggmp.presign(key_shares[:2])
+
+# Fast online signing with presignature
+message = b"XRPL payment"
+signature = cggmp.sign(key_shares[:2], message, presignatures)
+assert cggmp.verify(public_key, message, signature)
+```
+
+**DKLS23 with XRPL testnet:**
+
+```python
+from charm.schemes.threshold import DKLS23
+from charm.schemes.threshold.xrpl_wallet import XRPLThresholdWallet, XRPLClient
+
 dkls = DKLS23(group, threshold=2, num_parties=3)
-g = get_secp256k1_generator(group)
-key_shares, public_key = dkls.distributed_keygen(g)
+key_shares, public_key = dkls.keygen()
 wallet = XRPLThresholdWallet(group, public_key)
 client = XRPLClient(is_testnet=True)
 ```
 
-See `examples/xrpl_memo_demo.py` for a complete XRPL testnet flow (fund account, create
-threshold wallet, send payment with memo).
+See `examples/xrpl_memo_demo.py` for a complete XRPL testnet flow.
+
+**Comparison of Threshold ECDSA Schemes:**
+
+| Feature | GG18 | CGGMP21 | DKLS23 |
+|---------|------|---------|--------|
+| **Security Model** | ROM | UC (composable) | ROM |
+| **DKG Rounds** | 3 | 3 | 3 |
+| **Signing Rounds** | 4 (interactive) | 3 presign + 1 sign | 3 presign + 1 sign |
+| **Presigning** | ❌ No | ✅ Yes | ✅ Yes |
+| **Identifiable Aborts** | ❌ No | ✅ Yes | ❌ No |
+| **MtA Protocol** | Paillier | Paillier | OT-based |
+| **Best For** | Simple deployments | High security needs | Low-latency signing |
+
+**References:**
+- GG18: [Gennaro & Goldfeder 2018](https://eprint.iacr.org/2019/114.pdf)
+- CGGMP21: [Canetti et al. 2021](https://eprint.iacr.org/2021/060)
+- DKLS23: [Doerner et al. 2023](https://eprint.iacr.org/2023/765)
 
 ## Schemes
 
@@ -241,8 +290,9 @@ Charm includes implementations of many cryptographic schemes:
 |----------|----------|
 | **ABE** | CP-ABE (BSW07), KP-ABE, FAME |
 | **IBE** | Waters05, BB04 |
-| **Signatures** | BLS, Waters, CL04 |
-| **Commitments** | Pedersen |
+| **Signatures** | BLS, Waters, CL04, ECDSA, Schnorr |
+| **Threshold Signatures** | GG18, CGGMP21, DKLS23 (threshold ECDSA) |
+| **Commitments** | Pedersen, Feldman VSS |
 | **Group Signatures** | BBS+, PS16 |
 
 See the [schemes directory](charm/schemes/) for all available implementations.

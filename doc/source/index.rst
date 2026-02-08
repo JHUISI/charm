@@ -27,6 +27,7 @@ while promoting the reuse of components.
 - **Elliptic curve groups** — NIST curves, secp256k1, Curve25519 via OpenSSL
 - **Integer groups** — RSA, DSA, safe primes for classical schemes
 - **50+ implemented schemes** — ABE, IBE, signatures, commitments, and more
+- **Threshold ECDSA / MPC** — GG18, CGGMP21, DKLS23 for distributed signing (Bitcoin, XRPL)
 - **ZKP compiler** — Schnorr proofs, Σ-protocols, AND/OR compositions
 - **Serialization** — Convert group elements to bytes for storage/transmission
 
@@ -76,6 +77,30 @@ Install from PyPI::
     ciphertext = cpabe.encrypt(master_public, message, policy)
     decrypted = cpabe.decrypt(master_public, user_key, ciphertext)
 
+**Threshold ECDSA** (MPC-based signing for Bitcoin/XRPL):
+
+.. code-block:: python
+
+    from charm.toolbox.ecgroup import ECGroup
+    from charm.toolbox.eccurve import secp256k1
+    from charm.schemes.threshold import GG18, CGGMP21, DKLS23
+
+    group = ECGroup(secp256k1)
+
+    # GG18: Classic threshold ECDSA (2-of-3)
+    gg18 = GG18(group, threshold=2, num_parties=3)
+    key_shares, public_key = gg18.keygen()
+    signature = gg18.sign(key_shares[:2], b"transaction")
+    assert gg18.verify(public_key, b"transaction", signature)
+
+    # CGGMP21: UC-secure with identifiable aborts
+    cggmp = CGGMP21(group, threshold=2, num_parties=3)
+    key_shares, public_key = cggmp.keygen()
+    presigs = cggmp.presign(key_shares[:2])  # Offline
+    signature = cggmp.sign(key_shares[:2], b"tx", presigs)  # Online
+
+See :doc:`threshold` for detailed documentation and API reference.
+
 Getting Started
 ---------------
 
@@ -101,6 +126,7 @@ Schemes & API Reference
    :maxdepth: 1
 
    schemes
+   threshold
    test_vectors
    adapters
    toolbox

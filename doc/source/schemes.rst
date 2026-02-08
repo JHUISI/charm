@@ -7,8 +7,52 @@ Implemented Schemes
 
 This section contains documentation for all cryptographic schemes implemented in Charm.
 Schemes are organized by type: attribute-based encryption (ABE), public-key encryption,
-public-key signatures, identity-based encryption, and more. Each scheme includes
-implementation details, security assumptions, and usage examples.
+public-key signatures, identity-based encryption, threshold signatures, and more.
+Each scheme includes implementation details, security assumptions, and usage examples.
+
+Threshold Signatures
+^^^^^^^^^^^^^^^^^^^^
+
+Charm provides three production-ready threshold ECDSA implementations for MPC-based
+distributed signing. These enable *t-of-n* signing where any *t* parties can
+collaboratively produce a valid signature without reconstructing the private key.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 40 40
+
+   * - Scheme
+     - Description
+     - Reference
+   * - **GG18**
+     - Classic Paillier-based threshold ECDSA (4-round interactive signing)
+     - `Gennaro & Goldfeder 2018 <https://eprint.iacr.org/2019/114.pdf>`_
+   * - **CGGMP21**
+     - UC-secure with identifiable aborts and presigning
+     - `Canetti et al. 2021 <https://eprint.iacr.org/2021/060>`_
+   * - **DKLS23**
+     - OT-based MtA with non-interactive presigning
+     - `Doerner et al. 2023 <https://eprint.iacr.org/2023/765>`_
+
+All schemes support **secp256k1** (Bitcoin, XRPL) and other elliptic curves.
+See :doc:`threshold` for detailed documentation, API reference, and usage examples.
+
+**Quick Example (GG18):**
+
+.. code-block:: python
+
+    from charm.toolbox.ecgroup import ECGroup
+    from charm.toolbox.eccurve import secp256k1
+    from charm.schemes.threshold import GG18
+
+    group = ECGroup(secp256k1)
+    gg18 = GG18(group, threshold=2, num_parties=3)
+    key_shares, public_key = gg18.keygen()
+    signature = gg18.sign(key_shares[:2], b"message")
+    assert gg18.verify(public_key, b"message", signature)
+
+Other Schemes
+^^^^^^^^^^^^^
 
 .. begin_auto_scheme_list
 .. toctree::

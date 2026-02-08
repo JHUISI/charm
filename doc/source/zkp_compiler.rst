@@ -19,6 +19,7 @@ zero-knowledge proof protocols. It supports both interactive and non-interactive
 - Range proofs via bit decomposition
 - Batch verification for improved performance
 - Serialization for network transmission
+- Used internally by CGGMP21 threshold ECDSA for Paillier-based ZK proofs
 
 Quick Start
 -----------
@@ -182,4 +183,5 @@ See Also
 
 - :mod:`charm.toolbox.pairinggroup` - Pairing group operations
 - ``charm/zkp_compiler/zk_demo.py`` - Additional usage examples
+- :doc:`threshold` - Threshold ECDSA (CGGMP21 uses ZK proofs for Paillier encryption)
 
