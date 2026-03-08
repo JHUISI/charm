@@ -18,6 +18,9 @@ class Protocol:
         self.partyTypes = {}
         self.party = {}
         self._serialize = False
+        # SECURITY: unsafe pickle deserialization is disabled by default.
+        # Enable only for trusted legacy peers that still use pickle framing.
+        self._allow_unsafe_pickle = False
         self.db = {} # initialize the database
         self.max_size = max_size
         self.prefix_size = ceil(log(max_size, 256))
@@ -203,24 +206,34 @@ class Protocol:
         return None
     
     def serialize(self, object):
-#        print("input object... => ", object)
-        if type(object) == dict:
-            bytes_object = serializeDict(object, self.group)
-            return pickleObject(bytes_object)
-        elif type(object) == str:
-            return pickleObject(object)
-        else:
-#            print("serialize: just =>", object)
-            return object
+        # Default to safe JSON/zlib serialization path.
+        return objectToBytes(object, self.group)
     
     def deserialize(self, bytes_object):
-#        print("deserialize input =>", bytes_object)
+        # Default to safe JSON/zlib deserialization path.
         if type(bytes_object) == bytes:
-            object = unpickleObject(bytes_object)
-            if isinstance(object, dict):
-                return deserializeDict(object, self.group)            
-                
-            return object
+            try:
+                return bytesToObject(bytes_object, self.group)
+            except Exception:
+                if not self._allow_unsafe_pickle:
+                    raise
+
+                # Backward compatibility path for trusted legacy peers only.
+                object = unpickleObject(bytes_object)
+                if isinstance(object, dict):
+                    return deserializeDict(object, self.group)
+                return object
+        return bytes_object
+
+    def setUnsafePickleDeserialization(self, enabled=False):
+        """Enable/disable unsafe legacy pickle deserialization.
+
+        WARNING: enabling this allows arbitrary code execution when parsing
+        untrusted input. Keep disabled unless communicating with trusted,
+        legacy peers that still use pickle-formatted messages.
+        """
+        self._allow_unsafe_pickle = bool(enabled)
+        return None
     # OPTIONAL
     # derived class must call this function in order to 
     def setSerializers(self, serial, deserial):
