@@ -1,3 +1,5 @@
+import warnings
+
 try:
   from charm.toolbox.pairingcurves import params as param_info
   from charm.core.math.pairing import pairing,pc_element,ZR,G1,G2,GT,init,pair,hashPair,H,random,serialize,deserialize,ismember,order
@@ -6,8 +8,19 @@ try:
 except Exception as err:
   raise ImportError("Cannot import pairing module. Ensure Charm crypto C extensions are compiled: %s" % err)
 
+# Curves with less than 128-bit security level
+_WEAK_CURVES = {'SS512': 80, 'SS1024': 80, 'MNT159': 80, 'MNT160': 80}
+
 class PairingGroup():
     def __init__(self, param_id, param_file = False, secparam = 512, verbose = False, seed1 = None, seed2 = None):
+        # Warn about weak curves
+        if isinstance(param_id, str) and param_id in _WEAK_CURVES:
+            warnings.warn(
+                f"Curve '{param_id}' provides only ~{_WEAK_CURVES[param_id]}-bit security, "
+                "which is below the 128-bit minimum recommended by NIST. "
+                "Use 'BN254' (128-bit) or stronger for production use.",
+                DeprecationWarning, stacklevel=2
+            )
         #legacy handler to handle calls that still pass in a file path
         if param_file:
           self.Pairing = pairing(file=param_id)

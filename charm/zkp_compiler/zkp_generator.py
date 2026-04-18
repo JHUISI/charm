@@ -323,13 +323,42 @@ def executeIntZKProof(public, secret, statement, party_info, interactive=int_def
     # Parse through the statement and insert code into each state of the prover and/or verifier
     ZKClass = parseAndGenerateCode(public, secret, statement, partyID, interactive)
     dummy_class = '<string>'
-    # SECURITY WARNING: compile() and exec() are used here for legacy compatibility.
-    # This is a known security vulnerability. Use ZKProofFactory for new code.
+    # SECURITY: Validate generated code before execution.
+    # Only allow code that defines the expected ZKProof class structure.
+    import ast
+    try:
+        tree = ast.parse(ZKClass)
+    except SyntaxError as e:
+        logger.error("Generated ZK proof code failed syntax validation: %s", e)
+        raise ValueError("Generated ZK proof code contains syntax errors") from e
+
+    # Validate AST: only allow imports, class definitions, and function definitions
+    _ALLOWED_NODE_TYPES = (ast.Module, ast.Import, ast.ImportFrom, ast.ClassDef,
+                           ast.FunctionDef, ast.AsyncFunctionDef, ast.Assign,
+                           ast.Return, ast.Expr, ast.Call, ast.Attribute,
+                           ast.Name, ast.Load, ast.Store, ast.Subscript,
+                           ast.Index, ast.Constant, ast.Num, ast.Str,
+                           ast.BinOp, ast.UnaryOp, ast.Compare, ast.BoolOp,
+                           ast.If, ast.For, ast.Dict, ast.List, ast.Tuple,
+                           ast.keyword, ast.arguments, ast.arg, ast.Starred)
+    for node in ast.walk(tree):
+        if not isinstance(node, _ALLOWED_NODE_TYPES):
+            # Allow additional expression types that may appear in generated code
+            if type(node).__name__ in ('Add', 'Sub', 'Mult', 'Div', 'Pow', 'Mod',
+                                        'Eq', 'NotEq', 'Lt', 'LtE', 'Gt', 'GtE',
+                                        'And', 'Or', 'Not', 'USub', 'UAdd',
+                                        'AugAssign', 'FormattedValue', 'JoinedStr'):
+                continue
+            logger.error("Disallowed AST node type in generated ZK code: %s", type(node).__name__)
+            raise ValueError(
+                f"Generated ZK proof code contains disallowed construct: {type(node).__name__}. "
+                "This may indicate a code injection attempt. Use ZKProofFactory instead."
+            )
+
     proof_code = compile(ZKClass, dummy_class, 'exec')
     logger.debug("Proof code object => %s", proof_code)
-#    return proof_code
     ns = {}
-    exec(proof_code, globals(), ns)  # nosec B102 - legacy code, deprecated
+    exec(proof_code, globals(), ns)  # nosec B102 - legacy code, deprecated, AST-validated
     ZKProof = ns['ZKProof']
 
     prov_db = None

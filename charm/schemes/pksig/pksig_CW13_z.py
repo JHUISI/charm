@@ -23,7 +23,9 @@ from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.crypto.cryptobase import *
 from charm.toolbox.PKSig import PKSig
 from charm.toolbox.matrixops import *
+import logging
 
+logger = logging.getLogger(__name__)
 debug = False
 class Sign_CW13(PKSig):
     def __init__(self, groupObj):
@@ -85,10 +87,8 @@ class Sign_CW13(PKSig):
         sk = { 'k':k, 'b0s':b0s, 'b1s':b1s,'b2s':b2s}
         
         if(debug):
-            print("Public parameters...")
-            group.debug(pk)
-            print("Secret parameters...")
-            group.debug(sk)
+            logger.debug("Public parameters: %s", {k: type(v).__name__ for k, v in pk.items()})
+            logger.debug("Secret parameters: [REDACTED]")
         return (pk, sk)
 
     def sign(self, pk, sk, m):
@@ -104,7 +104,15 @@ class Sign_CW13(PKSig):
         
        
     def verify(self, pk, sig, m):
-        
+        # Validate group membership of signature elements to prevent subgroup attacks
+        try:
+            for key in ('K0', 'K1'):
+                for elem in sig[key]:
+                    if not group.ismember(elem):
+                        return False
+        except (TypeError, AttributeError):
+            pass  # Some group implementations may not support full membership checks
+
         M = group.hash(m,ZR)
         C0 = [pk['g1b0'][0], pk['g1b0'][1]]
         C1 = [(pk['g1b2'][0]*(pk['g1b1'][0]**M)),
@@ -112,6 +120,7 @@ class Sign_CW13(PKSig):
         C2 = (pk['egg'])
 
         mask = self.vpair(C0, sig['K1']) / self.vpair(C1, sig['K0'])
+        # Verify via algebraic identity: C2 / mask == 1 (identity in GT)
         return (C2 == mask)
 
     def vpair(self, g1v, g2v):

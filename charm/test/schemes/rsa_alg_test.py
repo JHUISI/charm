@@ -5,8 +5,10 @@
 from binascii import a2b_hex
 from charm.schemes.pkenc.pkenc_rsa import RSA_Enc, RSA_Sig
 from charm.toolbox.conversion import Conversion
+from charm.toolbox.paddingschemes import OAEPEncryptionPadding, PSSPadding
 from charm.toolbox.securerandom import WeakRandom
 import unittest
+import warnings
 from random import Random
 
 debug = False
@@ -150,10 +152,13 @@ class Test(unittest.TestCase):
         da 95 36 ad 87 00 c8 4f c9 13 0a de a7 4e 55 8d \
         51 a7 4d df 85 d8 b5 0d e9 68 38 d6 06 3e 09 55 '.replace(' ',''),'utf-8'))
         
-        rsa = RSA_Enc()
+        # Test vector uses SHA-1; explicitly pass sha1 OAEP for vector compatibility
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            rsa = RSA_Enc(padding=OAEPEncryptionPadding('sha1'))
         pk = { 'N':n, 'e':e }
         sk = { 'phi_N':phi_N, 'd':d , 'N': n}
-        
+
         c = rsa.encrypt(pk, M, seed)
         C = Conversion.IP2OS(c)
         
@@ -330,7 +335,10 @@ class Test(unittest.TestCase):
             print("EM       = maskedDB || H || 0xbc", EM)
             print("S        = RSA decryption of EM", S)
         
-        rsa = RSA_Sig()
+        # Test vector uses SHA-1; explicitly pass sha1 PSS for vector compatibility
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            rsa = RSA_Sig(padding=PSSPadding('sha1'))
         sk = { 'phi_N':phi_N, 'd':d , 'N': n}
         sig = rsa.sign(sk, m, salt)
         assert S == sig

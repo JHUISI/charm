@@ -75,7 +75,16 @@ class VRF10:
                 
     def verify(self, pk, x, st):
         n, y, pi = pk['n'], st['y'], st['pi']
-        # check first index 
+        # Validate group membership of proof elements to prevent subgroup attacks
+        try:
+            for i in pi:
+                if not group.ismember(pi[i]):
+                    return False
+            if not group.ismember(y):
+                return False
+        except (TypeError, AttributeError):
+            pass  # Some group implementations may not support full membership checks
+        # check first index
         check1 = pair(pi[1], pk['g2'])
         if x[0] == 0 and check1 == pair(pk['g1'], pk['U_t']):
             if debug: print("Verify: check 0 successful!\t\tcase:", x[0])

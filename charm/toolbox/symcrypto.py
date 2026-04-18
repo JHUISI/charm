@@ -1,10 +1,28 @@
 from charm.toolbox.paddingschemes import PKCS7Padding
 from charm.toolbox.securerandom import OpenSSLRand
 from charm.core.crypto.cryptobase import MODE_CBC,AES,selectPRP
+from charm.core.crypto.cryptobase import MODE_ECB as _MODE_ECB_RAW
 from hashlib import sha256 as sha2
 import json
 import hmac
+import warnings
 from base64 import b64encode, b64decode
+
+
+def _get_mode_ecb():
+    """Return MODE_ECB value with a deprecation warning.
+
+    ECB mode is insecure: identical plaintext blocks produce identical
+    ciphertext blocks, revealing patterns. Use MODE_CBC or MODE_CTR instead.
+    """
+    warnings.warn(
+        "ECB mode is insecure and should not be used for encryption. "
+        "Identical plaintext blocks produce identical ciphertext, revealing patterns. "
+        "Use MODE_CBC or MODE_CTR instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    return _MODE_ECB_RAW
 
 class MessageAuthenticator(object):
     """ Abstraction for constructing and verifying authenticated messages
@@ -84,8 +102,8 @@ class MessageAuthenticator(object):
             raise ValueError("Currently only HMAC_SHA2 is supported as an algorithm")
         expected = bytes(self.mac(msgAndDigest['msg'], associatedData=associatedData)['digest'], 'utf-8')
         received = bytes(msgAndDigest['digest'], 'utf-8')
-        # we compare the hash instead of the direct value to avoid a timing attack
-        return sha2(expected).digest() == sha2(received).digest()
+        # Use constant-time comparison to prevent timing attacks
+        return hmac.compare_digest(expected, received)
 
 class SymmetricCryptoAbstraction(object):
     """
@@ -231,10 +249,9 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
         a dictionary composed of the cipher parameters (e.g., algorithm, mode, IV), and the ciphertext. The MAC function uses the whole JSON object/string
         to compute the MAC, prepended with the HMAC algorithm + associatedData.
 
-        The MAC key is computed as sha2(b'Poor Mans Key Extractor" + key).
+        The MAC key is derived using HMAC-based key separation.
         """
-        # warning only valid in the random oracle
-        mac_key = sha2(b'Poor Mans Key Extractor'+self._key).digest()
+        mac_key = hmac.new(self._key, b'charm-mac-key-v1', sha2).digest()
         mac = MessageAuthenticator(mac_key)
         enc = super(AuthenticatedCryptoAbstraction, self).encrypt(msg)
         return mac.mac(enc, associatedData=associatedData)
@@ -268,10 +285,9 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
         a dictionary composed of the cipher parameters (e.g., algorithm, mode, IV), and the ciphertext. The MAC function uses the whole JSON object/string
         to compute the MAC, prepended with the HMAC algorithm + associatedData.
 
-        The MAC key is computed as sha2(b'Poor Mans Key Extractor" + key).
+        The MAC key is derived using HMAC-based key separation.
         """
-        # warning only valid in the random oracle
-        mac_key = sha2(b'Poor Mans Key Extractor'+self._key).digest()
+        mac_key = hmac.new(self._key, b'charm-mac-key-v1', sha2).digest()
         mac = MessageAuthenticator(mac_key)
         if not mac.verify(cipherText, associatedData=associatedData):
             raise ValueError("Invalid mac. Your data was tampered with or your key is wrong")

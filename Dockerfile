@@ -1,7 +1,19 @@
-FROM ubuntu:18.04
-MAINTAINER support@charm-crypto.com
+FROM ubuntu:22.04
+LABEL maintainer="support@charm-crypto.com"
 
-RUN apt update && apt install --yes build-essential flex bison wget subversion m4 python3 python3-dev python3-setuptools libgmp-dev libssl-dev
-RUN wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz && tar xvf pbc-1.0.0.tar.gz && cd /pbc-1.0.0 && ./configure LDFLAGS="-lgmp" && make && make install && ldconfig
+RUN apt-get update && apt-get install --yes --no-install-recommends \
+    build-essential flex bison wget subversion m4 python3 python3-dev \
+    python3-setuptools libgmp-dev libssl-dev ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download PBC library over HTTPS and verify checksum
+RUN wget --no-verbose https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz \
+    && echo "772527404117587560080241cedaf441e5cac3269009cdde4c588a1dce4c73a6  pbc-0.5.14.tar.gz" | sha256sum -c - \
+    && tar xzf pbc-0.5.14.tar.gz \
+    && cd /pbc-0.5.14 \
+    && ./configure LDFLAGS="-lgmp" \
+    && make && make install && ldconfig \
+    && cd / && rm -rf pbc-0.5.14 pbc-0.5.14.tar.gz
+
 COPY . /charm
 RUN cd /charm && ./configure.sh && make && make install && ldconfig

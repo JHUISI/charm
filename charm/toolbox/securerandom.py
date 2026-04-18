@@ -52,9 +52,23 @@ class OpenSSLRand(SecureRandom):
         return Conversion.IP2OS(i, len)
 
 
-class WeakRandom(SecureRandom):
+class WeakRandom():
+    """Weak (non-cryptographic) random number generator for TESTING ONLY.
+
+    WARNING: This class does NOT inherit from SecureRandom to prevent
+    accidental substitution in cryptographic code. It uses Python's
+    random module which is NOT cryptographically secure (Mersenne Twister
+    is fully predictable after ~624 outputs).
+
+    Do NOT use this in production code.
+    """
     def __init__(self):
-        SecureRandom.__init__(self)
+        import warnings
+        warnings.warn(
+            "WeakRandom is NOT cryptographically secure. "
+            "Do NOT use in production code. Use OpenSSLRand instead.",
+            UserWarning, stacklevel=2
+        )
     def getRandomBytes(self, length):
         return self.myrandom(length, False)
     def addSeed(self, seed):

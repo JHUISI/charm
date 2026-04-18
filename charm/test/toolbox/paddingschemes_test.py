@@ -3,6 +3,7 @@
 :Authors: Gary Belvin
 '''
 import unittest
+import warnings
 from  charm.toolbox.paddingschemes import OAEPEncryptionPadding, MGF1, hashFunc, PSSPadding, PKCS7Padding
 from binascii import a2b_hex
 
@@ -54,14 +55,19 @@ class PaddingSchemesTest(unittest.TestCase):
             print("seedMask=>", seedMask)   #Correct
             print("maskedseed=>", maskedSeed)
 
-        c = OAEPEncryptionPadding()
+        # Test vector uses SHA-1; explicitly pass sha1 for vector compatibility
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            c = OAEPEncryptionPadding('sha1')
         E = c.encode(m, 128,"",seed)
         self.assertEqual(EM, E)
     
     def testOAEPRoundTripEquiv(self):
         oaep = OAEPEncryptionPadding()
         m = b'This is a test message'
-        ct = oaep.encode(m, 64)
+        # With SHA-256, the encoded message needs to be large enough to hold
+        # 2*hLen (64) + 2 + len(m) bytes. Use 128 bytes for SHA-256 compatibility.
+        ct = oaep.encode(m, 128)
         pt = oaep.decode(ct)
         self.assertEqual(m, pt, 'Decoded message is not equal to encoded message\n'\
                          'ct: %s\nm:  %s\npt: %s' % (ct, m, pt))
@@ -77,8 +83,12 @@ class PaddingSchemesTest(unittest.TestCase):
             self.assertEqual(len(a), mbytes, 'MFG output wrong size')
 
     def testMFGvector(self):
-        hashFn = OAEPEncryptionPadding().hashFn
-        hLen =  OAEPEncryptionPadding().hashFnOutputBytes
+        # Test vector uses SHA-1
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            oaep = OAEPEncryptionPadding('sha1')
+        hashFn = oaep.hashFn
+        hLen = oaep.hashFnOutputBytes
         seed  = a2b_hex(bytes("aa fd 12 f6 59 ca e6 34 89 b4 79 e5 07 6d de c2 f0 6c b5 8f".replace(' ' ,''),'utf-8'))
         #dbmask = dbMask = MGF (seed , 107):
         dbmask= a2b_hex(bytes("06 e1 de b2 36 9a a5 a5 c7 07 d8 2c 8e 4e 93 24 8a c7 83 de e0 b2 c0 46\
@@ -203,7 +213,10 @@ class PaddingSchemesTest(unittest.TestCase):
             print("EM    =>", EM)
             print("EMLen =>", len(EM))
         
-        pss = PSSPadding()
+        # Test vector uses SHA-1; explicitly pass sha1 for vector compatibility
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            pss = PSSPadding('sha1')
         realEM = pss.encode(m,len(EM)*8,salt)
         self.assertEqual(EM, realEM)
 

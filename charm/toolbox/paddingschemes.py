@@ -3,9 +3,11 @@ from charm.toolbox.bitstring import Bytes,py3
 from charm.toolbox.securerandom import SecureRandomFactory
 import charm.core.crypto.cryptobase
 import hashlib
+import hmac
 import math
 import struct
 import sys
+import warnings
 
 debug = False
 
@@ -13,13 +15,16 @@ debug = False
 class OAEPEncryptionPadding:
     '''
     :Authors: Gary Belvin
-    
+
     OAEPEncryptionPadding
-    
+
     Implements the OAEP padding scheme.  Appropriate for RSA-OAEP encryption.
     Implemented according to PKCS#1 v2.1 Section 7 ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf
     '''
-    def __init__(self, _hash_type ='sha1'):
+    def __init__(self, _hash_type ='sha256'):
+        if _hash_type == 'sha1':
+            warnings.warn("SHA-1 is deprecated for OAEP padding. Use 'sha256' or stronger.",
+                          DeprecationWarning, stacklevel=2)
         self.name = "OAEPEncryptionPadding"
         self.hashFn = hashFunc(_hash_type)
         self.hashFnOutputBytes = len(hashlib.new(_hash_type).digest())
@@ -130,8 +135,11 @@ def MGF1(seed, maskBytes, hashFn, hLen):
 class hashFunc:
     def __init__(self, _hash_type=None):
         if _hash_type == None:
-            self.hashObj = hashlib.new('sha1')  # nosec B324 - SHA1 default for historical compatibility
+            self.hashObj = hashlib.new('sha256')
         else:
+            if _hash_type == 'sha1':
+                warnings.warn("SHA-1 is deprecated. Use 'sha256' or stronger.",
+                              DeprecationWarning, stacklevel=2)
             self.hashObj = hashlib.new(_hash_type)
         
     #message must be a binary string
@@ -146,13 +154,16 @@ class hashFunc:
 class PSSPadding:
     '''
     :Authors: Gary Belvin
-    
+
     PSSSignaturePadding
-    
-    Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing. 
+
+    Implements the PSS signature padding scheme.  Appropriate for RSA-PSS signing.
     Implemented according to section 8 of ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1.pdf.
     '''
-    def __init__(self, _hash_type ='sha1'):
+    def __init__(self, _hash_type ='sha256'):
+        if _hash_type == 'sha1':
+            warnings.warn("SHA-1 is deprecated for PSS padding. Use 'sha256' or stronger.",
+                          DeprecationWarning, stacklevel=2)
         self.hashFn = hashFunc(_hash_type)
         self.hLen = len(hashlib.new(_hash_type).digest())
         self.sLen = self.hLen # The length of the default salt
@@ -411,8 +422,20 @@ class PKCS7Padding(object):
         pad = self._padlength(_bytes)
         return _bytes.ljust(pad+len(_bytes),bytes([pad]))
 
-    def decode(self,_bytes):
-        return _bytes[:-(_bytes[-1])]
+    def decode(self, _bytes):
+        if len(_bytes) == 0:
+            raise ValueError("Invalid padding: empty input")
+        pad_len = _bytes[-1]
+        if pad_len == 0 or pad_len > self.block_size:
+            raise ValueError("Invalid padding: pad length out of range")
+        if len(_bytes) < pad_len:
+            raise ValueError("Invalid padding: input shorter than pad length")
+        # Constant-time check: verify all padding bytes match expected value
+        padding = _bytes[-pad_len:]
+        expected = bytes([pad_len]) * pad_len
+        if not hmac.compare_digest(padding, expected):
+            raise ValueError("Invalid padding: incorrect padding bytes")
+        return _bytes[:-pad_len]
 
 
     def _padlength(self,_bytes):

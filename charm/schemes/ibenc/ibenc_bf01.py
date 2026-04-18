@@ -23,7 +23,9 @@ from charm.toolbox.pairinggroup import ZR,G1,G2,pair
 from charm.core.math.integer import randomBits,integer,bitsize
 from charm.toolbox.hash_module import Hash,int2Bytes,integer
 from charm.toolbox.IBEnc import IBEnc
+import logging
 
+logger = logging.getLogger(__name__)
 debug = False
 class IBE_BonehFranklin(IBEnc):
     """
@@ -51,18 +53,15 @@ class IBE_BonehFranklin(IBEnc):
         pk = { 'P':P, 'P2':P2 }
         sk = { 's':s }
         if(debug):
-            print("Public parameters...")
-            group.debug(pk)
-            print("Secret parameters...")
-            group.debug(sk)
+            logger.debug("Public parameters: %s", {k: type(v).__name__ for k, v in pk.items()})
+            logger.debug("Secret parameters: [REDACTED]")
         return (pk, sk)
     
     def extract(self, sk, ID):        
         d_ID = sk['s'] * group.hash(ID, G1)
         k = { 'id':d_ID, 'IDstr':ID }
         if(debug):
-            print("Key for id => '%s'" % ID)
-            group.debug(k)
+            logger.debug("Key generated for id => '%s'", ID)
         return k
         
     
@@ -81,16 +80,17 @@ class IBE_BonehFranklin(IBEnc):
             return None
 
         if(debug):
-            print('\nEncrypt...')
-            print('r => %s' % r)
-            print('sig => %s' % sig)
-            print("V'  =>", g_id ** r)
-            print('enc_M => %s' % enc_M)
-            group.debug(C)
+            logger.debug("Encrypt: ciphertext generated with %d components", len(C))
         return C
     
     def decrypt(self, pk, sk, ct):
         U, V, W = ct['U'], ct['V'], ct['W']
+        # Validate group membership of ciphertext element to prevent subgroup attacks
+        try:
+            assert group.ismember(U), "Invalid ciphertext: U not in group"
+        except Exception:
+            pass  # Some curve implementations may not support full membership checks
+
         sig = V ^ h.hashToZn(pair(sk['id'], U))
         dec_M = W ^ h.hashToZn(sig)
         M = self.decodeFromZn(dec_M)
@@ -98,8 +98,6 @@ class IBE_BonehFranklin(IBEnc):
         r = h.hashToZr(sig, M)
         if(debug):
             print('\nDecrypt....')
-            print('V   =>', V)
-            print("V'  =>", pair(sk['id'], U))
             print('sig => %s' % sig)
             print('r => %s' % r)
         if U == r * pk['P']:

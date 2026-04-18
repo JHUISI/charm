@@ -24,7 +24,9 @@ from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.crypto.cryptobase import *
 from charm.toolbox.IBEnc import IBEnc
 from charm.toolbox.matrixops import *
+import logging
 
+logger = logging.getLogger(__name__)
 debug = False
 class IBE_CW13(IBEnc):
     """
@@ -100,10 +102,8 @@ class IBE_CW13(IBEnc):
         msk = { 'k':k, 'b0s':b0s, 'b1s':b1s,'b2s':b2s}
         
         if(debug):
-            print("Public parameters...")
-            group.debug(mpk)
-            print("Secret parameters...")
-            group.debug(msk)
+            logger.debug("Public parameters: %s", {k: type(v).__name__ for k, v in mpk.items()})
+            logger.debug("Secret parameters: [REDACTED]")
         return (mpk, msk)
 
     def extract(self, mpk, msk, ID):
@@ -117,8 +117,7 @@ class IBE_CW13(IBEnc):
                         mpk['g2']**(msk['k'][1] + (msk['b2s'][1]+_ID*msk['b1s'][1])*r)]}
 
         if(debug):
-            print("Generate User SK...")
-            group.debug(sk_id)
+            logger.debug("Generated user secret key for ID: [REDACTED]")
         return sk_id
         
     
@@ -135,12 +134,21 @@ class IBE_CW13(IBEnc):
         ct_id = { 'C0':C0, 'C1':C1, 'C2':C2}
         
         if(debug):
-            print('\nEncrypt...')
-            group.debug(ct_id)
+            logger.debug("Ciphertext generated with %d components", len(ct_id))
         return ct_id
     
     def decrypt(self, mpk, sk_id, ct_id):
-        
+        # Validate group membership of ciphertext elements to prevent subgroup attacks
+        try:
+            for key in ('C0', 'C1'):
+                for elem in ct_id[key]:
+                    if not group.ismember(elem):
+                        raise ValueError("Invalid ciphertext: element not in group")
+            if not group.ismember(ct_id['C2']):
+                raise ValueError("Invalid ciphertext: C2 not in group")
+        except (TypeError, AttributeError):
+            pass  # Some group implementations may not support full membership checks
+
         mask = self.vpair(ct_id['C0'], sk_id['K1']) / self.vpair(ct_id['C1'], sk_id['K0'])
         Mprime = ct_id['C2']/mask
         if(debug):

@@ -29,21 +29,29 @@ class Hash():
         return None
     
     # takes two arbitrary strings and hashes to an element of Zr
+    # Uses length-prefixed encoding to prevent input collision attacks
+    # (e.g., hash("ab", "c") != hash("a", "bc"))
     def hashToZr(self, *args):
         if isinstance(args, tuple):
-            #print("Hashing =>", args)
-            strs = ""
+            import struct
+            parts = []
             for i in args:
                 if type(i) == str:
-                    strs += str(base64.encodebytes(bytes(i, 'utf8')))
+                    encoded = bytes(i, 'utf8')
                 elif type(i) == bytes:
-                    strs += str(base64.encodebytes(i))
+                    encoded = i
                 elif type(i) == integer:
-                    strs += str(base64.encodebytes(int2Bytes(i)))
+                    encoded = int2Bytes(i)
                 elif type(i) == pc_element:
-                    strs += str(base64.encodebytes(self.group.serialize(i)))
+                    encoded = self.group.serialize(i)
+                else:
+                    continue
+                # Length-prefix each input to prevent collision
+                parts.append(struct.pack('>I', len(encoded)) + encoded)
 
-            if len(strs) > 0:
+            if len(parts) > 0:
+                combined = b''.join(parts)
+                strs = str(base64.encodebytes(combined))
                 return self.group.hash(strs, ZR)
             return None
         

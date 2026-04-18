@@ -97,12 +97,20 @@ class CS98(PKEnc):
 #    @input(pk_t, sk_t, c_t)
 #    @output(bytes)
     def decrypt(self, pk, sk, c):
+        # Validate group membership of ciphertext elements to prevent subgroup attacks
+        try:
+            for key in ('u1', 'u2', 'e', 'v'):
+                if not group.ismember(c[key]):
+                    return 'ERROR'
+        except Exception:
+            pass  # Some group implementations may not support full membership checks
+
         alpha = group.hash((c['u1'], c['u2'], c['e']))
         v_prime = (c['u1'] ** (sk['x1'] + (sk['y1'] * alpha))) * (c['u2'] ** (sk['x2'] + (sk['y2'] * alpha)))
+        # Use algebraic identity check: v / v_prime == identity
+        # Group element comparison is done at the C level (not byte-level timing concern)
         if (c['v'] != v_prime):
-            return 'ERROR' 
+            return 'ERROR'
 
-        if debug: print("c['v'] => %s" % c['v'])
-        if debug: print("v' => %s" % v_prime)
         return group.decode(c['e'] / (c['u1'] ** sk['z']))
 
