@@ -68,6 +68,7 @@ deps/relic/relic-toolkit-*/
 
 # Project management
 BACKLOG.md
+charm_pq_plan.md
 
 # Local pip config
 pip.conf
