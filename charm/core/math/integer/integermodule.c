@@ -2449,8 +2449,8 @@ static int int_traverse(PyObject *m, visitproc visit, void *arg) {
 static int int_clear(PyObject *m) {
   Py_CLEAR(GETSTATE(m)->error);
   Py_XDECREF(IntegerError);
+  IntegerError = NULL;
 #if defined(BENCHMARK_ENABLED)
-	//printf("int_clear: Refcnt dBench = '%i'\n", (int) Py_REFCNT(GETSTATE(m)->dBench));
 	Py_CLEAR(GETSTATE(m)->dBench);
 #endif
 	return 0;

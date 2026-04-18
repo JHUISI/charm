@@ -29,6 +29,16 @@
 
 #include "pairingmodule.h"
 
+/*
+ * Python 3.13+ made Py_IsFinalizing() public and removed _Py_IsFinalizing().
+ * For older versions, we need to use the private _Py_IsFinalizing().
+ */
+#if PY_VERSION_HEX >= 0x030D0000
+  #define CHARM_PY_IS_FINALIZING() Py_IsFinalizing()
+#else
+  #define CHARM_PY_IS_FINALIZING() _Py_IsFinalizing()
+#endif
+
 // PEP 757 – C API to import-export Python integers
 #if PY_MINOR_VERSION <= 11
   #define PyLong_DIGIT(l, i)  (l)->ob_digit[i]
@@ -288,26 +298,46 @@ void 	Pairing_dealloc(Pairing *self)
 	if(self->param_buf != NULL) {
 		debug("param_buf => %p\n", self->param_buf);
 		free(self->param_buf);
+		self->param_buf = NULL;
 	}
 
 	debug("Clear pairing => 0x%p\n", self->pair_obj);
 	if(self->group_init == TRUE) {
-		pairing_clear(self->pair_obj);
-		pbc_param_clear(self->p);
+		if(!CHARM_PY_IS_FINALIZING()) {
+			pairing_clear(self->pair_obj);
+			pbc_param_clear(self->p);
+		}
+		self->group_init = FALSE;
 	}
 
 #ifdef BENCHMARK_ENABLED
 	if(self->dBench != NULL) {
-//		PrintPyRef("releasing benchmark object", self->dBench);
 		Py_CLEAR(self->dBench);
-		if(self->gBench != NULL) {
-//			PrintPyRef("releasing operations object", self->gBench);
-			Py_CLEAR(self->gBench);
-		}
+	}
+	if(self->gBench != NULL) {
+		Py_CLEAR(self->gBench);
 	}
 #endif
 	debug("Releasing pairing object!\n");
 	Py_TYPE(self)->tp_free((PyObject *) self);
+}
+
+/* GC traversal for Pairing — lets the GC see benchmark references */
+static int Pairing_traverse(Pairing *self, visitproc visit, void *arg) {
+#ifdef BENCHMARK_ENABLED
+	Py_VISIT(self->dBench);
+	Py_VISIT(self->gBench);
+#endif
+	return 0;
+}
+
+/* GC clear for Pairing — breaks reference cycles */
+static int Pairing_clear_gc(Pairing *self) {
+#ifdef BENCHMARK_ENABLED
+	Py_CLEAR(self->dBench);
+	Py_CLEAR(self->gBench);
+#endif
+	return 0;
 }
 
 void	Element_dealloc(Element* self)
@@ -318,10 +348,23 @@ void	Element_dealloc(Element* self)
 			element_pp_clear(self->e_pp);
 		}
 		element_clear(self->e);
-		Py_DECREF(self->pairing);
 	}
+	Py_XDECREF(self->pairing);
+	self->pairing = NULL;
 
 	Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+/* GC traversal for Element — lets the GC see the Pairing reference */
+static int Element_traverse(Element *self, visitproc visit, void *arg) {
+	Py_VISIT(self->pairing);
+	return 0;
+}
+
+/* GC clear for Element — breaks reference cycles */
+static int Element_clear_gc(Element *self) {
+	Py_CLEAR(self->pairing);
+	return 0;
 }
 
 // helper method 
@@ -2144,11 +2187,16 @@ static int pairings_traverse(PyObject *m, visitproc visit, void *arg) {
 static int pairings_clear(PyObject *m) {
   Py_CLEAR(GETSTATE(m)->error);
   Py_XDECREF(ElementError);
+  ElementError = NULL;
 	return 0;
 }
 
 static int pairings_free(PyObject *m) {
-	//return pairings_clear(m);
+	// Defensive: skip cleanup during interpreter finalization to avoid
+	// crashes from accessing already-freed PBC/GMP state
+	if(m != NULL && !CHARM_PY_IS_FINALIZING()) {
+		// PBC/GMP cleanup is handled by library destructors
+	}
 	return 0;
 }
 

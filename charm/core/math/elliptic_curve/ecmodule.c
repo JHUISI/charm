@@ -181,7 +181,20 @@ void ECElement_dealloc(ECElement* self) {
 	if(self->point_init && self->type == G)  { debug("clearing ec point.\n"); EC_POINT_free(self->P);    }
 	if(self->point_init && self->type == ZR) { debug("clearing ec zr element.\n"); BN_free(self->elemZ); }
 	Py_XDECREF(self->group);
+	self->group = NULL;
 	Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+/* GC traversal for ECElement — lets the GC see the ECGroup reference */
+static int ECElement_traverse(ECElement *self, visitproc visit, void *arg) {
+	Py_VISIT(self->group);
+	return 0;
+}
+
+/* GC clear for ECElement — breaks reference cycles */
+static int ECElement_clear_gc(ECElement *self) {
+	Py_CLEAR(self->group);
+	return 0;
 }
 
 PyObject *ECElement_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
@@ -1890,6 +1903,7 @@ static int ec_traverse(PyObject *m, visitproc visit, void *arg) {
 static int ec_clear(PyObject *m) {
   Py_CLEAR(GETSTATE(m)->error);
   Py_XDECREF(PyECErrorObject);
+  PyECErrorObject = NULL;
 	return 0;
 }
 
