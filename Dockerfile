@@ -1,5 +1,5 @@
 FROM ubuntu:22.04
-LABEL maintainer="support@charm-crypto.com"
+LABEL maintainer="jakinye3@jhu.edu"
 
 RUN apt-get update && apt-get install --yes --no-install-recommends \
     build-essential flex bison wget subversion m4 python3 python3-dev \
