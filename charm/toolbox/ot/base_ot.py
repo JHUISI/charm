@@ -15,7 +15,7 @@ Simplest Oblivious Transfer (Chou-Orlandi style) for Elliptic Curve Groups
 '''
 
 from charm.toolbox.ecgroup import ECGroup, ZR, G
-from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from charm.toolbox.symcrypto import AESGCMCryptoAbstraction
 from hashlib import sha256
 import logging
 
@@ -90,9 +90,9 @@ class SimpleOT:
 
     Encryption Note
     ---------------
-    This implementation uses AuthenticatedCryptoAbstraction for symmetric
+    This implementation uses AESGCMCryptoAbstraction for symmetric
     encryption of OT messages. The current implementation provides AEAD
-    (Authenticated Encryption with Associated Data) using AES-CBC with
+    (Authenticated Encryption with Associated Data) using AES-GCM with
     HMAC-SHA256 in an Encrypt-then-MAC construction. While this provides
     authentication, it is not as robust as AES-GCM. For production use,
     consider verifying the underlying implementation uses authenticated
@@ -322,8 +322,8 @@ class SimpleOT:
         logger.debug("Sender transfer: k0_point=%s, k1_point=%s", k0_point, k1_point)
 
         # Encrypt messages
-        cipher0 = AuthenticatedCryptoAbstraction(k0)
-        cipher1 = AuthenticatedCryptoAbstraction(k1)
+        cipher0 = AESGCMCryptoAbstraction(k0)
+        cipher1 = AESGCMCryptoAbstraction(k1)
 
         e0 = cipher0.encrypt(m0)
         e1 = cipher1.encrypt(m1)
@@ -365,7 +365,7 @@ class SimpleOT:
         logger.debug("Receiver retrieve (choice=%d): k_point=%s", choice_bit, k_point)
 
         # Decrypt the chosen ciphertext
-        cipher = AuthenticatedCryptoAbstraction(k)
+        cipher = AESGCMCryptoAbstraction(k)
 
         if choice_bit == 0:
             return cipher.decrypt(sender_ciphertexts['e0'])

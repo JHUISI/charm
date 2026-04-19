@@ -23,7 +23,8 @@ scheme capable of encrypting arbitrary-length messages.
 # Works for ElGamal and CS98 schemes
 from charm.toolbox.PKEnc import PKEnc
 from charm.toolbox.securerandom import OpenSSLRand
-from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from charm.toolbox.symcrypto import AESGCMCryptoAbstraction
+from hashlib import sha256
 from charm.toolbox.ecgroup import ECGroup
 from charm.toolbox.eccurve import prime192v1
 from charm.schemes.pkenc.pkenc_cs98 import CS98
@@ -66,16 +67,16 @@ class HybridEnc(PKEnc):
         # encrypt session key using PKEnc
         c1 = self.pkenc.encrypt(pk, key)
         # use symmetric key encryption to enc actual message
-        c2 = AuthenticatedCryptoAbstraction(key).encrypt(M)
+        c2 = AESGCMCryptoAbstraction(sha256(key).digest()).encrypt(M)
         if debug: print("Ciphertext...")
         if debug: print(c2)
         return { 'c1':c1, 'c2':c2 }
     
     def decrypt(self, pk, sk, ct):
         c1, c2 = ct['c1'], ct['c2']
-        key = self.pkenc.decrypt(pk, sk, c1)[:self.key_len]
+        key = self.pkenc.decrypt(pk, sk, c1)
         if debug: print("Rec key =>", key, ", len =", len(key))
-        msg = AuthenticatedCryptoAbstraction(key).decrypt(c2)
+        msg = AESGCMCryptoAbstraction(sha256(key).digest()).decrypt(c2)
         if debug: print("Rec msg =>", msg)
         return msg
     
