@@ -25,6 +25,11 @@ class PairingGroup():
         if param_file:
           self.Pairing = pairing(file=param_id)
         elif type(param_id) == str:
+          if param_info is None:
+              raise ImportError(
+                  "Pairing library not configured. Run './configure.sh' and rebuild "
+                  "with 'python setup.py build_ext --inplace' before using PairingGroup."
+              )
           pairID = param_info.get(param_id)
           assert pairID != None, "'%s' not recognized! See 'pairingcurves.py' in toolbox." % param_id
           if pairing_lib == libs.pbc:

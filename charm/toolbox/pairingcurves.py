@@ -76,10 +76,14 @@ alpha1 1283344488056780137754156378093305499283099252785021407934260964811912498
 # represents the size of the base field in bits. MNT curves were created by 
 # Miyaji, Nakabayashi and Takano. BN curve was created by Barreto and Naehrig
 params = None
-if pairing_lib == libs.pbc:
-   params = {'SS512':a, 'SS1024':a1, 'MNT159':d159, 'MNT201':d201, 'MNT224':d224, 'BN254':f254 }
-elif pairing_lib == libs.miracl:
-   params = {'MNT160':80, 'BN256':128, 'SS512':80, 'SS1536':128}
-elif pairing_lib == libs.relic:
-   params = {'BN158':0, 'BN254':1, 'BN256':2}
+try:
+    if pairing_lib == libs.pbc:
+       params = {'SS512':a, 'SS1024':a1, 'MNT159':d159, 'MNT201':d201, 'MNT224':d224, 'BN254':f254 }
+    elif pairing_lib == libs.miracl:
+       params = {'MNT160':80, 'BN256':128, 'SS512':80, 'SS1536':128}
+    elif pairing_lib == libs.relic:
+       params = {'BN158':0, 'BN254':1, 'BN256':2}
+except (AttributeError, TypeError):
+    # pairing_lib not yet configured (still set to EnumClass rather than EnumValue)
+    params = None
 
