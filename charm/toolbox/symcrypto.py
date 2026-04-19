@@ -5,6 +5,7 @@ from charm.core.crypto.cryptobase import MODE_ECB as _MODE_ECB_RAW
 from hashlib import sha256 as sha2
 import json
 import hmac
+import os
 import warnings
 from base64 import b64encode, b64decode
 
@@ -293,3 +294,137 @@ class AuthenticatedCryptoAbstraction(SymmetricCryptoAbstraction):
             raise ValueError("Invalid mac. Your data was tampered with or your key is wrong")
         else:
             return super(AuthenticatedCryptoAbstraction, self).decrypt(cipherText['msg'])
+
+
+class AESGCMCryptoAbstraction(object):
+    """
+    Authenticated Encryption using AES-GCM (Galois/Counter Mode).
+
+    Provides IND-CCA2 secure authenticated encryption with associated data (AEAD)
+    using AES-GCM via OpenSSL. This is the recommended symmetric encryption
+    abstraction for new code — it replaces the Encrypt-then-MAC construction
+    in AuthenticatedCryptoAbstraction with a single-pass AEAD cipher.
+
+    Requires the ``cryptography`` package (``pip install cryptography``).
+
+    Examples
+    --------
+    >>> from hashlib import sha256
+    >>> import charm.toolbox.symcrypto
+    >>> key = sha256(b'shameful secret key').digest()[:16]
+    >>> cipher = charm.toolbox.symcrypto.AESGCMCryptoAbstraction(key)
+    >>> ciphertext = cipher.encrypt(b'My age is 42.')
+    >>> cipher.decrypt(ciphertext)
+    b'My age is 42.'
+    >>> ad = b'\\x10\\x11\\x11\\x11'
+    >>> ct_ad = cipher.encrypt(b'Network PDU.', associatedData=ad)
+    >>> cipher.decrypt(ct_ad, associatedData=ad)
+    b'Network PDU.'
+    >>> cipher.decrypt(ct_ad, associatedData=b'wrong')
+    Traceback (most recent call last):
+        ...
+    ValueError: Decryption failed: authentication tag is invalid (data tampered or wrong key)
+    """
+
+    # NIST recommends 96-bit (12-byte) nonces for AES-GCM
+    _NONCE_SIZE = 12
+    # AES-GCM produces a 128-bit (16-byte) authentication tag
+    _TAG_SIZE = 16
+
+    def __init__(self, key):
+        """
+        Create an AES-GCM encryption/decryption object.
+
+        Parameters
+        ----------
+        key : bytes
+            AES key — must be 16 (AES-128), 24 (AES-192), or 32 (AES-256) bytes.
+
+        Raises
+        ------
+        ImportError
+            If the ``cryptography`` package is not installed.
+        ValueError
+            If the key length is not 16, 24, or 32 bytes.
+        """
+        try:
+            from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+        except ImportError:
+            raise ImportError(
+                "AES-GCM requires the 'cryptography' package. "
+                "Install it with: pip install cryptography"
+            )
+        if len(key) not in (16, 24, 32):
+            raise ValueError(
+                f"AES-GCM key must be 16, 24, or 32 bytes, got {len(key)}"
+            )
+        self._key = key
+        self._aesgcm = AESGCM(key)
+
+    def encrypt(self, message, associatedData=b''):
+        """
+        Encrypt a message with AES-GCM.
+
+        Parameters
+        ----------
+        message : bytes or str
+            The plaintext to encrypt.
+        associatedData : bytes or str, optional
+            Associated data authenticated but not encrypted.
+
+        Returns
+        -------
+        str
+            JSON-encoded ciphertext containing nonce, ciphertext+tag, and mode.
+        """
+        if isinstance(message, str):
+            message = message.encode('utf-8')
+        if isinstance(associatedData, str):
+            associatedData = associatedData.encode('utf-8')
+
+        nonce = os.urandom(self._NONCE_SIZE)
+        ct_and_tag = self._aesgcm.encrypt(nonce, message, associatedData or None)
+
+        payload = {
+            'ALG': 'AES-GCM',
+            'Nonce': b64encode(nonce).decode('utf-8'),
+            'CipherText': b64encode(ct_and_tag).decode('utf-8'),
+        }
+        return json.dumps(payload)
+
+    def decrypt(self, cipherText, associatedData=b''):
+        """
+        Decrypt and authenticate an AES-GCM ciphertext.
+
+        Parameters
+        ----------
+        cipherText : str
+            JSON-encoded ciphertext from encrypt().
+        associatedData : bytes or str, optional
+            Associated data that was provided during encryption.
+
+        Returns
+        -------
+        bytes
+            The decrypted plaintext.
+
+        Raises
+        ------
+        ValueError
+            If authentication fails (data tampered or wrong key/AD).
+        """
+        if isinstance(associatedData, str):
+            associatedData = associatedData.encode('utf-8')
+
+        payload = json.loads(cipherText)
+        nonce = b64decode(payload['Nonce'])
+        ct_and_tag = b64decode(payload['CipherText'])
+
+        try:
+            plaintext = self._aesgcm.decrypt(nonce, ct_and_tag, associatedData or None)
+        except Exception:
+            raise ValueError(
+                "Decryption failed: authentication tag is invalid "
+                "(data tampered or wrong key)"
+            )
+        return plaintext
