@@ -28,7 +28,7 @@ jobs:
       run: |
         sudo apt-get update
         # Install OpenSSL 3.x explicitly (libssl-dev on Ubuntu 22.04+ is OpenSSL 3.x)
-        sudo apt-get install -y libgmp-dev libssl-dev flex bison libfl-dev
+        sudo apt-get install -y libgmp-dev libssl-dev flex bison libfl-dev libntl-dev
         # Verify OpenSSL version
         openssl version
 
@@ -45,10 +45,10 @@ jobs:
     - name: Configure charm-crypto
       run: ./configure.sh
 
-    - name: Build C extensions
+    - name: Build C extensions (including lattice module)
       run: |
         pip install --upgrade pip setuptools wheel
-        python setup.py build_ext --inplace
+        LAT_MOD=yes python setup.py build_ext --inplace
 
     - name: Install Python dependencies
       run: pip install pyparsing pytest pytest-timeout hypothesis
@@ -98,7 +98,7 @@ jobs:
 
     - name: Install system dependencies
       run: |
-        brew install gmp openssl@3 flex bison
+        brew install gmp openssl@3 flex bison ntl
 
     - name: Build and install PBC library
       run: |
@@ -115,10 +115,10 @@ jobs:
         export LDFLAGS="-L$(brew --prefix gmp)/lib -L$(brew --prefix openssl@3)/lib"
         ./configure.sh --enable-darwin
 
-    - name: Build C extensions
+    - name: Build C extensions (including lattice module)
       run: |
         pip install --upgrade pip setuptools wheel
-        python setup.py build_ext --inplace
+        LAT_MOD=yes python setup.py build_ext --inplace
 
     - name: Install Python dependencies
       run: pip install pyparsing pytest pytest-timeout hypothesis
@@ -219,7 +219,7 @@ jobs:
       run: |
         sudo apt-get update
         # Install OpenSSL 3.x explicitly (libssl-dev on Ubuntu 22.04+ is OpenSSL 3.x)
-        sudo apt-get install -y flex bison libfl-dev libgmp-dev libssl-dev
+        sudo apt-get install -y flex bison libfl-dev libgmp-dev libssl-dev libntl-dev
         # Verify OpenSSL version
         openssl version
 
@@ -239,14 +239,14 @@ jobs:
         # Install setuptools before building (required for Python 3.12+)
         pip install setuptools wheel
 
-    - name: Build Charm with ASan
+    - name: Build Charm with ASan (including lattice module)
       env:
         CFLAGS: "-fsanitize=address -fno-omit-frame-pointer -g"
         LDFLAGS: "-fsanitize=address"
         ASAN_OPTIONS: "detect_leaks=1:strict_string_checks=1:detect_stack_use_after_return=1"
       run: |
         ./configure.sh
-        make
+        LAT_MOD=yes make
 
     - name: Install Python test dependencies
       run: |
@@ -276,7 +276,7 @@ jobs:
       run: |
         sudo apt-get update
         # Install OpenSSL 3.x explicitly (libssl-dev on Ubuntu 22.04+ is OpenSSL 3.x)
-        sudo apt-get install -y flex bison libfl-dev libgmp-dev libssl-dev valgrind
+        sudo apt-get install -y flex bison libfl-dev libgmp-dev libssl-dev libntl-dev valgrind
         # Verify OpenSSL version
         openssl version
 
@@ -296,12 +296,12 @@ jobs:
         # Install setuptools before building (required for Python 3.12+)
         pip install setuptools wheel
 
-    - name: Build Charm with debug symbols
+    - name: Build Charm with debug symbols (including lattice module)
       env:
         CFLAGS: "-g -O0"
       run: |
         ./configure.sh
-        make
+        LAT_MOD=yes make
 
     - name: Install Python test dependencies
       run: |
@@ -331,7 +331,7 @@ jobs:
       run: |
         sudo apt-get update
         # Install OpenSSL 3.x explicitly (libssl-dev on Ubuntu 22.04+ is OpenSSL 3.x)
-        sudo apt-get install -y libgmp-dev libssl-dev flex bison libfl-dev
+        sudo apt-get install -y libgmp-dev libssl-dev flex bison libfl-dev libntl-dev
         # Verify OpenSSL version
         openssl version
         wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
@@ -341,18 +341,19 @@ jobs:
     - name: Install system dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install gmp openssl@3 flex bison
+        brew install gmp openssl@3 flex bison ntl
         wget https://crypto.stanford.edu/pbc/files/pbc-1.0.0.tar.gz
         tar -xzf pbc-1.0.0.tar.gz
         cd pbc-1.0.0
         ./configure LDFLAGS="-L$(brew --prefix gmp)/lib" CPPFLAGS="-I$(brew --prefix gmp)/include"
         make -j$(sysctl -n hw.ncpu) && sudo make install
 
-    - name: Build wheels
+    - name: Build wheels (including lattice module)
       uses: pypa/cibuildwheel@v2.21.3
       env:
         CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*
         CIBW_SKIP: "*-musllinux_* *-win32 *-manylinux_i686"
+        CIBW_ENVIRONMENT: "LAT_MOD=yes"
         CIBW_BEFORE_BUILD_LINUX: "./configure.sh"
         CIBW_BEFORE_BUILD_MACOS: "export CPPFLAGS=\"-I$(brew --prefix gmp)/include -I$(brew --prefix openssl@3)/include\" && export LDFLAGS=\"-L$(brew --prefix gmp)/lib -L$(brew --prefix openssl@3)/lib\" && ./configure.sh --enable-darwin"
 
