@@ -12,7 +12,7 @@ Dilithium-style Digital Signature (simplified ML-DSA)
 This is a simplified Dilithium implementation for prototyping.
 It implements the core Fiat-Shamir with Aborts paradigm.
 
-:Authors:    charm-crypto
+:Authors:    J. Ayo Akinyele
 :Date:       04/2026
 """
 

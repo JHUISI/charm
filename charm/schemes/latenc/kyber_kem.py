@@ -13,7 +13,7 @@ This is a simplified Kyber implementation for prototyping.
 It implements the core CPAPKE component (IND-CPA secure PKE)
 without the Fujisaki-Okamoto transform needed for IND-CCA security.
 
-:Authors:    charm-crypto
+:Authors:    J. Ayo Akinyele
 :Date:       04/2026
 """
 
