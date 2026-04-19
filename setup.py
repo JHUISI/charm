@@ -168,6 +168,7 @@ def get_default_config():
         'USE_PBC': 'yes',
         'INT_MOD': 'yes',
         'ECC_MOD': 'yes',
+        'LAT_MOD': 'no',
         'DISABLE_BENCHMARK': 'no',
         # These must be strings (even if empty) to avoid AttributeError on .split()
         'LDFLAGS': '',
@@ -351,6 +352,20 @@ if opt.get('ECC_MOD') == 'yes':
 				libraries=['gmp', 'crypto'], define_macros=_macros, undef_macros=_undef_macro,
                 library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs)
    _ext_modules.append(ecc_module)
+
+if opt.get('LAT_MOD') == 'yes':
+   replaceString(lib_config_file, "lattice_lib=libs ", "lattice_lib=libs.ntl")
+   lattice_module = Extension(math_prefix + '.lattice',
+                include_dirs = [utils_path,
+                                benchmark_path,
+                                math_path + 'lattice/'] + inc_dirs,
+                sources = [math_path + 'lattice/latticemodule.cpp',
+                            utils_path + 'base64.c'],
+                libraries=['ntl', 'gmp', 'pthread'], define_macros=_macros, undef_macros=_undef_macro,
+                library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs,
+                language='c++',
+                extra_compile_args=['-std=c++14'])
+   _ext_modules.append(lattice_module)
 
 benchmark_module = Extension(core_prefix + '.benchmark', sources = [benchmark_path + 'benchmarkmodule.c'])
 

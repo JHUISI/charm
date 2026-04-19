@@ -114,6 +114,7 @@ pairing_miracl="no"
 pairing_relic="no"
 pairing_pbc="yes"
 disable_benchmark="no"
+lattice_module="no"
 integer_ssl="no"
 integer_gmp="yes"
 python_version=""
@@ -364,6 +365,9 @@ for opt do
   --enable-integer-relic)
     echo "integer module using RELIC not supported yet."
   ;;
+  --enable-lattice)
+    lattice_module="yes"
+  ;;
   --enable-debug)
       # Enable debugging options that aren't excessively noisy
       debug="yes"
@@ -455,6 +459,7 @@ echo "  --enable-pairing-pbc     enable PBC lib for pairing module (DEFAULT)"
 echo "  --enable-pairing-relic   enable RELIC lib for pairing module"
 echo "  --enable-integer-openssl enable openssl for integer module"
 echo "  --enable-integer-gmp     enable GMP lib for integer module (DEFAULT)"
+echo "  --enable-lattice         enable LATTICE base module (requires NTL library)"
 echo "  --disable-benchmark      disable BENCHMARK base module (DEFAULT is no)"
 echo "  --disable-werror         disable compilation abort on warning"
 echo "  --enable-cocoa           enable COCOA (Mac OS X only)"
@@ -694,6 +699,21 @@ if check_library "-lcrypto" $TMPC == 0 ; then
 fi
 ##########################################
 
+# check for -lntl (only if lattice module enabled)
+libntl_found="no"
+if test "$lattice_module" = "yes" ; then
+   if check_library "-lntl" $TMPC == 0 ; then
+      libntl_found="yes"
+   fi
+   if test "$libntl_found" = "no" ; then
+      echo ""
+      echo "ERROR: NTL library not found but --enable-lattice was specified."
+      echo "Please install NTL (https://libntl.org/) with GMP support:"
+      echo "  ./configure NTL_GMP_LIP=on SHARED=on && make && make install"
+      echo ""
+      exit 1
+   fi
+fi
 
 ##########################################
 # End of CC checks
@@ -747,11 +767,13 @@ echo "-Werror enabled   $werror"
 echo "integer module    $integer_module"
 echo "ecc module        $ecc_module"
 echo "pairing module    $pairing_module"
+echo "lattice module    $lattice_module"
 echo "disable benchmark $disable_benchmark"
 echo "libm found        $libm_found"
 echo "libgmp found      $libgmp_found"
 echo "libpbc found      $libpbc_found"
 echo "libcrypto found   $libcrypto_found"
+echo "libntl found      $libntl_found"
 #if test "$darwin" = "yes" ; then
 #    echo "Cocoa support     $cocoa"
 #fi
@@ -890,6 +912,7 @@ fi
 echo "INT_MOD=$integer_module" >> $config_mk
 echo "ECC_MOD=$ecc_module" >> $config_mk
 echo "PAIR_MOD=$pairing_module" >> $config_mk
+echo "LAT_MOD=$lattice_module" >> $config_mk
 
 if test "$pairing_pbc" = "yes" ; then
     echo "USE_PBC=$pairing_pbc" >> $config_mk
@@ -972,6 +995,7 @@ echo "HAVE_LIBM=$libm_found" >> $config_mk
 echo "HAVE_LIBGMP=$libgmp_found" >> $config_mk
 echo "HAVE_LIBPBC=$libpbc_found" >> $config_mk
 echo "HAVE_LIBCRYPTO=$libcrypto_found" >> $config_mk
+echo "HAVE_LIBNTL=$libntl_found" >> $config_mk
 echo "PYPARSING=$pyparse_found" >> $config_mk
 if test "$docs" = "yes" ; then
     echo "SPHINX=$sphinx_build" >> $config_mk
