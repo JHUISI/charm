@@ -1,7 +1,7 @@
 from setuptools import setup
 from distutils.core import  Command, Extension
 from distutils.sysconfig import get_python_lib
-import os, platform, sys, shutil, re, fileinput
+import os, platform, sys, shutil, re, fileinput, subprocess
 
 def replaceString(file,searchExp,replaceExp):
     if file == None: return # fail silently
@@ -220,6 +220,10 @@ else:
         print("Using platform-aware defaults for PyPI installation...")
         opt = get_default_config()
 
+# Allow enabling lattice module via environment variable
+if os.environ.get('LAT_MOD', '').lower() in ('yes', '1', 'true'):
+    opt['LAT_MOD'] = 'yes'
+
 core_path = 'charm/core/'
 math_path = core_path + 'math/'
 crypto_path = core_path + 'crypto/'
@@ -355,14 +359,29 @@ if opt.get('ECC_MOD') == 'yes':
 
 if opt.get('LAT_MOD') == 'yes':
    replaceString(lib_config_file, "lattice_lib=libs ", "lattice_lib=libs.ntl")
+   # Detect NTL include/lib paths
+   ntl_inc_dirs = list(inc_dirs)
+   ntl_lib_dirs = list(library_dirs)
+   ntl_rt_dirs = list(runtime_library_dirs)
+   try:
+       _ntl_cflags = subprocess.check_output(['pkg-config', '--cflags', 'ntl'], stderr=subprocess.DEVNULL).decode().strip()
+       _ntl_libs = subprocess.check_output(['pkg-config', '--libs', 'ntl'], stderr=subprocess.DEVNULL).decode().strip()
+       ntl_inc_dirs += [s[2:] for s in _ntl_cflags.split() if s.startswith('-I')]
+       ntl_lib_dirs += [s[2:] for s in _ntl_libs.split() if s.startswith('-L')]
+   except (subprocess.CalledProcessError, FileNotFoundError):
+       # Fallback: check common installation paths
+       for prefix in ['/opt/homebrew/opt/ntl', '/usr/local', '/usr']:
+           if os.path.isfile(os.path.join(prefix, 'include', 'NTL', 'ZZ.h')):
+               ntl_inc_dirs.append(os.path.join(prefix, 'include'))
+               ntl_lib_dirs.append(os.path.join(prefix, 'lib'))
+               break
    lattice_module = Extension(math_prefix + '.lattice',
                 include_dirs = [utils_path,
                                 benchmark_path,
-                                math_path + 'lattice/'] + inc_dirs,
-                sources = [math_path + 'lattice/latticemodule.cpp',
-                            utils_path + 'base64.c'],
+                                math_path + 'lattice/'] + ntl_inc_dirs,
+                sources = [math_path + 'lattice/latticemodule.cpp'],
                 libraries=['ntl', 'gmp', 'pthread'], define_macros=_macros, undef_macros=_undef_macro,
-                library_dirs=library_dirs, runtime_library_dirs=runtime_library_dirs,
+                library_dirs=ntl_lib_dirs, runtime_library_dirs=ntl_rt_dirs,
                 language='c++',
                 extra_compile_args=['-std=c++14'])
    _ext_modules.append(lattice_module)
