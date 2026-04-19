@@ -9,7 +9,7 @@ LPR (Lyubashevsky-Peikert-Regev) Ring-LWE Public Key Encryption
 * setting:        lattice-based (Ring-LWE)
 * assumption:     RLWE hardness in R_q = Z_q[X]/(X^n+1)
 
-:Authors:    charm-crypto
+:Authors:    J. Ayo Akinyele
 :Date:       04/2026
 
 This scheme encrypts binary messages of up to n bits using Ring-LWE.

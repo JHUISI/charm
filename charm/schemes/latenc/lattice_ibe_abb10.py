@@ -26,7 +26,7 @@ Encrypt(id, m):
 Decrypt(sk_id, ct):
     m = decode(c2 - sk_id * c1)
 
-:Authors:    charm-crypto
+:Authors:    J. Ayo Akinyele
 :Date:       04/2026
 """
 
