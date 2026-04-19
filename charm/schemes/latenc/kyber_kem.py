@@ -43,20 +43,11 @@ class KyberKEM(LatticeKEM):
         self.du = self.params['du']
         self.dv = self.params['dv']
         self.n = group.degree()
-
-    def _cbd_vec(self, k, eta):
-        """Sample a vector of k CBD(eta) polynomials."""
-        polys = [self.group.cbd_sample(eta) for _ in range(k)]
-        # Build a VEC element from these polys
-        vec = self.group.random_vec(k)  # allocate
-        # Replace with CBD samples via arithmetic trick: vec = 0 + poly
-        zero_vec = vec - vec  # zero vector
-        for i in range(k):
-            # We need to set individual vector components — work around by
-            # using the C API to build the vector
-            pass
-        # For now, use Gaussian as approximation of CBD
-        return self.group.gaussian_vec(k, (eta / 2.0) ** 0.5)
+        # CBD(eta) has variance eta/2; use sqrt(eta/2) as Gaussian sigma
+        # to match the noise distribution of real Kyber
+        import math
+        self._sigma1 = math.sqrt(self.eta1 / 2.0)
+        self._sigma2 = math.sqrt(self.eta2 / 2.0)
 
     def keygen(self):
         """
@@ -69,9 +60,9 @@ class KyberKEM(LatticeKEM):
         k = self.k
         # Generate uniform matrix A (k×k of polynomials)
         A = self.group.random_mat(k, k)
-        # Sample secret and error from CBD(eta1)
-        s = self.group.gaussian_vec(k, self.eta1)
-        e = self.group.gaussian_vec(k, self.eta1)
+        # Sample secret and error (Gaussian approximation of CBD(eta1))
+        s = self.group.gaussian_vec(k, self._sigma1)
+        e = self.group.gaussian_vec(k, self._sigma1)
         # t = A*s + e
         t = A * s + e
         pk = {'A': A, 't': t}
@@ -86,10 +77,10 @@ class KyberKEM(LatticeKEM):
         """
         k = self.k
         A, t = pk['A'], pk['t']
-        # Sample ephemeral secret and errors
-        r = self.group.gaussian_vec(k, self.eta1)
-        e1 = self.group.gaussian_vec(k, self.eta2)
-        e2 = self.group.gaussian(self.eta2)
+        # Sample ephemeral secret and errors (Gaussian approximation of CBD)
+        r = self.group.gaussian_vec(k, self._sigma1)
+        e1 = self.group.gaussian_vec(k, self._sigma2)
+        e2 = self.group.gaussian(self._sigma2)
         # Generate random message for KEM
         import os
         msg_bytes = os.urandom(32)
