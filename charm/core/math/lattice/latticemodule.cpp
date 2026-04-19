@@ -417,6 +417,23 @@ static PyObject *Element_mul(PyObject *o1, PyObject *o2) {
         return (PyObject *)result;
     }
 
+    /* VEC * POLY or POLY * VEC — componentwise scalar multiply */
+    if ((lhs->elem_type == VEC && rhs->elem_type == POLY) ||
+        (lhs->elem_type == POLY && rhs->elem_type == VEC)) {
+        LatticeElement *v = (lhs->elem_type == VEC) ? lhs : rhs;
+        LatticeElement *p = (lhs->elem_type == POLY) ? lhs : rhs;
+        LatticeElement *result = createElement(lhs->ctx, VEC);
+        if (!result) return NULL;
+        long len = v->vec->length();
+        result->vec = new vec_ZZ_pX();
+        result->vec->SetLength(len);
+        for (long i = 0; i < len; i++) {
+            (*result->vec)[i] = poly_mul_mod((*v->vec)[i], *p->poly, *lhs->ctx->modulus);
+        }
+        result->elem_initialized = 1;
+        return (PyObject *)result;
+    }
+
     PyErr_SetString(PyExc_TypeError, "Incompatible element types for multiplication");
     return NULL;
 }
@@ -1057,6 +1074,187 @@ static PyObject *Lattice_get_coeff(PyObject *self, PyObject *args) {
     return PyLong_FromString(oss.str().c_str(), NULL, 10);
 }
 
+/* set_coeff(ctx, element, i, val) */
+static PyObject *Lattice_set_coeff(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    LatticeElement *elem;
+    long idx, val;
+    if (!PyArg_ParseTuple(args, "OOll", &ctx, &elem, &idx, &val))
+        return NULL;
+    if (!PyLatticeElement_Check((PyObject*)elem) || !elem->elem_initialized || elem->elem_type != POLY) {
+        PyErr_SetString(PyExc_TypeError, "Must be an initialized POLY element");
+        return NULL;
+    }
+    NTLContextGuard guard(*ctx->q);
+    SetCoeff(*elem->poly, idx, to_ZZ_p(to_ZZ(val)));
+    Py_RETURN_NONE;
+}
+
+/* cbd_sample(ctx, eta) -> POLY with coefficients from CBD(eta) */
+static PyObject *Lattice_cbd_sample(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    int eta;
+    if (!PyArg_ParseTuple(args, "Oi", &ctx, &eta))
+        return NULL;
+    if (!PyLatticeContext_Check((PyObject*)ctx) || !ctx->group_init) {
+        PyErr_SetString(PyExc_TypeError, "First arg must be an initialized LatticeContext");
+        return NULL;
+    }
+    if (eta < 1 || eta > 8) {
+        PyErr_SetString(PyExc_ValueError, "eta must be in [1, 8]");
+        return NULL;
+    }
+
+    NTLContextGuard guard(*ctx->q);
+    LatticeElement *elem = createElement(ctx, POLY);
+    if (!elem) return NULL;
+    elem->poly = new ZZ_pX();
+
+    /* CBD(eta): sample 2*eta random bits, count ones in each half */
+    int bytes_needed = (2 * eta * ctx->n + 7) / 8;
+    std::vector<unsigned char> rand_buf(bytes_needed);
+    RAND_bytes(rand_buf.data(), bytes_needed);
+
+    int bit_pos = 0;
+    for (long i = 0; i < ctx->n; i++) {
+        int a_sum = 0, b_sum = 0;
+        for (int j = 0; j < eta; j++) {
+            int byte_idx = bit_pos / 8;
+            int bit_idx = bit_pos % 8;
+            a_sum += (rand_buf[byte_idx] >> bit_idx) & 1;
+            bit_pos++;
+        }
+        for (int j = 0; j < eta; j++) {
+            int byte_idx = bit_pos / 8;
+            int bit_idx = bit_pos % 8;
+            b_sum += (rand_buf[byte_idx] >> bit_idx) & 1;
+            bit_pos++;
+        }
+        long coef = a_sum - b_sum;
+        /* to_ZZ_p handles negative values correctly via mod q */
+        SetCoeff(*elem->poly, i, to_ZZ_p(to_ZZ(coef)));
+    }
+    elem->elem_initialized = 1;
+    return (PyObject *)elem;
+}
+
+/* compress(ctx, elem, d) -> POLY with coefficients compressed to d bits */
+static PyObject *Lattice_compress(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    LatticeElement *elem;
+    int d;
+    if (!PyArg_ParseTuple(args, "OOi", &ctx, &elem, &d))
+        return NULL;
+    if (!PyLatticeElement_Check((PyObject*)elem) || !elem->elem_initialized || elem->elem_type != POLY) {
+        PyErr_SetString(PyExc_TypeError, "Must be an initialized POLY element");
+        return NULL;
+    }
+
+    NTLContextGuard guard(*ctx->q);
+    LatticeElement *result = createElement(ctx, POLY);
+    if (!result) return NULL;
+    result->poly = new ZZ_pX();
+
+    ZZ two_d_zz = ZZ(1) << d;
+    ZZ q = *ctx->q;
+    for (long i = 0; i < ctx->n; i++) {
+        ZZ x = rep(coeff(*elem->poly, i));
+        /* compress_d(x) = round(2^d / q * x) mod 2^d */
+        ZZ val = (x * two_d_zz + q / 2) / q;
+        val %= two_d_zz;
+        SetCoeff(*result->poly, i, to_ZZ_p(val));
+    }
+    result->elem_initialized = 1;
+    return (PyObject *)result;
+}
+
+/* decompress(ctx, elem, d) -> POLY with coefficients decompressed from d bits */
+static PyObject *Lattice_decompress(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    LatticeElement *elem;
+    int d;
+    if (!PyArg_ParseTuple(args, "OOi", &ctx, &elem, &d))
+        return NULL;
+    if (!PyLatticeElement_Check((PyObject*)elem) || !elem->elem_initialized || elem->elem_type != POLY) {
+        PyErr_SetString(PyExc_TypeError, "Must be an initialized POLY element");
+        return NULL;
+    }
+
+    NTLContextGuard guard(*ctx->q);
+    LatticeElement *result = createElement(ctx, POLY);
+    if (!result) return NULL;
+    result->poly = new ZZ_pX();
+
+    ZZ two_d_zz = ZZ(1) << d;
+    ZZ q = *ctx->q;
+    for (long i = 0; i < ctx->n; i++) {
+        ZZ x = rep(coeff(*elem->poly, i));
+        /* decompress_d(x) = round(q / 2^d * x) */
+        ZZ val = (q * x + two_d_zz / 2) / two_d_zz;
+        SetCoeff(*result->poly, i, to_ZZ_p(val));
+    }
+    result->elem_initialized = 1;
+    return (PyObject *)result;
+}
+
+/* poly_from_coeffs(ctx, list) -> POLY from a Python list of ints */
+static PyObject *Lattice_poly_from_coeffs(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    PyObject *coeffs;
+    if (!PyArg_ParseTuple(args, "OO", &ctx, &coeffs))
+        return NULL;
+    if (!PyLatticeContext_Check((PyObject*)ctx) || !ctx->group_init) {
+        PyErr_SetString(PyExc_TypeError, "First arg must be an initialized LatticeContext");
+        return NULL;
+    }
+    if (!PyList_Check(coeffs)) {
+        PyErr_SetString(PyExc_TypeError, "Second arg must be a list of integers");
+        return NULL;
+    }
+
+    NTLContextGuard guard(*ctx->q);
+    LatticeElement *elem = createElement(ctx, POLY);
+    if (!elem) return NULL;
+    elem->poly = new ZZ_pX();
+
+    Py_ssize_t n = PyList_Size(coeffs);
+    for (Py_ssize_t i = 0; i < n; i++) {
+        PyObject *item = PyList_GetItem(coeffs, i);
+        long val = PyLong_AsLong(item);
+        if (val == -1 && PyErr_Occurred()) { Py_DECREF(elem); return NULL; }
+        SetCoeff(*elem->poly, i, to_ZZ_p(to_ZZ(val)));
+    }
+    elem->elem_initialized = 1;
+    return (PyObject *)elem;
+}
+
+/* mat_transpose(ctx, mat) -> transposed MAT */
+static PyObject *Lattice_mat_transpose(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    LatticeElement *mat;
+    if (!PyArg_ParseTuple(args, "OO", &ctx, &mat))
+        return NULL;
+    if (!PyLatticeElement_Check((PyObject*)mat) || !mat->elem_initialized || mat->elem_type != MAT) {
+        PyErr_SetString(PyExc_TypeError, "Second arg must be an initialized MAT element");
+        return NULL;
+    }
+    NTLContextGuard guard(*ctx->q);
+    long rows = mat->mat_rows, cols = mat->mat_cols;
+    LatticeElement *result = createElement(ctx, MAT);
+    if (!result) return NULL;
+    result->vec = new vec_ZZ_pX();
+    result->vec->SetLength(cols * rows);
+    result->mat_rows = cols;
+    result->mat_cols = rows;
+    for (long i = 0; i < rows; i++) {
+        for (long j = 0; j < cols; j++) {
+            (*result->vec)[j * rows + i] = (*mat->vec)[i * cols + j];
+        }
+    }
+    result->elem_initialized = 1;
+    return (PyObject *)result;
+}
+
 /* =========================================================
  * Number protocol
  * ========================================================= */
@@ -1095,6 +1293,12 @@ static PyMethodDef lattice_module_methods[] = {
     {"encode",         Lattice_encode,       METH_VARARGS, "encode(ctx, bytes) -> POLY with bits as q/2-scaled coefficients"},
     {"decode",         Lattice_decode,       METH_VARARGS, "decode(ctx, element) -> bytes from thresholded coefficients"},
     {"get_coeff",      Lattice_get_coeff,    METH_VARARGS, "get_coeff(ctx, element, i) -> coefficient i as Python int"},
+    {"set_coeff",      Lattice_set_coeff,    METH_VARARGS, "set_coeff(ctx, element, i, val) -> set coefficient i"},
+    {"cbd_sample",     Lattice_cbd_sample,   METH_VARARGS, "cbd_sample(ctx, eta) -> POLY with CBD(eta) coefficients"},
+    {"compress",       Lattice_compress,     METH_VARARGS, "compress(ctx, elem, d) -> compressed element"},
+    {"decompress",     Lattice_decompress,   METH_VARARGS, "decompress(ctx, elem, d) -> decompressed element"},
+    {"poly_from_coeffs", Lattice_poly_from_coeffs, METH_VARARGS, "poly_from_coeffs(ctx, list) -> POLY"},
+    {"mat_transpose", Lattice_mat_transpose, METH_VARARGS, "mat_transpose(ctx, mat) -> transposed MAT"},
     {NULL}
 };
 

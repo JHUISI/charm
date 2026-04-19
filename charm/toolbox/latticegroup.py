@@ -22,6 +22,12 @@ from charm.core.math.lattice import (
     encode as _encode,
     decode as _decode,
     get_coeff as _get_coeff,
+    set_coeff as _set_coeff,
+    cbd_sample as _cbd_sample,
+    compress as _compress,
+    decompress as _decompress,
+    poly_from_coeffs as _poly_from_coeffs,
+    mat_transpose as _mat_transpose,
 )
 
 # Re-export element type constants
@@ -149,6 +155,30 @@ class LatticeGroup:
     def get_coeff(self, elem, idx):
         """Get coefficient idx of a POLY element as a Python int."""
         return _get_coeff(self._ctx, elem, idx)
+
+    def set_coeff(self, elem, idx, val):
+        """Set coefficient idx of a POLY element."""
+        return _set_coeff(self._ctx, elem, idx, val)
+
+    def cbd_sample(self, eta):
+        """Sample a polynomial from Centered Binomial Distribution(eta)."""
+        return _cbd_sample(self._ctx, eta)
+
+    def compress(self, elem, d):
+        """Compress polynomial coefficients to d bits."""
+        return _compress(self._ctx, elem, d)
+
+    def decompress(self, elem, d):
+        """Decompress polynomial coefficients from d bits."""
+        return _decompress(self._ctx, elem, d)
+
+    def poly_from_coeffs(self, coeffs):
+        """Create a polynomial from a list of integer coefficients."""
+        return _poly_from_coeffs(self._ctx, coeffs)
+
+    def mat_transpose(self, mat):
+        """Transpose a matrix element."""
+        return _mat_transpose(self._ctx, mat)
 
     def serialize(self, elem):
         """Serialize an element to bytes."""
