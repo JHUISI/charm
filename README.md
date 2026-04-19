@@ -368,6 +368,95 @@ See `examples/xrpl_memo_demo.py` for a complete XRPL testnet flow.
 - CGGMP21: [Canetti et al. 2021](https://eprint.iacr.org/2021/060)
 - DKLS23: [Doerner et al. 2023](https://eprint.iacr.org/2023/765)
 
+### Lattice-Based Cryptography (Post-Quantum)
+
+Charm includes a lattice-based crypto module backed by [NTL](https://libntl.org/), providing polynomial ring arithmetic in R_q = Z_q[X]/(X^n+1). Requires building with `LAT_MOD=yes` (see [Installation](#installation)).
+
+**Ring-LWE Encryption (LPR scheme):**
+
+```python
+from charm.toolbox.latticegroup import LatticeGroup
+from charm.schemes.latenc.rlwe_pke import RLWE_PKE
+
+# R_q = Z_7681[X]/(X^256 + 1), ~128-bit post-quantum security
+group = LatticeGroup('RLWE-256-7681')
+rlwe = RLWE_PKE(group, sigma=3.0)
+
+(pk, sk) = rlwe.keygen()
+ciphertext = rlwe.encrypt(pk, b"Post-quantum secure!")
+plaintext = rlwe.decrypt(sk, ciphertext)[:20]
+assert plaintext == b"Post-quantum secure!"
+```
+
+**Kyber KEM (simplified ML-KEM / FIPS 203):**
+
+```python
+from charm.toolbox.latticegroup import LatticeGroup
+from charm.schemes.latenc.kyber_kem import KyberKEM
+
+# ML-KEM-768 parameters (n=256, q=3329, k=3)
+group = LatticeGroup('KYBER-768')
+kem = KyberKEM(group, 'KYBER-768')
+
+(pk, sk) = kem.keygen()
+(ciphertext, shared_secret_enc) = kem.encapsulate(pk)
+shared_secret_dec = kem.decapsulate(sk, ciphertext)
+assert shared_secret_enc == shared_secret_dec  # 32-byte shared key
+```
+
+**Dilithium Signatures (simplified ML-DSA / FIPS 204):**
+
+```python
+from charm.toolbox.latticegroup import LatticeGroup
+from charm.schemes.latenc.dilithium_sig import DilithiumSig
+
+# ML-DSA-44 parameters (n=256, q=8380417, k=4, l=4)
+group = LatticeGroup('DILITHIUM-2')
+signer = DilithiumSig(group, 'DILITHIUM-2')
+
+(pk, sk) = signer.keygen()
+signature = signer.sign(sk, b"Quantum-resistant signature")
+assert signer.verify(pk, b"Quantum-resistant signature", signature)
+assert not signer.verify(pk, b"Tampered message", signature)
+```
+
+**Working with ring elements directly:**
+
+```python
+from charm.toolbox.latticegroup import LatticeGroup, POLY, ZQ, VEC
+
+group = LatticeGroup('RLWE-256-7681')
+
+# Polynomial arithmetic in R_q = Z_7681[X]/(X^256 + 1)
+a = group.random(POLY)
+b = group.random(POLY)
+c = a * b          # polynomial multiplication mod X^n+1
+d = a + b          # polynomial addition
+e = a * 3          # scalar multiplication
+
+# Discrete Gaussian sampling (for LWE-based schemes)
+noise = group.gaussian(sigma=3.0)
+
+# Vectors and matrices (for Module-LWE schemes like Kyber)
+v = group.random_vec(3)           # vector of 3 random polynomials
+A = group.random_mat(3, 3)       # 3x3 matrix of random polynomials
+result = A * v                    # matrix-vector product
+inner = v * group.random_vec(3)   # inner product -> polynomial
+
+# Deterministic hashing and serialization
+h = group.hash(b"input data", POLY)
+data = group.serialize(a)
+a_restored = group.deserialize(data)
+assert a == a_restored
+```
+
+> **Note:** These are simplified implementations for prototyping and education.
+> They implement the core algebraic structure of ML-KEM and ML-DSA but omit
+> some hardening steps (e.g., Fujisaki-Okamoto transform for IND-CCA,
+> constant-time operations). See the NIST standards
+> ([FIPS 203](https://csrc.nist.gov/pubs/fips/203/final),
+> [FIPS 204](https://csrc.nist.gov/pubs/fips/204/final)) for production requirements.
+
 ## Schemes
 
 Charm includes implementations of many cryptographic schemes:
