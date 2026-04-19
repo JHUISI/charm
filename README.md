@@ -29,6 +29,12 @@ Charm uses a hybrid design: performance-intensive mathematical operations are im
   - Aggregate/Multi-signatures: BLS aggregation, MuSig
 * **Public-Key Encryption**: Standard and advanced PKE schemes
   - ElGamal, RSA, Paillier (homomorphic), Cramer-Shoup
+* **Post-Quantum / Lattice-Based Cryptography**: NTL-backed lattice schemes *(optional module)*
+  - Ring-LWE Public Key Encryption (LPR)
+  - Kyber-style KEM (simplified ML-KEM / FIPS 203)
+  - Dilithium-style Signatures (simplified ML-DSA / FIPS 204)
+  - Lattice-based Identity-Based Encryption (ABB10)
+  - Polynomial ring arithmetic in R_q = Z_q[X]/(X^n+1)
 * **Commitments & Secret Sharing**: Pedersen commitments, Feldman/Pedersen VSS
 
 ### Threshold Cryptography / MPC
@@ -114,15 +120,22 @@ Charm requires the following system libraries:
 | [GMP](http://gmplib.org/) | 5.0+ | Arbitrary precision arithmetic |
 | [PBC](http://crypto.stanford.edu/pbc/download.html) | 1.0.0 | Pairing-based cryptography |
 | [OpenSSL](http://www.openssl.org/source/) | 3.0+ | Cryptographic primitives |
+| [NTL](https://libntl.org/) | 11.0+ | Lattice-based cryptography *(optional)* |
 
 **Ubuntu/Debian:**
 ```bash
 sudo apt-get install libgmp-dev libssl-dev libpbc-dev flex bison
+
+# Optional: for lattice-based crypto module
+sudo apt-get install libntl-dev
 ```
 
 **macOS (Homebrew):**
 ```bash
 brew install gmp openssl@3 pbc
+
+# Optional: for lattice-based crypto module
+brew install ntl
 ```
 
 **PBC from Source** (if not available via package manager):
@@ -133,6 +146,15 @@ cd pbc-1.0.0
 ./configure && make && sudo make install
 ```
 
+**NTL from Source** (if not available via package manager):
+```bash
+wget https://libntl.org/ntl-11.6.0.tar.gz
+tar xzf ntl-11.6.0.tar.gz
+cd ntl-11.6.0/src
+./configure NTL_GMP_LIP=on SHARED=on
+make && sudo make install
+```
+
 ### From Source (Development)
 
 ```bash
@@ -140,6 +162,13 @@ git clone https://github.com/JHUISI/charm.git
 cd charm
 ./configure.sh  # add --enable-darwin on macOS
 pip install -e ".[dev]"
+```
+
+To include the lattice-based crypto module (requires NTL):
+
+```bash
+./configure.sh --enable-lattice  # add --enable-darwin on macOS
+LAT_MOD=yes pip install -e ".[dev]"
 ```
 
 ### Verify Installation
@@ -350,6 +379,7 @@ Charm includes implementations of many cryptographic schemes:
 | **Signatures** | BLS, Waters, CL04, ECDSA, Schnorr |
 | **Threshold Signatures** | GG18, CGGMP21, DKLS23 (threshold ECDSA) |
 | **Commitments** | Pedersen, Feldman VSS |
+| **Lattice (PQ)** | RLWE-PKE, Kyber KEM, Dilithium Sig, Lattice IBE |
 | **Group Signatures** | BBS+, PS16 |
 
 See the [schemes directory](charm/schemes/) for all available implementations.
