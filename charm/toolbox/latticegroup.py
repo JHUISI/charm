@@ -19,6 +19,9 @@ from charm.core.math.lattice import (
     ismember as _ismember,
     order as _order,
     degree as _degree,
+    encode as _encode,
+    decode as _decode,
+    get_coeff as _get_coeff,
 )
 
 # Re-export element type constants
@@ -132,13 +135,20 @@ class LatticeGroup:
         return _hash(self._ctx, data, elem_type)
 
     def encode(self, msg):
-        """Encode a binary message into a polynomial (1 bit per coefficient)."""
+        """Encode a binary message into a polynomial (1 bit per coefficient, scaled by q/2)."""
         if isinstance(msg, str):
             msg = msg.encode('utf-8')
-        # Convert bytes to bits, embed as coefficients scaled by q/2
-        half_q = self._q // 2
-        poly = self.random(POLY)  # placeholder — will be replaced by C-level encode
-        return poly
+        return _encode(self._ctx, msg)
+
+    def decode(self, elem, num_bytes=None):
+        """Decode a polynomial back to bytes by thresholding coefficients."""
+        if num_bytes is not None:
+            return _decode(self._ctx, elem, num_bytes * 8)
+        return _decode(self._ctx, elem)
+
+    def get_coeff(self, elem, idx):
+        """Get coefficient idx of a POLY element as a Python int."""
+        return _get_coeff(self._ctx, elem, idx)
 
     def serialize(self, elem):
         """Serialize an element to bytes."""
@@ -184,19 +194,19 @@ class LatticeGroup:
         """
         RLWE encryption.
 
-        msg_poly: a polynomial with coefficients in {0, 1} (or small values)
-                  scaled by floor(q/2)
+        msg_poly: a polynomial already scaled (output of encode(), with
+                  coefficients 0 or floor(q/2))
 
         Returns ct = (c1, c2) where:
             c1 = a*r + e1
-            c2 = b*r + e2 + floor(q/2)*msg
+            c2 = b*r + e2 + msg_poly
         """
         a, b = pk['a'], pk['b']
         r = self.gaussian(sigma)
         e1 = self.gaussian(sigma)
         e2 = self.gaussian(sigma)
         c1 = a * r + e1
-        c2 = b * r + e2 + msg_poly * (self._q // 2)
+        c2 = b * r + e2 + msg_poly
         return {'c1': c1, 'c2': c2}
 
     def rlwe_decrypt(self, sk, ct):

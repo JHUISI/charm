@@ -958,6 +958,105 @@ static PyObject *Lattice_degree(PyObject *self, PyObject *args) {
     return PyLong_FromLong(ctx->n);
 }
 
+/* encode(ctx, bytes) -> POLY with bits embedded as floor(q/2)-scaled coefficients */
+static PyObject *Lattice_encode(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    const char *data;
+    Py_ssize_t data_len;
+    if (!PyArg_ParseTuple(args, "Os#", &ctx, &data, &data_len))
+        return NULL;
+    if (!PyLatticeContext_Check((PyObject*)ctx) || !ctx->group_init) {
+        PyErr_SetString(PyExc_TypeError, "First arg must be an initialized LatticeContext");
+        return NULL;
+    }
+    /* Maximum n bits can be encoded */
+    long max_bits = ctx->n;
+    long total_bits = data_len * 8;
+    if (total_bits > max_bits) {
+        PyErr_Format(PyExc_ValueError, "Message too long: %ld bits > %ld max", total_bits, max_bits);
+        return NULL;
+    }
+
+    NTLContextGuard guard(*ctx->q);
+    ZZ half_q = *ctx->q / 2;
+    LatticeElement *elem = createElement(ctx, POLY);
+    if (!elem) return NULL;
+    elem->poly = new ZZ_pX();
+
+    for (long i = 0; i < total_bits; i++) {
+        int bit = (data[i / 8] >> (i % 8)) & 1;
+        if (bit) {
+            SetCoeff(*elem->poly, i, to_ZZ_p(half_q));
+        }
+        /* else coefficient stays 0 */
+    }
+    elem->elem_initialized = 1;
+    return (PyObject *)elem;
+}
+
+/* decode(ctx, element) -> bytes by thresholding each coefficient */
+static PyObject *Lattice_decode(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    LatticeElement *elem;
+    long num_bits = -1;
+    if (!PyArg_ParseTuple(args, "OO|l", &ctx, &elem, &num_bits))
+        return NULL;
+    if (!PyLatticeElement_Check((PyObject*)elem) || !elem->elem_initialized || elem->elem_type != POLY) {
+        PyErr_SetString(PyExc_TypeError, "Second arg must be an initialized POLY element");
+        return NULL;
+    }
+
+    NTLContextGuard guard(*ctx->q);
+    ZZ q = *ctx->q;
+    ZZ quarter_q = q / 4;
+    ZZ three_quarter_q = q - quarter_q;
+
+    if (num_bits < 0) num_bits = ctx->n;
+    long num_bytes = (num_bits + 7) / 8;
+    std::vector<unsigned char> result(num_bytes, 0);
+
+    for (long i = 0; i < num_bits; i++) {
+        ZZ coef = rep(coeff(*elem->poly, i));
+        /* Threshold: if coef is closer to q/2 than to 0, it's a 1
+         * i.e., if quarter_q <= coef <= three_quarter_q, bit = 1 */
+        if (coef >= quarter_q && coef <= three_quarter_q) {
+            result[i / 8] |= (1 << (i % 8));
+        }
+    }
+    return PyBytes_FromStringAndSize((const char *)result.data(), num_bytes);
+}
+
+/* get_coeff(ctx, element, i) -> coefficient i as Python int */
+static PyObject *Lattice_get_coeff(PyObject *self, PyObject *args) {
+    LatticeContext *ctx;
+    LatticeElement *elem;
+    long idx;
+    if (!PyArg_ParseTuple(args, "OOl", &ctx, &elem, &idx))
+        return NULL;
+    if (!PyLatticeElement_Check((PyObject*)elem) || !elem->elem_initialized) {
+        PyErr_SetString(PyExc_TypeError, "Element must be initialized");
+        return NULL;
+    }
+    if (elem->elem_type != POLY && elem->elem_type != ZQ) {
+        PyErr_SetString(PyExc_TypeError, "get_coeff only works on POLY and ZQ elements");
+        return NULL;
+    }
+    NTLContextGuard guard(*ctx->q);
+    ZZ val;
+    if (elem->elem_type == ZQ) {
+        val = rep(*elem->zq);
+    } else {
+        if (idx < 0 || idx >= ctx->n) {
+            PyErr_Format(PyExc_IndexError, "Index %ld out of range [0, %ld)", idx, ctx->n);
+            return NULL;
+        }
+        val = rep(coeff(*elem->poly, idx));
+    }
+    std::ostringstream oss;
+    oss << val;
+    return PyLong_FromString(oss.str().c_str(), NULL, 10);
+}
+
 /* =========================================================
  * Number protocol
  * ========================================================= */
@@ -993,6 +1092,9 @@ static PyMethodDef lattice_module_methods[] = {
     {"ismember",       Lattice_ismember,     METH_VARARGS, "ismember(ctx, element) -> bool"},
     {"order",          Lattice_order,        METH_VARARGS, "order(ctx) -> q"},
     {"degree",         Lattice_degree,       METH_VARARGS, "degree(ctx) -> n"},
+    {"encode",         Lattice_encode,       METH_VARARGS, "encode(ctx, bytes) -> POLY with bits as q/2-scaled coefficients"},
+    {"decode",         Lattice_decode,       METH_VARARGS, "decode(ctx, element) -> bytes from thresholded coefficients"},
+    {"get_coeff",      Lattice_get_coeff,    METH_VARARGS, "get_coeff(ctx, element, i) -> coefficient i as Python int"},
     {NULL}
 };
 
