@@ -160,5 +160,74 @@ class LatticeGroup:
         """Return the parameter set name."""
         return self._param_id
 
+    # =========================================================
+    # RLWE Primitives
+    # =========================================================
+
+    def rlwe_keygen(self, sigma=3.0):
+        """
+        RLWE key generation.
+
+        Returns (pk, sk) where:
+            pk = (a, b = a*s + e)  with a uniform, s,e Gaussian
+            sk = s
+        """
+        a = self.random(POLY)
+        s = self.gaussian(sigma)
+        e = self.gaussian(sigma)
+        b = a * s + e
+        pk = {'a': a, 'b': b}
+        sk = {'s': s}
+        return pk, sk
+
+    def rlwe_encrypt(self, pk, msg_poly, sigma=3.0):
+        """
+        RLWE encryption.
+
+        msg_poly: a polynomial with coefficients in {0, 1} (or small values)
+                  scaled by floor(q/2)
+
+        Returns ct = (c1, c2) where:
+            c1 = a*r + e1
+            c2 = b*r + e2 + floor(q/2)*msg
+        """
+        a, b = pk['a'], pk['b']
+        r = self.gaussian(sigma)
+        e1 = self.gaussian(sigma)
+        e2 = self.gaussian(sigma)
+        c1 = a * r + e1
+        c2 = b * r + e2 + msg_poly * (self._q // 2)
+        return {'c1': c1, 'c2': c2}
+
+    def rlwe_decrypt(self, sk, ct):
+        """
+        RLWE decryption.
+
+        Returns the noisy message polynomial. Caller should threshold
+        each coefficient: if closer to 0 -> 0, if closer to q/2 -> 1.
+        """
+        s = sk['s']
+        return ct['c2'] - ct['c1'] * s
+
+    # =========================================================
+    # MLWE Primitives (for Kyber/Dilithium)
+    # =========================================================
+
+    def mlwe_keygen(self, k, sigma=3.0):
+        """
+        Module-LWE key generation.
+
+        Returns (pk, sk) where:
+            pk = (A, t = A*s + e)  with A uniform k×k matrix
+            sk = s (vector of k polynomials)
+        """
+        A = self.random_mat(k, k)
+        s = self.gaussian_vec(k, sigma)
+        e = self.gaussian_vec(k, sigma)
+        t = A * s + e
+        pk = {'A': A, 't': t}
+        sk = {'s': s}
+        return pk, sk
+
     def __repr__(self):
         return f"LatticeGroup('{self._param_id}', n={self._n}, q={self._q})"
