@@ -47,7 +47,7 @@ PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 		self->bench_inprogress = FALSE;  // false until we StartBenchmark( ... )
 		self->op_add = self->op_sub = self->op_mult = 0;
 		self->op_div = self->op_exp = self->op_pair = 0;
-		self->cpu_time_ms = self->real_time_ms = 0.0;
+		self->cpu_time_secs = self->real_time_secs = 0.0;
 		self->cpu_option = self->real_option = FALSE;
     	debug("Creating new benchmark object.\n");
     }
@@ -163,13 +163,13 @@ static int PyEndBenchmark(Benchmark *data)
 			MeasureType option = data->options_selected[i];
 			debug("option => %d\n", option);
 			switch(option) {
-				case CPU_TIME:  // compute processor time or clocks per sec
-								data->cpu_time_ms = ((double)(data->stop_clock - data->start_clock))/CLOCKS_PER_SEC;
-								debug("CPU Time:\t%f\n", data->cpu_time_ms);
+				case CPU_TIME:  // compute processor time in seconds
+								data->cpu_time_secs = ((double)(data->stop_clock - data->start_clock))/CLOCKS_PER_SEC;
+								debug("CPU Time:\t%f s\n", data->cpu_time_secs);
 								break;
 				case REAL_TIME:	debug("realtime option was set!\n");
-								data->real_time_ms = CalcUsecs(&data->start_time, &data->stop_time);
-								debug("Real Time:\t%f\n", data->real_time_ms);
+								data->real_time_secs = CalcUsecs(&data->start_time, &data->stop_time);
+								debug("Real Time:\t%f s\n", data->real_time_secs);
 								break;
 				case ADDITION: 		debug("add operations:\t\t%d\n", data->op_add); break;
 				case SUBTRACTION:  debug("sub operations:\t\t%d\n", data->op_sub); break;
@@ -222,8 +222,8 @@ static int PyClearBenchmark(Benchmark *data) {
 	data->identifier = -1;
 	data->op_add = data->op_sub = data->op_mult = 0;
 	data->op_div = data->op_exp = data->op_pair = 0;
-	data->cpu_time_ms = 0.0;
-	data->real_time_ms = 0.0;
+	data->cpu_time_secs = 0.0;
+	data->real_time_secs = 0.0;
 	data->cpu_option = FALSE;
 	data->real_option = FALSE;
 	data->granular_option = FALSE;
@@ -234,9 +234,9 @@ static int PyClearBenchmark(Benchmark *data) {
 
 PyObject *Benchmark_print(Benchmark *self) {
 	if(self != NULL) {
-		PyObject *cpu = PyFloat_FromDouble(self->cpu_time_ms);
-		PyObject *real = PyFloat_FromDouble(self->real_time_ms);
-		PyObject *results = _PyUnicode_FromFormat("<--- Results --->\nCPU Time:  %Sms\nReal Time: %Ss\nAdd:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
+		PyObject *cpu = PyFloat_FromDouble(self->cpu_time_secs);
+		PyObject *real = PyFloat_FromDouble(self->real_time_secs);
+		PyObject *results = _PyUnicode_FromFormat("<--- Results --->\nCPU Time:  %Ss\nReal Time: %Ss\nAdd:\t%i\nSub:\t%i\nMul:\t%i\nDiv:\t%i\nExp:\t%i\nPair:\t%i\n",
 								cpu, real, self->op_add, self->op_sub, self->op_mult, self->op_div, self->op_exp, self->op_pair);
 
 		PyClearBenchmark(self);
@@ -248,7 +248,7 @@ PyObject *Benchmark_print(Benchmark *self) {
 PyObject *GetResults(Benchmark *self) {
 	if(self != NULL) {
 		return Py_BuildValue("{sfsfsisisisisi}",
-						"CpuTime", self->cpu_time_ms, "RealTime", self->real_time_ms,
+						"CpuTime", self->cpu_time_secs, "RealTime", self->real_time_secs,
 						"Add", self->op_add, "Sub", self->op_sub, "Mul", self->op_mult,
 						"Div", self->op_div, "Exp", self->op_exp);
 	}
@@ -259,7 +259,7 @@ PyObject *GetResults(Benchmark *self) {
 PyObject *GetResultsWithPair(Benchmark *self) {
 	if(self != NULL) {
 		return Py_BuildValue("{sfsfsisisisisisi}",
-						"CpuTime", self->cpu_time_ms, "RealTime", self->real_time_ms,
+						"CpuTime", self->cpu_time_secs, "RealTime", self->real_time_secs,
 						"Add", self->op_add, "Sub", self->op_sub, "Mul", self->op_mult,
 						"Div", self->op_div, "Exp", self->op_exp, "Pair", self->op_pair);
 	}
@@ -273,10 +273,10 @@ PyObject *Retrieve_result(Benchmark *self, char *option) {
 
 	if(self != NULL) {
 		if(strcmp(option, _CPUTIME_OPT) == 0) {
-			result = PyFloat_FromDouble(self->cpu_time_ms);
+			result = PyFloat_FromDouble(self->cpu_time_secs);
 		}
 		else if(strcmp(option, _REALTIME_OPT) == 0) {
-			result = PyFloat_FromDouble(self->real_time_ms);
+			result = PyFloat_FromDouble(self->real_time_secs);
 		}
 		else if(strcmp(option, _ADD_OPT) == 0) {
 			result = PyToLongObj(self->op_add);

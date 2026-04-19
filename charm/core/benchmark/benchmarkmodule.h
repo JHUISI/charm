@@ -80,7 +80,7 @@ typedef struct {
 
 	int op_add, op_sub, op_mult, op_div;
 	int op_exp, op_pair;
-	double cpu_time_ms, real_time_ms;
+	double cpu_time_secs, real_time_secs;
 	int num_options; // track num options for a particular benchmark
 	MeasureType options_selected[MAX_MEASURE+1]; // measurement options selected
 	int cpu_option, real_option, granular_option;

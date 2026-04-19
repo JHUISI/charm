@@ -2146,7 +2146,7 @@ PyObject *Benchmark_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     self->bench_inprogress = FALSE;  // false until we StartBenchmark( ... )
     self->op_add = self->op_sub = self->op_mult = 0;
     self->op_div = self->op_exp = self->op_pair = 0;
-    self->cpu_time_ms = self->real_time_ms = 0.0;
+    self->cpu_time_secs = self->real_time_secs = 0.0;
     self->cpu_option = self->real_option = FALSE;
     debug("Creating new benchmark object.\n");
   }
