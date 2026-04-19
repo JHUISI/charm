@@ -20,7 +20,7 @@ with only a small number of base OT calls (k base OTs for m >> k OTs).
 from charm.toolbox.securerandom import OpenSSLRand
 from charm.toolbox.bitstring import Bytes
 from charm.toolbox.ot.base_ot import SimpleOT
-from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from charm.toolbox.symcrypto import AESGCMCryptoAbstraction
 import hashlib
 import logging
 
@@ -525,8 +525,8 @@ class OTExtension:
             # Encrypt messages using authenticated encryption (AEAD)
             m0, m1 = message_pairs[i]
 
-            cipher0 = AuthenticatedCryptoAbstraction(key0)
-            cipher1 = AuthenticatedCryptoAbstraction(key1)
+            cipher0 = AESGCMCryptoAbstraction(key0)
+            cipher1 = AESGCMCryptoAbstraction(key1)
 
             y0 = cipher0.encrypt(m0)
             y1 = cipher1.encrypt(m1)
@@ -576,7 +576,7 @@ class OTExtension:
             y = y1 if r_i else y0
 
             # Decrypt with authentication
-            cipher = AuthenticatedCryptoAbstraction(key)
+            cipher = AESGCMCryptoAbstraction(key)
             try:
                 msg = cipher.decrypt(y)
             except ValueError as e:

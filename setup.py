@@ -402,10 +402,17 @@ des  = Extension(crypto_prefix + '.DES',
 des3  = Extension(crypto_prefix + '.DES3',
                     include_dirs = [cryptobase_path + 'libtom/',
                                     cryptobase_path,
-                                    crypto_path + 'DES/'], 
+                                    crypto_path + 'DES/'],
                     sources = [crypto_path + 'DES3/DES3.c'])
 
-_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3])
+aesgcm = Extension(crypto_prefix + '.AES_GCM',
+                    include_dirs = inc_dirs,
+                    sources = [crypto_path + 'AES_GCM/AES_GCM.c'],
+                    libraries=['crypto'],
+                    library_dirs=library_dirs,
+                    runtime_library_dirs=runtime_library_dirs)
+
+_ext_modules.extend([benchmark_module, cryptobase, aes, des, des3, aesgcm])
 #_ext_modules.extend([cryptobase, aes, des, des3])
 
 if platform.system() in ['Linux', 'Windows']:

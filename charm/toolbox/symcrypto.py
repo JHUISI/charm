@@ -301,11 +301,13 @@ class AESGCMCryptoAbstraction(object):
     Authenticated Encryption using AES-GCM (Galois/Counter Mode).
 
     Provides IND-CCA2 secure authenticated encryption with associated data (AEAD)
-    using AES-GCM via OpenSSL. This is the recommended symmetric encryption
-    abstraction for new code — it replaces the Encrypt-then-MAC construction
-    in AuthenticatedCryptoAbstraction with a single-pass AEAD cipher.
+    using AES-GCM via Charm's native OpenSSL-based C extension. This is the
+    recommended symmetric encryption abstraction for new code — it replaces the
+    Encrypt-then-MAC construction in AuthenticatedCryptoAbstraction with a
+    single-pass AEAD cipher.
 
-    Requires the ``cryptography`` package (``pip install cryptography``).
+    No external Python dependencies are required; the underlying implementation
+    uses OpenSSL's EVP API directly through charm.core.crypto.AES_GCM.
 
     Examples
     --------
@@ -342,24 +344,14 @@ class AESGCMCryptoAbstraction(object):
 
         Raises
         ------
-        ImportError
-            If the ``cryptography`` package is not installed.
         ValueError
             If the key length is not 16, 24, or 32 bytes.
         """
-        try:
-            from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-        except ImportError:
-            raise ImportError(
-                "AES-GCM requires the 'cryptography' package. "
-                "Install it with: pip install cryptography"
-            )
         if len(key) not in (16, 24, 32):
             raise ValueError(
                 f"AES-GCM key must be 16, 24, or 32 bytes, got {len(key)}"
             )
         self._key = key
-        self._aesgcm = AESGCM(key)
 
     def encrypt(self, message, associatedData=b''):
         """
@@ -377,13 +369,16 @@ class AESGCMCryptoAbstraction(object):
         str
             JSON-encoded ciphertext containing nonce, ciphertext+tag, and mode.
         """
+        from charm.core.crypto.AES_GCM import encrypt as _gcm_encrypt
+
         if isinstance(message, str):
             message = message.encode('utf-8')
         if isinstance(associatedData, str):
             associatedData = associatedData.encode('utf-8')
 
         nonce = os.urandom(self._NONCE_SIZE)
-        ct_and_tag = self._aesgcm.encrypt(nonce, message, associatedData or None)
+        ct_and_tag = _gcm_encrypt(self._key, message, nonce,
+                                   aad=associatedData or b'')
 
         payload = {
             'ALG': 'AES-GCM',
@@ -413,6 +408,8 @@ class AESGCMCryptoAbstraction(object):
         ValueError
             If authentication fails (data tampered or wrong key/AD).
         """
+        from charm.core.crypto.AES_GCM import decrypt as _gcm_decrypt
+
         if isinstance(associatedData, str):
             associatedData = associatedData.encode('utf-8')
 
@@ -421,7 +418,8 @@ class AESGCMCryptoAbstraction(object):
         ct_and_tag = b64decode(payload['CipherText'])
 
         try:
-            plaintext = self._aesgcm.decrypt(nonce, ct_and_tag, associatedData or None)
+            plaintext = _gcm_decrypt(self._key, ct_and_tag, nonce,
+                                      aad=associatedData or b'')
         except Exception:
             raise ValueError(
                 "Decryption failed: authentication tag is invalid "

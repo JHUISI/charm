@@ -21,7 +21,7 @@ encryption scheme capable of encrypting arbitrary-length messages.
 
 
 from charm.toolbox.pairinggroup import PairingGroup,GT,extract_key
-from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction
+from charm.toolbox.symcrypto import AESGCMCryptoAbstraction
 from charm.toolbox.ABEnc import ABEnc
 from charm.schemes.abenc.abenc_lsw08 import KPabe
 
@@ -59,14 +59,14 @@ class HybridABEnc(ABEnc):
         key = self.group.random(GT)
         c1 = abenc.encrypt(pk, key, object)
         # instantiate a symmetric enc scheme from this key
-        cipher = AuthenticatedCryptoAbstraction(extract_key(key))
+        cipher = AESGCMCryptoAbstraction(extract_key(key))
         c2 = cipher.encrypt(M)
         return { 'c1':c1, 'c2':c2 }
 
     def decrypt(self, ct, sk):
         c1, c2 = ct['c1'], ct['c2']
         key = abenc.decrypt(c1, sk)
-        cipher = AuthenticatedCryptoAbstraction(extract_key(key))
+        cipher = AESGCMCryptoAbstraction(extract_key(key))
         return cipher.decrypt(c2)
 
 def main():
