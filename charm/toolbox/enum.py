@@ -16,34 +16,41 @@ def Enum(*names):
          def getList(self):         return list(names)
 
       class EnumValue(object):
-         #__slots__ = ('__value')
-         def __init__(self, value): self.__value = value
-         Value = property(lambda self: self.__value)
+         # Use _value (single underscore) to avoid Python 3.13+ name-mangling
+         # issues with double-underscore attributes in nested classes.
+         __slots__ = ('_value',)
+         def __init__(self, value): self._value = value
+         Value = property(lambda self: self._value)
          EnumType = property(lambda self: EnumType)
-         def __hash__(self):        return hash(self.__value)
-         def __lt__(self, other): 
-             return (self.__value < other.__value)
-         def __gt__(self, other): 
-             return (self.__value > other.__value)
-         def __le__(self, other): 
-             return (self.__value <= other.__value)
-         def __ge__(self, other): 
-             return (self.__value >= other.__value)
-         def __eq__(self, other): 
-             if type(self) == int: lhs = self
-             else: lhs = self.__value
-             if type(other) == int: rhs = other
-             else: rhs = other.__value
-             return (lhs == rhs)
-         def __ne__(self, other): 
-             if type(self) == int: lhs = self
-             else: lhs = self.__value
-             if type(other) == int: rhs = other
-             else: rhs = other.__value
-             return (lhs != rhs)
-         def __invert__(self):      return constants[maximum - self.__value]
-         def __nonzero__(self):     return bool(self.__value)
-         def __repr__(self):        return str(names[self.__value])
+         def __hash__(self):        return hash(self._value)
+         def __lt__(self, other):
+             if not isinstance(other, EnumValue): return NotImplemented
+             return (self._value < other._value)
+         def __gt__(self, other):
+             if not isinstance(other, EnumValue): return NotImplemented
+             return (self._value > other._value)
+         def __le__(self, other):
+             if not isinstance(other, EnumValue): return NotImplemented
+             return (self._value <= other._value)
+         def __ge__(self, other):
+             if not isinstance(other, EnumValue): return NotImplemented
+             return (self._value >= other._value)
+         def __eq__(self, other):
+             if isinstance(other, int):
+                 return self._value == other
+             if isinstance(other, EnumValue):
+                 return self._value == other._value
+             return NotImplemented
+         def __ne__(self, other):
+             if isinstance(other, int):
+                 return self._value != other
+             if isinstance(other, EnumValue):
+                 return self._value != other._value
+             return NotImplemented
+         def __invert__(self):      return constants[maximum - self._value]
+         def __nonzero__(self):     return bool(self._value)
+         def __bool__(self):        return bool(self._value)
+         def __repr__(self):        return str(names[self._value])
 
       maximum = len(names) - 1
       constants = [None] * len(names)

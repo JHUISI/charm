@@ -1,10 +1,16 @@
 """Tests for Kyber KEM scheme."""
 
 import unittest
-from charm.toolbox.latticegroup import LatticeGroup
-from charm.schemes.latenc.kyber_kem import KyberKEM
+
+try:
+    from charm.toolbox.latticegroup import LatticeGroup
+    from charm.schemes.latenc.kyber_kem import KyberKEM
+    LATTICE_AVAILABLE = True
+except ImportError:
+    LATTICE_AVAILABLE = False
 
 
+@unittest.skipUnless(LATTICE_AVAILABLE, "Lattice module not available (NTL not installed)")
 class KyberKEMTest(unittest.TestCase):
     """Test Kyber KEM encapsulate/decapsulate."""
 

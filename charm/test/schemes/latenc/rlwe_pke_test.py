@@ -1,10 +1,16 @@
 """Tests for RLWE Public Key Encryption scheme."""
 
 import unittest
-from charm.toolbox.latticegroup import LatticeGroup
-from charm.schemes.latenc.rlwe_pke import RLWE_PKE
+
+try:
+    from charm.toolbox.latticegroup import LatticeGroup
+    from charm.schemes.latenc.rlwe_pke import RLWE_PKE
+    LATTICE_AVAILABLE = True
+except ImportError:
+    LATTICE_AVAILABLE = False
 
 
+@unittest.skipUnless(LATTICE_AVAILABLE, "Lattice module not available (NTL not installed)")
 class RLWE_PKETest(unittest.TestCase):
     """Test Ring-LWE PKE encrypt/decrypt roundtrip."""
 

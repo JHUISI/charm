@@ -1,10 +1,16 @@
 """Tests for Dilithium signature scheme."""
 
 import unittest
-from charm.toolbox.latticegroup import LatticeGroup
-from charm.schemes.latenc.dilithium_sig import DilithiumSig
+
+try:
+    from charm.toolbox.latticegroup import LatticeGroup
+    from charm.schemes.latenc.dilithium_sig import DilithiumSig
+    LATTICE_AVAILABLE = True
+except ImportError:
+    LATTICE_AVAILABLE = False
 
 
+@unittest.skipUnless(LATTICE_AVAILABLE, "Lattice module not available (NTL not installed)")
 class DilithiumSigTest(unittest.TestCase):
     """Test Dilithium sign/verify."""
 
