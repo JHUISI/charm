@@ -149,7 +149,7 @@ install_deps_ubuntu() {
     $SUDO apt-get install -y \
         build-essential gcc g++ make flex bison m4 wget git \
         python3 python3-dev python3-pip python3-venv \
-        libgmp-dev libssl-dev
+        libgmp-dev libssl-dev libntl-dev
     success "Ubuntu/Debian dependencies installed"
 }
 
@@ -158,7 +158,7 @@ install_deps_fedora() {
     $SUDO dnf install -y \
         gcc gcc-c++ make flex flex-devel bison m4 wget git \
         python3 python3-devel python3-pip \
-        gmp-devel openssl-devel \
+        gmp-devel openssl-devel ntl-devel \
         diffutils coreutils
     success "Fedora/RHEL dependencies installed"
 }
@@ -168,7 +168,7 @@ install_deps_arch() {
     $SUDO pacman -S --noconfirm --needed \
         base-devel flex bison wget git m4 \
         python python-pip \
-        gmp openssl
+        gmp openssl ntl
     success "Arch Linux dependencies installed"
 }
 
@@ -187,7 +187,7 @@ install_deps_macos() {
 
     # Issue #4: Install each package separately with proper error handling
     # Only ignore "already installed" warnings, not genuine failures
-    local brew_packages="gmp openssl@3 wget python@3"
+    local brew_packages="gmp openssl@3 ntl wget python@3"
     for pkg in $brew_packages; do
         if brew list "$pkg" &>/dev/null; then
             info "$pkg is already installed"
@@ -253,7 +253,7 @@ install_system_deps() {
                 $SUDO yum install -y \
                     gcc gcc-c++ make flex bison m4 wget git \
                     python3 python3-devel python3-pip \
-                    gmp-devel openssl-devel
+                    gmp-devel openssl-devel ntl-devel
                 success "Dependencies installed via yum"
             else
                 fatal "Unsupported distribution: $DISTRO. Please install dependencies manually."
@@ -411,9 +411,9 @@ install_from_source() {
 
     info "Configuring Charm..."
     if [ "$DISTRO" = "macos" ]; then
-        ./configure.sh --enable-darwin --prefix="$PREFIX"
+        ./configure.sh --enable-darwin --enable-lattice --prefix="$PREFIX"
     else
-        ./configure.sh --prefix="$PREFIX"
+        ./configure.sh --enable-lattice --prefix="$PREFIX"
     fi
 
     info "Building Charm (this may take several minutes)..."

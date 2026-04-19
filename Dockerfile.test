@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y \
     # Libraries
     libgmp-dev \
     libssl-dev \
+    libntl-dev \
     # Python build dependencies
     software-properties-common \
     # Debugging tools
@@ -85,6 +86,7 @@ RUN pip install pytest pytest-timeout hypothesis pyparsing
 # Set environment variables
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=/workspace:$PYTHONPATH
+ENV LAT_MOD=yes
 
 # Default command: run bash for interactive debugging
 CMD ["/bin/bash"]

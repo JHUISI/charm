@@ -20,5 +20,5 @@ RUN /tmp/install.sh --no-sudo
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 # Verify the installation
-CMD ["python3", "-c", "from charm.toolbox.pairinggroup import PairingGroup; g = PairingGroup('SS512'); print('SUCCESS: PairingGroup works!')"]
+CMD ["python3", "-c", "from charm.toolbox.pairinggroup import PairingGroup; g = PairingGroup('SS512'); print('SUCCESS: PairingGroup works!'); from charm.toolbox.latticegroup import LatticeGroup; lg = LatticeGroup(128); print('SUCCESS: LatticeGroup works!')"]
 

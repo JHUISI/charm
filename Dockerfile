@@ -3,7 +3,7 @@ LABEL maintainer="jakinye3@jhu.edu"
 
 RUN apt-get update && apt-get install --yes --no-install-recommends \
     build-essential flex bison wget subversion m4 python3 python3-dev \
-    python3-setuptools libgmp-dev libssl-dev ca-certificates \
+    python3-setuptools libgmp-dev libssl-dev libntl-dev ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Download PBC library over HTTPS and verify checksum
@@ -16,4 +16,4 @@ RUN wget --no-verbose https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz \
     && cd / && rm -rf pbc-0.5.14 pbc-0.5.14.tar.gz
 
 COPY . /charm
-RUN cd /charm && ./configure.sh && make && make install && ldconfig
+RUN cd /charm && ./configure.sh --enable-lattice && make && make install && ldconfig

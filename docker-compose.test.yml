@@ -31,6 +31,7 @@ services:
       - LD_LIBRARY_PATH=/usr/local/lib
       - PYTHONPATH=/workspace
       - PYTHON_VERSION=3.12
+      - LAT_MOD=yes
     stdin_open: true
     tty: true
 
@@ -49,6 +50,7 @@ services:
       - LD_LIBRARY_PATH=/usr/local/lib
       - PYTHONPATH=/workspace
       - PYTHON_VERSION=3.13
+      - LAT_MOD=yes
     stdin_open: true
     tty: true
 
@@ -67,6 +69,7 @@ services:
       - LD_LIBRARY_PATH=/usr/local/lib
       - PYTHONPATH=/workspace
       - PYTHON_VERSION=3.14
+      - LAT_MOD=yes
     stdin_open: true
     tty: true
     profiles:
@@ -87,6 +90,7 @@ services:
       - LD_LIBRARY_PATH=/usr/local/lib
       - PYTHONPATH=/workspace
       - PYTHON_VERSION=3.11
+      - LAT_MOD=yes
     stdin_open: true
     tty: true
     profiles:
