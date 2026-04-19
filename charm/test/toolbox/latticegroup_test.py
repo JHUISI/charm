@@ -1,9 +1,15 @@
 """Tests for LatticeGroup wrapper and core lattice operations."""
 
 import unittest
-from charm.toolbox.latticegroup import LatticeGroup, POLY, ZQ, VEC, MAT
+
+try:
+    from charm.toolbox.latticegroup import LatticeGroup, POLY, ZQ, VEC, MAT
+    LATTICE_AVAILABLE = True
+except ImportError:
+    LATTICE_AVAILABLE = False
 
 
+@unittest.skipUnless(LATTICE_AVAILABLE, "Lattice module not available (NTL not installed)")
 class LatticeGroupTest(unittest.TestCase):
     """Test LatticeGroup construction and basic operations."""
 
