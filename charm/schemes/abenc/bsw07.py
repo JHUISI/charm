@@ -23,6 +23,10 @@
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from charm.toolbox.ABEnc import ABEnc
 from charm.toolbox.msp import MSP
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext,
+)
 
 debug = False
 
@@ -85,6 +89,8 @@ class BSW07(ABEnc):
          Encrypt a message M under a policy string.
         """
 
+        # Encapsulate a random key; authenticate the application message below.
+        _message, msg = msg, self.group.random(GT)
         if debug:
             print('Encryption algorithm:\n')
 
@@ -114,16 +120,21 @@ class BSW07(ABEnc):
 
         c_m = (pk['e_gg_alpha'] ** s) * msg
 
-        return {'policy': policy, 'c0': c0, 'C': C, 'c_m': c_m}
+        _ciphertext = {'policy': policy, 'c0': c0, 'C': C, 'c_m': c_m}
+        return seal_ciphertext(
+            self.group, 'BSW07-MSP', msg, _message, _ciphertext
+        )
 
     def decrypt(self, pk, ctxt, key):
         """
          Decrypt ciphertext ctxt with key key.
         """
 
+        require_authenticated_ciphertext(ctxt)
         if debug:
             print('Decryption algorithm:\n')
 
+        validate_policy_shares(ctxt['policy'], ctxt['C'])
         nodes = self.util.prune(ctxt['policy'], key['attr_list'])
         if not nodes:
             print ("Policy not satisfied.")
@@ -138,4 +149,7 @@ class BSW07(ABEnc):
             (k_attr1, k_attr2) = key['K'][attr_stripped]
             prod *= (pair(k_attr1, c_attr1) / pair(c_attr2, k_attr2))
 
-        return (ctxt['c_m'] * prod) / (pair(key['k0'], ctxt['c0']))
+        _session_key = (ctxt['c_m'] * prod) / (pair(key['k0'], ctxt['c0']))
+        return open_ciphertext(
+            self.group, 'BSW07-MSP', _session_key, ctxt
+        )

@@ -55,15 +55,39 @@ def createTree(op, node1, node2):
 def downcaseTokens(s, loc, toks):
     return [t.lower() for t in toks]
 
+def validate_policy_shares(policy, *components):
+    """Reject policy leaves that do not match the supplied share collections.
+
+    This is a structural check, NOT authentication: changing only an operator
+    can preserve every leaf. Raw ABE callers must authenticate their inputs.
+    """
+    leaves = []
+    def visit(node):
+        if node.getNodeType() == OpType.ATTR:
+            leaves.append(node.getAttributeAndIndex())
+        else:
+            visit(node.getLeft())
+            visit(node.getRight())
+    visit(policy)
+    expected = set(leaves)
+    if len(expected) != len(leaves):
+        raise ValueError("Policy contains ambiguous duplicate share labels")
+    for shares in components:
+        if set(shares) != expected:
+            raise ValueError("Policy leaves do not match share components")
+
+
 class PolicyParser:
     def __init__(self, verbose=False):
         self.finalPol = self.getBNF()
         self.verbose = verbose
 
     def getBNF(self):
-        # supported operators => (OR, AND, <
-        OperatorOR = _set_parse_action(Literal("OR"), downcaseTokens) | Literal("or")
-        OperatorAND = _set_parse_action(Literal("AND"), downcaseTokens) | Literal("and")
+        attribute_chars = alphanums + '-_./\\?!@#$^&*%'
+        keyword_or = CaselessKeyword("or", attribute_chars)
+        keyword_and = CaselessKeyword("and", attribute_chars)
+        OperatorOR = _set_parse_action(keyword_or.copy(), downcaseTokens)
+        OperatorAND = _set_parse_action(keyword_and.copy(), downcaseTokens)
         Operator = OperatorAND | OperatorOR
         lpar = Literal("(").suppress()
         rpar = Literal(")").suppress()
@@ -71,7 +95,10 @@ class PolicyParser:
         BinOperator = Literal("<=") | Literal(">=") | Literal("==") | Word("<>", max=1)
 
         # describes an individual leaf node
-        leafNode = _set_parse_action(Optional("!") + Word(alphanums+'-_./\\?!@#$^&*%'), createAttribute)
+        leafNode = _set_parse_action(
+            Optional("!") + ~(keyword_and | keyword_or) + Word(attribute_chars),
+            createAttribute,
+        )
         # describes expressions such as (attr < value)
         leafConditional = _set_parse_action(Word(alphanums) + BinOperator + Word(nums), parseNumConditional)
 
@@ -101,9 +128,9 @@ class PolicyParser:
         del objStack[:]
         # Use parse_string (pyparsing 3.x) or parseString (pyparsing 2.x)
         if hasattr(self.finalPol, 'parse_string'):
-            self.finalPol.parse_string(string)
+            self.finalPol.parse_string(string, parse_all=True)
         else:
-            self.finalPol.parseString(string)
+            self.finalPol.parseString(string, parseAll=True)
         return self.evalStack(objStack)
 
     def findDuplicates(self, tree, _dict):

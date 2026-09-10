@@ -1,5 +1,7 @@
 """
-The serialization API supports the following datatypes: dict, list, str, bytes, int, float, and whatever is supported by group.serialize and group.deserialize
+The serialization API supports dict, list, str, bytes, int, float, Boolean
+policy trees (BinNode), and types supported by group.serialize/deserialize.
+Serialization does not authenticate the data or its policy.
 
 """
 
@@ -8,6 +10,8 @@ import io, pickle
 import json, zlib
 from base64 import *
 from charm.toolbox.bitstring import *
+from charm.toolbox.node import BinNode
+from charm.toolbox.policytree import PolicyParser
 
 def serializeDict(Object, group):
     return {
@@ -22,6 +26,7 @@ def serializeList(Object, group):
     ]
 
 serializers = {
+    BinNode: lambda obj, g: 'policy:' + str(obj),
     dict: serializeDict,
     list: serializeList,
     tuple: serializeList,
@@ -67,6 +72,8 @@ def deserializeStr(object, group):
         return str(obj)
     elif typ == 'bytes':
         return getBytes(obj)
+    elif typ == 'policy':
+        return PolicyParser().parse(obj)
 
 deserializers = {
     dict: deserializeDict,

@@ -1,3 +1,15 @@
+Unreleased
+----------
+Security / compatibility:
+- Add mandatory authenticated GT payloads to both BSW07 implementations, LSW08,
+  Waters09, Waters11, AW11, RW15, YJ14 MAABE, YAHK14, AC17, and CGW15.
+  ABE encapsulates a fresh session key; HKDF-SHA256 and AES-256-GCM protect the
+  message and ciphertext policy/context. Missing or invalid authentication
+  raises InvalidCiphertext (ValueError). Legacy ciphertexts require migration.
+- Preserve YJ14 ciphertext revocation updates; revoked users now fail payload
+  authentication. YAHK14 returns False for an unsatisfied policy instead of GT 1.
+- See docs/abe-input-integrity.md for format and security boundaries.
+
 v0.63 release (Lattice-based / post-quantum cryptography)
 ---------------------------------------------------------
 Added:

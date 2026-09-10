@@ -21,6 +21,10 @@
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext,
+)
 from charm.toolbox.ABEnc import ABEnc
 
 debug = False
@@ -69,6 +73,8 @@ class CPabe09(ABEnc):
     
     def encrypt(self, pk, M, policy_str):
         # Extract the attributes as a list
+        # Encapsulate a random key; authenticate the application message below.
+        _message, M = M, group.random(GT)
         policy = util.createPolicy(policy_str)        
         p_list = util.getAttributeList(policy)
         s = group.random()
@@ -87,10 +93,15 @@ class CPabe09(ABEnc):
                D[ p_list[i] ] = (pk['g2'] ** r)
         
         if debug: print("SessionKey: %s" % C_tilde)
-        return { 'C0':C_0, 'C':C, 'D':D , 'C_tilde':C_tilde, 'policy':policy_str, 'attribute':p_list }
+        _ciphertext = { 'C0':C_0, 'C':C, 'D':D , 'C_tilde':C_tilde, 'policy':policy_str, 'attribute':p_list }
+        return seal_ciphertext(
+            group, 'Waters09', M, _message, _ciphertext
+        )
     
     def decrypt(self, pk, sk, ct):
+        require_authenticated_ciphertext(ct)
         policy = util.createPolicy(ct['policy'])
+        validate_policy_shares(policy, ct['C'], ct['D'])
         pruned = util.prune(policy, sk['attributes'])
         if pruned == False:
             return False
@@ -111,7 +122,10 @@ class CPabe09(ABEnc):
         for i in pruned:
             j = i.getAttributeAndIndex()
             denominator *= ( pair(C[j] ** w_i[j], sk['L']) * pair(k_x[j] ** w_i[j], D[j]) )   
-        return ct['C_tilde'] / (numerator / denominator)
+        _session_key = ct['C_tilde'] / (numerator / denominator)
+        return open_ciphertext(
+            group, 'Waters09', _session_key, ct
+        )
 
 def main():
     #Get the eliptic curve with the bilinear mapping feature needed.

@@ -22,6 +22,7 @@
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,GT,pair
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.policytree import validate_policy_shares
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 
 class DACMACS(object):
@@ -132,7 +133,7 @@ class DACMACS(object):
         for attr, s_share in shares.items():
             k_attr = self.util.strip_index(attr)
             r_i = self.group.random()
-            attrPK = authAttrs[attr]
+            attrPK = authAttrs[k_attr]
             C[attr] = (GPP['g_a'] ** s_share) * ~(attrPK['PK'] ** r_i)
             D[attr] = APK['g_beta_inv'] ** r_i
             DS[attr] = ~(APK['g_beta_gamma'] ** r_i)
@@ -143,6 +144,7 @@ class DACMACS(object):
         '''Generates a token using the user's attribute secret keys to offload the decryption process (executed by cloud provider)'''
         usr_attribs = list(UASK['AK'].keys())
         policy = self.util.createPolicy(CT['policy'])
+        validate_policy_shares(policy, CT['C'], CT['D'], CT['DS'])
         pruned = self.util.prune(policy, usr_attribs)
         if pruned == False:
             return False
@@ -156,9 +158,9 @@ class DACMACS(object):
             x = attr.getAttributeAndIndex()
             y = attr.getAttribute()
             temp = \
-                pair(CT['C'][y], g_u) * \
-                pair(CT['D'][y], UASK['AK'][y]) * \
-                pair(CT['DS'][y], UASK['L'])
+                pair(CT['C'][x], g_u) * \
+                pair(CT['D'][x], UASK['AK'][y]) * \
+                pair(CT['DS'][x], UASK['L'])
             divisor *= temp ** (coeffs[x] * n_a)
         return dividend / divisor
     
@@ -191,7 +193,9 @@ class DACMACS(object):
     
     def ctupdate(self, GPP, CT, attribute, CUK):
         '''Updates the cipher-text using the update key, because of the revoked attribute (executed by cloud provider)'''
-        CT['C'][attribute] = CT['C'][attribute] * (CT['DS'][attribute] ** CUK)
+        for leaf in CT['C']:
+            if self.util.strip_index(leaf) == attribute:
+                CT['C'][leaf] *= CT['DS'][leaf] ** CUK
 
 def basicTest():
     print("RUN basicTest")

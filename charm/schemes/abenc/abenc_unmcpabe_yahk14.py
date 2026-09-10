@@ -22,6 +22,10 @@
 
 from charm.toolbox.pairinggroup import *
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext, InvalidCiphertext,
+)
 from charm.toolbox.ABEnc import *
 
 
@@ -75,7 +79,7 @@ class CPABE_YAHK14(ABEnc):
         rDotCumulative = r
         for i, idx in zip(S, range(len(S))):
             ri = group.random( )
-            if idx + 1 is len(S):
+            if idx + 1 == len(S):
                 riDot = rDotCumulative
             else:
                 riDot = group.random( )
@@ -92,6 +96,8 @@ class CPABE_YAHK14(ABEnc):
         return { 'S':S, 'D1': D1, 'D2' : D2, 'K1':K1, 'K1Dot':K1Dot, 'K2':K2, 'K2Dot':K2Dot }
 
     def encrypt(self, pp, message, policy_str):
+        # Encapsulate a random key; authenticate the application message below.
+        _message, message = message, group.random(GT)
         s = group.random()
 
         policy = util.createPolicy(policy_str)
@@ -118,30 +124,36 @@ class CPABE_YAHK14(ABEnc):
 
             #print('The exponent is ',inti)
 
-        return { 'Policy':policy_str, 'C0':C0, 'C1':C1, 'C_1':C_1, 'C_2':C_2, 'C_3':C_3 }
+        _ciphertext = { 'Policy':policy_str, 'C0':C0, 'C1':C1, 'C_1':C_1, 'C_2':C_2, 'C_3':C_3 }
+        return seal_ciphertext(
+            group, 'YAHK14', message, _message, _ciphertext
+        )
 
     def decrypt(self, pp, sk, ct):
+        require_authenticated_ciphertext(ct)
         policy = util.createPolicy(ct['Policy'])
+        validate_policy_shares(policy, ct['C_1'], ct['C_2'], ct['C_3'])
         z = util.getCoefficients(policy)
 
         # workaround to let the charm policy parser successfully parse the non-monotonic attributes
         a_list = util.getAttributeList(policy)
         nS = sk['S'][:]
         for att in a_list:
-            if att[0] == '!' and att[1:] not in sk['S']:
-                nS.append(att)
+            attribute = util.strip_index(att)
+            if attribute[0] == '!' and attribute[1:] not in sk['S']:
+                nS.append(attribute)
 
         pruned_list = util.prune(policy, nS)
 
         if (pruned_list == False):
-            return group.init(GT,1)
+            return False
 
         B = pair(ct['C1'], sk['D1'])
         for i in range(len(pruned_list)):
             x = pruned_list[i].getAttribute( ) #without the underscore
             y = pruned_list[i].getAttributeAndIndex( ) #with the underscore
 
-            a = pair( ct['C_1'][x], sk['D2'])
+            a = pair( ct['C_1'][y], sk['D2'])
             if x[0] == '!':
                 b = group.init(GT, 1)
                 inti = self.exp(int(x[1:]))
@@ -150,13 +162,16 @@ class CPABE_YAHK14(ABEnc):
                         intj = self.exp(int(xj[1:]))
                     else:
                         intj = self.exp(int(xj))
-                    b *= ( pair( ct['C_2'][x], sk['K2Dot'][str(intj)]) * pair( ct['C_3'][x], sk['K1Dot'][str(intj)]) ) ** (1 / (inti - intj))
+                    b *= ( pair( ct['C_2'][y], sk['K2Dot'][str(intj)]) * pair( ct['C_3'][y], sk['K1Dot'][str(intj)]) ) ** (1 / (inti - intj))
             else:
-                b = pair( ct['C_2'][x], sk['K2'][x]) * pair( ct['C_3'][x], sk['K1'][x])
+                b = pair( ct['C_2'][y], sk['K2'][x]) * pair( ct['C_3'][y], sk['K1'][x])
             d = - z[y]
             B *= ( a * b )**d
 
-        return ct['C0'] / B
+        _session_key = ct['C0'] / B
+        return open_ciphertext(
+            group, 'YAHK14', _session_key, ct
+        )
 
     def randomMessage(self):
         return group.random(GT)
@@ -211,12 +226,12 @@ def main():
     sk = scheme.keygen(pp, mk, {'1', '2'})
     ct = scheme.encrypt(pp, m, '!1 and 2')
     sk['S'].remove('1')
-    res = scheme.decrypt(pp, sk, ct)
-
-    if (m == res) == False:
+    try:
+        scheme.decrypt(pp, sk, ct)
+    except InvalidCiphertext:
         print("PASS: attack failed")
     else:
-        print("FAIL: attack succeeded")
+        raise AssertionError("Modified secret-key attributes were not rejected")
 
 if __name__ == '__main__':
     debug = True

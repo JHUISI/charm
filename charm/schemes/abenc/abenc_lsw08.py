@@ -22,6 +22,10 @@
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext,
+)
 from charm.toolbox.ABEnc import ABEnc
 
 debug = False
@@ -96,6 +100,8 @@ class KPabe(ABEnc):
         return False    
     
     def encrypt(self, pk, M, attr_list):   
+        # Encapsulate a random key; authenticate the application message below.
+        _message, M = M, group.random(GT)
         if debug: print('Encryption Algorithm...')    
         # s will hold secret
         t = group.init(ZR, 0)
@@ -114,10 +120,15 @@ class KPabe(ABEnc):
         
         E1 = (pk['e(gg)_alpha'] ** s) * M
         E2 = pk['g_G2'] ** s
-        return {'E1':E1, 'E2':E2, 'E3':E3, 'attributes':attr_list }
+        _ciphertext = {'E1':E1, 'E2':E2, 'E3':E3, 'attributes':attr_list }
+        return seal_ciphertext(
+            group, 'LSW08', M, _message, _ciphertext
+        )
     
     def decrypt(self, E, D):
+        require_authenticated_ciphertext(E)
         policy = util.createPolicy(D['policy'])
+        validate_policy_shares(policy, {k: v for k, v in D.items() if k != 'policy'})
         attrs = util.prune(policy, E['attributes'])
         if attrs == False:
             return False              
@@ -131,7 +142,10 @@ class KPabe(ABEnc):
                  Z[y] = pair(D[y][0], E['E2']) / pair(E['E3'][x], D[y][1])
                  prodT *= Z[y] ** coeff[y] 
        
-        return E['E1'] / prodT 
+        _session_key = E['E1'] / prodT
+        return open_ciphertext(
+            group, 'LSW08', _session_key, E
+        )
 
 def main():
     groupObj = PairingGroup('MNT224')

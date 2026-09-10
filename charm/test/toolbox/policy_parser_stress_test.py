@@ -278,12 +278,9 @@ class PolicyParserStressTest(unittest.TestCase):
             except Exception as e:
                 self.fail(f"Failed to parse attribute: {attr}\nError: {e}")
 
-    def test_underscore_limitation(self):
-        """Test that underscore + non-digits fails (known limitation)."""
-        # This is a known limitation: attr_name fails because the parser
-        # expects digits after underscore for duplicate indexing
-        with self.assertRaises(Exception):
-            self.parser.parse('attr_name')
+    def test_underscore_attribute(self):
+        """Non-numeric underscore suffixes belong to the attribute name."""
+        self.assertEqual(self.parser.parse('attr_name').getAttribute(), 'ATTR_NAME')
 
     # =========================================================================
     # Performance Tests

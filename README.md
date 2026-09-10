@@ -484,6 +484,12 @@ We welcome contributions\! Please note:
 
 ## Security
 
+The affected BSW07, LSW08, Waters09/11, AW11, RW15, YJ14 MAABE, YAHK14,
+AC17, and CGW15 implementations now authenticate GT messages and reject the
+reported policy-tampering attacks. Their new ciphertext format rejects legacy
+unauthenticated ciphertexts. See [ABE ciphertext integrity](docs/abe-input-integrity.md)
+for the exact scope, migration requirements, and revocation behavior.
+
 Charm uses the BN254 curve which provides approximately **128-bit security**. For production use:
 
 * Keep dependencies updated

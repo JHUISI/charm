@@ -1,3 +1,5 @@
+from functools import wraps
+from inspect import signature
 from charm.toolbox.enum import *
 
 # user-map
@@ -128,22 +130,22 @@ class Input:
         #print("INPUT TYPE: Defined types: ", self._types)
     
     def __call__(self, func, *args):
-        def check_input(*args):
-            result = None
-            try:
-                # check inputs
-                inputs = args[1:]
-                for i in range(0, len(self._types)):
-                   _res_type = type(self._types[i])
-                   if _res_type in [list, dict]: # make sure it's either a dict, list or tuple
-                     assert SchemeBase.verifyTypeStruct(inputs[i], self._types[i], _res_type), "invalid '%s' type for '%s'" % (self._types[i], i)
-                   else:
-                     assert SchemeBase.verifyType(inputs[i], self._types[i]), "invalid '%s' type for '%s'" % (self._types[i], i)
-                result = func(*args)
-            except Exception as e:
-                print(e)
-            return result
-        
+        func_signature = signature(func)
+
+        @wraps(func)
+        def check_input(*args, **kwargs):
+            bound = func_signature.bind(*args, **kwargs)
+            bound.apply_defaults()
+            inputs = list(bound.arguments.values())
+            if next(iter(bound.arguments), None) in ('self', 'cls'):
+                inputs = inputs[1:]
+            for i, expected in enumerate(self._types):
+                if type(expected) in (list, dict):
+                    SchemeBase.verifyTypeStruct(inputs[i], expected, type(expected))
+                elif not SchemeBase.verifyType(inputs[i], expected):
+                    raise TypeError("invalid '%s' type for argument %s" % (expected, i))
+            return func(*args, **kwargs)
+
         return check_input
 
 """
@@ -160,9 +162,10 @@ class Output:
         #print("OUTPUT TYPE: ", self._types)
 
     def __call__(self, func, *args):
-        def check_output(*args):
+        @wraps(func)
+        def check_output(*args, **kwargs):
             # we do not mask error raised by the function not related to types
-            output = func(*args)
+            output = func(*args, **kwargs)
             try:
                 # check the output        
                 if self.check_first:

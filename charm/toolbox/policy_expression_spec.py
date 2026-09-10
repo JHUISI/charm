@@ -42,7 +42,10 @@ def alland_policy_expressions(min_leaves=1, max_leaves=25):
 
 
 def attributes():
-    return text(min_size=1, alphabet=characters(whitelist_categories='L', max_codepoint=0x7e))
+    # This strategy generates valid leaf names; Boolean gates are reserved.
+    return text(min_size=1, alphabet=characters(whitelist_categories='L', max_codepoint=0x7e)).filter(
+        lambda name: name.lower() not in ('and', 'or')
+    )
 
 
 @composite

@@ -22,6 +22,10 @@
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext,
+)
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 
 debug = False
@@ -117,6 +121,8 @@ class Dabe(ABEncMultiAuth):
         #pk is a dictionary with all the attributes of all authorities put together.
         #This is legal because no attribute can be shared by more than one authority
         #{i: {'e(gg)^alpha_i: , 'g^y_i'}
+        # Encapsulate a random key; authenticate the application message below.
+        _message, M = M, group.random(GT)
         s = group.random()
         w = group.init(ZR, 0)
         egg_s = pair(gp['g'],gp['g']) ** s
@@ -139,15 +145,20 @@ class Dabe(ABEncMultiAuth):
             C2[attr] = gp['g'] ** r_x
             C3[attr] = (pk[k_attr]['g^y_i'] ** r_x) * (gp['g'] ** w_share)
             
-        return { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy_str }
+        _ciphertext = { 'C0':C0, 'C1':C1, 'C2':C2, 'C3':C3, 'policy':policy_str }
+        return seal_ciphertext(
+            group, 'AW11', M, _message, _ciphertext
+        )
 
     def decrypt(self, gp, sk, ct):
         '''Decrypt a ciphertext
         SK is the user's private key dictionary {attr: { xxx , xxx }}
         ''' 
+        require_authenticated_ciphertext(ct)
         usr_attribs = list(sk.keys())
         usr_attribs.remove('gid')
         policy = util.createPolicy(ct['policy'])
+        validate_policy_shares(policy, ct['C1'], ct['C2'], ct['C3'])
         pruned = util.prune(policy, usr_attribs)
         if pruned == False:
             raise Exception("Don't have the required attributes for decryption!")        
@@ -164,7 +175,10 @@ class Dabe(ABEncMultiAuth):
    
         if(debug): print("e(gg)^s: %s" % egg_s)
 
-        return ct['C0'] / egg_s
+        _session_key = ct['C0'] / egg_s
+        return open_ciphertext(
+            group, 'AW11', _session_key, ct
+        )
 
 def main():
     groupObj = PairingGroup('SS512')

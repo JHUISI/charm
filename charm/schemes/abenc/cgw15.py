@@ -23,6 +23,10 @@
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from charm.toolbox.ABEnc import ABEnc
 from charm.toolbox.msp import MSP
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext,
+)
 
 debug = False
 
@@ -179,6 +183,8 @@ class CGW15CPABE(ABEnc):
         Encrypt a message M under a policy string.
         """
 
+        # Encapsulate a random key; authenticate the application message below.
+        _message, msg = msg, self.group.random(GT)
         if debug:
             print('Encryption algorithm:\n')
 
@@ -244,16 +250,21 @@ class CGW15CPABE(ABEnc):
             Cx = Cx * (pk['e_gh_kA'][i] ** s[i])
         Cx = Cx * msg
 
-        return {'policy': policy, 'C_0': g_As, 'C': C, 'Cx': Cx}
+        _ciphertext = {'policy': policy, 'C_0': g_As, 'C': C, 'Cx': Cx}
+        return seal_ciphertext(
+            self.group, 'CGW15', msg, _message, _ciphertext
+        )
 
     def decrypt(self, pk, ctxt, key):
         """
         Decrypt ciphertext ctxt with key key.
         """
 
+        require_authenticated_ciphertext(ctxt)
         if debug:
             print('Decryption algorithm:\n')
 
+        validate_policy_shares(ctxt['policy'], ctxt['C'])
         nodes = self.util.prune(ctxt['policy'], key['attr_list'])
         if not nodes:
             print ("Policy not satisfied.")
@@ -274,4 +285,7 @@ class CGW15CPABE(ABEnc):
             prod1_GT *= pair(ctxt['C_0'][i], key['Kp'][i] * prod_H)
             prod2_GT *= pair(prod_G, key['K_0'][i])
 
-        return ctxt['Cx'] * prod2_GT / prod1_GT
+        _session_key = ctxt['Cx'] * prod2_GT / prod1_GT
+        return open_ciphertext(
+            self.group, 'CGW15', _session_key, ctxt
+        )

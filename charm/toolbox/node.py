@@ -16,10 +16,10 @@ class BinNode:
       if value[0] == '!': 
           value = value[1:] # remove but set flag
           self.negated = True
-      if value.find('_') != -1:
-          val = value.split('_')
-          self.index = int(val[1]) # index
-          value = val[0]
+      base, separator, suffix = value.rpartition('_')
+      if separator and suffix.isascii() and suffix.isdigit():
+          self.index = int(suffix)
+          value = base
       self.type = OpType.ATTR
       self.attribute = value.upper()      
       

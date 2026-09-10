@@ -131,8 +131,8 @@ class SecretUtil:
         self._compute_shares(shares[2], subtree.getRight(), List)
     
     def strip_index(self, node_str):
-        if node_str.find('_') != -1: return node_str.split('_')[0]
-        return node_str
+        base, separator, suffix = node_str.rpartition('_')
+        return base if separator and suffix.isascii() and suffix.isdigit() else node_str
         
     
     def createPolicy(self, policy_string):

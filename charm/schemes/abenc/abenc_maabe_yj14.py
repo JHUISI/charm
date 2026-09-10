@@ -22,6 +22,10 @@
 
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,GT,pair
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext, InvalidCiphertext,
+)
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 
 class MAABE(object):
@@ -117,6 +121,8 @@ class MAABE(object):
         #policy_str is the policy string
         #authority is the authority tuple
         
+        # Encapsulate a random key; authenticate the application message below.
+        _message, k = k, self.group.random(GT)
         _, APK, authAttrs = authority
         
         policy = self.util.createPolicy(policy_str)
@@ -135,20 +141,25 @@ class MAABE(object):
         for attr, s_share in shares.items():
             k_attr = self.util.strip_index(attr)
             r_i = self.group.random()
-            attrPK = authAttrs[attr]
+            attrPK = authAttrs[k_attr]
             C[attr] = (GPP['g_a'] ** s_share) * ~(attrPK['PK1'] ** r_i)
             CS[attr] = GPP['g'] ** r_i
             D[attr] = APK['g_beta_inv'] ** r_i
             DS[attr] = attrPK['PK2'] ** r_i
         
-        return {'C1': C1, 'C2': C2, 'C3': C3, 'C': C, 'CS': CS, 'D': D, 'DS': DS, 'policy': policy_str}
+        _ciphertext = {'C1': C1, 'C2': C2, 'C3': C3, 'C': C, 'CS': CS, 'D': D, 'DS': DS, 'policy': policy_str}
+        return seal_ciphertext(
+            self.group, 'YJ14-MAABE', k, _message, _ciphertext, mutable_fields=('C', 'DS')
+        )
         
     def decrypt(self, GPP, CT, user):
         '''Decrypts the content(-key) from the cipher-text (executed by user/content consumer)'''
+        require_authenticated_ciphertext(CT)
         UASK = user['authoritySecretKeys']
         USK = user['keys']
         usr_attribs = list(UASK['AK'].keys())
         policy = self.util.createPolicy(CT['policy'])
+        validate_policy_shares(policy, CT['C'], CT['CS'], CT['D'], CT['DS'])
         pruned = self.util.prune(policy, usr_attribs)
         if pruned == False:
             return False
@@ -164,12 +175,15 @@ class MAABE(object):
             x = attr.getAttributeAndIndex()
             y = attr.getAttribute()
             temp = \
-                pair(CT['C'][y], ugpk1) * \
-                pair(CT['D'][y], UASK['AK'][y]) * \
-                pair(CT['CS'][y], ~(UASK['KS'] ** ugsk2)) * \
-                ~pair(GPP['g'], CT['DS'][y])
+                pair(CT['C'][x], ugpk1) * \
+                pair(CT['D'][x], UASK['AK'][y]) * \
+                pair(CT['CS'][x], ~(UASK['KS'] ** ugsk2)) * \
+                ~pair(GPP['g'], CT['DS'][x])
             e_gg_auns *= temp ** (coeffs[x] * n_a)
-        return CT['C1'] / (first / e_gg_auns)
+        _session_key = CT['C1'] / (first / e_gg_auns)
+        return open_ciphertext(
+            self.group, 'YJ14-MAABE', _session_key, CT, mutable_fields=('C', 'DS')
+        )
     
     def ukeygen(self, GPP, authority, attribute, userObj):
         '''Generate update keys for users and cloud provider (executed by attribute authority?)'''
@@ -195,8 +209,10 @@ class MAABE(object):
     
     def ctupdate(self, GPP, CT, attribute, UKc):
         '''Updates the cipher-text using the update key, because of the revoked attribute (executed by cloud provider)'''
-        CT['C'][attribute] = CT['C'][attribute] * (CT['DS'][attribute] ** UKc[1])
-        CT['DS'][attribute] = CT['DS'][attribute] ** UKc[0]
+        for leaf in CT['C']:
+            if self.util.strip_index(leaf) == attribute:
+                CT['C'][leaf] *= CT['DS'][leaf] ** UKc[1]
+                CT['DS'][leaf] **= UKc[0]
 
 def basicTest():
     print("RUN basicTest")
@@ -276,10 +292,13 @@ def revokedTest():
     maabe.ctupdate(GPP, CT, attribute, UK['UKc'])
     
     PT2a = maabe.decrypt(GPP, CT, alice)
-    PT2b = maabe.decrypt(GPP, CT, bob)
-    
     assert k == PT2a, 'FAILED DECRYPTION (2a)!'
-    assert k != PT2b, 'SUCCESSFUL DECRYPTION (2b)!'
+    try:
+        maabe.decrypt(GPP, CT, bob)
+    except InvalidCiphertext:
+        pass  # Revoked keys must fail authentication, not yield corrupted plaintext.
+    else:
+        raise AssertionError('Revoked user unexpectedly decrypted the ciphertext')
     print('SUCCESSFUL DECRYPTION 2')
 
 def test():

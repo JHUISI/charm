@@ -21,6 +21,10 @@
 '''
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext,
+)
 from charm.toolbox.ABEnc import ABEnc, Input, Output
 
 # type annotations
@@ -82,6 +86,8 @@ class CPabe_BSW07(ABEnc):
     @Input(pk_t, GT, str)
     @Output(ct_t)
     def encrypt(self, pk, M, policy_str): 
+        # Encapsulate a random key; authenticate the application message below.
+        _message, M = M, group.random(GT)
         policy = util.createPolicy(policy_str)
         a_list = util.getAttributeList(policy)
         s = group.random(ZR)
@@ -94,13 +100,18 @@ class CPabe_BSW07(ABEnc):
             C_y[i] = pk['g'] ** shares[i]
             C_y_pr[i] = group.hash(j, G2) ** shares[i] 
         
-        return { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
+        _ciphertext = { 'C_tilde':(pk['e_gg_alpha'] ** s) * M,
                  'C':C, 'Cy':C_y, 'Cyp':C_y_pr, 'policy':policy_str, 'attributes':a_list }
+        return seal_ciphertext(
+            group, 'BSW07-SecretUtil', M, _message, _ciphertext
+        )
     
     @Input(pk_t, sk_t, ct_t)
     @Output(GT)
     def decrypt(self, pk, sk, ct):
+        require_authenticated_ciphertext(ct)
         policy = util.createPolicy(ct['policy'])
+        validate_policy_shares(policy, ct['Cy'], ct['Cyp'])
         pruned_list = util.prune(policy, sk['S'])
         if pruned_list == False:
             return False
@@ -110,7 +121,10 @@ class CPabe_BSW07(ABEnc):
             j = i.getAttributeAndIndex(); k = i.getAttribute()
             A *= ( pair(ct['Cy'][j], sk['Dj'][k]) / pair(sk['Djp'][k], ct['Cyp'][j]) ) ** z[j]
         
-        return ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
+        _session_key = ct['C_tilde'] / (pair(ct['C'], sk['D']) / A)
+        return open_ciphertext(
+            group, 'BSW07-SecretUtil', _session_key, ct
+        )
 
 
 def main():   

@@ -173,6 +173,13 @@ class TBPRE(object):
         
     def decrypt(self, CT, user, term = None):
         '''Decrypts the content(-key) from the cipher-text (executed by user/content consumer)'''
+        policy = CT['A']
+        if (not policy or any(not attributes for attributes in policy)
+                or CT['nA'] != lcm(len(attributes) for attributes in policy)
+                or any(len(shares) != len(policy) for shares in CT['Ut'].values())):
+            raise ValueError("Policy terms do not match share components")
+        if term is not None and (type(term) is not int or not 0 <= term < len(policy)):
+            raise ValueError("Invalid policy term")
         if term is None:
             term = self.policyTerm(user, CT['A'])
             if term is False:

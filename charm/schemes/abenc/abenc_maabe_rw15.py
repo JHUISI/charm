@@ -22,6 +22,10 @@
 
 from charm.toolbox.pairinggroup import *
 from charm.toolbox.secretutil import SecretUtil
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext,
+)
 from charm.toolbox.ABEncMultiAuth import ABEncMultiAuth
 import re
 
@@ -172,6 +176,8 @@ class MaabeRW15(ABEncMultiAuth):
         :param policy_str: The access policy to use.
         :return: The encrypted message.
         """
+        # Encapsulate a random key; authenticate the application message below.
+        _message, message = message, self.group.random(GT)
         s = self.group.random()  # secret to be shared
         w = self.group.init(ZR, 0)  # 0 to be shared
 
@@ -195,7 +201,10 @@ class MaabeRW15(ABEncMultiAuth):
             print("Encrypt")
             print(message)
             print({'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4})
-        return {'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4}
+        _ciphertext = {'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4}
+        return seal_ciphertext(
+            self.group, 'RW15', message, _message, _ciphertext
+        )
 
     def decrypt(self, gp, sk, ct):
         """
@@ -206,7 +215,9 @@ class MaabeRW15(ABEncMultiAuth):
         :return: The decrypted message.
         :raise Exception: When the access policy can not be satisfied with the user's attributes.
         """
+        require_authenticated_ciphertext(ct)
         policy = self.util.createPolicy(ct['policy'])
+        validate_policy_shares(policy, ct['C1'], ct['C2'], ct['C3'], ct['C4'])
         coefficients = self.util.getCoefficients(policy)
         pruned_list = self.util.prune(policy, sk['keys'].keys())
 
@@ -225,7 +236,10 @@ class MaabeRW15(ABEncMultiAuth):
             print(sk)
             print("Decrypted Message:")
             print(ct['C0'] / B)
-        return ct['C0'] / B
+        _session_key = ct['C0'] / B
+        return open_ciphertext(
+            self.group, 'RW15', _session_key, ct
+        )
 
 
 if __name__ == '__main__':

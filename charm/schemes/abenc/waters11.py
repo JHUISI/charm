@@ -23,6 +23,10 @@
 from charm.toolbox.pairinggroup import PairingGroup, ZR, G1, G2, GT, pair
 from charm.toolbox.ABEnc import ABEnc
 from charm.toolbox.msp import MSP
+from charm.toolbox.policytree import validate_policy_shares
+from charm.toolbox.abeintegrity import (
+    seal_ciphertext, open_ciphertext, require_authenticated_ciphertext,
+)
 
 debug = False
 
@@ -84,6 +88,8 @@ class Waters11(ABEnc):
          Encrypt a message M under a monotone span program.
         """
 
+        # Encapsulate a random key; authenticate the application message below.
+        _message, msg = msg, self.group.random(GT)
         if debug:
             print('Encryption algorithm:\n')
 
@@ -116,16 +122,21 @@ class Waters11(ABEnc):
 
         c_m = (pk['e_gg_alpha'] ** s) * msg
 
-        return {'policy': policy, 'c0': c0, 'C': C, 'D': D, 'c_m': c_m}
+        _ciphertext = {'policy': policy, 'c0': c0, 'C': C, 'D': D, 'c_m': c_m}
+        return seal_ciphertext(
+            self.group, 'Waters11', msg, _message, _ciphertext
+        )
 
     def decrypt(self, pk, ctxt, key):
         """
          Decrypt ciphertext ctxt with key key.
         """
 
+        require_authenticated_ciphertext(ctxt)
         if debug:
             print('Decryption algorithm:\n')
 
+        validate_policy_shares(ctxt['policy'], ctxt['C'], ctxt['D'])
         nodes = self.util.prune(ctxt['policy'], key['attr_list'])
         if not nodes:
             print ("Policy not satisfied.")
@@ -140,4 +151,7 @@ class Waters11(ABEnc):
             prodG *= ctxt['C'][attr]
             prodGT *= pair(key['K'][attr_stripped], ctxt['D'][attr])
 
-        return (ctxt['c_m'] * pair(prodG, key['L']) * prodGT) / (pair(key['k0'], ctxt['c0']))
+        _session_key = (ctxt['c_m'] * pair(prodG, key['L']) * prodGT) / (pair(key['k0'], ctxt['c0']))
+        return open_ciphertext(
+            self.group, 'Waters11', _session_key, ctxt
+        )
